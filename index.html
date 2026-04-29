@@ -404,4 +404,2916 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
     <div class="section-tabs">
       <button class="sec-tab active" onclick="switchSec('gift','new-order',this)">➕ New Order</button>
       <button class="sec-tab" onclick="switchSec('gift','orders',this)">📋 Orders</button>
-      <button class="sec-tab" onclick="switchSec('gift','tracking',this)">🚚 Tracking<
+      <button class="sec-tab" onclick="switchSec('gift','tracking',this)">🚚 Tracking</button>
+      <button class="sec-tab" onclick="switchSec('gift','report',this)">📊 Report</button>
+    </div>
+
+    <div class="section gift active" id="gift-new-order">
+      <div class="card">
+        <div class="card-title">🎁 <span style="color:var(--pink)">Gift Order</span> - Customer விவரம்</div>
+        <div class="grid g4">
+          <div><label>Customer பெயர் *</label><input type="text" id="g-cname" placeholder="பெயர்"></div>
+          <div><label>Mobile Number *</label><input type="tel" id="g-phone" placeholder="9876543210" maxlength="10"></div>
+          <div><label>Order Date</label><input type="date" id="g-orderdate"></div>
+          <div><label>Order No #</label><input type="text" id="g-ordno" readonly></div>
+        </div>
+        <div class="grid g2">
+          <div><label>Delivery Address *</label><textarea id="g-addr" rows="2" placeholder="வீடு, தெரு, ஊர், PIN"></textarea></div>
+          <div><label>Special Note / Gift Message</label><textarea id="g-note" rows="2" placeholder="Birthday wish..."></textarea></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📦 Product விவரம்</div>
+        <div class="grid g3">
+          <div>
+            <label>Product Category <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து save பண்ணலாம்)</span></label>
+            <div style="position:relative;">
+              <input type="text" id="g-cat" list="g-cat-list" placeholder="Category தேர்வு / Type பண்ணவும்" oninput="filterGiftCatSuggestions()">
+              <datalist id="g-cat-list">
+                <option>Soft Toys</option><option>Photo Gifts</option><option>Mugs & Bottles</option><option>Cushions</option><option>Keychains</option><option>Jewellery Box</option><option>Chocolate Basket</option><option>Perfume Set</option><option>Custom Gift</option><option>Other</option>
+              </datalist>
+            </div>
+          </div>
+          <div><label>Product பெயர்</label><input type="text" id="g-prod" placeholder="e.g. Teddy Bear 2ft"></div>
+          <div><label>Quantity</label><input type="number" id="g-qty" value="1" min="1" oninput="calcGiftTotal()"></div>
+        </div>
+        <div class="grid g3">
+          <div><label>MRP (₹) - Per Item</label><input type="number" id="g-mrp" placeholder="0" oninput="calcGiftTotal()"></div>
+          <div><label>Rate per item (₹)</label><input type="number" id="g-rate" placeholder="0" oninput="calcGiftTotal()"></div>
+          <div>
+            <label>Total Amount (₹)</label>
+            <input type="number" id="g-total-display" placeholder="0" readonly style="font-weight:800;color:var(--gold);">
+          </div>
+        </div>
+        <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+          <span style="font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</span>
+          <button class="btn btn-ghost btn-sm" onclick="openQREditor('gift')" style="font-size:0.72rem;padding:3px 10px;">✏️ Edit Quick Rates</button>
+        </div>
+        <div id="gift-qr-btns" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
+        <div class="grid g3">
+          <div><label>Payment Method</label><select id="g-pay" onchange="toggleGiftUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
+          <div id="g-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="g-upi-id" placeholder="example@upi"></div>
+          <div><label>Payment Status</label><select id="g-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
+        </div>
+        <div class="grid g3">
+          <div><label>Advance Paid (₹)</label><input type="number" id="g-advance" placeholder="0" oninput="calcGiftBalance()"></div>
+          <div><label>Balance (₹)</label><input type="number" id="g-balance-display" placeholder="0" readonly style="color:var(--red);font-weight:700;"></div>
+          <div>
+            <label>Shipping Courier <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து புதிய courier சேர்க்கலாம்)</span></label>
+            <input type="text" id="g-courier" list="g-courier-list" placeholder="Courier தேர்வு / Type பண்ணவும்" oninput="toggleGiftDelivered();toggleGiftOfflineSale()">
+            <datalist id="g-courier-list">
+              <option>-- Self Pickup --</option><option>ST Courier</option><option>DTDC</option><option>Blue Dart</option><option>Delhivery</option><option>India Post</option><option>Ekart</option><option>✅ Delivered</option><option>Other</option>
+            </datalist>
+          </div>
+        </div>
+        <div id="g-delivered-note" style="display:none;padding:8px 12px;background:rgba(26,138,80,0.1);border:1px solid rgba(26,138,80,0.3);border-radius:8px;font-size:0.82rem;color:var(--green);font-weight:700;margin-bottom:8px;">✅ கடையில் வந்து வாங்கினார் — Courier தேவையில்லை. Bill Save-ஐ Click பண்ணினதும் Print Option வரும்!</div>
+        <div class="grid g2">
+          <div><label>Tracking ID</label><input type="text" id="g-track" placeholder="Optional"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-pink" onclick="saveGiftOrder()">💾 Order Save பண்ணு</button>
+          <button class="btn btn-ghost" onclick="clearGiftForm()">🗑️ Clear</button>
+          <button id="g-print-btn" class="btn btn-gold" style="display:none;" onclick="doPrint()">🖨️ Print Bill</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section gift" id="gift-orders">
+      <div class="stats" id="gift-stats"></div>
+      <div class="card">
+        <div class="card-title">📋 Gift Orders</div>
+        <div class="grid g3" style="margin-bottom:12px;">
+          <div><label>தேடு</label><input type="text" id="g-search" placeholder="தேடவும்..." oninput="renderGiftOrders()"></div>
+          <div><label>Payment Filter</label><select id="g-filter-pay" onchange="renderGiftOrders()"><option value="">எல்லாம்</option><option value="paid">Paid</option><option value="partial">Partial</option><option value="pending">Pending</option></select></div>
+          <div><label>Courier Filter</label><select id="g-filter-courier" onchange="renderGiftOrders()"><option value="">எல்லாம்</option><option>-- Self Pickup --</option><option>DTDC</option><option>Blue Dart</option><option>Delhivery</option></select></div>
+        </div>
+        <div id="gift-orders-list"></div>
+      </div>
+    </div>
+
+    <div class="section gift" id="gift-tracking">
+      <div class="card">
+        <div class="card-title">🚚 Shipment Tracking</div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Order #</th><th>Customer</th><th>Courier</th><th>Tracking ID</th><th>Status</th><th>Update</th></tr></thead><tbody id="gift-track-body"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="section gift" id="gift-report">
+      <div class="stats" id="gift-report-stats"></div>
+      <div class="card">
+        <div class="card-title">📊 Report</div>
+        <div class="grid g2" style="margin-bottom:12px;">
+          <div><label>From Date</label><input type="date" id="g-from"></div>
+          <div><label>To Date</label><input type="date" id="g-to"></div>
+        </div>
+        <button class="btn btn-pink btn-sm" onclick="renderGiftReport()">🔍 Show</button>
+        <div class="tbl-wrap" style="margin-top:14px;"><table class="tbl"><thead><tr><th>Order #</th><th>Date</th><th>Customer</th><th>Product</th><th>Amount</th><th>Payment</th><th>Bill</th></tr></thead><tbody id="gift-report-body"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FRAME ══ -->
+  <div class="page frame" id="page-frame">
+    <div class="section-tabs">
+      <button class="sec-tab active" onclick="switchSec('frame','new-order',this)">➕ New Order</button>
+      <button class="sec-tab" onclick="switchSec('frame','orders',this)">📋 Orders</button>
+      <button class="sec-tab" onclick="switchSec('frame','tracking',this)">🚚 Tracking</button>
+      <button class="sec-tab" onclick="switchSec('frame','report',this)">📊 Report</button>
+    </div>
+
+    <div class="section frame active" id="frame-new-order">
+      <div class="card">
+        <div class="card-title">🖼️ <span style="color:var(--blue)">Frame Order</span> - Customer விவரம்</div>
+        <div class="grid g4">
+          <div><label>Customer பெயர் *</label><input type="text" id="f-cname" placeholder="பெயர்"></div>
+          <div><label>Mobile Number *</label><input type="tel" id="f-phone" placeholder="9876543210" maxlength="10"></div>
+          <div><label>Order Date</label><input type="date" id="f-orderdate"></div>
+          <div><label>Order No #</label><input type="text" id="f-ordno" readonly></div>
+        </div>
+        <div class="grid g2">
+          <div><label>Delivery Address</label><textarea id="f-addr" rows="2" placeholder="வீடு, தெரு, ஊர், PIN"></textarea></div>
+          <div><label>Special Instructions</label><textarea id="f-note" rows="2" placeholder="Black frame with white mat..."></textarea></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🖼️ Frame விவரம்</div>
+        <div class="grid g4">
+          <div>
+            <label>Frame Type <span style="font-size:0.7rem;color:var(--blue);">(Type செய்து custom சேர்க்கலாம்)</span></label>
+            <input type="text" id="f-type" list="f-type-list" placeholder="Frame type தேர்வு / Type பண்ணவும்">
+            <datalist id="f-type-list">
+              <option>Photo Frame</option><option>Canvas Print</option><option>Poster Frame</option><option>Shadow Box</option><option>Mirror Frame</option><option>Certificate Frame</option><option>Collage Frame</option><option>Custom Frame</option><option>Couple Photo</option><option>Sammi Photo</option><option>Family Photo</option><option>Kids Photo</option>
+            </datalist>
+          </div>
+          <div><label>Frame Size</label><select id="f-size"><option>4×6 inch</option><option>5×7 inch</option><option>6×8 inch</option><option>8×10 inch</option><option>10×12 inch</option><option>12×16 inch</option><option>16×20 inch</option><option>A4</option><option>A3</option><option>Custom Size</option></select></div>
+          <div><label>Custom Size</label><input type="text" id="f-csize" placeholder="e.g. 18×24 inch"></div>
+          <div><label>Quantity</label><input type="number" id="f-qty" value="1" min="1"></div>
+        </div>
+        <div class="grid g2">
+          <div><label>🎨 Customised Name / Text <span style="font-size:0.72rem;color:var(--purple);font-weight:700;">(Frame-ல் print பண்ண வேண்டிய பெயர்)</span></label><input type="text" id="f-customname" placeholder="e.g. Our Wedding Anniversary 2024"></div>
+          <div><label>Text Style / Color Details</label><input type="text" id="f-customdetail" placeholder="e.g. Gold font, bottom center..."></div>
+        </div>
+        <div class="grid g4">
+          <div><label>Material</label><select id="f-material"><option>Wood - Basic</option><option>Wood - Premium</option><option>Metal</option><option>Plastic</option><option>Acrylic</option><option>Synthetic Wood</option></select></div>
+          <div><label>Color</label><select id="f-color"><option>Black</option><option>Brown</option><option>White</option><option>Golden</option><option>Silver</option><option>Natural Wood</option><option>Custom</option></select></div>
+          <div><label>Photo Printing?</label><select id="f-print"><option value="no">No (Customer Photo)</option><option value="yes">Yes (Print Here)</option></select></div>
+          <div><label>Rate (₹)</label><input type="number" id="f-rate" placeholder="0" oninput="calcFrameTotal()"></div>
+        </div>
+        <div class="grid g3" style="margin-top:8px;">
+          <div><label>MRP (₹) - Per Item</label><input type="number" id="f-mrp" placeholder="0" oninput="calcFrameTotal()"></div>
+          <div><label>Total Amount (₹)</label><input type="number" id="f-total-display" placeholder="0" readonly style="font-weight:800;color:var(--blue);"></div>
+          <div><label>Balance (₹)</label><input type="number" id="f-balance-display" placeholder="0" readonly style="color:var(--red);font-weight:700;"></div>
+        </div>
+        <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+          <span style="font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</span>
+          <button class="btn btn-ghost btn-sm" onclick="openQREditor('frame')" style="font-size:0.72rem;padding:3px 10px;">✏️ Edit Quick Rates</button>
+        </div>
+        <div id="frame-qr-btns" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
+        <div class="grid g3">
+          <div><label>Payment Method</label><select id="f-pay" onchange="toggleFrameUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
+          <div id="f-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="f-upi-id" placeholder="example@upi"></div>
+          <div><label>Payment Status</label><select id="f-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
+          <div><label>Advance Paid (₹)</label><input type="number" id="f-advance" placeholder="0" oninput="calcFrameBalance()"></div>
+        </div>
+        <div class="grid g2">
+          <div>
+            <label>Courier <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து புதிய courier சேர்க்கலாம்)</span></label>
+            <input type="text" id="f-courier" list="f-courier-list" placeholder="Courier தேர்வு / Type பண்ணவும்" oninput="toggleFrameDelivered()">
+            <datalist id="f-courier-list">
+              <option>-- Self Pickup --</option><option>ST Courier</option><option>DTDC</option><option>Blue Dart</option><option>Delhivery</option><option>India Post</option><option>Ekart</option><option>✅ Delivered</option><option>Other</option>
+            </datalist>
+          </div>
+          <div><label>Tracking ID</label><input type="text" id="f-track" placeholder="Optional"></div>
+        </div>
+        <div id="f-delivered-note" style="display:none;padding:8px 12px;background:rgba(26,138,80,0.1);border:1px solid rgba(26,138,80,0.3);border-radius:8px;font-size:0.82rem;color:var(--green);font-weight:700;margin-bottom:8px;">✅ கடையில் வந்து வாங்கினார் — Courier தேவையில்லை. Bill Save-ஐ Click பண்ணினதும் Print Option வரும்!</div>
+        <div class="btn-row">
+          <button class="btn btn-blue" onclick="saveFrameOrder()">💾 Order Save பண்ணு</button>
+          <button class="btn btn-ghost" onclick="clearFrameForm()">🗑️ Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section frame" id="frame-orders">
+      <div class="stats" id="frame-stats"></div>
+      <div class="card">
+        <div class="card-title">📋 Frame Orders</div>
+        <div class="grid g3" style="margin-bottom:12px;">
+          <div><label>தேடு</label><input type="text" id="f-search" placeholder="தேடவும்..." oninput="renderFrameOrders()"></div>
+          <div><label>Payment Filter</label><select id="f-filter-pay" onchange="renderFrameOrders()"><option value="">எல்லாம்</option><option value="paid">Paid</option><option value="partial">Partial</option><option value="pending">Pending</option></select></div>
+          <div><label>Size Filter</label><select id="f-filter-size" onchange="renderFrameOrders()"><option value="">எல்லாம்</option><option>4×6 inch</option><option>5×7 inch</option><option>8×10 inch</option><option>A4</option></select></div>
+        </div>
+        <div id="frame-orders-list"></div>
+      </div>
+    </div>
+
+    <div class="section frame" id="frame-tracking">
+      <div class="card">
+        <div class="card-title">🚚 Frame Tracking</div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Order #</th><th>Customer</th><th>Size</th><th>Courier</th><th>Tracking ID</th><th>Status</th><th>Update</th></tr></thead><tbody id="frame-track-body"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="section frame" id="frame-report">
+      <div class="stats" id="frame-report-stats"></div>
+      <div class="card">
+        <div class="card-title">📊 Frame Report</div>
+        <div class="grid g2" style="margin-bottom:12px;">
+          <div><label>From Date</label><input type="date" id="f-from"></div>
+          <div><label>To Date</label><input type="date" id="f-to"></div>
+        </div>
+        <button class="btn btn-blue btn-sm" onclick="renderFrameReport()">🔍 Show</button>
+        <div class="tbl-wrap" style="margin-top:14px;"><table class="tbl"><thead><tr><th>Order #</th><th>Date</th><th>Customer</th><th>Frame</th><th>Size</th><th>Amount</th><th>Payment</th><th>Bill</th></tr></thead><tbody id="frame-report-body"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ XEROX ══ -->
+  <div class="page xerox" id="page-xerox">
+    <div class="section-tabs">
+      <button class="sec-tab active" onclick="switchSec('xerox','new-bill',this)">➕ New Bill</button>
+      <button class="sec-tab" onclick="switchSec('xerox','history',this)">📋 History</button>
+      <button class="sec-tab" onclick="switchSec('xerox','report',this)">📊 Report</button>
+    </div>
+
+    <div class="section xerox active" id="xerox-new-bill">
+      <div class="card">
+        <div class="card-title">🖨️ <span style="color:var(--green)">Xerox Stationery Item and Money Transfers and Net Center</span> Bill</div>
+        <div class="grid g3">
+          <div><label>Bill No #</label><input type="text" id="x-billno" readonly></div>
+          <div><label>Customer பெயர் <span style="font-size:0.7rem;color:var(--green);">(optional)</span></label><input type="text" id="x-custname" placeholder="e.g. Ravi Kumar"></div>
+          <div><label>Bill Date</label><input type="date" id="x-billdate"></div>
+        </div>
+        <div class="grid g2">
+          <div><label>Reference (optional)</label><input type="text" id="x-ref" placeholder="e.g. Office, School name"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">➕ Item சேர்</div>
+        <div class="grid g4">
+          <div>
+            <label>Category <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து save)</span></label>
+            <input type="text" id="x-cat" list="x-cat-list" placeholder="Category தேர்வு / Type பண்ணவும்" oninput="updateXItemSuggestions()">
+            <datalist id="x-cat-list">
+              <option>Xerox / Photocopy</option><option>Color Print</option><option>B&W Print</option><option>Lamination</option><option>Spiral Binding</option><option>Notebook</option><option>Pen / Pencil</option><option>Eraser / Scale</option><option>Stapler / Pins</option><option>File / Folder</option><option>Envelope</option><option>Money Transfer</option><option>Net Center / Internet</option><option>Other Stationery</option>
+            </datalist>
+          </div>
+          <div>
+            <label>Item விவரம் <span style="font-size:0.7rem;color:var(--purple);">(1-2 எழுத்து type → suggestions)</span></label>
+            <input type="text" id="x-item" list="x-item-list" placeholder="e.g. A4 Xerox" oninput="updateXItemSuggestions()">
+            <datalist id="x-item-list"></datalist>
+          </div>
+          <div><label>Quantity</label><input type="number" id="x-qty" value="1" min="1"></div>
+          <div><label>Rate (₹)</label><input type="number" id="x-rate" placeholder="0" step="0.5"></div>
+        </div>
+        <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+          <span style="font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</span>
+          <button class="btn btn-ghost btn-sm" onclick="openQREditor('xerox')" style="font-size:0.72rem;padding:3px 10px;">✏️ Edit Quick Rates</button>
+        </div>
+        <div id="xerox-qr-btns" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"></div>
+        <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-green" onclick="addXItem()">➕ Item சேர்</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🧾 Bill Preview</div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Item</th><th>Category</th><th>Qty</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="x-bill-body"><tr><td colspan="7" class="empty"><div class="empty-icon">🖨️</div>Item சேர்க்கவில்லை</td></tr></tbody></table></div>
+        <div style="max-width:280px;margin-left:auto;margin-top:12px;">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:0.85rem;color:var(--text2);"><span>Subtotal</span><span id="x-sub">₹0.00</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;align-items:center;gap:8px;">
+            <span style="font-size:0.85rem;color:var(--text2);">Discount ₹</span>
+            <input type="number" id="x-disc" value="0" style="width:80px;text-align:right;" oninput="calcXTotal()">
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:1.1rem;font-weight:800;border-top:1px solid var(--border);margin-top:6px;"><span>மொத்தம்</span><span id="x-grand" style="color:var(--green);">₹0.00</span></div>
+        </div>
+        <div class="grid g2" style="margin-top:10px;">
+          <div><label>Payment Method</label><select id="x-pay" onchange="toggleXeUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Pending</option></select></div>
+          <div id="x-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="x-upi-id" placeholder="example@upi"></div>
+          <div><label>Note (optional)</label><input type="text" id="x-note" placeholder="School project..."></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-green" onclick="saveXBill()">💾 Bill Save பண்ணு</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearXBill()">🗑️ Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section xerox" id="xerox-history">
+      <div class="stats" id="xerox-stats"></div>
+      <div class="card">
+        <div class="card-title">📋 Bills History</div>
+        <div class="grid g2" style="margin-bottom:12px;">
+          <div><label>தேடு</label><input type="text" id="x-search" placeholder="தேடவும்..." oninput="renderXHistory()"></div>
+          <div><label>Payment Filter</label><select id="x-filter-pay" onchange="renderXHistory()"><option value="">எல்லாம்</option><option value="Cash">Cash</option><option value="UPI / GPay">UPI</option><option value="Pending">Pending</option></select></div>
+        </div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Bill #</th><th>Date</th><th>Customer</th><th>Reference</th><th>Items</th><th>Payment</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="x-history-body"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="section xerox" id="xerox-report">
+      <div class="stats" id="xerox-report-stats"></div>
+      <div class="card">
+        <div class="card-title">📊 Xerox Report</div>
+        <div class="grid g2" style="margin-bottom:12px;">
+          <div><label>From Date</label><input type="date" id="x-from"></div>
+          <div><label>To Date</label><input type="date" id="x-to"></div>
+        </div>
+        <button class="btn btn-green btn-sm" onclick="renderXReport()">🔍 Show</button>
+        <div class="tbl-wrap" style="margin-top:14px;"><table class="tbl"><thead><tr><th>Bill #</th><th>Date</th><th>Items</th><th>Amount</th><th>Payment</th><th>Bill</th></tr></thead><tbody id="xerox-report-body"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STUDIO ══ -->
+  <div class="page studio" id="page-studio">
+    <div class="section-tabs">
+      <button class="sec-tab active" onclick="switchSec('studio','new-booking',this)">📷 Passport Photo</button>
+      <button class="sec-tab" onclick="switchSec('studio','frame-order',this)">🖼️ Frame Order</button>
+      <button class="sec-tab" onclick="switchSec('studio','bookings',this)">📋 Bookings</button>
+      <button class="sec-tab" onclick="switchSec('studio','report',this)">📊 Report</button>
+    </div>
+
+    <!-- PASSPORT PHOTO PAGE -->
+    <div class="section studio active" id="studio-new-booking">
+      <div class="card">
+        <div class="card-title">📷 <span style="color:var(--purple)">Passport Size Photo</span> - Bill</div>
+        <div class="grid g3">
+          <div><label>Customer பெயர் *</label><input type="text" id="st-cname" placeholder="பெயர்"></div>
+          <div><label>Mobile Number *</label><input type="tel" id="st-phone" placeholder="9876543210" maxlength="10"></div>
+          <div><label>Booking No #</label><input type="text" id="st-bookno" readonly></div>
+        </div>
+        <div class="grid g3">
+          <div><label>Booking Date</label><input type="date" id="st-bookdate"></div>
+          <div><label>WhatsApp Number</label><input type="tel" id="st-whatsapp" placeholder="9876543210" maxlength="10"></div>
+          <div><label>Email</label><input type="email" id="st-email" placeholder="email@example.com"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📸 Photo விவரம் (Service Type)</div>
+        <div class="grid g3">
+          <div>
+            <label>Service Type / Category <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து custom சேர்க்கலாம்)</span></label>
+            <input type="text" id="st-service" list="st-service-list" placeholder="Service type தேர்வு / Type பண்ணவும்">
+            <datalist id="st-service-list">
+              <option>Passport Size Photo</option><option>Visa Photo</option><option>ID Card Photo</option><option>School Photo</option><option>Portrait Photography</option><option>Wedding Photography</option><option>Baby Shoot</option><option>Birthday Shoot</option><option>Event Photography</option><option>Product Photography</option><option>Maternity Shoot</option><option>Corporate Photography</option><option>Video Shoot</option><option>Album Design</option><option>Photo Editing</option><option>Custom Studio Work</option>
+            </datalist>
+          </div>
+          <div><label>Photo எடுத்த வருடம் / Occasion</label><input type="text" id="st-package" placeholder="e.g. 2024, Wedding, School..."></div>
+          <div><label>No. of Copies / Photos</label><input type="number" id="st-photos" placeholder="0" value="1"></div>
+        </div>
+        <div style="margin:10px 0 4px;font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('Passport Size Photo',30)">📷 Passport ₹30</button>
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('Visa Photo',50)">🌍 Visa ₹50</button>
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('ID Card Photo',20)">🪪 ID Card ₹20</button>
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('School Photo',25)">🏫 School ₹25</button>
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('Portrait Photography',200)">🎨 Portrait ₹200</button>
+        </div>
+        <div class="grid g4">
+          <div><label>Rate (₹)</label><input type="number" id="st-rate" placeholder="0" oninput="calcStudioTotal()"></div>
+          <div><label>Total Amount (₹)</label><input type="number" id="st-total-display" placeholder="0" readonly style="font-weight:800;color:var(--purple);"></div>
+          <div><label>Advance Paid (₹)</label><input type="number" id="st-advance" placeholder="0" oninput="calcStudioBalance()"></div>
+          <div><label>Balance (₹)</label><input type="number" id="st-balance-display" placeholder="0" readonly style="color:var(--red);font-weight:700;"></div>
+        </div>
+        <div class="grid g3">
+          <div><label>Payment Method</label><select id="st-pay" onchange="toggleStudioUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
+          <div id="st-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="st-upi-id" placeholder="example@upi"></div>
+          <div><label>Payment Status</label><select id="st-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial (Advance)</option><option value="pending">⏳ Pending</option></select></div>
+        </div>
+        <div style="margin-bottom:10px;"><label>Note</label><input type="text" id="st-addr" placeholder="Special requirements..."></div>
+        <input type="hidden" id="st-duration" value="Instant">
+        <input type="hidden" id="st-session-dt" value="">
+        <input type="hidden" id="st-delivery" value="Printed Photos">
+        <input type="hidden" id="st-delivdays" value="0">
+        <input type="hidden" id="st-note" value="">
+        <div class="btn-row">
+          <button class="btn" style="background:var(--purple);color:#fff;" onclick="saveStudioBooking()">💾 Bill Save பண்ணு</button>
+          <button class="btn btn-ghost" onclick="clearStudioForm()">🗑️ Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STUDIO FRAME ORDER PAGE -->
+    <div class="section studio" id="studio-frame-order">
+      <div class="card">
+        <div class="card-title">🖼️ <span style="color:var(--blue)">Studio Frame Order</span> - Customer விவரம்</div>
+        <div class="grid g3">
+          <div><label>Customer பெயர் *</label><input type="text" id="sf-cname" placeholder="பெயர்"></div>
+          <div><label>Mobile Number *</label><input type="tel" id="sf-phone" placeholder="9876543210" maxlength="10"></div>
+          <div><label>Order Date</label><input type="date" id="sf-date"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🖼️ Frame விவரம்</div>
+        <div class="grid g3">
+          <div>
+            <label>Frame Type <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து custom சேர்க்கலாம்)</span></label>
+            <input type="text" id="sf-type" list="sf-type-list" placeholder="Frame type தேர்வு / Type பண்ணவும்">
+            <datalist id="sf-type-list">
+              <option>Passport Frame</option><option>Photo Frame</option><option>Canvas Print</option><option>Poster Frame</option><option>Shadow Box</option><option>Mirror Frame</option><option>Certificate Frame</option><option>Collage Frame</option><option>Custom Frame</option>
+            </datalist>
+          </div>
+          <div><label>Frame Size</label><input type="text" id="sf-size" list="sf-size-list" placeholder="Size தேர்வு / Type பண்ணவும்">
+            <datalist id="sf-size-list"><option>4×6 inch</option><option>5×7 inch</option><option>6×8 inch</option><option>8×10 inch</option><option>10×12 inch</option><option>A4</option><option>A3</option><option>Custom</option></datalist>
+          </div>
+          <div><label>Quantity</label><input type="number" id="sf-qty" value="1" min="1" oninput="calcSfTotal()"></div>
+        </div>
+        <div style="margin:10px 0 4px;font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Passport Frame','4×6 inch',50)">📷 Passport ₹50</button>
+          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Photo Frame','5×7 inch',100)">🖼️ 5×7 ₹100</button>
+          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Photo Frame','8×10 inch',200)">🖼️ 8×10 ₹200</button>
+          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Canvas Print','A4',350)">🎨 Canvas A4 ₹350</button>
+        </div>
+        <div class="grid g4">
+          <div><label>Rate (₹)</label><input type="number" id="sf-rate" placeholder="0" oninput="calcSfTotal()"></div>
+          <div><label>Total (₹)</label><input type="number" id="sf-total" placeholder="0" readonly style="font-weight:800;color:var(--blue);"></div>
+          <div><label>Advance (₹)</label><input type="number" id="sf-advance" placeholder="0" oninput="calcSfBalance()"></div>
+          <div><label>Balance (₹)</label><input type="number" id="sf-balance" placeholder="0" readonly style="color:var(--red);font-weight:700;"></div>
+        </div>
+        <div class="grid g3">
+          <div><label>Payment Method</label><select id="sf-pay" onchange="toggleSfUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Pending / Credit</option></select></div>
+          <div id="sf-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="sf-upi-id" placeholder="example@upi"></div>
+          <div><label>Payment Status</label><select id="sf-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
+        </div>
+        <div class="grid g2">
+          <div>
+            <label>Courier <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து custom courier சேர்க்கலாம்)</span></label>
+            <input type="text" id="sf-courier" list="sf-courier-list" placeholder="Courier தேர்வு / Type பண்ணவும்">
+            <datalist id="sf-courier-list">
+              <option>-- Self Pickup --</option><option>ST Courier</option><option>DTDC</option><option>Blue Dart</option><option>Delhivery</option><option>India Post</option><option>✅ Delivered</option>
+            </datalist>
+          </div>
+          <div><label>Note</label><input type="text" id="sf-note" placeholder="Special instructions..."></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-blue" onclick="saveSfOrder()">💾 Frame Order Save பண்ணு</button>
+          <button class="btn btn-ghost" onclick="clearSfForm()">🗑️ Clear</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px;">
+        <div class="card-title">📋 Studio Frame Orders</div>
+        <div id="sf-orders-list"><div class="empty"><div class="empty-icon">🖼️</div>Frame orders இல்லை</div></div>
+      </div>
+    </div>
+
+    <div class="section studio" id="studio-bookings">
+      <div class="stats" id="studio-stats"></div>
+      <div class="card">
+        <div class="card-title">📋 Studio Bookings</div>
+        <div class="grid g3" style="margin-bottom:12px;">
+          <div><label>தேடு</label><input type="text" id="st-search" placeholder="தேடவும்..." oninput="renderStudioBookings()"></div>
+          <div><label>Payment Filter</label><select id="st-filter-pay" onchange="renderStudioBookings()"><option value="">எல்லாம்</option><option value="paid">Paid</option><option value="partial">Partial</option><option value="pending">Pending</option></select></div>
+          <div><label>Service Filter</label><select id="st-filter-service" onchange="renderStudioBookings()"><option value="">எல்லாம்</option><option>Portrait Photography</option><option>Wedding Photography</option><option>Baby Shoot</option><option>Event Photography</option></select></div>
+        </div>
+        <div id="studio-bookings-list"></div>
+      </div>
+    </div>
+
+    <div class="section studio" id="studio-report">
+      <div class="stats" id="studio-report-stats"></div>
+      <div class="card">
+        <div class="card-title">📊 Studio Report</div>
+        <div class="grid g2" style="margin-bottom:12px;">
+          <div><label>From Date</label><input type="date" id="st-from"></div>
+          <div><label>To Date</label><input type="date" id="st-to"></div>
+        </div>
+        <button class="btn btn-sm" style="background:var(--purple);color:#fff;" onclick="renderStudioReport()">🔍 Show</button>
+        <div class="tbl-wrap" style="margin-top:14px;"><table class="tbl"><thead><tr><th>Booking #</th><th>Date</th><th>Customer</th><th>Service</th><th>Amount</th><th>Advance</th><th>Balance</th><th>Status</th><th>Bill</th></tr></thead><tbody id="studio-report-body"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ OWNER PANEL ══ -->
+  <div class="page owner-panel" id="page-owner">
+    <div class="section-tabs">
+      <button class="sec-tab active" onclick="switchSec('owner','dashboard',this)">📊 Dashboard</button>
+      <button class="sec-tab" onclick="switchSec('owner','requests',this)">📧 Owner Requests <span id="req-count-badge"></span></button>
+      <button class="sec-tab" onclick="switchSec('owner','workers',this)">👷 Workers</button>
+      <button class="sec-tab" onclick="switchSec('owner','credit',this)">💰 Credit / Loan</button>
+      <button class="sec-tab" onclick="switchSec('owner','stock',this)">📦 Stock</button>
+      <button class="sec-tab" onclick="switchSec('owner','monthly',this)">📅 Monthly Sheet</button>
+      <button class="sec-tab" onclick="switchSec('owner','yearly',this)">📆 Yearly Sheet</button>
+      <button class="sec-tab" onclick="switchSec('owner','settings',this)">⚙️ Settings</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="section owner-panel active" id="owner-dashboard">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);">
+        <span style="font-size:0.82rem;font-weight:700;color:var(--text2);">📅 தேதி தேர்வு:</span>
+        <input type="date" id="dash-date-filter" style="width:auto;padding:6px 12px;font-size:0.88rem;" onchange="renderOwnerDash()">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('dash-date-filter').value=new Date().toISOString().split('T')[0];renderOwnerDash();">📅 Today</button>
+        <span id="dash-date-label" style="font-size:0.78rem;color:var(--text2);font-style:italic;"></span>
+      </div>
+      <div class="stats" id="owner-dash-stats"></div>
+      <div class="grid g2">
+        <div class="card">
+          <div class="card-title">📊 <span id="dash-overview-title">Today's Overview</span></div>
+          <div id="today-overview"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚠️ Pending Actions</div>
+          <div id="pending-actions"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OWNER REQUESTS -->
+    <div class="section owner-panel" id="owner-requests">
+      <div class="card">
+        <div class="card-title">📧 New Owner Requests</div>
+        <p style="font-size:0.8rem;color:var(--text2);margin-bottom:14px;">புதிய owner request வந்தால் இங்கே தெரியும். Approve பண்ணினால் login பண்ண முடியும்.</p>
+        <div id="owner-requests-list">
+          <div class="empty"><div class="empty-icon">📧</div>Request இல்லை</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEES -->
+    <div class="section owner-panel" id="owner-workers">
+      <!-- PENDING EMPLOYEE REQUESTS -->
+      <div class="card">
+        <div class="card-title">📋 Employee Requests <span id="emp-req-badge" style="background:var(--red);color:#fff;border-radius:10px;padding:2px 8px;font-size:0.72rem;display:none;"></span></div>
+        <p style="font-size:0.8rem;color:var(--text2);margin-bottom:14px;">புதிய Employee register பண்ணினால் இங்கே வரும். Approve பண்ணி PIN assign பண்ணவும்.</p>
+        <div id="emp-requests-list"><div class="empty"><div class="empty-icon">📋</div>Request இல்லை</div></div>
+      </div>
+
+      <!-- APPROVED EMPLOYEES -->
+      <div class="card">
+        <div class="card-title">✅ Approved Employees</div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>பெயர்</th><th>Mobile</th><th>Mail ID</th><th>PIN</th><th>Status</th><th>Actions</th></tr></thead><tbody id="emp-approved-list"></tbody></table></div>
+      </div>
+
+      <!-- PERMISSIONS -->
+      <div class="card">
+        <div class="card-title">🔒 Employee Permissions</div>
+        <div style="margin-top:8px;">
+          <label style="cursor:pointer;display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="worker-can-delete" onchange="saveWorkerPerms()" style="width:auto;">
+            <span style="font-size:0.85rem;">Employee - Bill Delete பண்ண Allow பண்ணவா?</span>
+          </label>
+          <label style="cursor:pointer;display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <input type="checkbox" id="worker-can-edit-today" onchange="saveWorkerPerms()" style="width:auto;" checked>
+            <span style="font-size:0.85rem;">Employee - இன்றைய bill edit Allow பண்ணவா?</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREDIT BALANCE -->
+    <div class="section owner-panel" id="owner-credit">
+      <!-- CREDIT TYPE TABS -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button class="btn" id="cr-tab-customer" style="background:var(--orange);color:#fff;" onclick="setCrTab('customer')">🧾 Customer Credit (நாம் கொடுத்தது)</button>
+        <button class="btn btn-ghost" id="cr-tab-borrowed" onclick="setCrTab('borrowed')">🏦 Loan வாங்கினது</button>
+      </div>
+
+      <!-- CUSTOMER CREDIT FORM -->
+      <div id="cr-section-customer">
+        <div class="card">
+          <div class="card-title">🧾 Customer Credit Entry</div>
+          <div class="grid g3" style="margin-bottom:12px;">
+            <div><label>Customer பெயர் *</label><input type="text" id="cr-name" placeholder="பெயர்"></div>
+            <div><label>Phone</label><input type="tel" id="cr-phone" placeholder="9876543210" maxlength="10"></div>
+            <div><label>Amount (₹) *</label><input type="number" id="cr-amount" placeholder="0"></div>
+          </div>
+          <div class="grid g3" style="margin-bottom:12px;">
+            <div><label>Type</label><select id="cr-type"><option value="credit">Credit (நாம் கொடுத்தது)</option><option value="debit">Payment Received</option></select></div>
+            <div><label>திரும்ப கொடுக்க வேண்டிய தேதி</label><input type="date" id="cr-duedate"></div>
+            <div><label>Note / Order #</label><input type="text" id="cr-note" placeholder="Order # or reason"></div>
+          </div>
+          <button class="btn btn-gold" onclick="addCredit()">➕ Credit சேர்</button>
+        </div>
+
+        <!-- DUE ALERTS -->
+        <div id="cr-due-alerts"></div>
+
+        <div class="card">
+          <div class="card-title">📋 Customer Credit Records</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" onclick="filterCredit('all')" id="crf-all" style="border-color:var(--gold);color:var(--gold)">எல்லாம்</button>
+            <button class="btn btn-ghost btn-sm" onclick="filterCredit('pending')" id="crf-pending">⏳ Pending</button>
+            <button class="btn btn-ghost btn-sm" onclick="filterCredit('cleared')" id="crf-cleared">✅ Cleared</button>
+          </div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Customer</th><th>Phone</th><th>Credit</th><th>Paid</th><th>Balance</th><th>Due Date</th><th>Note</th><th>Actions</th></tr></thead><tbody id="credit-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- LOAN SECTION (நாம் வாங்கினது) -->
+      <div id="cr-section-borrowed" style="display:none;">
+        <div class="card" style="border-color:rgba(124,58,173,0.3);">
+          <div class="card-title">🏦 Loan Entry - வாங்கியது</div>
+          <div class="grid g3" style="margin-bottom:12px;">
+            <div><label>யாரிடம் வாங்கினோம் (Person/Shop) *</label><input type="text" id="br-from" placeholder="பெயர் / கடை பெயர்"></div>
+            <div><label>Phone</label><input type="tel" id="br-phone" placeholder="9876543210" maxlength="10"></div>
+            <div><label>Loan Amount (₹) *</label><input type="number" id="br-amount" placeholder="0"></div>
+          </div>
+          <div class="grid g4" style="margin-bottom:12px;">
+            <div><label>என்னத்துக்கு வாங்கினோம்</label><input type="text" id="br-reason" placeholder="e.g. Stock வாங்க, Emergency..."></div>
+            <div><label>எப்போது வாங்கினோம்</label><input type="date" id="br-loandate"></div>
+            <div><label>திரும்ப கொடுக்க வேண்டிய தேதி *</label><input type="date" id="br-duedate"></div>
+            <div><label>Monthly Payment (₹)</label><input type="number" id="br-monthly" placeholder="Monthly தொகை" title="மாதம் எவ்வளவு திரும்ப கொடுப்பீர்கள்?"></div>
+          </div>
+          <div class="grid g2" style="margin-bottom:12px;">
+            <div><label>Type</label><select id="br-type"><option value="borrowed">Loan வாங்கினது</option><option value="repaid">திரும்ப கொடுத்தது (Repaid)</option></select></div>
+            <div><label>Note</label><input type="text" id="br-note-extra" placeholder="Any note..."></div>
+          </div>
+          <button class="btn" style="background:var(--purple);color:#fff;" onclick="addBorrowed()">➕ Loan Entry சேர்</button>
+        </div>
+
+        <!-- OVERDUE ALERTS for borrowed -->
+        <div id="br-due-alerts"></div>
+
+        <div class="card" style="border-color:rgba(124,58,173,0.2);">
+          <div class="card-title">📋 Loan Records</div>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>யாரிடம்</th><th>Phone</th><th>Loan Amount</th><th>Monthly Pay</th><th>திரும்ப கொடுத்தது</th><th>Balance</th><th>Due Date</th><th>Reason</th><th>Actions</th></tr></thead><tbody id="borrowed-body"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STOCK -->
+    <div class="section owner-panel" id="owner-stock">
+      <div class="card">
+        <div class="card-title">📦 Stock Management</div>
+        <div class="grid g4" style="margin-bottom:12px;">
+          <div><label>Item பெயர் *</label><input type="text" id="stk-name" placeholder="Item name"></div>
+          <div>
+            <label>Category <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து custom)</span></label>
+            <input type="text" id="stk-cat" list="stk-cat-list" placeholder="Category தேர்வு / Type பண்ணவும்">
+            <datalist id="stk-cat-list"><option>Gift Items</option><option>Frame Materials</option><option>Stationery</option><option>Consumables</option><option>Photo Paper</option><option>Ink / Toner</option><option>Other</option></datalist>
+          </div>
+          <div><label>Quantity</label><input type="number" id="stk-qty" placeholder="0"></div>
+          <div><label>Min Alert Level</label><input type="number" id="stk-min" placeholder="5"></div>
+        </div>
+        <div class="grid g2" style="margin-bottom:12px;">
+          <div><label>Unit</label><select id="stk-unit"><option>Nos</option><option>Pcs</option><option>Kg</option><option>Litre</option><option>Box</option><option>Pack</option></select></div>
+          <div><label>Note / Supplier</label><input type="text" id="stk-note" placeholder="Supplier name, etc."></div>
+        </div>
+        <div style="padding:10px 12px;background:rgba(124,58,173,0.06);border:1px solid rgba(124,58,173,0.2);border-radius:8px;margin-bottom:12px;">
+          <div style="font-size:0.78rem;font-weight:700;color:var(--purple);margin-bottom:8px;">💰 Price Details (Owner Only)</div>
+          <div class="grid g4">
+            <div><label>MRP (₹)</label><input type="number" id="stk-mrp" placeholder="0.00" step="0.01"></div>
+            <div><label>Wholesale Total (₹)</label><input type="number" id="stk-ws-total" placeholder="0.00" step="0.01" oninput="calcStkWsPerPc()"></div>
+            <div><label>Wholesale Per Piece (₹)</label><input type="number" id="stk-ws-piece" placeholder="0.00" step="0.01"></div>
+            <div><label>Selling Price (₹)</label><input type="number" id="stk-selling" placeholder="0.00" step="0.01"></div>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="addStock()">➕ Stock சேர்</button>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 Stock List</div>
+        <div class="grid g2" style="margin-bottom:12px;">
+          <div><label>🔍 Category Filter</label><input type="text" id="stk-search-cat" placeholder="Category filter..." oninput="renderStockList()"></div>
+          <div><label>🔍 Item Name Search</label><input type="text" id="stk-search-name" placeholder="Item name தேடவும்..." oninput="renderStockList()"></div>
+        </div>
+        <div id="stock-list"></div>
+      </div>
+    </div>
+
+    <!-- MONTHLY SHEET -->
+    <div class="section owner-panel" id="owner-monthly">
+      <div class="card">
+        <div class="card-title">📅 Monthly Summary Sheet</div>
+        <div class="grid g2" style="margin-bottom:12px;">
+          <div><label>Month</label><input type="month" id="monthly-month"></div>
+          <div style="display:flex;align-items:flex-end;"><button class="btn btn-gold" onclick="renderMonthly()">📊 Generate Sheet</button></div>
+        </div>
+        <div id="monthly-content"></div>
+      </div>
+    </div>
+
+    <!-- YEARLY SHEET -->
+    <div class="section owner-panel" id="owner-yearly">
+      <div class="card">
+        <div class="card-title">📆 Yearly Summary Sheet</div>
+        <div class="grid g2" style="margin-bottom:12px;">
+          <div><label>Year</label><input type="number" id="yearly-year" placeholder="2024" min="2020" max="2099"></div>
+          <div style="display:flex;align-items:flex-end;"><button class="btn btn-gold" onclick="renderYearly()">📊 Generate Yearly Sheet</button></div>
+        </div>
+        <div id="yearly-content"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="section owner-panel" id="owner-settings">
+      <div class="card">
+        <div class="card-title">⚙️ Owner Settings</div>
+        <div class="grid g2" style="margin-bottom:14px;">
+          <div><label>Shop பெயர்</label><input type="text" id="set-shopname" placeholder="உங்கள் கடை பெயர்"></div>
+          <div><label>Address</label><input type="text" id="set-addr" placeholder="கடை address"></div>
+          <div><label>Phone</label><input type="tel" id="set-phone" placeholder="9876543210"></div>
+          <div><label>Edit Lock (Days)</label><select id="set-editdays"><option value="0">No Lock</option><option value="1">1 Day (Yesterday lock)</option><option value="2" selected>2 Days</option><option value="7">7 Days</option></select></div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:0.85rem;font-weight:700;">🌐 Language / மொழி</label>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button id="lang-ta-btn" class="btn btn-gold btn-sm" onclick="setAppLang('ta')">🇮🇳 Tamil</button>
+            <button id="lang-en-btn" class="btn btn-ghost btn-sm" onclick="setAppLang('en')">🇬🇧 English</button>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="saveSettingsUI()">💾 Settings Save</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🔑 Change Owner Password</div>
+        <div class="grid g3">
+          <div><label>Current Password</label><input type="password" id="cp-old" placeholder="Current password"></div>
+          <div><label>New Password</label><input type="password" id="cp-new" placeholder="New password"></div>
+          <div style="display:flex;align-items:flex-end;"><button class="btn btn-gold" onclick="changePassword()">🔑 Change</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--red);">⚠️ Approved Owners List</div>
+        <div id="approved-owners-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-bg" id="trackModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('trackModal')">✕</button>
+    <div style="font-size:1rem;font-weight:800;margin-bottom:16px;">🚚 Tracking Update</div>
+    <input type="hidden" id="tm-type"><input type="hidden" id="tm-id">
+    <div style="margin-bottom:10px;"><label>Tracking ID</label><input type="text" id="tm-track" placeholder="Tracking number"></div>
+    <div style="margin-bottom:10px;"><label>Shipping Status</label><select id="tm-status"><option value="processing">⏳ Processing</option><option value="dispatched">📦 Dispatched</option><option value="in-transit">🚚 In Transit</option><option value="out-for-delivery">🛵 Out for Delivery</option><option value="delivered">✅ Delivered</option><option value="returned">↩️ Returned</option></select></div>
+    <div class="btn-row"><button class="btn btn-gold" onclick="saveTracking()">💾 Update</button><button class="btn btn-ghost" onclick="closeModal('trackModal')">Cancel</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="billModal">
+  <div class="modal" style="max-width:460px;">
+    <button class="modal-close" onclick="closeModal('billModal')">✕</button>
+    <div id="billModalContent"></div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn btn-gold" onclick="doPrint()">🖨️ Print</button>
+      <button class="btn btn-ghost" onclick="closeModal('billModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="editBillModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('editBillModal')">✕</button>
+    <div style="font-size:1rem;font-weight:800;margin-bottom:16px;">✏️ Bill Edit</div>
+    <input type="hidden" id="eb-type"><input type="hidden" id="eb-id">
+    <div class="grid g2">
+      <div><label>Rate (₹)</label><input type="number" id="eb-rate" placeholder="0"></div>
+      <div><label>Quantity</label><input type="number" id="eb-qty" value="1" min="1"></div>
+    </div>
+    <div class="grid g2">
+      <div><label>Payment Status</label><select id="eb-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
+      <div><label>Advance Paid (₹)</label><input type="number" id="eb-advance" placeholder="0"></div>
+    </div>
+    <div><label>Note</label><input type="text" id="eb-note" placeholder=""></div>
+    <div class="btn-row"><button class="btn btn-gold" onclick="saveEditBill()">💾 Save</button><button class="btn btn-ghost" onclick="closeModal('editBillModal')">Cancel</button></div>
+  </div>
+</div>
+
+<script>
+// ===== FIREBASE SETUP (compat SDK) =====
+const firebaseConfig = {
+  apiKey: "AIzaSyDTqhXtLcxoESdKegYRahvdRR0MtW5YpP8",
+  authDomain: "roaji-shop.firebaseapp.com",
+  projectId: "roaji-shop",
+  storageBucket: "roaji-shop.firebasestorage.app",
+  messagingSenderId: "972713794542",
+  appId: "1:972713794542:web:e7a317fef597594eea0cff",
+  databaseURL: "https://roaji-shop-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ===== FIREBASE HELPERS =====
+async function fbGet(path){
+  const snap = await db.ref(path).get();
+  return snap.exists() ? snap.val() : null;
+}
+async function fbSet(path, val){ await db.ref(path).set(val); }
+async function fbRemove(path){ await db.ref(path).remove(); }
+async function fbUpdate(path, val){ await db.ref(path).update(val); }
+function fbListen(path, cb){ db.ref(path).on('value', snap => cb(snap.exists() ? snap.val() : null)); }
+
+// Convert Firebase object to array
+function toArr(obj){ if(!obj) return []; return Object.entries(obj).map(([k,v])=>({...v,_key:k})); }
+
+// ===== DATA LAYER =====
+let giftOrders = [];
+let frameOrders = [];
+let xeroxBills = [];
+let studioBookings = [];
+let creditRecords = [];
+let stockItems = [];
+let ownerRequests = [];
+let approvedOwners = [{"email":"iamajithkumar98@gmail.com","name":"Ajith Kumar","password":"roaji@2024","isPrimary":true}];
+let settings = {"shopName":"Roaji.in","editLockDays":2,"workerPin":"1234","workerCanDelete":false,"workerCanEditToday":true};
+let employeeRecords = [];
+let xItems = [];
+let currentPrintHTML = '';
+let currentUser = null;
+let dbLoaded = false;
+
+// ===== LOAD ALL DATA FROM FIREBASE =====
+async function loadAllData(){
+  showLoadingScreen(true);
+  try {
+    // Load settings
+    const s = await fbGet('settings');
+    if(s) settings = s;
+
+    // Load approved owners
+    const ao = await fbGet('approvedOwners');
+    if(ao) approvedOwners = Array.isArray(ao)?ao:toArr(ao);
+    else {
+      // First time — save default owner
+      await fbSet('approvedOwners',[{"email":"iamajithkumar98@gmail.com","name":"Ajith Kumar","password":"roaji@2024","isPrimary":true}]);
+    }
+
+    // Load orders
+    const go = await fbGet('giftOrders'); giftOrders = toArr(go);
+    const fo = await fbGet('frameOrders'); frameOrders = toArr(fo);
+    const xb = await fbGet('xeroxBills'); xeroxBills = toArr(xb);
+    const sb = await fbGet('studioBookings'); studioBookings = toArr(sb);
+    const cr = await fbGet('creditRecords'); creditRecords = toArr(cr);
+    const si = await fbGet('stockItems'); stockItems = toArr(si);
+    const or = await fbGet('ownerRequests'); ownerRequests = toArr(or);
+    const er = await fbGet('employeeRecords'); employeeRecords = toArr(er);
+
+    dbLoaded = true;
+  } catch(e){
+    console.error('Firebase load error:',e);
+    showNotif('❌ Database connection error!','red');
+  }
+  showLoadingScreen(false);
+}
+
+function showLoadingScreen(show){
+  let el = document.getElementById('loadingScreen');
+  if(!el){
+    el = document.createElement('div');
+    el.id='loadingScreen';
+    el.style.cssText='position:fixed;inset:0;background:rgba(255,255,255,0.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:inherit;';
+    el.innerHTML='<div style="font-size:2.5rem;">🛍️</div><div style="font-size:1.1rem;font-weight:800;color:#c8960a;">Roaji.in Loading...</div><div style="width:50px;height:4px;background:#eee;border-radius:4px;overflow:hidden;"><div id="loadBar" style="height:100%;background:#c8960a;animation:loadAnim 1s infinite;border-radius:4px;"></div></div><style>@keyframes loadAnim{0%{width:0%}100%{width:100%}}</style>';
+    document.body.appendChild(el);
+  }
+  el.style.display = show?'flex':'none';
+}
+
+// ===== SAVE HELPERS =====
+async function saveGiftOrders(){ await fbSet('giftOrders', arrToObj(giftOrders)); }
+async function saveFrameOrders(){ await fbSet('frameOrders', arrToObj(frameOrders)); }
+async function saveXeroxBills(){ await fbSet('xeroxBills', arrToObj(xeroxBills)); }
+async function saveStudioBookings(){ await fbSet('studioBookings', arrToObj(studioBookings)); }
+async function saveCreditRecords(){ await fbSet('creditRecords', arrToObj(creditRecords)); }
+async function saveStockItems(){ await fbSet('stockItems', arrToObj(stockItems)); }
+async function saveOwnerRequests(){ await fbSet('ownerRequests', arrToObj(ownerRequests)); }
+async function saveEmployeeRecords(){ await fbSet('employeeRecords', arrToObj(employeeRecords)); }
+async function saveApprovedOwners(){ await fbSet('approvedOwners', approvedOwners); }
+async function saveSettings(){ await fbSet('settings', settings); }
+
+function arrToObj(arr){
+  if(!arr||!arr.length) return {};
+  const obj={};
+  arr.forEach((item,i)=>{ const key=item._key||item.id||('item'+i); const {_key,...rest}=item; obj[key]=rest; });
+  return obj;
+}
+
+// localStorage fallback removed — all Firebase now
+
+// ===== LOGIN =====
+let loginRole = 'owner';
+function setLoginRole(role, el){
+  loginRole = role;
+  document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ownerLoginForm').style.display = role==='owner'?'block':'none';
+  document.getElementById('workerLoginForm').style.display = role==='employee'?'block':'none';
+  document.getElementById('newOwnerForm').style.display = role==='new-owner'?'block':'none';
+}
+
+function setEmpTab(tab){
+  document.getElementById('empLoginForm').style.display = tab==='login'?'block':'none';
+  document.getElementById('empRegisterForm').style.display = tab==='register'?'block':'none';
+  document.getElementById('emp-tab-login').classList.toggle('active', tab==='login');
+  document.getElementById('emp-tab-register').classList.toggle('active', tab==='register');
+}
+
+function togglePinView(){
+  const inp = document.getElementById('worker-pin');
+  const eye = document.getElementById('pin-eye');
+  if(inp.type==='password'){inp.type='text';eye.textContent='🙈';}
+  else{inp.type='password';eye.textContent='👁️';}
+}
+
+async function doOwnerLogin(){
+  const email = document.getElementById('owner-email').value.trim().toLowerCase();
+  const pass = document.getElementById('owner-pass').value;
+  const err = document.getElementById('owner-err');
+  if(!email||!pass){err.textContent='❌ Mail ID மற்றும் Password உள்ளிடவும்!';err.style.display='block';return;}
+  showLoadingScreen(true);
+  await loadAllData();
+  showLoadingScreen(false);
+  const match = approvedOwners.find(o=>o.email.toLowerCase()===email && o.password===pass);
+  if(!match){
+    err.textContent='❌ Mail ID அல்லது Password தவறு!';
+    err.style.display='block';
+    setTimeout(()=>err.style.display='none',3000);
+    return;
+  }
+  currentUser = {role:'owner', name:match.name||'Owner', email:match.email, isPrimary:match.isPrimary};
+  enterApp();
+}
+
+async function doWorkerLogin(){
+  const email = document.getElementById('worker-email-login').value.trim().toLowerCase();
+  const pin = document.getElementById('worker-pin').value.trim();
+  const err = document.getElementById('worker-err');
+  if(!email||!pin){err.textContent='❌ Mail ID மற்றும் PIN உள்ளிடவும்!';err.style.display='block';return;}
+  showLoadingScreen(true);
+  await loadAllData();
+  showLoadingScreen(false);
+  // Find approved employee
+  const emp = employeeRecords.find(e=>e.email.toLowerCase()===email && e.pin===pin && e.status==='approved');
+  if(!emp){
+    err.textContent='❌ Mail ID அல்லது PIN தவறு! அல்லது Approval pending.';
+    err.style.display='block';
+    setTimeout(()=>err.style.display='none',4000);
+    return;
+  }
+  currentUser = {role:'worker', name:emp.name, email:emp.email};
+  enterApp();
+}
+
+async function submitEmployeeRequest(){
+  const name = document.getElementById('emp-reg-name').value.trim();
+  const mobile = document.getElementById('emp-reg-mobile').value.trim();
+  const email = document.getElementById('emp-reg-email').value.trim().toLowerCase();
+  const err = document.getElementById('emp-reg-err');
+  if(!name||!mobile||!email){err.textContent='❌ எல்லா details-உம் தேவை!';err.style.color='var(--red)';err.style.display='block';return;}
+  showLoadingScreen(true);
+  await loadAllData();
+  showLoadingScreen(false);
+  // Check already exists
+  if(employeeRecords.find(e=>e.email===email)){
+    err.textContent='⏳ இந்த mail already registered! Approval pending அல்லது already approved.';
+    err.style.color='var(--orange)';err.style.display='block';return;
+  }
+  const newEmp = {id:'EMP'+Date.now(), name, mobile, email, pin:'', status:'pending', date:new Date().toISOString()};
+  employeeRecords.push(newEmp);
+  await saveEmployeeRecords();
+  err.textContent='✅ Request அனுப்பப்பட்டது! Owner approve பண்ணிய பிறகு உங்கள் PIN mail/phone-ல தெரியும்.';
+  err.style.color='var(--green)';err.style.display='block';
+  ['emp-reg-name','emp-reg-mobile','emp-reg-email'].forEach(id=>document.getElementById(id).value='');
+  updateEmpReqBadge();
+}
+
+function submitOwnerRequest(){
+  const name = document.getElementById('no-name').value.trim();
+  const email = document.getElementById('no-email').value.trim().toLowerCase();
+  const phone = document.getElementById('no-phone').value.trim();
+  const shop = document.getElementById('no-shop').value.trim();
+  const pass = document.getElementById('no-pass').value;
+  const err = document.getElementById('no-err');
+  if(!name||!email||!pass){err.textContent='❌ பெயர், Mail ID, Password தேவை!';err.style.display='block';return;}
+  // Check already approved
+  if(approvedOwners.find(o=>o.email.toLowerCase()===email)){
+    err.style.color='var(--green)';
+    err.textContent='✅ இந்த mail already approved! Login பண்ணவும்.';
+    err.style.display='block';return;
+  }
+  // Check already requested
+  if(ownerRequests.find(r=>r.email===email&&r.status==='pending')){
+    err.style.color='var(--orange)';
+    err.textContent='⏳ Request already sent! Approval pending...';
+    err.style.display='block';return;
+  }
+  const req = {id:'REQ'+Date.now(), name, email, phone, shop, password:pass, date:new Date().toISOString(), status:'pending'};
+  ownerRequests.push(req);
+  saveOwnerRequests();
+  err.style.color='var(--green)';
+  err.textContent='✅ Request அனுப்பப்பட்டது! iamajithkumar98@gmail.com Approve பண்ணிய பிறகு login பண்ணலாம்.';
+  err.style.display='block';
+  ['no-name','no-email','no-phone','no-shop','no-pass'].forEach(id=>document.getElementById(id).value='');
+  updateReqCountBadge();
+}
+
+function enterApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+  document.getElementById('headerUserName').textContent = currentUser.name;
+  if(currentUser.role==='owner'){
+    document.getElementById('headerUserIcon').textContent='👑';
+    document.getElementById('headerRolePill').textContent='Owner';
+    document.getElementById('headerRolePill').className='role-pill rp-owner';
+    document.getElementById('ownerPanelTab').style.display='block';
+    document.getElementById('worker-can-delete').checked = settings.workerCanDelete||false;
+    document.getElementById('worker-can-edit-today').checked = settings.workerCanEditToday!==false;
+    loadSettings();
+    updateReqCountBadge();
+    updateEmpReqBadge();
+    renderOwnerDash();
+    renderOwnerRequests();
+    renderEmployeeRequests();
+    renderApprovedEmployees();
+    renderCreditList();renderCreditDueAlerts();
+    renderBorrowedDueAlerts();
+    renderStockList();
+    renderApprovedOwners();
+  } else {
+    document.getElementById('headerUserIcon').textContent='🧑‍💼';
+    document.getElementById('headerRolePill').textContent='Employee';
+    document.getElementById('headerRolePill').className='role-pill rp-worker';
+    document.getElementById('ownerPanelTab').style.display='none';
+  }
+  genOrderNos();
+  renderGiftOrders();
+  renderFrameOrders();
+  renderXHistory();
+  renderStudioBookings();
+  renderGiftStats();
+  renderFrameStats();
+  renderXStats();
+  // Init dash date filter to today
+  const ddf=document.getElementById('dash-date-filter');
+  if(ddf&&!ddf.value)ddf.value=new Date().toISOString().split('T')[0];
+  renderStudioStats();
+  const today = new Date().toISOString().split('T')[0];
+  ['g-from','g-to','f-from','f-to','x-from','x-to','st-from','st-to'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.value=today;
+  });
+  const mm = new Date().toISOString().slice(0,7);
+  const mel = document.getElementById('monthly-month');
+  if(mel)mel.value=mm;
+}
+
+function doLogout(){
+  currentUser=null;
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('owner-email').value='';
+  document.getElementById('owner-pass').value='';
+  document.getElementById('worker-name').value='';
+  document.getElementById('worker-pin').value='';
+}
+
+function isOwner(){return currentUser&&currentUser.role==='owner';}
+
+// Edit permission check
+function canEdit(dateISO){
+  if(isOwner()) return true;
+  const lockDays = settings.editLockDays||2;
+  if(lockDays===0) return settings.workerCanEditToday!==false;
+  const orderDate = new Date(dateISO);
+  orderDate.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diffDays = Math.floor((today - orderDate)/(1000*60*60*24));
+  if(diffDays===0) return settings.workerCanEditToday!==false;
+  return diffDays < lockDays;
+}
+function canDelete(dateISO){
+  if(isOwner()) return true;
+  if(!settings.workerCanDelete) return false;
+  return canEdit(dateISO);
+}
+
+// ===== TABS =====
+function switchShop(shop, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.shop-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+shop).classList.add('active');
+  el.classList.add('active');
+  if(shop==='gift'){renderGiftOrders();renderGiftStats();}
+  if(shop==='frame'){renderFrameOrders();renderFrameStats();}
+  if(shop==='xerox'){renderXHistory();renderXStats();}
+  if(shop==='studio'){renderStudioBookings();renderStudioStats();}
+  if(shop==='owner'){renderOwnerDash();renderOwnerRequests();}
+}
+function switchSec(shop, sec, el){
+  const page = document.getElementById('page-'+shop);
+  page.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  page.querySelectorAll('.sec-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(shop+'-'+sec).classList.add('active');
+  el.classList.add('active');
+  if(sec==='orders'){if(shop==='gift')renderGiftOrders();else renderFrameOrders();}
+  if(sec==='tracking'){if(shop==='gift')renderGiftTracking();else renderFrameTracking();}
+  if(sec==='history')renderXHistory();
+  if(sec==='bookings')renderStudioBookings();
+  if(sec==='frame-order'){renderSfOrders();}
+  if(sec==='report'){if(shop==='gift')renderGiftReport();else if(shop==='frame')renderFrameReport();else if(shop==='studio')renderStudioReport();else renderXReport();}
+  if(sec==='workers'){renderEmployeeRequests();renderApprovedEmployees();updateEmpReqBadge();}
+  if(sec==='credit'){renderCreditList();renderCreditDueAlerts();renderBorrowedDueAlerts();}
+  if(sec==='stock')renderStockList();
+  if(sec==='monthly'){const mel=document.getElementById('monthly-month');if(mel&&!mel.value){const now=new Date();mel.value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');}renderMonthly();}
+  if(sec==='yearly'){const yel=document.getElementById('yearly-year');if(yel&&!yel.value)yel.value=new Date().getFullYear();renderYearly();}
+  if(sec==='settings')loadSettings();
+}
+
+// ===== BADGES =====
+function payBadge(status){
+  const map={paid:'b-green ✅ Paid',partial:'b-orange ⚡ Partial',pending:'b-red ⏳ Pending'};
+  const v=map[status]||'b-gold '+status;const i=v.indexOf(' ');
+  return `<span class="badge ${v.slice(0,i)}">${v.slice(i+1)}</span>`;
+}
+function shipBadge(status){
+  const map={processing:'b-gold ⏳ Processing',dispatched:'b-blue 📦 Dispatched','in-transit':'b-orange 🚚 In Transit','out-for-delivery':'b-purple 🛵 Delivery',delivered:'b-green ✅ Delivered',returned:'b-red ↩️ Returned'};
+  const v=map[status]||'b-gold '+status;const i=v.indexOf(' ');
+  return `<span class="badge ${v.slice(0,i)}">${v.slice(i+1)}</span>`;
+}
+function lockLabel(dateISO){
+  if(isOwner()) return '';
+  if(!canEdit(dateISO)) return `<span class="lock-badge">🔒 Locked</span>`;
+  return '';
+}
+
+// ===== GIFT ORDERS =====
+function calcGiftTotal(){
+  const rate=parseFloat(document.getElementById('g-rate').value)||0;
+  const qty=parseInt(document.getElementById('g-qty').value)||1;
+  const total=rate*qty;
+  const td=document.getElementById('g-total-display');
+  if(td)td.value=total.toFixed(2);
+  calcGiftBalance();
+}
+function calcGiftBalance(){
+  const rate=parseFloat(document.getElementById('g-rate').value)||0;
+  const qty=parseInt(document.getElementById('g-qty').value)||1;
+  const total=rate*qty;
+  const advance=parseFloat(document.getElementById('g-advance').value)||0;
+  const bal=Math.max(0,total-advance);
+  const bd=document.getElementById('g-balance-display');
+  if(bd)bd.value=bal.toFixed(2);
+}
+function calcFrameTotal(){
+  const rate=parseFloat(document.getElementById('f-rate').value)||0;
+  const qty=parseInt(document.getElementById('f-qty').value)||1;
+  const total=rate*qty;
+  const td=document.getElementById('f-total-display');
+  if(td)td.value=total.toFixed(2);
+  calcFrameBalance();
+}
+function calcFrameBalance(){
+  const rate=parseFloat(document.getElementById('f-rate').value)||0;
+  const qty=parseInt(document.getElementById('f-qty').value)||1;
+  const total=rate*qty;
+  const advance=parseFloat(document.getElementById('f-advance').value)||0;
+  const bal=Math.max(0,total-advance);
+  const bd=document.getElementById('f-balance-display');
+  if(bd)bd.value=bal.toFixed(2);
+}
+function toggleGiftUPI(){
+  const pay=document.getElementById('g-pay').value;
+  const f=document.getElementById('g-upi-field');
+  if(f)f.style.display=(pay==='UPI / GPay'||pay==='PhonePe')?'block':'none';
+}
+function toggleGiftDelivered(){
+  const courier=document.getElementById('g-courier').value;
+  const note=document.getElementById('g-delivered-note');
+  if(note)note.style.display=(courier==='✅ Delivered')?'block':'none';
+}
+function filterGiftCatSuggestions(){}
+// Xerox item suggestions by category
+const xItemsByCategory={
+  'Xerox / Photocopy':['A4 B&W Xerox','A3 B&W Xerox','A4 Double Side','A3 Double Side','Passport Size'],
+  'Color Print':['A4 Color Print','A3 Color Print','Photo Print 4x6','Photo Print 5x7','ID Card Print'],
+  'B&W Print':['A4 B&W Print','A3 B&W Print','Document Print'],
+  'Lamination':['A4 Lamination','A3 Lamination','ID Card Lamination','Small Lamination'],
+  'Spiral Binding':['Spiral Binding A4','Spiral Binding A3','Report Binding'],
+  'Notebook':['Notebook 100 Pages','Notebook 200 Pages','Single Line','Double Line'],
+  'Pen / Pencil':['Pen','Pencil','Ball Pen','Gel Pen','Marker'],
+  'Eraser / Scale':['Eraser','Scale 15cm','Scale 30cm','Sharpener'],
+  'Stapler / Pins':['Stapler','Stapler Pins','Paper Clip'],
+  'File / Folder':['File Cover','Document Folder','L-Folder','Plastic File'],
+  'Envelope':['A4 Envelope','Small Envelope','Brown Envelope'],
+  'Money Transfer':['Money Transfer','NEFT Transfer','Cash Transfer'],
+  'Net Center / Internet':['Internet 1 Hour','Internet 30 Min','Print from Net','Email Send','Form Fill','Online Application'],
+  'Other Stationery':['Glue','Tape','Scissors','Correction Pen','Highlighter']
+};
+function updateXItemSuggestions(){
+  const cat=document.getElementById('x-cat').value;
+  const itemInput=document.getElementById('x-item').value;
+  const dl=document.getElementById('x-item-list');
+  if(!dl)return;
+  const suggestions=xItemsByCategory[cat]||[];
+  // Filter by what user typed (show all if <3 chars or show matching)
+  const q=itemInput.toLowerCase();
+  const filtered=q.length<1?suggestions:suggestions.filter(s=>s.toLowerCase().includes(q));
+  dl.innerHTML=filtered.map(s=>`<option>${s}</option>`).join('');
+}
+function toggleFrameUPI(){
+  const pay=document.getElementById('f-pay').value;
+  const f=document.getElementById('f-upi-field');
+  if(f)f.style.display=(pay==='UPI / GPay'||pay==='PhonePe')?'block':'none';
+}
+function toggleXeUPI(){
+  const pay=document.getElementById('x-pay').value;
+  const f=document.getElementById('x-upi-field');
+  if(f)f.style.display=(pay==='UPI / GPay'||pay==='PhonePe')?'block':'none';
+}
+function saveGiftOrder(){
+  const cname=document.getElementById('g-cname').value.trim();
+  const phone=document.getElementById('g-phone').value.trim();
+  const addr=document.getElementById('g-addr').value.trim();
+  if(!cname){showNotif('❌ Customer பெயர் உள்ளிடவும்!','red');return;}
+  if(!phone){showNotif('❌ Mobile number உள்ளிடவும்!','red');return;}
+  if(!addr){showNotif('❌ Address உள்ளிடவும்!','red');return;}
+  const rate=parseFloat(document.getElementById('g-rate').value)||0;
+  const qty=parseInt(document.getElementById('g-qty').value)||1;
+  const advance=parseFloat(document.getElementById('g-advance').value)||0;
+  const mrp=parseFloat(document.getElementById('g-mrp').value)||0;
+  const upiId=document.getElementById('g-upi-id')?document.getElementById('g-upi-id').value:'';
+  const courier=document.getElementById('g-courier').value;
+  const isDelivered=courier==='✅ Delivered';
+  const orderDateVal=document.getElementById('g-orderdate').value;
+  const orderDate=orderDateVal?new Date(orderDateVal+'T12:00:00').toISOString():new Date().toISOString();
+  const order={
+    id:document.getElementById('g-ordno').value,
+    date:orderDate,createdBy:currentUser.name,
+    cname,phone,addr,
+    note:document.getElementById('g-note').value,
+    cat:document.getElementById('g-cat').value,
+    prod:document.getElementById('g-prod').value||document.getElementById('g-cat').value,
+    customName:'',customDetail:'',
+    qty,rate,mrp,total:rate*qty,advance,balance:Math.max(0,rate*qty-advance),
+    payMethod:document.getElementById('g-pay').value,
+    upiId,
+    payStatus:document.getElementById('g-paystatus').value,
+    courier:isDelivered?'✅ Delivered':courier,
+    trackId:isDelivered?'':document.getElementById('g-track').value,
+    shipStatus:isDelivered?'delivered':(document.getElementById('g-track').value?'dispatched':'processing')
+  };
+  giftOrders.push(order);
+  saveGiftOrders();
+  showNotif('✅ Gift Order சேமிக்கப்பட்டது!');
+  if(isDelivered){
+    showBill('gift',order.id);
+    const pb=document.getElementById('g-print-btn');if(pb)pb.style.display='inline-flex';
+  }
+  clearGiftForm();genOrderNos();refreshDash();
+}
+function clearGiftForm(){
+  ['g-cname','g-phone','g-addr','g-note','g-prod','g-rate','g-mrp','g-advance','g-track','g-upi-id','g-total-display','g-balance-display','g-cat'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('g-qty').value=1;
+  document.getElementById('g-orderdate').value=new Date().toISOString().split('T')[0];
+  const uf=document.getElementById('g-upi-field');if(uf)uf.style.display='none';
+  const pb=document.getElementById('g-print-btn');if(pb)pb.style.display='none';
+  const dn=document.getElementById('g-delivered-note');if(dn)dn.style.display='none';
+}
+function renderGiftOrders(){
+  const search=(document.getElementById('g-search')||{value:''}).value.toLowerCase();
+  const fPay=(document.getElementById('g-filter-pay')||{value:''}).value;
+  const fCourier=(document.getElementById('g-filter-courier')||{value:''}).value;
+  let data=giftOrders.filter(o=>{
+    return (!search||o.id.toLowerCase().includes(search)||o.cname.toLowerCase().includes(search)||o.phone.includes(search))&&
+           (!fPay||o.payStatus===fPay)&&(!fCourier||o.courier===fCourier);
+  }).slice().reverse();
+  const el=document.getElementById('gift-orders-list');
+  if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">🎁</div>Order இல்லை</div>';return;}
+  el.innerHTML=data.map(o=>{
+    const locked=!canEdit(o.date);
+    const canDel=canDelete(o.date);
+    return `<div class="order-card">
+      <div>
+        <div class="order-num">#${o.id} · ${fmtDate(o.date)} ${lockLabel(o.date)}</div>
+        <div class="order-cust">👤 ${o.cname} &nbsp;<span style="color:var(--text2);font-size:0.82rem;">📱 ${o.phone}</span></div>
+        <div class="order-detail">📦 ${o.prod} (${o.cat}) × ${o.qty}</div>
+        ${o.customName?`<div class="order-detail" style="color:var(--purple);font-weight:700;">🎨 Custom: "${o.customName}"${o.customDetail?' — '+o.customDetail:''}</div>`:''}
+        <div class="order-detail">📍 ${o.addr}</div>
+        ${o.mrp>0?`<div class="order-detail" style="color:var(--text2);">🏷️ MRP: ₹${o.mrp} × ${o.qty} = ₹${(o.mrp*o.qty).toFixed(2)}</div>`:''}
+        ${o.advance>0?`<div class="order-detail" style="color:var(--green);">✅ Advance Paid: ₹${o.advance.toFixed(2)}</div>`:''}
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+          ${payBadge(o.payStatus)}<span class="badge b-blue">${o.payMethod}</span>
+          ${o.courier!=='-- Self Pickup --'?`<span class="badge b-purple">🚚 ${o.courier}</span>`:'<span class="badge b-gold">🏪 Self Pickup</span>'}
+          ${o.shipStatus?shipBadge(o.shipStatus):''}
+        </div>
+        ${o.trackId?`<div style="margin-top:6px;font-size:0.78rem;color:var(--text2);">Tracking: <span class="track-badge" onclick="copyTrack('${o.trackId}')">${o.trackId}</span></div>`:''}
+        ${o.balance>0?`<div style="margin-top:4px;font-size:0.78rem;color:var(--red);">⚠️ Balance: ₹${o.balance.toFixed(2)}</div>`:''}
+      </div>
+      <div class="order-actions">
+        <div class="order-amt">₹${o.total.toFixed(2)}</div>
+        <button class="btn btn-pink btn-sm" onclick="showBill('gift','${o.id}')">🧾 Bill</button>
+        ${!locked?`<button class="btn btn-ghost btn-sm" onclick="openEditModal('gift','${o.id}')">✏️ Edit</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="openTrackModal('gift','${o.id}')">🚚 Track</button>
+        ${canDel?`<button class="btn btn-red btn-sm" onclick="deleteOrder('gift','${o.id}')">🗑️</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  renderGiftStats();
+}
+function renderGiftStats(){
+  const today=new Date().toISOString().split('T')[0];
+  const todayO=giftOrders.filter(o=>o.date.startsWith(today));
+  const pending=giftOrders.filter(o=>o.payStatus==='pending').length;
+  const html=`
+    <div class="stat s-pink"><div class="stat-val" style="color:var(--pink)">${todayO.length}</div><div class="stat-lbl">📅 இன்று Orders</div></div>
+    <div class="stat s-gold"><div class="stat-val" style="color:var(--gold)">₹${todayO.reduce((s,o)=>s+o.total,0).toFixed(0)}</div><div class="stat-lbl">💰 இன்று Sales</div></div>
+    <div class="stat s-blue"><div class="stat-val" style="color:var(--blue)">${giftOrders.length}</div><div class="stat-lbl">📋 Total Orders</div></div>
+    <div class="stat s-green"><div class="stat-val" style="color:var(--red)">${pending}</div><div class="stat-lbl">⏳ Pending</div></div>`;
+  ['gift-stats','gift-report-stats'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=html;});
+}
+function renderGiftTracking(){
+  const tbody=document.getElementById('gift-track-body');
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-30);
+  const data=giftOrders.filter(o=>o.courier!=='-- Self Pickup --'&&new Date(o.date)>=cutoff).slice().reverse();
+  if(!data.length){tbody.innerHTML='<tr><td colspan="6" class="empty">கடந்த 30 நாட்களில் Shipping orders இல்லை</td></tr>';return;}
+  tbody.innerHTML=`<tr><td colspan="6" style="font-size:0.72rem;color:var(--text2);padding:6px 12px;background:rgba(255,107,157,0.05);">📅 கடந்த 30 நாட்கள் History — ${data.length} orders</td></tr>`+data.map(o=>`<tr>
+    <td><strong>${o.id}</strong><br><small style="color:var(--text2)">${fmtDateShort(o.date)}</small></td>
+    <td>${o.cname}<br><small style="color:var(--text2)">${o.phone}</small></td>
+    <td>${o.courier}</td>
+    <td>${o.trackId?`<span class="track-badge" onclick="copyTrack('${o.trackId}')">${o.trackId}</span>`:'—'}</td>
+    <td>${o.shipStatus?shipBadge(o.shipStatus):'—'}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="openTrackModal('gift','${o.id}')">✏️</button></td>
+  </tr>`).join('');
+}
+function renderGiftReport(){
+  const from=document.getElementById('g-from').value;const to=document.getElementById('g-to').value;
+  const data=giftOrders.filter(o=>{const d=o.date.split('T')[0];return(!from||d>=from)&&(!to||d<=to);}).slice().reverse();
+  const tbody=document.getElementById('gift-report-body');
+  if(!data.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Data இல்லை</td></tr>';return;}
+  tbody.innerHTML=data.map(o=>`<tr>
+    <td>${o.id}</td><td>${fmtDate(o.date)}</td>
+    <td>${o.cname}<br><small>${o.phone}</small></td>
+    <td>${o.prod}</td><td><strong>₹${o.total.toFixed(2)}</strong></td>
+    <td>${payBadge(o.payStatus)}</td>
+    <td><button class="btn btn-pink btn-sm" onclick="showBill('gift','${o.id}')">🧾</button></td>
+  </tr>`).join('');
+}
+
+// ===== FRAME ORDERS =====
+function saveFrameOrder(){
+  const cname=document.getElementById('f-cname').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  if(!cname){showNotif('❌ Customer பெயர்!','red');return;}
+  if(!phone){showNotif('❌ Mobile number!','red');return;}
+  const rate=parseFloat(document.getElementById('f-rate').value)||0;
+  const qty=parseInt(document.getElementById('f-qty').value)||1;
+  const advance=parseFloat(document.getElementById('f-advance').value)||0;
+  const mrp=parseFloat(document.getElementById('f-mrp').value)||0;
+  const upiId=document.getElementById('f-upi-id')?document.getElementById('f-upi-id').value:'';
+  const size=document.getElementById('f-csize').value||document.getElementById('f-size').value;
+  const orderDateVal=document.getElementById('f-orderdate').value;
+  const orderDate=orderDateVal?new Date(orderDateVal+'T12:00:00').toISOString():new Date().toISOString();
+  const order={
+    id:document.getElementById('f-ordno').value,date:orderDate,createdBy:currentUser.name,
+    cname,phone,addr:document.getElementById('f-addr').value,note:document.getElementById('f-note').value,
+    ftype:document.getElementById('f-type').value,size,qty,rate,mrp,total:rate*qty,
+    material:document.getElementById('f-material').value,color:document.getElementById('f-color').value,
+    printing:document.getElementById('f-print').value,
+    customName:document.getElementById('f-customname')?document.getElementById('f-customname').value:'',
+    customDetail:document.getElementById('f-customdetail')?document.getElementById('f-customdetail').value:'',
+    advance,balance:Math.max(0,rate*qty-advance),
+    payMethod:document.getElementById('f-pay').value,upiId,payStatus:document.getElementById('f-paystatus').value,
+    courier:document.getElementById('f-courier').value,trackId:document.getElementById('f-track').value,
+    shipStatus:document.getElementById('f-track').value?'dispatched':'processing'
+  };
+  frameOrders.push(order);saveFrameOrders();
+  showNotif('✅ Frame Order சேமிக்கப்பட்டது!');clearFrameForm();genOrderNos();refreshDash();
+}
+function clearFrameForm(){
+  ['f-cname','f-phone','f-addr','f-note','f-csize','f-rate','f-mrp','f-advance','f-track','f-upi-id','f-total-display','f-balance-display','f-customname','f-customdetail','f-courier'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('f-qty').value=1;
+  document.getElementById('f-orderdate').value=new Date().toISOString().split('T')[0];
+  const uf=document.getElementById('f-upi-field');if(uf)uf.style.display='none';
+}
+function renderFrameOrders(){
+  const search=(document.getElementById('f-search')||{value:''}).value.toLowerCase();
+  const fPay=(document.getElementById('f-filter-pay')||{value:''}).value;
+  const fSize=(document.getElementById('f-filter-size')||{value:''}).value;
+  let data=frameOrders.filter(o=>{
+    return(!search||o.id.toLowerCase().includes(search)||o.cname.toLowerCase().includes(search)||o.phone.includes(search))&&
+           (!fPay||o.payStatus===fPay)&&(!fSize||o.size===fSize);
+  }).slice().reverse();
+  const el=document.getElementById('frame-orders-list');
+  if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">🖼️</div>Order இல்லை</div>';return;}
+  el.innerHTML=data.map(o=>{
+    const locked=!canEdit(o.date);const canDel=canDelete(o.date);
+    return `<div class="order-card">
+      <div>
+        <div class="order-num">#${o.id} · ${fmtDate(o.date)} ${lockLabel(o.date)}</div>
+        <div class="order-cust">👤 ${o.cname} &nbsp;<span style="color:var(--text2);font-size:0.82rem;">📱 ${o.phone}</span></div>
+        <div class="order-detail">🖼️ ${o.ftype} · ${o.size} · ${o.material} · ${o.color}</div>
+        <div class="order-detail">Qty: ${o.qty} · Print: ${o.printing==='yes'?'✅ Yes':'❌ No'}</div>
+        ${o.customName?`<div class="order-detail" style="color:var(--purple);font-weight:700;">🎨 Custom: "${o.customName}"${o.customDetail?' — '+o.customDetail:''}</div>`:''}
+        ${o.addr?`<div class="order-detail">📍 ${o.addr}</div>`:''}
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+          ${payBadge(o.payStatus)}<span class="badge b-blue">${o.payMethod}</span>
+          ${o.courier!=='-- Self Pickup --'?`<span class="badge b-purple">🚚 ${o.courier}</span>`:'<span class="badge b-gold">🏪 Self Pickup</span>'}
+          ${o.shipStatus?shipBadge(o.shipStatus):''}
+        </div>
+        ${o.trackId?`<div style="margin-top:6px;font-size:0.78rem;color:var(--text2);">Tracking: <span class="track-badge" onclick="copyTrack('${o.trackId}')">${o.trackId}</span></div>`:''}
+        ${o.balance>0?`<div style="margin-top:4px;font-size:0.78rem;color:var(--red);">⚠️ Balance: ₹${o.balance.toFixed(2)}</div>`:''}
+      </div>
+      <div class="order-actions">
+        <div class="order-amt">₹${o.total.toFixed(2)}</div>
+        <button class="btn btn-blue btn-sm" onclick="showBill('frame','${o.id}')">🧾 Bill</button>
+        ${!locked?`<button class="btn btn-ghost btn-sm" onclick="openEditModal('frame','${o.id}')">✏️ Edit</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="openTrackModal('frame','${o.id}')">🚚 Track</button>
+        ${canDel?`<button class="btn btn-red btn-sm" onclick="deleteOrder('frame','${o.id}')">🗑️</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  renderFrameStats();
+}
+function renderFrameStats(){
+  const today=new Date().toISOString().split('T')[0];
+  const todayO=frameOrders.filter(o=>o.date.startsWith(today));
+  const pending=frameOrders.filter(o=>o.payStatus==='pending').length;
+  const html=`
+    <div class="stat s-blue"><div class="stat-val" style="color:var(--blue)">${todayO.length}</div><div class="stat-lbl">📅 இன்று Orders</div></div>
+    <div class="stat s-gold"><div class="stat-val" style="color:var(--gold)">₹${todayO.reduce((s,o)=>s+o.total,0).toFixed(0)}</div><div class="stat-lbl">💰 இன்று Sales</div></div>
+    <div class="stat s-pink"><div class="stat-val" style="color:var(--blue)">${frameOrders.length}</div><div class="stat-lbl">📋 Total Orders</div></div>
+    <div class="stat s-green"><div class="stat-val" style="color:var(--red)">${pending}</div><div class="stat-lbl">⏳ Pending</div></div>`;
+  ['frame-stats','frame-report-stats'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=html;});
+}
+function renderFrameTracking(){
+  const tbody=document.getElementById('frame-track-body');
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-30);
+  const data=frameOrders.filter(o=>o.courier!=='-- Self Pickup --'&&new Date(o.date)>=cutoff).slice().reverse();
+  if(!data.length){tbody.innerHTML='<tr><td colspan="7" class="empty">கடந்த 30 நாட்களில் Shipping orders இல்லை</td></tr>';return;}
+  tbody.innerHTML=`<tr><td colspan="7" style="font-size:0.72rem;color:var(--text2);padding:6px 12px;background:rgba(79,195,247,0.05);">📅 கடந்த 30 நாட்கள் History — ${data.length} orders</td></tr>`+data.map(o=>`<tr>
+    <td><strong>${o.id}</strong><br><small style="color:var(--text2)">${fmtDateShort(o.date)}</small></td>
+    <td>${o.cname}<br><small>${o.phone}</small></td>
+    <td>${o.size}</td><td>${o.courier}</td>
+    <td>${o.trackId?`<span class="track-badge" onclick="copyTrack('${o.trackId}')">${o.trackId}</span>`:'—'}</td>
+    <td>${o.shipStatus?shipBadge(o.shipStatus):'—'}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="openTrackModal('frame','${o.id}')">✏️</button></td>
+  </tr>`).join('');
+}
+function renderFrameReport(){
+  const from=document.getElementById('f-from').value;const to=document.getElementById('f-to').value;
+  const data=frameOrders.filter(o=>{const d=o.date.split('T')[0];return(!from||d>=from)&&(!to||d<=to);}).slice().reverse();
+  const tbody=document.getElementById('frame-report-body');
+  if(!data.length){tbody.innerHTML='<tr><td colspan="8" class="empty">Data இல்லை</td></tr>';return;}
+  tbody.innerHTML=data.map(o=>`<tr>
+    <td>${o.id}</td><td>${fmtDate(o.date)}</td>
+    <td>${o.cname}<br><small>${o.phone}</small></td>
+    <td>${o.ftype}</td><td>${o.size}</td>
+    <td><strong>₹${o.total.toFixed(2)}</strong></td>
+    <td>${payBadge(o.payStatus)}</td>
+    <td><button class="btn btn-blue btn-sm" onclick="showBill('frame','${o.id}')">🧾</button></td>
+  </tr>`).join('');
+}
+
+// ===== XEROX =====
+function setXRate(cat,item,rate){
+  document.getElementById('x-cat').value=cat;
+  document.getElementById('x-item').value=item;
+  document.getElementById('x-rate').value=rate;
+  document.getElementById('x-qty').focus();
+}
+function addXItem(){
+  const item=document.getElementById('x-item').value.trim()||document.getElementById('x-cat').value;
+  const qty=parseInt(document.getElementById('x-qty').value)||1;
+  const rate=parseFloat(document.getElementById('x-rate').value)||0;
+  const customName=document.getElementById('x-customname')?document.getElementById('x-customname').value.trim():'';
+  if(rate<=0){showNotif('❌ Rate உள்ளிடவும்!','red');return;}
+  xItems.push({cat:document.getElementById('x-cat').value,item,qty,rate,amt:qty*rate,customName});
+  renderXBillTable();
+  document.getElementById('x-item').value='';
+  document.getElementById('x-qty').value=1;
+  document.getElementById('x-rate').value='';
+  const xcn=document.getElementById('x-customname');if(xcn)xcn.value='';
+}
+function removeXItem(i){xItems.splice(i,1);renderXBillTable();}
+function renderXBillTable(){
+  const tbody=document.getElementById('x-bill-body');
+  if(!xItems.length){tbody.innerHTML='<tr><td colspan="7" class="empty"><div class="empty-icon">🖨️</div>Item சேர்க்கவில்லை</td></tr>';calcXTotal();return;}
+  tbody.innerHTML=xItems.map((it,i)=>`<tr>
+    <td>${i+1}</td>
+    <td>${it.item}${it.customName?`<br><small style="color:var(--purple);font-weight:700;">🎨 "${it.customName}"</small>`:''}</td>
+    <td><span class="badge b-green">${it.cat}</span></td>
+    <td>${it.qty}</td><td>₹${it.rate.toFixed(2)}</td>
+    <td><strong>₹${it.amt.toFixed(2)}</strong></td>
+    <td><button class="btn btn-red btn-sm" onclick="removeXItem(${i})">🗑️</button></td>
+  </tr>`).join('');
+  calcXTotal();
+}
+function calcXTotal(){
+  const sub=xItems.reduce((s,i)=>s+i.amt,0);
+  const disc=parseFloat(document.getElementById('x-disc').value)||0;
+  const grand=Math.max(0,sub-disc);
+  document.getElementById('x-sub').textContent='₹'+sub.toFixed(2);
+  document.getElementById('x-grand').textContent='₹'+grand.toFixed(2);
+}
+function saveXBill(){
+  if(!xItems.length){showNotif('❌ Item சேர்க்கவும்!','red');return;}
+  const sub=xItems.reduce((s,i)=>s+i.amt,0);
+  const disc=parseFloat(document.getElementById('x-disc').value)||0;
+  const billDateVal=document.getElementById('x-billdate').value;
+  const billDate=billDateVal?new Date(billDateVal+'T12:00:00').toISOString():new Date().toISOString();
+  const custname=document.getElementById('x-custname')?document.getElementById('x-custname').value.trim():'';
+  const bill={
+    id:document.getElementById('x-billno').value,date:billDate,createdBy:currentUser.name,
+    custname,
+    ref:document.getElementById('x-ref').value||custname||'Walk-in',
+    items:[...xItems],subtotal:sub,discount:disc,
+    total:Math.max(0,sub-disc),
+    payMethod:document.getElementById('x-pay').value,
+    note:document.getElementById('x-note').value
+  };
+  xeroxBills.push(bill);saveXeroxBills();
+  showNotif('✅ Bill Save ஆனது!');clearXBill();genOrderNos();refreshDash();
+}
+function clearXBill(){
+  xItems=[];renderXBillTable();
+  document.getElementById('x-ref').value='';
+  document.getElementById('x-disc').value='0';
+  document.getElementById('x-note').value='';
+  const xc=document.getElementById('x-custname');if(xc)xc.value='';
+  document.getElementById('x-billdate').value=new Date().toISOString().split('T')[0];
+  const xcat=document.getElementById('x-cat');if(xcat)xcat.value='';
+  const xcn=document.getElementById('x-customname');if(xcn)xcn.value='';
+}
+function renderXHistory(){
+  const search=(document.getElementById('x-search')||{value:''}).value.toLowerCase();
+  const fPay=(document.getElementById('x-filter-pay')||{value:''}).value;
+  let data=xeroxBills.filter(b=>{
+    return(!search||b.id.toLowerCase().includes(search)||b.ref.toLowerCase().includes(search))&&(!fPay||b.payMethod===fPay);
+  }).slice().reverse();
+  const tbody=document.getElementById('x-history-body');
+  if(!data.length){tbody.innerHTML='<tr><td colspan="8" class="empty">Bills இல்லை</td></tr>';return;}
+  tbody.innerHTML=data.map(b=>{
+    const locked=!canEdit(b.date);const canDel=canDelete(b.date);
+    return `<tr>
+      <td><strong>${b.id}</strong></td><td>${fmtDate(b.date)} ${lockLabel(b.date)}</td>
+      <td>${b.custname||'—'}</td>
+      <td>${b.ref}</td><td>${b.items.length} items</td>
+      <td><span class="badge b-green">${b.payMethod}</span></td>
+      <td><strong style="color:var(--green)">₹${b.total.toFixed(2)}</strong></td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap;">
+        <button class="btn btn-green btn-sm" onclick="showBill('xerox','${b.id}')">🧾</button>
+        ${canDel?`<button class="btn btn-red btn-sm" onclick="deleteXBill('${b.id}')">🗑️</button>`:''}
+      </td>
+    </tr>`;
+  }).join('');
+  renderXStats();
+}
+function deleteXBill(id){
+  if(!confirm('இந்த bill delete பண்ணவா?'))return;
+  xeroxBills=xeroxBills.filter(b=>b.id!==id);
+  saveXeroxBills();
+  renderXHistory();
+}
+function renderXStats(){
+  const today=new Date().toISOString().split('T')[0];
+  const tod=xeroxBills.filter(b=>b.date.startsWith(today));
+  const html=`
+    <div class="stat s-green"><div class="stat-val" style="color:var(--green)">${tod.length}</div><div class="stat-lbl">📅 இன்று Bills</div></div>
+    <div class="stat s-gold"><div class="stat-val" style="color:var(--gold)">₹${tod.reduce((s,b)=>s+b.total,0).toFixed(0)}</div><div class="stat-lbl">💰 இன்று Sales</div></div>
+    <div class="stat s-pink"><div class="stat-val" style="color:var(--green)">${xeroxBills.length}</div><div class="stat-lbl">📋 Total Bills</div></div>
+    <div class="stat s-blue"><div class="stat-val" style="color:var(--gold)">₹${xeroxBills.reduce((s,b)=>s+b.total,0).toFixed(0)}</div><div class="stat-lbl">💰 மொத்த Sales</div></div>`;
+  ['xerox-stats','xerox-report-stats'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=html;});
+}
+function renderXReport(){
+  const from=document.getElementById('x-from').value;const to=document.getElementById('x-to').value;
+  const data=xeroxBills.filter(b=>{const d=b.date.split('T')[0];return(!from||d>=from)&&(!to||d<=to);}).slice().reverse();
+  const tbody=document.getElementById('xerox-report-body');
+  if(!data.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Data இல்லை</td></tr>';return;}
+  tbody.innerHTML=data.map(b=>`<tr>
+    <td>${b.id}</td><td>${fmtDate(b.date)}</td>
+    <td>${b.items.length} items</td><td><strong>₹${b.total.toFixed(2)}</strong></td>
+    <td><span class="badge b-green">${b.payMethod}</span></td>
+    <td><button class="btn btn-green btn-sm" onclick="showBill('xerox','${b.id}')">🧾</button></td>
+  </tr>`).join('');
+}
+
+// ===== OWNER PANEL =====
+function renderOwnerDash(){
+  const dateEl=document.getElementById('dash-date-filter');
+  const today=new Date().toISOString().split('T')[0];
+  if(dateEl&&!dateEl.value) dateEl.value=today;
+  const selDate=(dateEl&&dateEl.value)||today;
+  const isToday=selDate===today;
+  const labelEl=document.getElementById('dash-date-label');
+  if(labelEl) labelEl.textContent=isToday?'(இன்றைய தரவு)':'('+selDate+' தரவு காட்டுகிறது)';
+  const titleEl=document.getElementById('dash-overview-title');
+  if(titleEl) titleEl.textContent=isToday?"Today's Overview":selDate+" Overview";
+
+  const gToday=giftOrders.filter(o=>o.date.startsWith(selDate));
+  const fToday=frameOrders.filter(o=>o.date.startsWith(selDate));
+  const xToday=xeroxBills.filter(b=>b.date.startsWith(selDate));
+  const sToday=studioBookings.filter(b=>b.date.startsWith(selDate));
+  const sfToday=(typeof sfOrders!=='undefined'?sfOrders:[]).filter(o=>o.date.startsWith(selDate));
+  const gAmt=gToday.reduce((s,o)=>s+o.total,0);
+  const fAmt=fToday.reduce((s,o)=>s+o.total,0);
+  const xAmt=xToday.reduce((s,b)=>s+b.total,0);
+  const sAmt=sToday.reduce((s,b)=>s+b.total,0);
+  const sfAmt=sfToday.reduce((s,o)=>s+o.total,0);
+  const totalToday=gAmt+fAmt+xAmt+sAmt+sfAmt;
+  const el=document.getElementById('owner-dash-stats');
+  if(el) el.innerHTML=`
+    <div class="stat s-gold"><div class="stat-val" style="color:var(--gold)">₹${totalToday.toFixed(0)}</div><div class="stat-lbl">💰 ${isToday?'இன்று':selDate} Total</div></div>
+    <div class="stat s-pink"><div class="stat-val" style="color:var(--pink)">${giftOrders.length}</div><div class="stat-lbl">🎁 Gift Orders (All)</div></div>
+    <div class="stat s-blue"><div class="stat-val" style="color:var(--blue)">${frameOrders.length}</div><div class="stat-lbl">🖼️ Frame Orders (All)</div></div>
+    <div class="stat s-green"><div class="stat-val" style="color:var(--green)">${xeroxBills.length}</div><div class="stat-lbl">🖨️ Xerox Bills (All)</div></div>
+    <div class="stat" style="border-top:3px solid var(--purple)"><div class="stat-val" style="color:var(--purple)">${studioBookings.length}</div><div class="stat-lbl">🎨 Studio (All)</div></div>`;
+  const ov=document.getElementById('today-overview');
+  if(ov) ov.innerHTML=`
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
+      <span>🎁 Gift</span><strong style="color:var(--pink)">₹${gAmt.toFixed(0)} <span style="font-weight:400;color:var(--text2);">(${gToday.length})</span></strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
+      <span>🖼️ Frame</span><strong style="color:var(--blue)">₹${fAmt.toFixed(0)} <span style="font-weight:400;color:var(--text2);">(${fToday.length})</span></strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
+      <span>🖨️ Xerox</span><strong style="color:var(--green)">₹${xAmt.toFixed(0)} <span style="font-weight:400;color:var(--text2);">(${xToday.length})</span></strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
+      <span>🎨 Studio</span><strong style="color:var(--purple)">₹${sAmt.toFixed(0)} <span style="font-weight:400;color:var(--text2);">(${sToday.length})</span></strong>
+    </div>
+    ${sfAmt>0?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
+      <span>🖼️ Studio Frame</span><strong style="color:var(--blue)">₹${sfAmt.toFixed(0)} <span style="font-weight:400;color:var(--text2);">(${sfToday.length})</span></strong>
+    </div>`:''}
+    <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:0.95rem;font-weight:800;">
+      <span>💰 மொத்தம்</span><strong style="color:var(--gold)">₹${totalToday.toFixed(0)}</strong>
+    </div>`;
+  // Pending actions
+  const pendG=giftOrders.filter(o=>o.payStatus==='pending').length;
+  const pendF=frameOrders.filter(o=>o.payStatus==='pending').length;
+  const lowStock=stockItems.filter(s=>s.qty<=s.minQty).length;
+  const pendReq=ownerRequests.filter(r=>r.status==='pending').length;
+  const pa=document.getElementById('pending-actions');
+  if(pa) pa.innerHTML=`
+    ${pendG?`<div style="padding:6px 0;font-size:0.85rem;color:var(--red);">⚠️ ${pendG} Gift orders pending payment</div>`:''}
+    ${pendF?`<div style="padding:6px 0;font-size:0.85rem;color:var(--red);">⚠️ ${pendF} Frame orders pending payment</div>`:''}
+    ${lowStock?`<div style="padding:6px 0;font-size:0.85rem;color:var(--orange);">📦 ${lowStock} stock items low</div>`:''}
+    ${pendReq?`<div style="padding:6px 0;font-size:0.85rem;color:var(--blue);">📧 ${pendReq} owner requests pending</div>`:''}
+    ${!pendG&&!pendF&&!lowStock&&!pendReq?'<div style="color:var(--text2);font-size:0.85rem;">✅ எல்லாம் சரியாக இருக்கு!</div>':''}`;
+}
+
+function renderOwnerRequests(){
+  const list=document.getElementById('owner-requests-list');
+  const pending=ownerRequests.filter(r=>r.status==='pending');
+  const approved=ownerRequests.filter(r=>r.status==='approved');
+  if(!ownerRequests.length){list.innerHTML='<div class="empty"><div class="empty-icon">📧</div>Request இல்லை</div>';return;}
+  let html='';
+  if(pending.length){
+    html+='<div style="font-size:0.82rem;font-weight:700;color:var(--orange);margin-bottom:8px;">⏳ Pending Requests</div>';
+    html+=pending.map(r=>`<div class="req-card">
+      <div class="req-info">
+        <div class="req-name">👤 ${r.name}</div>
+        <div class="req-email">✉️ ${r.email} ${r.phone?`· 📱 ${r.phone}`:''}</div>
+        ${r.shop?`<div class="req-email">🏪 ${r.shop}</div>`:''}
+        <div class="req-time">${fmtDate(r.date)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button class="btn btn-green btn-sm" onclick="approveOwner('${r.id}')">✅ Approve</button>
+        <button class="btn btn-red btn-sm" onclick="rejectOwner('${r.id}')">❌ Reject</button>
+      </div>
+    </div>`).join('');
+  }
+  if(approved.length){
+    html+='<div style="font-size:0.82rem;font-weight:700;color:var(--green);margin:14px 0 8px;">✅ Approved</div>';
+    html+=approved.map(r=>`<div class="req-card">
+      <div class="req-info">
+        <div class="req-name">👤 ${r.name}</div>
+        <div class="req-email">✉️ ${r.email}</div>
+      </div>
+      <span class="badge b-green">Approved</span>
+    </div>`).join('');
+  }
+  list.innerHTML=html;
+}
+
+function approveOwner(id){
+  const req=ownerRequests.find(r=>r.id===id);
+  if(!req)return;
+  req.status='approved';
+  approvedOwners.push({email:req.email,name:req.name,password:req.password,isPrimary:false});
+  saveOwnerRequests();
+  saveApprovedOwners();
+  showNotif(`✅ ${req.name} Approved!`);
+  renderOwnerRequests();updateReqCountBadge();renderApprovedOwners();
+}
+function rejectOwner(id){
+  if(!confirm('இந்த request reject பண்ணவா?'))return;
+  ownerRequests=ownerRequests.filter(r=>r.id!==id);
+  saveOwnerRequests();
+  renderOwnerRequests();updateReqCountBadge();
+}
+function updateReqCountBadge(){
+  const count=ownerRequests.filter(r=>r.status==='pending').length;
+  const el=document.getElementById('req-count-badge');
+  if(el) el.innerHTML=count?`<span class="badge b-orange">${count}</span>`:'';
+}
+
+// ===== EMPLOYEE MANAGEMENT =====
+function updateEmpReqBadge(){
+  const count = employeeRecords.filter(e=>e.status==='pending').length;
+  const badge = document.getElementById('emp-req-badge');
+  if(badge){badge.textContent=count;badge.style.display=count?'inline':'none';}
+}
+
+function renderEmployeeRequests(){
+  const el = document.getElementById('emp-requests-list'); if(!el)return;
+  const pending = employeeRecords.filter(e=>e.status==='pending');
+  if(!pending.length){el.innerHTML='<div class="empty"><div class="empty-icon">📋</div>Pending request இல்லை</div>';return;}
+  el.innerHTML = pending.map(e=>`
+    <div class="req-card">
+      <div class="req-info">
+        <div class="req-name">🧑‍💼 ${e.name}</div>
+        <div class="req-email">📱 ${e.mobile} &nbsp;|&nbsp; ✉️ ${e.email}</div>
+        <div class="req-time">${new Date(e.date).toLocaleString('ta-IN')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="text" id="pin-for-${e.id}" placeholder="PIN assign" maxlength="6" style="width:100px;padding:6px 10px;">
+          <button class="btn btn-green btn-sm" onclick="approveEmployee('${e.id}')">✅ Approve</button>
+        </div>
+        <button class="btn btn-red btn-sm" onclick="rejectEmployee('${e.id}')">❌ Reject</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderApprovedEmployees(){
+  const tbody = document.getElementById('emp-approved-list'); if(!tbody)return;
+  const approved = employeeRecords.filter(e=>e.status==='approved'||e.status==='rejected');
+  if(!approved.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Employee இல்லை</td></tr>';return;}
+  tbody.innerHTML = approved.map(e=>`
+    <tr>
+      <td><strong>${e.name}</strong></td>
+      <td>${e.mobile}</td>
+      <td style="font-size:0.78rem;">${e.email}</td>
+      <td>
+        <input type="text" value="${e.pin||''}" maxlength="6" style="width:80px;padding:4px 8px;font-size:0.85rem;" onchange="updateEmployeePin('${e.id}',this.value)">
+      </td>
+      <td><span class="badge ${e.status==='approved'?'b-green':'b-red'}">${e.status==='approved'?'✅ Active':'❌ Rejected'}</span></td>
+      <td>
+        <button class="btn btn-red btn-sm" onclick="removeEmployee('${e.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function approveEmployee(id){
+  const pinEl = document.getElementById('pin-for-'+id);
+  const pin = pinEl ? pinEl.value.trim() : '';
+  if(!pin||pin.length<4){showNotif('❌ குறைந்தது 4-digit PIN உள்ளிடவும்!','red');return;}
+  const emp = employeeRecords.find(e=>e.id===id); if(!emp)return;
+  emp.status='approved'; emp.pin=pin;
+  await saveEmployeeRecords();
+  showNotif(`✅ ${emp.name} Approved! PIN: ${pin}`);
+  renderEmployeeRequests(); renderApprovedEmployees(); updateEmpReqBadge();
+}
+
+async function rejectEmployee(id){
+  if(!confirm('Reject பண்ணவா?'))return;
+  const emp = employeeRecords.find(e=>e.id===id); if(!emp)return;
+  emp.status='rejected';
+  await saveEmployeeRecords();
+  showNotif('❌ Employee Rejected');
+  renderEmployeeRequests(); renderApprovedEmployees(); updateEmpReqBadge();
+}
+
+async function updateEmployeePin(id, newPin){
+  if(!newPin||newPin.length<4){showNotif('❌ 4-digit PIN தேவை!','red');return;}
+  const emp = employeeRecords.find(e=>e.id===id); if(!emp)return;
+  emp.pin=newPin;
+  await saveEmployeeRecords();
+  showNotif(`✅ ${emp.name} PIN Updated!`);
+}
+
+async function removeEmployee(id){
+  if(!confirm('Employee remove பண்ணவா?'))return;
+  employeeRecords = employeeRecords.filter(e=>e.id!==id);
+  await saveEmployeeRecords();
+  renderApprovedEmployees(); updateEmpReqBadge();
+  showNotif('🗑️ Employee removed');
+}
+
+function updateWorkerPin(){ showNotif('PIN system now per-employee. Employee section-ல PIN assign பண்ணவும்.'); }
+
+function saveWorkerPerms(){
+  settings.workerCanDelete=document.getElementById('worker-can-delete').checked;
+  settings.workerCanEditToday=document.getElementById('worker-can-edit-today').checked;
+  saveSettings();
+  showNotif('✅ Permissions Saved!');
+}
+
+// CREDIT TAB TOGGLE
+let currentCrTab = 'customer';
+let creditFilter = 'all';
+function setCrTab(tab){
+  currentCrTab = tab;
+  document.getElementById('cr-section-customer').style.display = tab==='customer'?'block':'none';
+  document.getElementById('cr-section-borrowed').style.display = tab==='borrowed'?'block':'none';
+  document.getElementById('cr-tab-customer').style.background = tab==='customer'?'var(--orange)':'';
+  document.getElementById('cr-tab-customer').style.color = tab==='customer'?'#fff':'';
+  document.getElementById('cr-tab-customer').className = tab==='customer'?'btn':'btn btn-ghost';
+  document.getElementById('cr-tab-borrowed').style.background = tab==='borrowed'?'var(--purple)':'';
+  document.getElementById('cr-tab-borrowed').style.color = tab==='borrowed'?'#fff':'';
+  document.getElementById('cr-tab-borrowed').className = tab==='borrowed'?'btn':'btn btn-ghost';
+  if(tab==='customer'){renderCreditList();renderCreditDueAlerts();}
+  else{renderBorrowedList();renderBorrowedDueAlerts();}
+}
+function filterCredit(f){
+  creditFilter=f;
+  ['all','pending','cleared'].forEach(x=>{
+    const b=document.getElementById('crf-'+x);
+    if(b){b.style.borderColor=x===f?'var(--gold)':'';b.style.color=x===f?'var(--gold)':'';}
+  });
+  renderCreditList();
+}
+
+// CREDIT
+function addCredit(){
+  const name=document.getElementById('cr-name').value.trim();
+  const phone=document.getElementById('cr-phone').value.trim();
+  const amount=parseFloat(document.getElementById('cr-amount').value)||0;
+  const type=document.getElementById('cr-type').value;
+  const duedate=document.getElementById('cr-duedate').value;
+  if(!name||!amount){showNotif('❌ பெயர் மற்றும் Amount தேவை!','red');return;}
+  let cust=creditRecords.find(c=>c.phone&&c.phone===phone||(c.name.toLowerCase()===name.toLowerCase()&&!phone));
+  if(!cust){
+    cust={id:'CR'+Date.now(),name,phone,transactions:[],totalCredit:0,totalPaid:0,duedate:''};
+    creditRecords.push(cust);
+  }
+  if(duedate) cust.duedate=duedate;
+  cust.transactions.push({date:new Date().toISOString(),type,amount,note:document.getElementById('cr-note').value,duedate});
+  if(type==='credit') cust.totalCredit=(cust.totalCredit||0)+amount;
+  else cust.totalPaid=(cust.totalPaid||0)+amount;
+  saveCreditRecords();
+  showNotif('✅ Credit Record சேமிக்கப்பட்டது!');
+  ['cr-name','cr-phone','cr-amount','cr-note','cr-duedate'].forEach(id=>document.getElementById(id).value='');
+  renderCreditList();renderCreditDueAlerts();
+}
+function renderCreditDueAlerts(){
+  const el=document.getElementById('cr-due-alerts');if(!el)return;
+  const today=new Date();today.setHours(0,0,0,0);
+  const alerts=creditRecords.filter(c=>{
+    const bal=(c.totalCredit||0)-(c.totalPaid||0);
+    if(bal<=0)return false;
+    if(!c.duedate)return false;
+    const due=new Date(c.duedate);due.setHours(0,0,0,0);
+    return due<=new Date(today.getTime()+3*24*60*60*1000); // within 3 days
+  });
+  if(!alerts.length){el.innerHTML='';return;}
+  el.innerHTML=`<div style="background:rgba(204,34,34,0.08);border:1px solid rgba(204,34,34,0.3);border-radius:10px;padding:12px;margin-bottom:12px;">
+    <div style="font-weight:800;color:var(--red);margin-bottom:8px;">⚠️ Due Date Reminders</div>
+    ${alerts.map(c=>{
+      const due=new Date(c.duedate);due.setHours(0,0,0,0);
+      const today2=new Date();today2.setHours(0,0,0,0);
+      const diff=Math.round((due-today2)/(1000*60*60*24));
+      const bal=((c.totalCredit||0)-(c.totalPaid||0)).toFixed(2);
+      const tag=diff<0?`<span style="color:var(--red);font-weight:700;">⚠️ ${Math.abs(diff)} நாள் கடந்துவிட்டது!</span>`:
+                diff===0?`<span style="color:var(--orange);font-weight:700;">🔴 இன்றே கொடுக்கணும்!</span>`:
+                `<span style="color:var(--orange);">🟡 ${diff} நாள் மட்டுமே உள்ளது</span>`;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(204,34,34,0.2);">
+        <div><strong>${c.name}</strong> ${c.phone?`<small style="color:var(--text2)">📱${c.phone}</small>`:''}<br>${tag}</div>
+        <div style="text-align:right;"><strong style="color:var(--red);">₹${bal}</strong><br><small>${c.duedate}</small></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function renderCreditList(){
+  const tbody=document.getElementById('credit-body');
+  if(!creditRecords.length){tbody.innerHTML='<tr><td colspan="9" class="empty">Credit records இல்லை</td></tr>';return;}
+  let data=creditRecords;
+  if(creditFilter==='pending') data=data.filter(c=>((c.totalCredit||0)-(c.totalPaid||0))>0);
+  if(creditFilter==='cleared') data=data.filter(c=>((c.totalCredit||0)-(c.totalPaid||0))<=0);
+  const today=new Date();today.setHours(0,0,0,0);
+  tbody.innerHTML=data.map(c=>{
+    const balance=(c.totalCredit||0)-(c.totalPaid||0);
+    let dueBadge='—';
+    if(c.duedate){
+      const due=new Date(c.duedate);due.setHours(0,0,0,0);
+      const diff=Math.round((due-today)/(1000*60*60*24));
+      dueBadge=diff<0?`<span style="color:var(--red);font-weight:700;">${c.duedate} ⚠️ Overdue</span>`:
+               diff===0?`<span style="color:var(--orange);font-weight:700;">${c.duedate} 🔴 Today!</span>`:
+               `<span style="color:${diff<=3?'var(--orange)':'var(--text2)'};">${c.duedate}</span>`;
+    }
+    return `<tr>
+      <td>${fmtDateShort(c.transactions[c.transactions.length-1]?.date)}</td>
+      <td><strong>${c.name}</strong></td>
+      <td>${c.phone||'—'}</td>
+      <td style="color:var(--red);">₹${(c.totalCredit||0).toFixed(2)}</td>
+      <td style="color:var(--green);">₹${(c.totalPaid||0).toFixed(2)}</td>
+      <td><strong style="color:${balance>0?'var(--orange)':'var(--green)'}">₹${balance.toFixed(2)}</strong></td>
+      <td style="font-size:0.78rem;">${dueBadge}</td>
+      <td style="font-size:0.75rem;color:var(--text2)">${c.transactions[c.transactions.length-1]?.note||'—'}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="quickPayCredit('${c.id}')" title="Payment Received">💰</button>
+        <button class="btn btn-red btn-sm" onclick="deleteCredit('${c.id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function quickPayCredit(id){
+  const amt=prompt('திரும்ப கொடுத்த Amount (₹):');
+  if(!amt)return;
+  const a=parseFloat(amt);if(!a)return;
+  const c=creditRecords.find(x=>x.id===id);if(!c)return;
+  c.transactions.push({date:new Date().toISOString(),type:'debit',amount:a,note:'Payment received'});
+  c.totalPaid=(c.totalPaid||0)+a;
+  saveCreditRecords();
+  showNotif('✅ Payment recorded!');renderCreditList();renderCreditDueAlerts();
+}
+function deleteCredit(id){
+  if(!confirm('Delete பண்ணவா?'))return;
+  creditRecords=creditRecords.filter(c=>c.id!==id);
+  saveCreditRecords();
+  renderCreditList();renderCreditDueAlerts();
+}
+
+// BORROWED / LOAN (நாம் வாங்கினது)
+let borrowedRecords = JSON.parse(localStorage.getItem('sm_borrowed')||'[]');
+function addBorrowed(){
+  const from=document.getElementById('br-from').value.trim();
+  const phone=document.getElementById('br-phone').value.trim();
+  const amount=parseFloat(document.getElementById('br-amount').value)||0;
+  const type=document.getElementById('br-type').value;
+  const duedate=document.getElementById('br-duedate').value;
+  const loandate=document.getElementById('br-loandate').value;
+  const monthly=parseFloat(document.getElementById('br-monthly').value)||0;
+  const reason=document.getElementById('br-reason').value.trim();
+  const note=document.getElementById('br-note-extra')?document.getElementById('br-note-extra').value.trim():'';
+  if(!from||!amount){showNotif('❌ பெயர் மற்றும் Amount தேவை!','red');return;}
+  let rec=borrowedRecords.find(b=>b.phone&&b.phone===phone||(b.from.toLowerCase()===from.toLowerCase()&&!phone));
+  if(!rec){
+    rec={id:'BR'+Date.now(),from,phone,transactions:[],totalBorrowed:0,totalRepaid:0,duedate:'',loandate:'',monthly:0};
+    borrowedRecords.push(rec);
+  }
+  if(duedate) rec.duedate=duedate;
+  if(loandate) rec.loandate=loandate;
+  if(monthly) rec.monthly=monthly;
+  rec.transactions.push({date:new Date().toISOString(),type,amount,reason,note,duedate,loandate,monthly});
+  if(type==='borrowed') rec.totalBorrowed=(rec.totalBorrowed||0)+amount;
+  else rec.totalRepaid=(rec.totalRepaid||0)+amount;
+  fbSet('borrowedRecords',arrToObj(borrowedRecords));
+  showNotif('✅ Loan Record சேமிக்கப்பட்டது!');
+  ['br-from','br-phone','br-amount','br-reason','br-duedate','br-loandate','br-monthly','br-note-extra'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderBorrowedList();renderBorrowedDueAlerts();
+}
+function renderBorrowedDueAlerts(){
+  const el=document.getElementById('br-due-alerts');if(!el)return;
+  const today=new Date();today.setHours(0,0,0,0);
+  const alerts=borrowedRecords.filter(b=>{
+    const bal=(b.totalBorrowed||0)-(b.totalRepaid||0);
+    if(bal<=0)return false;
+    if(!b.duedate)return false;
+    const due=new Date(b.duedate);due.setHours(0,0,0,0);
+    return due<=new Date(today.getTime()+3*24*60*60*1000);
+  });
+  if(!alerts.length){el.innerHTML='';return;}
+  el.innerHTML=`<div style="background:rgba(124,58,173,0.08);border:1px solid rgba(124,58,173,0.3);border-radius:10px;padding:12px;margin-bottom:12px;">
+    <div style="font-weight:800;color:var(--purple);margin-bottom:8px;">⚠️ திரும்ப கொடுக்க வேண்டியது - Reminders</div>
+    ${alerts.map(b=>{
+      const due=new Date(b.duedate);due.setHours(0,0,0,0);
+      const today2=new Date();today2.setHours(0,0,0,0);
+      const diff=Math.round((due-today2)/(1000*60*60*24));
+      const bal=((b.totalBorrowed||0)-(b.totalRepaid||0)).toFixed(2);
+      const tag=diff<0?`<span style="color:var(--red);font-weight:700;">⚠️ ${Math.abs(diff)} நாள் கடந்துவிட்டது!</span>`:
+                diff===0?`<span style="color:var(--orange);font-weight:700;">🔴 இன்றே திரும்ப கொடுக்கணும்!</span>`:
+                `<span style="color:var(--orange);">🟡 ${diff} நாள் மட்டுமே உள்ளது</span>`;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(124,58,173,0.2);">
+        <div><strong>${b.from}</strong> ${b.phone?`<small style="color:var(--text2)">📱${b.phone}</small>`:''}<br>${tag}</div>
+        <div style="text-align:right;"><strong style="color:var(--purple);">₹${bal}</strong><br><small>${b.duedate}</small></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function renderBorrowedList(){
+  const tbody=document.getElementById('borrowed-body');if(!tbody)return;
+  if(!borrowedRecords.length){tbody.innerHTML='<tr><td colspan="10" class="empty">Loan Records இல்லை</td></tr>';return;}
+  const today=new Date();today.setHours(0,0,0,0);
+  tbody.innerHTML=borrowedRecords.map(b=>{
+    const balance=(b.totalBorrowed||0)-(b.totalRepaid||0);
+    let dueBadge='—';
+    if(b.duedate){
+      const due=new Date(b.duedate);due.setHours(0,0,0,0);
+      const diff=Math.round((due-today)/(1000*60*60*24));
+      dueBadge=diff<0?`<span style="color:var(--red);font-weight:700;">${b.duedate} ⚠️ Overdue</span>`:
+               diff===0?`<span style="color:var(--orange);font-weight:700;">${b.duedate} 🔴 Today!</span>`:
+               `<span style="color:${diff<=3?'var(--orange)':'var(--text2)'};">${b.duedate}</span>`;
+    }
+    return `<tr>
+      <td>${b.loandate?fmtDateShort(b.loandate):fmtDateShort(b.transactions[0]?.date)}</td>
+      <td><strong>${b.from}</strong></td>
+      <td>${b.phone||'—'}</td>
+      <td style="color:var(--purple);">₹${(b.totalBorrowed||0).toFixed(2)}</td>
+      <td style="color:var(--blue);font-weight:700;">${b.monthly?'₹'+b.monthly.toFixed(2):'—'}</td>
+      <td style="color:var(--green);">₹${(b.totalRepaid||0).toFixed(2)}</td>
+      <td><strong style="color:${balance>0?'var(--red)':'var(--green)'}">₹${balance.toFixed(2)}</strong></td>
+      <td style="font-size:0.78rem;">${dueBadge}</td>
+      <td style="font-size:0.75rem;color:var(--text2)">${b.transactions[b.transactions.length-1]?.reason||'—'}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="quickRepay('${b.id}')" title="Repaid">💰</button>
+        <button class="btn btn-red btn-sm" onclick="deleteBorrowed('${b.id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function quickRepay(id){
+  const amt=prompt('திரும்ப கொடுத்த Amount (₹):');
+  if(!amt)return;
+  const a=parseFloat(amt);if(!a)return;
+  const b=borrowedRecords.find(x=>x.id===id);if(!b)return;
+  b.transactions.push({date:new Date().toISOString(),type:'repaid',amount:a,reason:'Repaid'});
+  b.totalRepaid=(b.totalRepaid||0)+a;
+  fbSet('borrowedRecords',arrToObj(borrowedRecords));
+  showNotif('✅ Repayment recorded!');renderBorrowedList();renderBorrowedDueAlerts();
+}
+function deleteBorrowed(id){
+  if(!confirm('Delete பண்ணவா?'))return;
+  borrowedRecords=borrowedRecords.filter(b=>b.id!==id);
+  fbSet('borrowedRecords',arrToObj(borrowedRecords));
+  renderBorrowedList();
+}
+
+// STOCK
+function calcStkWsPerPc(){
+  const total=parseFloat(document.getElementById('stk-ws-total').value)||0;
+  const qty=parseInt(document.getElementById('stk-qty').value)||1;
+  const el=document.getElementById('stk-ws-piece');
+  if(el&&total>0&&qty>0)el.value=(total/qty).toFixed(2);
+}
+function addStock(){
+  const name=document.getElementById('stk-name').value.trim();
+  const qty=parseInt(document.getElementById('stk-qty').value)||0;
+  if(!name){showNotif('❌ Item பெயர் உள்ளிடவும்!','red');return;}
+  const existing=stockItems.find(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(existing){
+    existing.qty+=qty;existing.lastUpdated=new Date().toISOString();
+    // Update prices if provided
+    const mrp=parseFloat(document.getElementById('stk-mrp').value);
+    const wsTotal=parseFloat(document.getElementById('stk-ws-total').value);
+    const wsPiece=parseFloat(document.getElementById('stk-ws-piece').value);
+    const selling=parseFloat(document.getElementById('stk-selling').value);
+    if(mrp)existing.mrp=mrp;
+    if(wsTotal)existing.wsTotal=wsTotal;
+    if(wsPiece)existing.wsPiece=wsPiece;
+    if(selling)existing.selling=selling;
+    showNotif('✅ Stock updated!');
+  } else {
+    stockItems.push({
+      id:'ST'+Date.now(),name,cat:document.getElementById('stk-cat').value,
+      qty,unit:document.getElementById('stk-unit').value,
+      minQty:parseInt(document.getElementById('stk-min').value)||5,
+      mrp:parseFloat(document.getElementById('stk-mrp').value)||0,
+      wsTotal:parseFloat(document.getElementById('stk-ws-total').value)||0,
+      wsPiece:parseFloat(document.getElementById('stk-ws-piece').value)||0,
+      selling:parseFloat(document.getElementById('stk-selling').value)||0,
+      wholesale:parseFloat(document.getElementById('stk-ws-piece').value)||0, // backward compat
+      note:document.getElementById('stk-note').value,
+      lastUpdated:new Date().toISOString()
+    });
+    showNotif('✅ Stock சேர்க்கப்பட்டது!');
+  }
+  saveStockItems();
+  ['stk-name','stk-qty','stk-min','stk-note','stk-mrp','stk-ws-total','stk-ws-piece','stk-selling'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderStockList();
+}
+function renderStockList(){
+  const el=document.getElementById('stock-list');
+  const searchCat=(document.getElementById('stk-search-cat')||{value:''}).value.toLowerCase();
+  const searchName=(document.getElementById('stk-search-name')||{value:''}).value.toLowerCase();
+  let items=stockItems.filter(s=>{
+    return(!searchCat||s.cat.toLowerCase().includes(searchCat))&&
+           (!searchName||s.name.toLowerCase().includes(searchName));
+  });
+  if(!items.length){el.innerHTML='<div class="empty"><div class="empty-icon">📦</div>Stock items இல்லை</div>';return;}
+  const ownerView=isOwner();
+  el.innerHTML=items.map(s=>{
+    const mrp=s.mrp||0; const wsPiece=s.wsPiece||s.wholesale||0; const wsTotal=s.wsTotal||0; const selling=s.selling||0;
+    const priceInfo=ownerView?`
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+        ${mrp?`<span class="badge b-blue" style="font-size:0.68rem;">MRP: ₹${mrp.toFixed(2)}</span>`:''}
+        ${wsTotal?`<span class="badge b-purple" style="font-size:0.68rem;">WS Total: ₹${wsTotal.toFixed(2)}</span>`:''}
+        ${wsPiece?`<span class="badge b-orange" style="font-size:0.68rem;">WS/Pc: ₹${wsPiece.toFixed(2)}</span>`:''}
+        ${selling?`<span class="badge b-green" style="font-size:0.68rem;">Sell: ₹${selling.toFixed(2)}</span>`:''}
+      </div>`:
+      `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+        ${mrp?`<span class="badge b-blue" style="font-size:0.68rem;">MRP: ₹${mrp.toFixed(2)}</span>`:''}
+        ${selling?`<span class="badge b-green" style="font-size:0.68rem;">Sell: ₹${selling.toFixed(2)}</span>`:''}
+      </div>`;
+    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;">
+        <div style="flex:1;">
+          <div style="font-weight:700;">${s.name} <span class="badge b-blue">${s.cat}</span>${s.qty<=s.minQty?'<span class="badge b-red" style="margin-left:4px;">⚠️ Low</span>':''}</div>
+          <div style="font-size:0.75rem;color:var(--text2);margin-top:2px;">Updated: ${fmtDateShort(s.lastUpdated)} ${s.note?'· '+s.note:''}</div>
+          ${priceInfo}
+        </div>
+        <div style="text-align:right;">
+          <div class="${s.qty<=s.minQty?'stock-low':''}"><strong style="font-size:1rem;">${s.qty}</strong> <span style="font-size:0.75rem;color:var(--text2);">${s.unit}</span></div>
+          <div style="font-size:0.72rem;color:var(--text2);">Min: ${s.minQty}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-ghost btn-sm" onclick="adjustStock('${s.id}',1)" style="padding:3px 10px;">+1</button>
+        <button class="btn btn-ghost btn-sm" onclick="adjustStock('${s.id}',-1)" style="padding:3px 10px;">-1</button>
+        <button class="btn btn-ghost btn-sm" onclick="editStockPrice('${s.id}')" style="padding:3px 10px;font-size:0.72rem;">✏️ Edit Prices</button>
+        <button class="btn btn-red btn-sm" onclick="deleteStock('${s.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function editStockPrice(id){
+  if(!isOwner()){showNotif('❌ Owner மட்டும் prices edit பண்ணலாம்!','red');return;}
+  const s=stockItems.find(x=>x.id===id);if(!s)return;
+  const mrp=prompt('MRP (₹):',s.mrp||0);if(mrp===null)return;
+  const wsTotal=prompt('Wholesale Total (₹):',s.wsTotal||0);if(wsTotal===null)return;
+  const wsPiece=prompt('Wholesale Per Piece (₹):',s.wsPiece||0);if(wsPiece===null)return;
+  const selling=prompt('Selling Price (₹):',s.selling||0);if(selling===null)return;
+  s.mrp=parseFloat(mrp)||0;s.wsTotal=parseFloat(wsTotal)||0;s.wsPiece=parseFloat(wsPiece)||0;s.selling=parseFloat(selling)||0;
+  s.wholesale=s.wsPiece;s.lastUpdated=new Date().toISOString();
+  saveStockItems();renderStockList();showNotif('✅ Prices updated!');
+}
+function adjustStock(id,delta){
+  const s=stockItems.find(x=>x.id===id);
+  if(!s)return;
+  s.qty=Math.max(0,s.qty+delta);
+  s.lastUpdated=new Date().toISOString();
+  saveStockItems();
+  renderStockList();
+}
+function deleteStock(id){
+  if(!confirm('Delete?'))return;
+  stockItems=stockItems.filter(x=>x.id!==id);
+  saveStockItems();
+  renderStockList();
+}
+
+// MONTHLY SHEET
+function renderMonthly(){
+  const month=document.getElementById('monthly-month').value;
+  if(!month)return;
+  const [yr,mn]=month.split('-');
+  const gM=giftOrders.filter(o=>{const d=new Date(o.date);return d.getFullYear()==yr&&(d.getMonth()+1)==parseInt(mn);});
+  const fM=frameOrders.filter(o=>{const d=new Date(o.date);return d.getFullYear()==yr&&(d.getMonth()+1)==parseInt(mn);});
+  const xM=xeroxBills.filter(b=>{const d=new Date(b.date);return d.getFullYear()==yr&&(d.getMonth()+1)==parseInt(mn);});
+  const sM=studioBookings.filter(b=>{const d=new Date(b.date);return d.getFullYear()==yr&&(d.getMonth()+1)==parseInt(mn);});
+  const gTotal=gM.reduce((s,o)=>s+o.total,0);
+  const fTotal=fM.reduce((s,o)=>s+o.total,0);
+  const xTotal=xM.reduce((s,b)=>s+b.total,0);
+  const stTotal=sM.reduce((s,b)=>s+b.total,0);
+  const grandTotal=gTotal+fTotal+xTotal+stTotal;
+  // Limit rows: Xerox=2, Gift/Frame=20
+  const gShow=gM.slice(-20);const fShow=fM.slice(-20);const xShow=xM.slice(-2);
+  const el=document.getElementById('monthly-content');
+  el.innerHTML=`
+    <div class="stats">
+      <div class="stat s-pink"><div class="stat-val" style="color:var(--pink)">₹${gTotal.toFixed(0)}</div><div class="stat-lbl">🎁 Gift Sales</div></div>
+      <div class="stat s-blue"><div class="stat-val" style="color:var(--blue)">₹${fTotal.toFixed(0)}</div><div class="stat-lbl">🖼️ Frame Sales</div></div>
+      <div class="stat s-green"><div class="stat-val" style="color:var(--green)">₹${xTotal.toFixed(0)}</div><div class="stat-lbl">🖨️ Xerox Sales</div></div>
+      <div class="stat" style="border-top:3px solid var(--purple)"><div class="stat-val" style="color:var(--purple)">₹${stTotal.toFixed(0)}</div><div class="stat-lbl">🎨 Studio Revenue</div></div>
+      <div class="stat s-gold"><div class="stat-val" style="color:var(--gold)">₹${grandTotal.toFixed(0)}</div><div class="stat-lbl">💰 மொத்தம்</div></div>
+    </div>
+    <div style="margin-top:14px;">
+      <div style="font-weight:700;margin-bottom:8px;font-size:0.9rem;">📋 Gift Orders (${gM.length}) <span style="font-size:0.75rem;font-weight:400;color:var(--text2);">— Showing last 20</span></div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Order#</th><th>Date</th><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
+      <tbody>${gShow.length?gShow.map(o=>`<tr><td>${o.id}</td><td>${fmtDateShort(o.date)}</td><td>${o.cname}</td><td>${o.prod}</td><td>₹${o.total.toFixed(2)}</td><td>${payBadge(o.payStatus)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">இல்லை</td></tr>'}</tbody>
+      <tfoot><tr><td colspan="4" style="font-weight:800;text-align:right;padding:6px;">🎁 Gift Total:</td><td colspan="2" style="font-weight:800;color:var(--pink);">₹${gTotal.toFixed(2)}</td></tr></tfoot></table></div>
+      <div style="font-weight:700;margin:14px 0 8px;font-size:0.9rem;">🖼️ Frame Orders (${fM.length}) <span style="font-size:0.75rem;font-weight:400;color:var(--text2);">— Showing last 20</span></div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Order#</th><th>Date</th><th>Customer</th><th>Frame</th><th>Amount</th><th>Status</th></tr></thead>
+      <tbody>${fShow.length?fShow.map(o=>`<tr><td>${o.id}</td><td>${fmtDateShort(o.date)}</td><td>${o.cname}</td><td>${o.ftype} ${o.size}</td><td>₹${o.total.toFixed(2)}</td><td>${payBadge(o.payStatus)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">இல்லை</td></tr>'}</tbody>
+      <tfoot><tr><td colspan="4" style="font-weight:800;text-align:right;padding:6px;">🖼️ Frame Total:</td><td colspan="2" style="font-weight:800;color:var(--blue);">₹${fTotal.toFixed(2)}</td></tr></tfoot></table></div>
+      <div style="font-weight:700;margin:14px 0 8px;font-size:0.9rem;">🖨️ Xerox Bills (${xM.length}) <span style="font-size:0.75rem;font-weight:400;color:var(--text2);">— Showing last 2 | Total all ₹${xTotal.toFixed(2)}</span></div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Bill#</th><th>Date</th><th>Ref</th><th>Items</th><th>Amount</th></tr></thead>
+      <tbody>${xShow.length?xShow.map(b=>`<tr><td>${b.id}</td><td>${fmtDateShort(b.date)}</td><td>${b.ref}</td><td>${b.items.length}</td><td>₹${b.total.toFixed(2)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">இல்லை</td></tr>'}</tbody>
+      <tfoot><tr><td colspan="3" style="font-weight:800;text-align:right;padding:6px;">🖨️ Xerox Total (all ${xM.length} bills):</td><td colspan="2" style="font-weight:800;color:var(--green);">₹${xTotal.toFixed(2)}</td></tr></tfoot></table></div>
+      <div style="font-weight:700;margin:14px 0 8px;font-size:0.9rem;">🎨 Studio Bookings (${sM.length})</div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Booking#</th><th>Date</th><th>Customer</th><th>Service</th><th>Amount</th><th>Status</th></tr></thead>
+      <tbody>${sM.length?sM.map(b=>`<tr><td>${b.id}</td><td>${fmtDateShort(b.date)}</td><td>${b.cname}</td><td>${b.service}</td><td>₹${b.total.toFixed(2)}</td><td>${payBadge(b.payStatus)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">இல்லை</td></tr>'}</tbody></table></div>
+      <div style="margin-top:16px;padding:14px;background:rgba(200,150,10,0.08);border:2px solid var(--gold);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:1rem;font-weight:800;">💰 மொத்த Monthly Total</span>
+        <span style="font-size:1.5rem;font-weight:800;color:var(--gold);">₹${grandTotal.toFixed(2)}</span>
+      </div>
+    </div>`;
+}
+
+// YEARLY SHEET
+function renderYearly(){
+  const yr=parseInt(document.getElementById('yearly-year').value);
+  if(!yr){showNotif('❌ Year உள்ளிடவும்!','red');return;}
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let rows='';let grandTotal=0;
+  months.forEach((m,i)=>{
+    const mn=i+1;
+    const gM=giftOrders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===yr&&(d.getMonth()+1)===mn;});
+    const fM=frameOrders.filter(o=>{const d=new Date(o.date);return d.getFullYear()===yr&&(d.getMonth()+1)===mn;});
+    const xM=xeroxBills.filter(b=>{const d=new Date(b.date);return d.getFullYear()===yr&&(d.getMonth()+1)===mn;});
+    const sM=studioBookings.filter(b=>{const d=new Date(b.date);return d.getFullYear()===yr&&(d.getMonth()+1)===mn;});
+    const gT=gM.reduce((s,o)=>s+o.total,0);
+    const fT=fM.reduce((s,o)=>s+o.total,0);
+    const xT=xM.reduce((s,b)=>s+b.total,0);
+    const sT=sM.reduce((s,b)=>s+b.total,0);
+    const total=gT+fT+xT+sT;
+    grandTotal+=total;
+    const hasDat=gM.length||fM.length||xM.length||sM.length;
+    rows+=`<tr style="${hasDat?'':'color:#aaa'}">
+      <td><strong>${m} ${yr}</strong></td>
+      <td style="color:var(--pink);">${gM.length?`₹${gT.toFixed(0)} (${gM.length})`:'—'}</td>
+      <td style="color:var(--blue);">${fM.length?`₹${fT.toFixed(0)} (${fM.length})`:'—'}</td>
+      <td style="color:var(--green);">${xM.length?`₹${xT.toFixed(0)} (${xM.length})`:'—'}</td>
+      <td style="color:var(--purple);">${sM.length?`₹${sT.toFixed(0)} (${sM.length})`:'—'}</td>
+      <td><strong style="color:${total>0?'var(--gold)':'#aaa'};">${total>0?'₹'+total.toFixed(0):'—'}</strong></td>
+    </tr>`;
+  });
+  const el=document.getElementById('yearly-content');
+  el.innerHTML=`
+    <div style="padding:14px;background:rgba(200,150,10,0.08);border:2px solid var(--gold);border-radius:10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:1rem;font-weight:800;">💰 ${yr} Total Revenue</span>
+      <span style="font-size:1.8rem;font-weight:800;color:var(--gold);">₹${grandTotal.toFixed(2)}</span>
+    </div>
+    <div class="tbl-wrap"><table class="tbl">
+      <thead><tr><th>Month</th><th style="color:var(--pink);">🎁 Gift</th><th style="color:var(--blue);">🖼️ Frame</th><th style="color:var(--green);">🖨️ Xerox</th><th style="color:var(--purple);">🎨 Studio</th><th style="color:var(--gold);">💰 Total</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="background:rgba(200,150,10,0.1);font-weight:800;">
+        <td>📅 GRAND TOTAL</td>
+        <td style="color:var(--pink);">₹${giftOrders.filter(o=>new Date(o.date).getFullYear()===yr).reduce((s,o)=>s+o.total,0).toFixed(0)}</td>
+        <td style="color:var(--blue);">₹${frameOrders.filter(o=>new Date(o.date).getFullYear()===yr).reduce((s,o)=>s+o.total,0).toFixed(0)}</td>
+        <td style="color:var(--green);">₹${xeroxBills.filter(b=>new Date(b.date).getFullYear()===yr).reduce((s,b)=>s+b.total,0).toFixed(0)}</td>
+        <td style="color:var(--purple);">₹${studioBookings.filter(b=>new Date(b.date).getFullYear()===yr).reduce((s,b)=>s+b.total,0).toFixed(0)}</td>
+        <td style="color:var(--gold);font-size:1.1rem;">₹${grandTotal.toFixed(0)}</td>
+      </tr></tfoot>
+    </table></div>`;
+}
+
+// SETTINGS
+function loadSettings(){
+  const s=settings;
+  const sn=document.getElementById('set-shopname');const sa=document.getElementById('set-addr');
+  const sp=document.getElementById('set-phone');const se=document.getElementById('set-editdays');
+  if(sn)sn.value=s.shopName||'';
+  if(sa)sa.value=s.shopAddr||'';
+  if(sp)sp.value=s.shopPhone||'';
+  if(se)se.value=s.editLockDays||2;
+}
+function saveSettingsUI(){
+  settings.shopName=document.getElementById('set-shopname').value;
+  settings.shopAddr=document.getElementById('set-addr').value;
+  settings.shopPhone=document.getElementById('set-phone').value;
+  settings.editLockDays=parseInt(document.getElementById('set-editdays').value)||2;
+  saveSettings();
+  showNotif('✅ Settings Saved!');
+}
+function changePassword(){
+  const old=document.getElementById('cp-old').value;
+  const nw=document.getElementById('cp-new').value;
+  const owner=approvedOwners.find(o=>o.email===currentUser.email);
+  if(!owner||owner.password!==old){showNotif('❌ Current password தவறு!','red');return;}
+  owner.password=nw;
+  saveApprovedOwners();
+  showNotif('✅ Password Changed!');
+  document.getElementById('cp-old').value='';document.getElementById('cp-new').value='';
+}
+function renderApprovedOwners(){
+  const el=document.getElementById('approved-owners-list');
+  if(!el)return;
+  el.innerHTML=approvedOwners.map(o=>`
+    <div class="req-card">
+      <div class="req-info">
+        <div class="req-name">👤 ${o.name||o.email} ${o.isPrimary?'<span class="badge b-gold">Primary</span>':''}</div>
+        <div class="req-email">✉️ ${o.email}</div>
+      </div>
+      ${!o.isPrimary&&currentUser.isPrimary?`<button class="btn btn-red btn-sm" onclick="removeOwner('${o.email}')">Remove</button>`:''}
+    </div>
+  `).join('');
+}
+function removeOwner(email){
+  if(!confirm('இந்த owner remove பண்ணவா?'))return;
+  approvedOwners=approvedOwners.filter(o=>o.email!==email);
+  saveApprovedOwners();
+  renderApprovedOwners();showNotif('✅ Owner removed!');
+}
+
+// ===== STUDIO BOOKINGS =====
+function calcStudioTotal(){
+  const rate=parseFloat(document.getElementById('st-rate').value)||0;
+  const td=document.getElementById('st-total-display');
+  if(td)td.value=rate.toFixed(2);
+  calcStudioBalance();
+}
+function calcStudioBalance(){
+  const rate=parseFloat(document.getElementById('st-rate').value)||0;
+  const advance=parseFloat(document.getElementById('st-advance').value)||0;
+  const bal=Math.max(0,rate-advance);
+  const bd=document.getElementById('st-balance-display');
+  if(bd)bd.value=bal.toFixed(2);
+}
+function toggleStudioUPI(){
+  const pay=document.getElementById('st-pay').value;
+  const f=document.getElementById('st-upi-field');
+  if(f)f.style.display=(pay==='UPI / GPay'||pay==='PhonePe')?'block':'none';
+}
+function saveStudioBooking(){
+  const cname=document.getElementById('st-cname').value.trim();
+  const phone=document.getElementById('st-phone').value.trim();
+  if(!cname){showNotif('❌ Customer பெயர் உள்ளிடவும்!','red');return;}
+  if(!phone){showNotif('❌ Mobile number உள்ளிடவும்!','red');return;}
+  const rate=parseFloat(document.getElementById('st-rate').value)||0;
+  const advance=parseFloat(document.getElementById('st-advance').value)||0;
+  const upiId=document.getElementById('st-upi-id')?document.getElementById('st-upi-id').value:'';
+  const booking={
+    id:document.getElementById('st-bookno').value,
+    date:new Date().toISOString(),createdBy:currentUser.name,
+    cname,phone,
+    email:document.getElementById('st-email').value,
+    whatsapp:document.getElementById('st-whatsapp').value,
+    bookdate:document.getElementById('st-bookdate').value,
+    addr:document.getElementById('st-addr').value,
+    note:document.getElementById('st-note').value,
+    service:document.getElementById('st-service').value,
+    duration:document.getElementById('st-duration').value,
+    sessionDt:document.getElementById('st-session-dt').value,
+    package:document.getElementById('st-package').value,
+    photos:document.getElementById('st-photos').value,
+    delivery:document.getElementById('st-delivery').value,
+    delivDays:document.getElementById('st-delivdays').value,
+    rate,total:rate,advance,balance:Math.max(0,rate-advance),
+    payMethod:document.getElementById('st-pay').value,
+    upiId,payStatus:document.getElementById('st-paystatus').value,
+  };
+  studioBookings.push(booking);
+  saveStudioBookings();
+  showNotif('✅ Studio Booking சேமிக்கப்பட்டது!');
+  clearStudioForm();genOrderNos();renderStudioStats();refreshDash();
+}
+function clearStudioForm(){
+  ['st-cname','st-phone','st-email','st-whatsapp','st-addr','st-note','st-package','st-photos','st-delivdays','st-rate','st-advance','st-total-display','st-balance-display','st-session-dt','st-upi-id'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const bd=document.getElementById('st-bookdate');if(bd)bd.value=new Date().toISOString().split('T')[0];
+  const dd=document.getElementById('st-delivdays');if(dd)dd.value=7;
+  const uf=document.getElementById('st-upi-field');if(uf)uf.style.display='none';
+}
+function renderStudioBookings(){
+  const search=(document.getElementById('st-search')||{value:''}).value.toLowerCase();
+  const fPay=(document.getElementById('st-filter-pay')||{value:''}).value;
+  const fSvc=(document.getElementById('st-filter-service')||{value:''}).value;
+  let data=studioBookings.filter(b=>{
+    return(!search||b.id.toLowerCase().includes(search)||b.cname.toLowerCase().includes(search)||b.phone.includes(search))&&
+           (!fPay||b.payStatus===fPay)&&(!fSvc||b.service===fSvc);
+  }).slice().reverse();
+  const el=document.getElementById('studio-bookings-list');
+  if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">🎨</div>Booking இல்லை</div>';return;}
+  el.innerHTML=data.map(b=>{
+    const locked=!canEdit(b.date);const canDel=canDelete(b.date);
+    return `<div class="order-card">
+      <div>
+        <div class="order-num">#${b.id} · ${fmtDate(b.date)} ${lockLabel(b.date)}</div>
+        <div class="order-cust">👤 ${b.cname} &nbsp;<span style="color:var(--text2);font-size:0.82rem;">📱 ${b.phone}</span></div>
+        <div class="order-detail">🎨 ${b.service} · ${b.duration}</div>
+        ${b.sessionDt?`<div class="order-detail">📅 Session: ${new Date(b.sessionDt).toLocaleString('en-IN')}</div>`:''}
+        ${b.package?`<div class="order-detail">📦 Package: ${b.package}</div>`:''}
+        ${b.advance>0?`<div class="order-detail" style="color:var(--green);">✅ Advance: ₹${b.advance.toFixed(2)}</div>`:''}
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+          ${payBadge(b.payStatus)}<span class="badge b-blue">${b.payMethod}</span>
+        </div>
+        ${b.balance>0?`<div style="margin-top:4px;font-size:0.78rem;color:var(--red);">⚠️ Balance: ₹${b.balance.toFixed(2)}</div>`:''}
+      </div>
+      <div class="order-actions">
+        <div class="order-amt" style="color:var(--purple);">₹${b.total.toFixed(2)}</div>
+        <button class="btn btn-sm" style="background:var(--purple);color:#fff;" onclick="showStudioBill('${b.id}')">🧾 Bill</button>
+        ${canDel?`<button class="btn btn-red btn-sm" onclick="deleteStudioBooking('${b.id}')">🗑️</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  renderStudioStats();
+}
+function deleteStudioBooking(id){
+  if(!confirm('இந்த booking delete பண்ணவா?'))return;
+  studioBookings=studioBookings.filter(b=>b.id!==id);
+  saveStudioBookings();
+  renderStudioBookings();
+}
+function renderStudioStats(){
+  const today=new Date().toISOString().split('T')[0];
+  const todayB=studioBookings.filter(b=>b.date.startsWith(today));
+  const pending=studioBookings.filter(b=>b.payStatus==='pending').length;
+  const html=`
+    <div class="stat" style="--c:var(--purple);"><div class="stat-val" style="color:var(--purple)">${todayB.length}</div><div class="stat-lbl">📅 இன்று Bookings</div></div>
+    <div class="stat s-gold"><div class="stat-val" style="color:var(--gold)">₹${todayB.reduce((s,b)=>s+b.total,0).toFixed(0)}</div><div class="stat-lbl">💰 இன்று Revenue</div></div>
+    <div class="stat s-blue"><div class="stat-val" style="color:var(--blue)">${studioBookings.length}</div><div class="stat-lbl">📋 Total Bookings</div></div>
+    <div class="stat s-green"><div class="stat-val" style="color:var(--red)">${pending}</div><div class="stat-lbl">⏳ Pending</div></div>`;
+  ['studio-stats','studio-report-stats'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=html;});
+}
+function renderStudioReport(){
+  const from=document.getElementById('st-from').value;const to=document.getElementById('st-to').value;
+  const data=studioBookings.filter(b=>{const d=b.date.split('T')[0];return(!from||d>=from)&&(!to||d<=to);}).slice().reverse();
+  const tbody=document.getElementById('studio-report-body');
+  if(!data.length){tbody.innerHTML='<tr><td colspan="9" class="empty">Data இல்லை</td></tr>';return;}
+  tbody.innerHTML=data.map(b=>`<tr>
+    <td>${b.id}</td><td>${fmtDate(b.date)}</td>
+    <td>${b.cname}<br><small>${b.phone}</small></td>
+    <td>${b.service}</td>
+    <td><strong>₹${b.total.toFixed(2)}</strong></td>
+    <td style="color:var(--green);">₹${b.advance.toFixed(2)}</td>
+    <td style="color:var(--red);">₹${b.balance.toFixed(2)}</td>
+    <td>${payBadge(b.payStatus)}</td>
+    <td><button class="btn btn-sm" style="background:var(--purple);color:#fff;" onclick="showStudioBill('${b.id}')">🧾</button></td>
+  </tr>`).join('');
+}
+function showStudioBill(id){
+  const b=studioBookings.find(x=>x.id===id);if(!b)return;
+  const rows=[
+    ['Booking #',b.id],['Customer',b.cname],['Mobile',b.phone],
+    ...(b.email?[['Email',b.email]]:[]),
+    ...(b.addr?[['Address',b.addr]]:[]),
+    ['Service',b.service],['Duration',b.duration],
+    ...(b.package?[['Package',b.package]]:[]),
+    ...(b.sessionDt?[['Session',new Date(b.sessionDt).toLocaleString('en-IN')]]:[]),
+    ...(b.photos?[['Photos Delivered',b.photos]]:[]),
+    ['Delivery',b.delivery],['Payment',b.payMethod],
+    ...(b.upiId?[['UPI ID',b.upiId]]:[]),
+    ...(b.advance>0?[['Advance Paid',`₹${b.advance.toFixed(2)}`]]:[]),
+    ...(b.balance>0?[['Balance Due',`₹${b.balance.toFixed(2)}`,true]]:[]),
+  ];
+  const html=billTable('🎨 STUDIO BOOKING RECEIPT','#7c3aad',b.id,fmtDate(b.date),rows,b.total,b.note);
+  currentPrintHTML=`<div style="font-family:Arial,sans-serif;padding:20px;max-width:420px;margin:0 auto;">${html}</div>`;
+  document.getElementById('billModalContent').innerHTML=html;
+  document.getElementById('billModal').classList.add('open');
+}
+
+// ===== BILL DISPLAY =====
+function showBill(type,id){
+  let html='';
+  if(type==='gift'){
+    const o=giftOrders.find(x=>x.id===id);if(!o)return;
+    html=billTable('🎁 GIFT ORDER RECEIPT','#3D2B1F',o.id,fmtDate(o.date),[
+      ['Order #',o.id],['Customer',o.cname],['Mobile',o.phone],['Address',o.addr],
+      ['Product',`${o.prod} (${o.cat})`],
+      ...(o.customName?[['🎨 Custom Name',o.customName]]:[]),
+      ...(o.customDetail?[['Custom Details',o.customDetail]]:[]),
+      ...(o.mrp>0?[['MRP',`₹${o.mrp} × ${o.qty} = ₹${(o.mrp*o.qty).toFixed(2)}`]]:[]),
+      ['Qty × Rate',`${o.qty} × ₹${o.rate}`],
+      ['Payment',o.payMethod],
+      ...(o.upiId?[['UPI ID',o.upiId]]:[]),
+      ...(o.advance>0?[['Advance Paid',`₹${o.advance.toFixed(2)}`]]:[]),
+      ...(o.balance>0?[['Balance Due',`₹${o.balance.toFixed(2)}`,true]]:[]),
+      ['Courier',o.courier],
+      ...(o.trackId?[['Tracking',o.trackId]]:[])
+    ],o.total,o.note);
+  } else if(type==='frame'){
+    const o=frameOrders.find(x=>x.id===id);if(!o)return;
+    html=billTable('🖼️ FRAME ORDER RECEIPT','#1a3a5c',o.id,fmtDate(o.date),[
+      ['Order #',o.id],['Customer',o.cname],['Mobile',o.phone],
+      ...(o.addr?[['Address',o.addr]]:[]),
+      ['Frame Type',o.ftype],['Size',o.size],['Material / Color',`${o.material} · ${o.color}`],
+      ['Photo Print',o.printing==='yes'?'✅ Yes':'❌ No'],
+      ...(o.customName?[['🎨 Custom Name',o.customName]]:[]),
+      ...(o.customDetail?[['Custom Details',o.customDetail]]:[]),
+      ...(o.mrp>0?[['MRP',`₹${o.mrp} × ${o.qty} = ₹${(o.mrp*o.qty).toFixed(2)}`]]:[]),
+      ['Qty × Rate',`${o.qty} × ₹${o.rate}`],['Payment',o.payMethod],
+      ...(o.upiId?[['UPI ID',o.upiId]]:[]),
+      ...(o.advance>0?[['Advance Paid',`₹${o.advance.toFixed(2)}`]]:[]),
+      ...(o.balance>0?[['Balance Due',`₹${o.balance.toFixed(2)}`,true]]:[]),
+      ['Courier',o.courier],
+      ...(o.trackId?[['Tracking',o.trackId]]:[])
+    ],o.total,o.note);
+  } else {
+    const b=xeroxBills.find(x=>x.id===id);if(!b)return;
+    const rows=b.items.map((it,i)=>`<tr style="border-bottom:1px solid #eee"><td style="padding:4px 6px">${i+1}</td><td style="padding:4px 6px">${it.item}${it.customName?`<br><small style="color:#7c3aad;font-weight:700;">🎨 "${it.customName}"</small>`:''}</td><td style="padding:4px 6px">${it.qty}</td><td style="padding:4px 6px">₹${it.rate.toFixed(2)}</td><td style="padding:4px 6px;text-align:right">₹${it.amt.toFixed(2)}</td></tr>`).join('');
+    html=`<div style="text-align:center;margin-bottom:14px;"><div style="font-size:1.1rem;font-weight:800;color:#1a5c1a">🖨️ XEROX STATIONERY ITEM AND MONEY TRANSFERS AND NET CENTER</div><div style="font-size:0.78rem;color:#666">${fmtDate(b.date)} · Ref: ${b.ref}</div></div>
+    <table style="width:100%;border-collapse:collapse;font-size:0.82rem;color:#111;margin-bottom:10px"><thead><tr style="background:#f0f0f0"><th style="padding:6px">S#</th><th style="padding:6px;text-align:left">Item</th><th style="padding:6px">Qty</th><th style="padding:6px">Rate</th><th style="padding:6px;text-align:right">Amt</th></tr></thead><tbody>${rows}</tbody></table>
+    <div style="max-width:200px;margin-left:auto;font-size:0.85rem;color:#111">
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>Subtotal</span><span>₹${b.subtotal.toFixed(2)}</span></div>
+      ${b.discount>0?`<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>Discount</span><span>-₹${b.discount.toFixed(2)}</span></div>`:''}
+      <div style="display:flex;justify-content:space-between;padding:6px 0;font-weight:800;font-size:1rem;border-top:2px solid #333"><span>மொத்தம்</span><span style="color:#27AE60">₹${b.total.toFixed(2)}</span></div>
+      <div style="font-size:0.78rem;color:#666">Payment: ${b.payMethod}</div>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:#999;border-top:1px dashed #ccc;padding-top:8px;">Bill No: ${b.id} · நன்றி!</div>`;
+  }
+  currentPrintHTML=`<div style="font-family:Arial,sans-serif;padding:20px;max-width:420px;margin:0 auto;">${html}</div>`;
+  document.getElementById('billModalContent').innerHTML=html;
+  document.getElementById('billModal').classList.add('open');
+}
+function billTable(title,color,id,date,rows,total,note){
+  const rowsHtml=rows.map(([l,v,red])=>`<tr style="border-bottom:1px dashed #ccc"><td style="padding:5px 0;color:#666">${l}</td><td style="text-align:right;${red?'color:red;font-weight:700':''}">${v}</td></tr>`).join('');
+  return `<div style="text-align:center;margin-bottom:14px;"><div style="font-size:1.3rem;font-weight:800;color:${color}">${title}</div><div style="font-size:0.78rem;color:#666">${date}</div></div>
+  <table style="width:100%;border-collapse:collapse;font-size:0.82rem;color:#111">${rowsHtml}
+  <tr><td style="padding:8px 0;font-weight:800;font-size:1rem;">TOTAL</td><td style="text-align:right;font-weight:800;font-size:1rem;color:#27AE60">₹${total.toFixed(2)}</td></tr></table>
+  ${note?`<div style="margin-top:10px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:0.78rem;color:#555">📝 ${note}</div>`:''}
+  <div style="text-align:center;margin-top:12px;font-size:0.72rem;color:#999;border-top:1px dashed #ccc;padding-top:8px;">நன்றி! மீண்டும் வாருங்கள்!</div>`;
+}
+function doPrint(){
+  document.getElementById('printContent').innerHTML=currentPrintHTML;
+  document.getElementById('printFrame').style.display='block';
+  window.print();
+  setTimeout(()=>{document.getElementById('printFrame').style.display='none';},1000);
+}
+
+// ===== EDIT MODAL =====
+function openEditModal(type,id){
+  const data=type==='gift'?giftOrders:frameOrders;
+  const o=data.find(x=>x.id===id);if(!o)return;
+  if(!canEdit(o.date)){showNotif('🔒 இந்த order lock ஆகிவிட்டது!','red');return;}
+  document.getElementById('eb-type').value=type;
+  document.getElementById('eb-id').value=id;
+  document.getElementById('eb-rate').value=o.rate;
+  document.getElementById('eb-qty').value=o.qty;
+  document.getElementById('eb-paystatus').value=o.payStatus;
+  document.getElementById('eb-advance').value=o.advance||0;
+  document.getElementById('eb-note').value=o.note||'';
+  document.getElementById('editBillModal').classList.add('open');
+}
+function saveEditBill(){
+  const type=document.getElementById('eb-type').value;
+  const id=document.getElementById('eb-id').value;
+  const data=type==='gift'?giftOrders:frameOrders;
+  const key=type==='gift'?'sm_gift':'sm_frame';
+  const o=data.find(x=>x.id===id);if(!o)return;
+  o.rate=parseFloat(document.getElementById('eb-rate').value)||o.rate;
+  o.qty=parseInt(document.getElementById('eb-qty').value)||o.qty;
+  o.total=o.rate*o.qty;
+  o.payStatus=document.getElementById('eb-paystatus').value;
+  o.advance=parseFloat(document.getElementById('eb-advance').value)||0;
+  o.balance=Math.max(0,o.total-o.advance);
+  o.note=document.getElementById('eb-note').value;
+  o.lastEdited=new Date().toISOString();o.editedBy=currentUser.name;
+  if(key==='sm_gift')saveGiftOrders();else saveFrameOrders();
+  closeModal('editBillModal');showNotif('✅ Updated!');
+  if(type==='gift')renderGiftOrders();else renderFrameOrders();
+}
+
+// ===== TRACKING =====
+function openTrackModal(type,id){
+  const data=type==='gift'?giftOrders:frameOrders;
+  const o=data.find(x=>x.id===id);if(!o)return;
+  document.getElementById('tm-type').value=type;
+  document.getElementById('tm-id').value=id;
+  document.getElementById('tm-track').value=o.trackId||'';
+  document.getElementById('tm-status').value=o.shipStatus||'processing';
+  document.getElementById('trackModal').classList.add('open');
+}
+function saveTracking(){
+  const type=document.getElementById('tm-type').value;
+  const id=document.getElementById('tm-id').value;
+  const trackId=document.getElementById('tm-track').value;
+  const status=document.getElementById('tm-status').value;
+  const data=type==='gift'?giftOrders:frameOrders;
+  const key=type==='gift'?'sm_gift':'sm_frame';
+  const o=data.find(x=>x.id===id);
+  if(o){o.trackId=trackId;o.shipStatus=status;}
+  if(key==='sm_gift')saveGiftOrders();else saveFrameOrders();
+  closeModal('trackModal');showNotif('✅ Tracking Updated!');
+  if(type==='gift'){renderGiftOrders();renderGiftTracking();}else{renderFrameOrders();renderFrameTracking();}
+}
+function deleteOrder(type,id){
+  if(!confirm('இந்த order delete பண்ணவா?'))return;
+  if(type==='gift'){giftOrders=giftOrders.filter(x=>x.id!==id);saveGiftOrders();renderGiftOrders();}
+  else{frameOrders=frameOrders.filter(x=>x.id!==id);saveFrameOrders();renderFrameOrders();}
+}
+
+// ===== HELPERS =====
+function genOrderNos(){
+  const now=new Date();const d=now.toISOString().slice(2,10).replace(/-/g,'');
+  const go=document.getElementById('g-ordno');const fo=document.getElementById('f-ordno');const xo=document.getElementById('x-billno');const so=document.getElementById('st-bookno');
+  if(go)go.value='GFT'+d+String(giftOrders.length+1).padStart(3,'0');
+  if(fo)fo.value='FRM'+d+String(frameOrders.length+1).padStart(3,'0');
+  if(xo)xo.value='XRX'+d+String(xeroxBills.length+1).padStart(3,'0');
+  if(so)so.value='STD'+d+String(studioBookings.length+1).padStart(3,'0');
+  // Set today date for studio booking
+  const bd=document.getElementById('st-bookdate');
+  if(bd&&!bd.value)bd.value=new Date().toISOString().split('T')[0];
+  // Set today date for order date fields
+  const today=new Date().toISOString().split('T')[0];
+  const god=document.getElementById('g-orderdate');if(god&&!god.value)god.value=today;
+  const fod=document.getElementById('f-orderdate');if(fod&&!fod.value)fod.value=today;
+  const xbd=document.getElementById('x-billdate');if(xbd&&!xbd.value)xbd.value=today;
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function copyTrack(id){navigator.clipboard.writeText(id).then(()=>showNotif('📋 Copied!'));}
+function fmtDate(iso){try{return new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return iso;}}
+function fmtDateShort(iso){try{return new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}catch{return iso||'—';}}
+function showNotif(msg,type='green'){
+  const n=document.getElementById('notif');
+  n.textContent=msg;n.style.background=type==='red'?'var(--red)':'var(--green)';
+  n.style.color=type==='red'?'#fff':'#000';n.style.display='block';
+  setTimeout(()=>n.style.display='none',2500);
+}
+document.querySelectorAll('.modal-bg').forEach(mb=>{
+  mb.addEventListener('click',e=>{if(e.target===mb)mb.classList.remove('open');});
+});
+
+// ===== STUDIO FRAME (separate from main Frame page) =====
+let sfOrders = JSON.parse(localStorage.getItem('sm_sfOrders')||'[]');
+function saveSfOrders(){localStorage.setItem('sm_sfOrders',JSON.stringify(sfOrders));fbSet('sfOrders',arrToObj(sfOrders));}
+
+function calcSfTotal(){
+  const rate=parseFloat(document.getElementById('sf-rate').value)||0;
+  const qty=parseInt(document.getElementById('sf-qty').value)||1;
+  const td=document.getElementById('sf-total');if(td)td.value=(rate*qty).toFixed(2);
+  calcSfBalance();
+}
+function calcSfBalance(){
+  const rate=parseFloat(document.getElementById('sf-rate').value)||0;
+  const qty=parseInt(document.getElementById('sf-qty').value)||1;
+  const adv=parseFloat(document.getElementById('sf-advance').value)||0;
+  const bl=document.getElementById('sf-balance');if(bl)bl.value=Math.max(0,rate*qty-adv).toFixed(2);
+}
+function toggleSfUPI(){
+  const pay=document.getElementById('sf-pay').value;
+  const f=document.getElementById('sf-upi-field');
+  if(f)f.style.display=(pay==='UPI / GPay'||pay==='PhonePe')?'block':'none';
+}
+function setSfRate(type,size,rate){
+  document.getElementById('sf-type').value=type;
+  document.getElementById('sf-size').value=size;
+  document.getElementById('sf-rate').value=rate;
+  calcSfTotal();
+}
+function saveSfOrder(){
+  const cname=document.getElementById('sf-cname').value.trim();
+  const phone=document.getElementById('sf-phone').value.trim();
+  if(!cname){showNotif('❌ Customer பெயர் உள்ளிடவும்!','red');return;}
+  if(!phone){showNotif('❌ Mobile number உள்ளிடவும்!','red');return;}
+  const rate=parseFloat(document.getElementById('sf-rate').value)||0;
+  const qty=parseInt(document.getElementById('sf-qty').value)||1;
+  const adv=parseFloat(document.getElementById('sf-advance').value)||0;
+  const dateVal=document.getElementById('sf-date').value;
+  const order={
+    id:'SFR'+Date.now(),
+    date:dateVal?new Date(dateVal+'T12:00:00').toISOString():new Date().toISOString(),
+    createdBy:currentUser.name,
+    cname,phone,
+    ftype:document.getElementById('sf-type').value,
+    size:document.getElementById('sf-size').value,
+    qty,rate,total:rate*qty,advance:adv,balance:Math.max(0,rate*qty-adv),
+    payMethod:document.getElementById('sf-pay').value,
+    payStatus:document.getElementById('sf-paystatus').value,
+    courier:document.getElementById('sf-courier').value,
+    note:document.getElementById('sf-note').value,
+  };
+  sfOrders.push(order);saveSfOrders();
+  showNotif('✅ Studio Frame Order Save ஆனது!');
+  clearSfForm();renderSfOrders();
+}
+function clearSfForm(){
+  ['sf-cname','sf-phone','sf-type','sf-size','sf-rate','sf-advance','sf-total','sf-balance','sf-courier','sf-note','sf-upi-id'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('sf-qty').value=1;
+  document.getElementById('sf-date').value=new Date().toISOString().split('T')[0];
+  const uf=document.getElementById('sf-upi-field');if(uf)uf.style.display='none';
+}
+function renderSfOrders(){
+  const el=document.getElementById('sf-orders-list');if(!el)return;
+  if(!sfOrders.length){el.innerHTML='<div class="empty"><div class="empty-icon">🖼️</div>Frame orders இல்லை</div>';return;}
+  el.innerHTML=sfOrders.slice().reverse().map(o=>`
+    <div class="order-card">
+      <div>
+        <div class="order-num">#${o.id} · ${fmtDateShort(o.date)}</div>
+        <div class="order-cust">👤 ${o.cname} · 📱 ${o.phone}</div>
+        <div class="order-detail">🖼️ ${o.ftype} · ${o.size} · Qty: ${o.qty}</div>
+        ${o.courier&&o.courier!=='-- Self Pickup --'?`<div class="order-detail">🚚 ${o.courier}</div>`:''}
+        <div style="margin-top:6px;">${payBadge(o.payStatus)} <span class="badge b-blue">${o.payMethod}</span></div>
+        ${o.balance>0?`<div style="font-size:0.78rem;color:var(--red);margin-top:4px;">⚠️ Balance: ₹${o.balance.toFixed(2)}</div>`:''}
+      </div>
+      <div class="order-actions">
+        <div class="order-amt" style="color:var(--blue);">₹${o.total.toFixed(2)}</div>
+        <button class="btn btn-red btn-sm" onclick="deleteSfOrder('${o.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+function deleteSfOrder(id){
+  if(!confirm('Delete பண்ணவா?'))return;
+  sfOrders=sfOrders.filter(o=>o.id!==id);saveSfOrders();renderSfOrders();
+}
+
+// ===== PASSPORT PHOTO quick rate helper =====
+function setStRate(service,rate){
+  const el=document.getElementById('st-service');if(el)el.value=service;
+  const re=document.getElementById('st-rate');if(re){re.value=rate;calcStudioTotal();}
+}
+
+// ===== LANGUAGE SYSTEM =====
+let appLang = localStorage.getItem('sm_lang')||'ta';
+const langMap={
+  ta:{
+    'Gift':'🎁 Gift','Frame':'🖼️ Frame','Xerox':'🖨️ Xerox','Studio':'🎨 Studio',
+    'Owner Panel':'⚙️ Work Space','Save':'💾 Save','Clear':'🗑️ Clear',
+    'New Order':'➕ New Order','History':'📋 History','Report':'📊 Report',
+    'Dashboard':'📊 Dashboard','Monthly Sheet':'📅 Monthly Sheet','Yearly Sheet':'📆 Yearly Sheet',
+    'Settings':'⚙️ Settings','Stock':'📦 Stock','Workers':'👷 Workers',
+    'Credit / Loan':'💰 Credit / Loan','Logout':'🚪 Logout',
+  },
+  en:{
+    'Gift':'🎁 Gift','Frame':'🖼️ Frame','Xerox':'🖨️ Xerox','Studio':'🎨 Studio',
+    'Owner Panel':'⚙️ Work Space','Save':'💾 Save','Clear':'🗑️ Clear',
+    'New Order':'➕ New Order','History':'📋 History','Report':'📊 Report',
+    'Dashboard':'📊 Dashboard','Monthly Sheet':'📅 Monthly Sheet','Yearly Sheet':'📆 Yearly Sheet',
+    'Settings':'⚙️ Settings','Stock':'📦 Stock','Workers':'👷 Workers',
+    'Credit / Loan':'💰 Credit / Loan','Logout':'🚪 Logout',
+  }
+};
+function setAppLang(lang){
+  appLang=lang;
+  localStorage.setItem('sm_lang',lang);
+  const taBtn=document.getElementById('lang-ta-btn');
+  const enBtn=document.getElementById('lang-en-btn');
+  if(taBtn){taBtn.className=lang==='ta'?'btn btn-gold btn-sm':'btn btn-ghost btn-sm';}
+  if(enBtn){enBtn.className=lang==='en'?'btn btn-gold btn-sm':'btn btn-ghost btn-sm';}
+  // Placeholder / label toggling for key inputs based on language
+  const placeholders=lang==='en'?{
+    'g-cname':'Customer Name','g-phone':'Mobile Number','g-addr':'Address',
+    'f-cname':'Customer Name','x-item':'Item name','st-cname':'Customer Name',
+  }:{
+    'g-cname':'பெயர்','g-phone':'9876543210','g-addr':'முகவரி',
+    'f-cname':'பெயர்','x-item':'e.g. A4 Xerox','st-cname':'பெயர்',
+  };
+  Object.entries(placeholders).forEach(([id,ph])=>{const el=document.getElementById(id);if(el)el.placeholder=ph;});
+  showNotif(lang==='en'?'✅ Language: English':'✅ மொழி: தமிழ்');
+}
+
+// ===== UPDATE DASHBOARD LIVE WHEN ORDER SAVED =====
+// Hook into saveGiftOrder, saveFrameOrder, saveXBill, saveStudioBooking to refresh dashboard
+const _origSaveGift=typeof saveGiftOrder==='function'?saveGiftOrder:null;
+function refreshDash(){if(currentUser&&currentUser.role==='owner'){const od=document.getElementById('owner-dash-stats');if(od&&od.offsetParent!==null)renderOwnerDash();}}
+
+// Init sfOrders from Firebase if available
+if(typeof fbRef==='function'||typeof fbGet==='function'){
+  try{
+    const sfRaw=localStorage.getItem('sm_sfOrders');
+    if(!sfRaw||sfRaw==='[]'){sfOrders=[];}
+    else{sfOrders=JSON.parse(sfRaw);}
+  }catch(e){sfOrders=[];}
+}
+
+// Apply saved language on load
+(function(){
+  const saved=localStorage.getItem('sm_lang')||'ta';
+  if(saved)setTimeout(()=>setAppLang(saved),500);
+})();
+
+// ===== WORKER SETTINGS LANGUAGE =====
+// Add language toggle to work screen too (appended via JS since worker screen is shared)
+function renderWorkerLangToggle(){
+  const existing=document.getElementById('worker-lang-toggle');
+  if(existing)return;
+  const bar=document.querySelector('.top-bar');
+  if(!bar)return;
+  const div=document.createElement('div');
+  div.id='worker-lang-toggle';
+  div.style.cssText='display:flex;gap:4px;align-items:center;margin-left:auto;';
+  div.innerHTML=`<button class="btn btn-ghost btn-sm" onclick="setAppLang('ta')" style="padding:2px 8px;font-size:0.7rem;"> த</button>
+  <button class="btn btn-ghost btn-sm" onclick="setAppLang('en')" style="padding:2px 8px;font-size:0.7rem;">En</button>`;
+  bar.appendChild(div);
+}
+
+</script>
+
+<!-- ===== QUICK RATE EDITOR MODAL ===== -->
+<div class="modal-bg" id="qr-editor-modal">
+  <div class="modal" style="max-width:600px;">
+    <button class="modal-close" onclick="closeQREditor()">✕</button>
+    <div style="font-size:1rem;font-weight:700;margin-bottom:14px;">✏️ Quick Rate Edit — <span id="qr-editor-title"></span></div>
+    <div id="qr-editor-list" style="max-height:300px;overflow-y:auto;margin-bottom:14px;"></div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;">
+      <div style="font-size:0.82rem;font-weight:700;margin-bottom:10px;color:var(--text2);">➕ புதிய Item சேர்</div>
+      <div class="grid g3">
+        <div><label>Category</label><input type="text" id="qr-new-cat" placeholder="Category" list="qr-cat-list"></div>
+        <div><label>Item Name</label><input type="text" id="qr-new-item" placeholder="Item name"></div>
+        <div><label>Rate (₹)</label><input type="number" id="qr-new-rate" placeholder="0"></div>
+      </div>
+      <datalist id="qr-cat-list"></datalist>
+      <button class="btn btn-gold btn-sm" onclick="addQRItem()" style="margin-top:8px;">➕ Add Item</button>
+    </div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn btn-green" onclick="saveQRItems()">💾 Save</button>
+      <button class="btn btn-ghost" onclick="closeQREditor()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Offline Sale Note -->
+<div id="g-offline-note" style="display:none;padding:8px 12px;background:rgba(0,119,187,0.08);border:1px solid rgba(0,119,187,0.3);border-radius:8px;font-size:0.82rem;color:var(--blue);font-weight:700;margin-bottom:8px;">🏪 Offline / In-store Sale — கடையில் நேரடியாக விற்பனை!</div>
+<div id="f-offline-note" style="display:none;padding:8px 12px;background:rgba(0,119,187,0.08);border:1px solid rgba(0,119,187,0.3);border-radius:8px;font-size:0.82rem;color:var(--blue);font-weight:700;margin-bottom:8px;">🏪 Offline / In-store Sale — கடையில் நேரடியாக விற்பனை!</div>
+
+<script>
+// ===== QUICK RATE SYSTEM =====
+const QR_DEFAULTS = {
+  xerox: [
+    {cat:'Xerox / Photocopy', item:'A4 B&W Xerox', rate:1},
+    {cat:'Color Print', item:'A4 Color Print', rate:5},
+    {cat:'Lamination', item:'A4 Lamination', rate:15},
+    {cat:'Spiral Binding', item:'Spiral Binding', rate:30},
+    {cat:'Notebook', item:'Notebook', rate:30},
+    {cat:'Pen / Pencil', item:'Pen', rate:10}
+  ],
+  gift: [
+    {cat:'Soft Toys', item:'Teddy Bear', rate:150},
+    {cat:'Photo Gifts', item:'Photo Mug', rate:250},
+    {cat:'Cushions', item:'Photo Cushion', rate:300},
+    {cat:'Keychains', item:'Custom Keychain', rate:100},
+    {cat:'Chocolate Basket', item:'Choco Basket', rate:500}
+  ],
+  frame: [
+    {cat:'Photo Frame', item:'4×6 Frame', rate:150},
+    {cat:'Photo Frame', item:'8×10 Frame', rate:350},
+    {cat:'Canvas Print', item:'Canvas A4', rate:500},
+    {cat:'Certificate Frame', item:'A4 Certificate', rate:200},
+    {cat:'Couple Photo', item:'Couple Frame', rate:600}
+  ]
+};
+
+function getQRItems(section){
+  const saved = localStorage.getItem('sm_qr_'+section);
+  if(saved) try{return JSON.parse(saved);}catch(e){}
+  return QR_DEFAULTS[section]||[];
+}
+function saveQRData(section, items){
+  localStorage.setItem('sm_qr_'+section, JSON.stringify(items));
+}
+
+let _qrSection='', _qrItems=[];
+
+function openQREditor(section){
+  _qrSection=section;
+  _qrItems=JSON.parse(JSON.stringify(getQRItems(section)));
+  document.getElementById('qr-editor-title').textContent=section.charAt(0).toUpperCase()+section.slice(1);
+  // Populate cat datalist
+  const cats=[...new Set(_qrItems.map(i=>i.cat))];
+  document.getElementById('qr-cat-list').innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
+  renderQREditorList();
+  document.getElementById('qr-editor-modal').classList.add('open');
+}
+function closeQREditor(){
+  document.getElementById('qr-editor-modal').classList.remove('open');
+}
+function renderQREditorList(){
+  const el=document.getElementById('qr-editor-list');
+  if(!_qrItems.length){el.innerHTML='<div style="color:var(--text2);font-size:0.85rem;padding:8px;">Items இல்லை</div>';return;}
+  el.innerHTML=_qrItems.map((it,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 1fr 80px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+      <input type="text" value="${it.cat}" onchange="_qrItems[${i}].cat=this.value" style="font-size:0.82rem;padding:5px 8px;">
+      <input type="text" value="${it.item}" onchange="_qrItems[${i}].item=this.value" style="font-size:0.82rem;padding:5px 8px;">
+      <input type="number" value="${it.rate}" onchange="_qrItems[${i}].rate=parseFloat(this.value)||0" style="font-size:0.82rem;padding:5px 8px;">
+      <button class="btn btn-red btn-sm" onclick="_qrItems.splice(${i},1);renderQREditorList()">🗑️</button>
+    </div>`).join('');
+}
+function addQRItem(){
+  const cat=document.getElementById('qr-new-cat').value.trim();
+  const item=document.getElementById('qr-new-item').value.trim();
+  const rate=parseFloat(document.getElementById('qr-new-rate').value)||0;
+  if(!item){showNotif('❌ Item name உள்ளிடவும்!','red');return;}
+  _qrItems.push({cat:cat||'General',item,rate});
+  renderQREditorList();
+  document.getElementById('qr-new-cat').value='';
+  document.getElementById('qr-new-item').value='';
+  document.getElementById('qr-new-rate').value='';
+}
+function saveQRItems(){
+  saveQRData(_qrSection, _qrItems);
+  renderQRButtons(_qrSection);
+  closeQREditor();
+  showNotif('✅ Quick Rates Saved!');
+}
+
+function renderQRButtons(section){
+  const items=getQRItems(section);
+  const icons={xerox:'📄',gift:'🎁',frame:'🖼️'};
+  const ic=icons[section]||'⚡';
+  const btnId=section+'-qr-btns';
+  const el=document.getElementById(btnId);
+  if(!el)return;
+  el.innerHTML=items.map(it=>`<button class="btn btn-ghost btn-sm" onclick="applyQR('${section}','${it.cat.replace(/'/g,"\\'")}','${it.item.replace(/'/g,"\\'")}',${it.rate})">${ic} ${it.item} ₹${it.rate}</button>`).join('');
+}
+
+function applyQR(section, cat, item, rate){
+  if(section==='xerox'){setXRate(cat,item,rate);}
+  else if(section==='gift'){
+    const el=document.getElementById('g-cat');if(el)el.value=cat;
+    const pr=document.getElementById('g-prod');if(pr)pr.value=item;
+    const re=document.getElementById('g-rate');if(re){re.value=rate;calcGiftTotal();}
+  }
+  else if(section==='frame'){
+    const el=document.getElementById('f-type');if(el)el.value=cat;
+    const re=document.getElementById('f-rate');if(re){re.value=rate;calcFrameTotal();}
+  }
+}
+
+// ===== AUTO OFFLINE SALE LOGIC =====
+function toggleGiftOfflineSale(){
+  const courier=document.getElementById('g-courier').value;
+  const note=document.getElementById('g-offline-note');
+  if(note && note.parentElement !== document.getElementById('gift-new-order')){
+    // Move note into correct parent if needed
+  }
+}
+function toggleFrameDelivered(){
+  const courier=document.getElementById('f-courier').value;
+  const note=document.getElementById('f-delivered-note');
+  if(note)note.style.display=(courier==='✅ Delivered')?'block':'none';
+  const offNote=document.getElementById('f-offline-note');
+  if(offNote)offNote.style.display=(courier==='✅ Delivered')?'block':'none';
+}
+
+// Override toggleGiftDelivered to also show offline note
+const _origToggleGiftDelivered=toggleGiftDelivered;
+function toggleGiftDelivered(){
+  const courier=document.getElementById('g-courier').value;
+  const note=document.getElementById('g-delivered-note');
+  if(note)note.style.display=(courier==='✅ Delivered')?'block':'none';
+  // Move/show offline note inside gift card
+  const offNote=document.getElementById('g-offline-note');
+  if(offNote){
+    offNote.style.display=(courier==='✅ Delivered')?'block':'none';
+  }
+}
+
+// Xerox: custname handled in main saveXBill above
+
+// ===== INIT QR BUTTONS ON LOAD =====
+document.addEventListener('DOMContentLoaded',function(){
+  renderQRButtons('xerox');
+  renderQRButtons('gift');
+  renderQRButtons('frame');
+});
+</script>
+
