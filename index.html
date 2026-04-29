@@ -728,16 +728,15 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
   <!-- ══ STUDIO ══ -->
   <div class="page studio" id="page-studio">
     <div class="section-tabs">
-      <button class="sec-tab active" onclick="switchSec('studio','new-booking',this)">📷 Passport Photo</button>
-      <button class="sec-tab" onclick="switchSec('studio','frame-order',this)">🖼️ Frame Order</button>
+      <button class="sec-tab active" onclick="switchSec('studio','new-booking',this)">📷 Photography</button>
       <button class="sec-tab" onclick="switchSec('studio','bookings',this)">📋 Bookings</button>
       <button class="sec-tab" onclick="switchSec('studio','report',this)">📊 Report</button>
     </div>
 
-    <!-- PASSPORT PHOTO PAGE -->
+    <!-- PHOTOGRAPHY PAGE -->
     <div class="section studio active" id="studio-new-booking">
       <div class="card">
-        <div class="card-title">📷 <span style="color:var(--purple)">Passport Size Photo</span> - Bill</div>
+        <div class="card-title">📷 <span style="color:var(--purple)">Photography</span> - New Bill</div>
         <div class="grid g3">
           <div><label>Customer பெயர் *</label><input type="text" id="st-cname" placeholder="பெயர்"></div>
           <div><label>Mobile Number *</label><input type="tel" id="st-phone" placeholder="9876543210" maxlength="10"></div>
@@ -763,14 +762,11 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
           <div><label>Photo எடுத்த வருடம் / Occasion</label><input type="text" id="st-package" placeholder="e.g. 2024, Wedding, School..."></div>
           <div><label>No. of Copies / Photos</label><input type="number" id="st-photos" placeholder="0" value="1"></div>
         </div>
-        <div style="margin:10px 0 4px;font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
-          <button class="btn btn-ghost btn-sm" onclick="setStRate('Passport Size Photo',30)">📷 Passport ₹30</button>
-          <button class="btn btn-ghost btn-sm" onclick="setStRate('Visa Photo',50)">🌍 Visa ₹50</button>
-          <button class="btn btn-ghost btn-sm" onclick="setStRate('ID Card Photo',20)">🪪 ID Card ₹20</button>
-          <button class="btn btn-ghost btn-sm" onclick="setStRate('School Photo',25)">🏫 School ₹25</button>
-          <button class="btn btn-ghost btn-sm" onclick="setStRate('Portrait Photography',200)">🎨 Portrait ₹200</button>
+        <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+          <span style="font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</span>
+          <button class="btn btn-ghost btn-sm" onclick="openQREditor('studio')" style="font-size:0.72rem;padding:3px 10px;">✏️ Edit Quick Rates</button>
         </div>
+        <div id="studio-qr-btns" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
         <div class="grid g4">
           <div><label>Rate (₹)</label><input type="number" id="st-rate" placeholder="0" oninput="calcStudioTotal()"></div>
           <div><label>Total Amount (₹)</label><input type="number" id="st-total-display" placeholder="0" readonly style="font-weight:800;color:var(--purple);"></div>
@@ -792,70 +788,6 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
           <button class="btn" style="background:var(--purple);color:#fff;" onclick="saveStudioBooking()">💾 Bill Save பண்ணு</button>
           <button class="btn btn-ghost" onclick="clearStudioForm()">🗑️ Clear</button>
         </div>
-      </div>
-    </div>
-
-    <!-- STUDIO FRAME ORDER PAGE -->
-    <div class="section studio" id="studio-frame-order">
-      <div class="card">
-        <div class="card-title">🖼️ <span style="color:var(--blue)">Studio Frame Order</span> - Customer விவரம்</div>
-        <div class="grid g3">
-          <div><label>Customer பெயர் *</label><input type="text" id="sf-cname" placeholder="பெயர்"></div>
-          <div><label>Mobile Number *</label><input type="tel" id="sf-phone" placeholder="9876543210" maxlength="10"></div>
-          <div><label>Order Date</label><input type="date" id="sf-date"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">🖼️ Frame விவரம்</div>
-        <div class="grid g3">
-          <div>
-            <label>Frame Type <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து custom சேர்க்கலாம்)</span></label>
-            <input type="text" id="sf-type" list="sf-type-list" placeholder="Frame type தேர்வு / Type பண்ணவும்">
-            <datalist id="sf-type-list">
-              <option>Passport Frame</option><option>Photo Frame</option><option>Canvas Print</option><option>Poster Frame</option><option>Shadow Box</option><option>Mirror Frame</option><option>Certificate Frame</option><option>Collage Frame</option><option>Custom Frame</option>
-            </datalist>
-          </div>
-          <div><label>Frame Size</label><input type="text" id="sf-size" list="sf-size-list" placeholder="Size தேர்வு / Type பண்ணவும்">
-            <datalist id="sf-size-list"><option>4×6 inch</option><option>5×7 inch</option><option>6×8 inch</option><option>8×10 inch</option><option>10×12 inch</option><option>A4</option><option>A3</option><option>Custom</option></datalist>
-          </div>
-          <div><label>Quantity</label><input type="number" id="sf-qty" value="1" min="1" oninput="calcSfTotal()"></div>
-        </div>
-        <div style="margin:10px 0 4px;font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
-          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Passport Frame','4×6 inch',50)">📷 Passport ₹50</button>
-          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Photo Frame','5×7 inch',100)">🖼️ 5×7 ₹100</button>
-          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Photo Frame','8×10 inch',200)">🖼️ 8×10 ₹200</button>
-          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Canvas Print','A4',350)">🎨 Canvas A4 ₹350</button>
-        </div>
-        <div class="grid g4">
-          <div><label>Rate (₹)</label><input type="number" id="sf-rate" placeholder="0" oninput="calcSfTotal()"></div>
-          <div><label>Total (₹)</label><input type="number" id="sf-total" placeholder="0" readonly style="font-weight:800;color:var(--blue);"></div>
-          <div><label>Advance (₹)</label><input type="number" id="sf-advance" placeholder="0" oninput="calcSfBalance()"></div>
-          <div><label>Balance (₹)</label><input type="number" id="sf-balance" placeholder="0" readonly style="color:var(--red);font-weight:700;"></div>
-        </div>
-        <div class="grid g3">
-          <div><label>Payment Method</label><select id="sf-pay" onchange="toggleSfUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Pending / Credit</option></select></div>
-          <div id="sf-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="sf-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="sf-paystatus" onchange="applyPayStatus('sf')"><option value="paid">✅ Paid</option><option value="pending">⏳ Pending</option></select></div>
-        </div>
-        <div class="grid g2">
-          <div>
-            <label>Courier <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து custom courier சேர்க்கலாம்)</span></label>
-            <input type="text" id="sf-courier" list="sf-courier-list" placeholder="Courier தேர்வு / Type பண்ணவும்">
-            <datalist id="sf-courier-list">
-              <option>-- Self Pickup --</option><option>ST Courier</option><option>DTDC</option><option>Blue Dart</option><option>Delhivery</option><option>India Post</option><option>✅ Delivered</option>
-            </datalist>
-          </div>
-          <div><label>Note</label><input type="text" id="sf-note" placeholder="Special instructions..."></div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-blue" onclick="saveSfOrder()">💾 Frame Order Save பண்ணு</button>
-          <button class="btn btn-ghost" onclick="clearSfForm()">🗑️ Clear</button>
-        </div>
-      </div>
-      <div class="card" style="margin-top:14px;">
-        <div class="card-title">📋 Studio Frame Orders</div>
-        <div id="sf-orders-list"><div class="empty"><div class="empty-icon">🖼️</div>Frame orders இல்லை</div></div>
       </div>
     </div>
 
@@ -3245,6 +3177,15 @@ const QR_DEFAULTS = {
     {cat:'Canvas Print', item:'Canvas A4', rate:500},
     {cat:'Certificate Frame', item:'A4 Certificate', rate:200},
     {cat:'Couple Photo', item:'Couple Frame', rate:600}
+  ],
+  studio: [
+    {cat:'Photography', item:'Passport Size Photo', rate:30},
+    {cat:'Photography', item:'Visa Photo', rate:50},
+    {cat:'Photography', item:'ID Card Photo', rate:20},
+    {cat:'Photography', item:'School Photo', rate:25},
+    {cat:'Photography', item:'Portrait Photography', rate:200},
+    {cat:'Photography', item:'Wedding Photography', rate:5000},
+    {cat:'Photography', item:'Baby Shoot', rate:1500}
   ]
 };
 
@@ -3303,7 +3244,7 @@ function saveQRItems(){
 
 function renderQRButtons(section){
   const items=getQRItems(section);
-  const icons={xerox:'📄',gift:'🎁',frame:'🖼️'};
+  const icons={xerox:'📄',gift:'🎁',frame:'🖼️',studio:'📷'};
   const ic=icons[section]||'⚡';
   const btnId=section+'-qr-btns';
   const el=document.getElementById(btnId);
@@ -3317,6 +3258,10 @@ function applyQR(section, cat, item, rate){
     const el=document.getElementById('g-cat');if(el)el.value=cat;
     const pr=document.getElementById('g-prod');if(pr)pr.value=item;
     const re=document.getElementById('g-rate');if(re){re.value=rate;calcGiftTotal();}
+  }
+  else if(section==='studio'){
+    const el=document.getElementById('st-service');if(el)el.value=item;
+    const re=document.getElementById('st-rate');if(re){re.value=rate;calcStudioTotal();}
   }
   else if(section==='frame'){
     const el=document.getElementById('f-type');if(el)el.value=cat;
@@ -3386,6 +3331,7 @@ document.addEventListener('DOMContentLoaded',function(){
   renderQRButtons('xerox');
   renderQRButtons('gift');
   renderQRButtons('frame');
+  renderQRButtons('studio');
 });
 </script>
 
