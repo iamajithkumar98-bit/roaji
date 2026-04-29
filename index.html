@@ -82,4 +82,326 @@ body{font-family:'Baloo Thambi 2',sans-serif;background:var(--bg);color:var(--te
   position:sticky;top:0;z-index:100;gap:10px;
   box-shadow:0 2px 12px rgba(80,20,180,0.08);
 }
-.app-logo{font-size:1.2rem;font-weight:800;background:linear-gradient(90deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-f
+.app-logo{font-size:1.2rem;font-weight:800;background:linear-gradient(90deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.user-badge{
+  display:flex;align-items:center;gap:6px;padding:5px 10px;
+  background:var(--surface2);border:1px solid var(--border);border-radius:20px;
+  font-size:0.75rem;
+}
+.role-pill{
+  padding:2px 8px;border-radius:10px;font-size:0.68rem;font-weight:700;
+}
+.rp-owner{background:rgba(245,200,66,0.2);color:var(--gold);}
+.rp-worker{background:rgba(79,195,247,0.2);color:var(--blue);}
+.logout-btn{
+  padding:5px 12px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;color:var(--text2);font-family:inherit;font-size:0.75rem;
+  font-weight:700;cursor:pointer;transition:all 0.2s;
+}
+.logout-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* SHOP TABS */
+.shop-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;padding:0 12px;}
+.shop-tab{
+  padding:13px 18px;cursor:pointer;font-size:0.85rem;font-weight:700;
+  color:var(--text2);border-bottom:3px solid transparent;transition:all 0.2s;
+  white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;
+  font-family:inherit;
+}
+.shop-tab:hover{color:var(--text);}
+.shop-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.shop-tab.tab-gift.active{color:var(--pink);border-bottom-color:var(--pink);}
+.shop-tab.tab-frame.active{color:var(--blue);border-bottom-color:var(--blue);}
+.shop-tab.tab-xerox.active{color:var(--green);border-bottom-color:var(--green);}
+.shop-tab.tab-studio.active{color:var(--purple);border-bottom-color:var(--purple);}
+.shop-tab.tab-owner.active{color:var(--gold);border-bottom-color:var(--gold);}
+.owner-only-tab{display:none;}
+
+/* PAGES */
+.page{display:none;padding:16px;max-width:1200px;margin:0 auto;animation:fadeIn 0.3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.section-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.sec-tab{
+  padding:8px 16px;border-radius:20px;cursor:pointer;font-size:0.82rem;font-weight:700;
+  background:var(--surface2);color:var(--text2);border:1px solid var(--border);
+  font-family:inherit;transition:all 0.2s;
+}
+.sec-tab:hover{color:var(--text);border-color:var(--text2);}
+.sec-tab.active{color:#000;}
+.gift .sec-tab.active{background:var(--pink);border-color:var(--pink);}
+.frame .sec-tab.active{background:var(--blue);border-color:var(--blue);}
+.xerox .sec-tab.active{background:var(--green);border-color:var(--green);}
+.owner-panel .sec-tab.active{background:var(--gold);border-color:var(--gold);}
+
+.section{display:none;}
+.section.active{display:block;}
+
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;margin-bottom:14px;
+}
+.card-title{
+  font-size:1rem;font-weight:700;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+  padding-bottom:10px;border-bottom:1px solid var(--border);
+}
+
+label{font-size:0.78rem;font-weight:600;color:var(--text2);margin-bottom:4px;display:block;}
+input,select,textarea{
+  width:100%;padding:9px 12px;
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:8px;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none;
+  transition:border 0.2s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);}
+select option{background:var(--surface2);}
+input:read-only{opacity:0.5;cursor:not-allowed;}
+
+.grid{display:grid;gap:12px;margin-bottom:12px;}
+.g2{grid-template-columns:1fr 1fr;}
+.g3{grid-template-columns:1fr 1fr 1fr;}
+.g4{grid-template-columns:1fr 1fr 1fr 1fr;}
+
+.btn{
+  padding:9px 18px;border:none;border-radius:8px;font-family:inherit;
+  font-size:0.88rem;font-weight:700;cursor:pointer;transition:all 0.18s;
+}
+.btn:hover{filter:brightness(1.12);transform:translateY(-1px);}
+.btn-gold{background:var(--gold);color:#000;}
+.btn-pink{background:var(--pink);color:#fff;}
+.btn-blue{background:var(--blue);color:#000;}
+.btn-green{background:var(--green);color:#000;}
+.btn-orange{background:var(--orange);color:#000;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-sm{padding:5px 12px;font-size:0.78rem;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;filter:none;}
+
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{background:var(--surface2);color:var(--text2);padding:9px 12px;font-size:0.78rem;text-align:left;border-bottom:1px solid var(--border);}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.85rem;vertical-align:middle;}
+.tbl tr:hover td{background:rgba(255,255,255,0.02);}
+.tbl-wrap{overflow-x:auto;}
+
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;}
+.b-gold{background:rgba(245,200,66,0.15);color:var(--gold);}
+.b-pink{background:rgba(255,107,157,0.15);color:var(--pink);}
+.b-blue{background:rgba(79,195,247,0.15);color:var(--blue);}
+.b-green{background:rgba(105,240,174,0.15);color:var(--green);}
+.b-orange{background:rgba(255,171,64,0.15);color:var(--orange);}
+.b-red{background:rgba(255,82,82,0.15);color:var(--red);}
+.b-purple{background:rgba(206,147,216,0.15);color:var(--purple);}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.stat.s-pink::before{background:var(--pink);}
+.stat.s-blue::before{background:var(--blue);}
+.stat.s-green::before{background:var(--green);}
+.stat.s-gold::before{background:var(--gold);}
+.stat-val{font-size:1.6rem;font-weight:800;margin-bottom:2px;}
+.stat-lbl{font-size:0.75rem;color:var(--text2);}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;overflow-y:auto;padding:20px;align-items:flex-start;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:540px;margin:auto;position:relative;}
+.modal-close{position:absolute;top:14px;right:14px;background:var(--surface2);border:1px solid var(--border);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:1rem;color:var(--text2);display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{color:var(--red);}
+
+.track-badge{display:inline-block;padding:4px 12px;border-radius:6px;font-size:0.72rem;font-weight:700;background:rgba(105,240,174,0.1);color:var(--green);border:1px solid rgba(105,240,174,0.3);cursor:pointer;}
+.track-badge:hover{background:rgba(105,240,174,0.2);}
+
+.notif{position:fixed;top:16px;right:16px;z-index:999;background:var(--green);color:#000;padding:11px 20px;border-radius:10px;font-weight:700;font-size:0.88rem;box-shadow:0 4px 20px rgba(0,0,0,0.4);display:none;animation:slideIn 0.3s;}
+@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+.empty{text-align:center;padding:32px;color:var(--text2);}
+.empty-icon{font-size:2.5rem;margin-bottom:8px;}
+
+.order-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;}
+.order-num{font-size:0.72rem;color:var(--text2);margin-bottom:4px;}
+.order-cust{font-weight:700;font-size:0.95rem;margin-bottom:2px;}
+.order-detail{font-size:0.8rem;color:var(--text2);}
+.order-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+.order-amt{font-size:1rem;font-weight:800;color:var(--gold);}
+
+/* OWNER PANEL */
+.owner-panel input:focus,.owner-panel select:focus{border-color:var(--gold);}
+
+/* LOCK BADGE */
+.lock-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 10px;
+  border-radius:8px;font-size:0.7rem;font-weight:700;
+  background:rgba(255,82,82,0.1);color:var(--red);border:1px solid rgba(255,82,82,0.2);
+}
+
+/* REQUEST CARD */
+.req-card{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;
+}
+.req-info{flex:1;}
+.req-name{font-weight:700;font-size:0.95rem;}
+.req-email{font-size:0.78rem;color:var(--text2);}
+.req-time{font-size:0.72rem;color:var(--text2);margin-top:2px;}
+
+/* CREDIT CARD */
+.credit-card{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:14px;margin-bottom:10px;
+}
+.credit-bal{font-size:1.2rem;font-weight:800;}
+
+/* STOCK */
+.stock-item{
+  display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;
+  padding:10px 12px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;margin-bottom:8px;
+}
+.stock-name{font-weight:600;}
+.stock-qty{font-size:0.8rem;color:var(--text2);}
+.stock-low{color:var(--red);}
+
+/* PAGE BACKGROUNDS */
+.page.gift { background: linear-gradient(160deg, rgba(214,56,112,0.04) 0%, transparent 40%), var(--bg); }
+.page.frame { background: linear-gradient(160deg, rgba(0,119,187,0.04) 0%, transparent 40%), var(--bg); }
+.page.xerox { background: linear-gradient(160deg, rgba(26,138,80,0.04) 0%, transparent 40%), var(--bg); }
+.page.studio { background: linear-gradient(160deg, rgba(124,58,173,0.05) 0%, transparent 40%), var(--bg); }
+
+/* GIFT distinctive styling */
+.gift .card { border-color: rgba(255,107,157,0.2); }
+.frame .card { border-color: rgba(79,195,247,0.2); }
+.xerox .card { border-color: rgba(105,240,174,0.2); }
+
+.gift input:focus,.gift select:focus,.gift textarea:focus{border-color:var(--pink);}
+.frame input:focus,.frame select:focus,.frame textarea:focus{border-color:var(--blue);}
+.xerox input:focus,.xerox select:focus,.xerox textarea:focus{border-color:var(--green);}
+
+/* WORKER RESTRICT OVERLAY */
+.worker-lock{
+  position:relative;
+}
+.worker-lock-msg{
+  display:none;position:absolute;inset:0;background:rgba(240,240,248,0.92);
+  border-radius:var(--radius);z-index:10;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;font-size:0.9rem;color:var(--text2);
+}
+.worker-lock-msg.show{display:flex;}
+
+#printFrame{display:none;}
+@media print{
+  body>*{display:none!important;}
+  #printFrame{display:block!important;position:fixed;inset:0;background:#fff;z-index:9999;padding:0;border:none;}
+}
+
+@media(max-width:600px){
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .page{padding:10px;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .app-header{padding:10px 12px;}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="notif" id="notif"></div>
+<div id="printFrame"><div id="printContent"></div></div>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <span class="login-logo-icon">🛍️</span>
+      <h1>Roaji.in</h1>
+      <p>உங்கள் கடையை நிர்வகிக்கவும்</p>
+    </div>
+
+    <div class="login-role-tabs">
+      <button class="role-tab active owner" onclick="setLoginRole('owner',this)">👑 Owner</button>
+      <button class="role-tab worker" onclick="setLoginRole('employee',this)">🧑‍💼 Employee</button>
+    </div>
+
+    <!-- OWNER LOGIN -->
+    <div class="login-form" id="ownerLoginForm">
+      <label>Mail ID</label>
+      <input type="email" id="owner-email" placeholder="உங்கள் mail id">
+      <label>Password</label>
+      <input type="password" id="owner-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doOwnerLogin()">
+      <button class="login-btn owner-btn" onclick="doOwnerLogin()">👑 Owner Login</button>
+      <div class="login-info">🔑 உங்கள் Owner mail id மற்றும் password உள்ளிடவும்</div>
+      <div class="login-err" id="owner-err" style="display:none;"></div>
+    </div>
+
+    <!-- EMPLOYEE LOGIN / REGISTER -->
+    <div class="login-form" id="workerLoginForm" style="display:none;">
+
+      <!-- TAB: Login vs Register -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button id="emp-tab-login" class="role-tab active worker" style="flex:1;" onclick="setEmpTab('login')">🔑 Login</button>
+        <button id="emp-tab-register" class="role-tab worker" style="flex:1;" onclick="setEmpTab('register')">📝 New Register</button>
+      </div>
+
+      <!-- EMPLOYEE LOGIN FORM -->
+      <div id="empLoginForm">
+        <label>Mail ID *</label>
+        <input type="email" id="worker-email-login" placeholder="உங்கள் mail id">
+        <label>PIN *</label>
+        <div style="position:relative;">
+          <input type="password" id="worker-pin" placeholder="Owner கொடுத்த PIN" maxlength="6" onkeydown="if(event.key==='Enter')doWorkerLogin()" style="padding-right:44px;">
+          <button onclick="togglePinView()" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;" id="pin-eye">👁️</button>
+        </div>
+        <button class="login-btn worker-btn" onclick="doWorkerLogin()" style="margin-top:8px;">🧑‍💼 Employee Login</button>
+        <div class="login-err" id="worker-err" style="display:none;"></div>
+      </div>
+
+      <!-- EMPLOYEE REGISTER FORM -->
+      <div id="empRegisterForm" style="display:none;">
+        <label>பெயர் *</label>
+        <input type="text" id="emp-reg-name" placeholder="உங்கள் பெயர்">
+        <label>Mobile Number *</label>
+        <input type="tel" id="emp-reg-mobile" placeholder="9876543210" maxlength="10">
+        <label>Mail ID *</label>
+        <input type="email" id="emp-reg-email" placeholder="உங்கள் mail id">
+        <button class="login-btn new-owner-btn" onclick="submitEmployeeRequest()" style="margin-top:8px;">📤 Owner-கிட்டே Approval கேளு</button>
+        <div class="login-err" id="emp-reg-err" style="display:none;"></div>
+        <div class="login-info" style="margin-top:10px;">📌 Request submit பண்ணினதும் Owner approve பண்ணி PIN assign பண்ணுவார். அந்த PIN மற்றும் உங்கள் mail id-ஆல் login பண்ணலாம்.</div>
+      </div>
+    </div>
+
+    <!-- NEW OWNER REQUEST - HIDDEN -->
+    <div class="login-form" id="newOwnerForm" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ===== APP SCREEN ===== -->
+<div id="appScreen">
+  <div class="app-header">
+    <div class="app-logo">🛍️ Roaji.in</div>
+    <div class="header-right">
+      <div class="user-badge">
+        <span id="headerUserIcon">👑</span>
+        <span id="headerUserName" style="font-size:0.78rem;font-weight:700;"></span>
+        <span class="role-pill rp-owner" id="headerRolePill">Owner</span>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <div class="shop-tabs">
+    <button class="shop-tab tab-gift active" onclick="switchShop('gift',this)">🎁 Gifts</button>
+    <button class="shop-tab tab-frame" onclick="switchShop('frame',this)">🖼️ Frame</button>
+    <button class="shop-tab tab-xerox" onclick="switchShop('xerox',this)">🖨️ Xerox</button>
+    <button class="shop-tab tab-studio" onclick="switchShop('studio',this)">🎨 Studio</button>
+    <button class="shop-tab tab-owner owner-only-tab" id="ownerPanelTab" onclick="switchShop('owner',this)">⚙️ Work Space</button>
+  </div>
+
+  <!-- ══ GIFTS ══ -->
+  <div class="page gift active" id="page-gift">
+    <div class="section-tabs">
+      <button class="sec-tab active" onclick="switchSec('gift','new-order',this)">➕ New Order</button>
+      <button class="sec-tab" onclick="switchSec('gift','orders',this)">📋 Orders</button>
+      <button class="sec-tab" onclick="switchSec('gift','tracking',this)">🚚 Tracking<
