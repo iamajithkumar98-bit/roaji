@@ -116,6 +116,7 @@ body{font-family:'Baloo Thambi 2',sans-serif;background:var(--bg);color:var(--te
 .shop-tab.tab-xerox.active{color:var(--green);border-bottom-color:var(--green);}
 .shop-tab.tab-studio.active{color:var(--purple);border-bottom-color:var(--purple);}
 .shop-tab.tab-owner.active{color:var(--gold);border-bottom-color:var(--gold);}
+.shop-tab.tab-stock.active{color:var(--orange);border-bottom-color:var(--orange);}
 .owner-only-tab{display:none;}
 
 /* PAGES */
@@ -396,6 +397,7 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
     <button class="shop-tab tab-frame" onclick="switchShop('frame',this)">🖼️ Frame</button>
     <button class="shop-tab tab-xerox" onclick="switchShop('xerox',this)">🖨️ Xerox</button>
     <button class="shop-tab tab-studio" onclick="switchShop('studio',this)">🎨 Studio</button>
+    <button class="shop-tab tab-stock" id="stockTab" onclick="switchShop('stock',this)">📦 Stock</button>
     <button class="shop-tab tab-owner owner-only-tab" id="ownerPanelTab" onclick="switchShop('owner',this)">⚙️ Work Space</button>
   </div>
 
@@ -881,6 +883,18 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
         <button class="btn btn-sm" style="background:var(--purple);color:#fff;" onclick="renderStudioReport()">🔍 Show</button>
         <div class="tbl-wrap" style="margin-top:14px;"><table class="tbl"><thead><tr><th>Booking #</th><th>Date</th><th>Customer</th><th>Service</th><th>Amount</th><th>Advance</th><th>Balance</th><th>Status</th><th>Bill</th></tr></thead><tbody id="studio-report-body"></tbody></table></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ══ STOCK PAGE (Workers) ══ -->
+  <div class="page" id="page-stock">
+    <div class="card">
+      <div class="card-title">📦 Stock List</div>
+      <div class="grid g2" style="margin-bottom:12px;">
+        <div><label>🔍 Category Filter</label><input type="text" id="ws-stk-search-cat" placeholder="Category filter..." oninput="renderWorkerStockList()"></div>
+        <div><label>🔍 Item Name Search</label><input type="text" id="ws-stk-search-name" placeholder="Item name தேடவும்..." oninput="renderWorkerStockList()"></div>
+      </div>
+      <div id="worker-stock-list"></div>
     </div>
   </div>
 
@@ -1488,6 +1502,7 @@ function switchShop(shop, el){
   if(shop==='xerox'){renderXHistory();renderXStats();}
   if(shop==='studio'){renderStudioBookings();renderStudioStats();}
   if(shop==='owner'){renderOwnerDash();renderOwnerRequests();}
+  if(shop==='stock'){renderWorkerStockList();}
 }
 function switchSec(shop, sec, el){
   const page = document.getElementById('page-'+shop);
@@ -2003,10 +2018,10 @@ function renderOwnerDash(){
   const el=document.getElementById('owner-dash-stats');
   if(el) el.innerHTML=`
     <div class="stat s-gold"><div class="stat-val" style="color:var(--gold)">₹${totalToday.toFixed(0)}</div><div class="stat-lbl">💰 ${isToday?'இன்று':selDate} Total</div></div>
-    <div class="stat s-pink"><div class="stat-val" style="color:var(--pink)">${giftOrders.length}</div><div class="stat-lbl">🎁 Gift Orders (All)</div></div>
-    <div class="stat s-blue"><div class="stat-val" style="color:var(--blue)">${frameOrders.length}</div><div class="stat-lbl">🖼️ Frame Orders (All)</div></div>
-    <div class="stat s-green"><div class="stat-val" style="color:var(--green)">${xeroxBills.length}</div><div class="stat-lbl">🖨️ Xerox Bills (All)</div></div>
-    <div class="stat" style="border-top:3px solid var(--purple)"><div class="stat-val" style="color:var(--purple)">${studioBookings.length}</div><div class="stat-lbl">🎨 Studio (All)</div></div>`;
+    <div class="stat s-pink"><div class="stat-val" style="color:var(--pink)">${gToday.length}</div><div class="stat-lbl">🎁 Gift Orders</div></div>
+    <div class="stat s-blue"><div class="stat-val" style="color:var(--blue)">${fToday.length}</div><div class="stat-lbl">🖼️ Frame Orders</div></div>
+    <div class="stat s-green"><div class="stat-val" style="color:var(--green)">${xToday.length}</div><div class="stat-lbl">🖨️ Xerox Bills</div></div>
+    <div class="stat" style="border-top:3px solid var(--purple)"><div class="stat-val" style="color:var(--purple)">${sToday.length}</div><div class="stat-lbl">🎨 Studio</div></div>`;
   const ov=document.getElementById('today-overview');
   if(ov) ov.innerHTML=`
     <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">
@@ -2524,6 +2539,37 @@ function adjustStock(id,delta){
   s.lastUpdated=new Date().toISOString();
   saveStockItems();
   renderStockList();
+}
+
+function renderWorkerStockList(){
+  const el=document.getElementById('worker-stock-list');
+  if(!el) return;
+  const searchCat=(document.getElementById('ws-stk-search-cat')||{value:''}).value.toLowerCase();
+  const searchName=(document.getElementById('ws-stk-search-name')||{value:''}).value.toLowerCase();
+  let items=stockItems.filter(s=>{
+    return(!searchCat||s.cat.toLowerCase().includes(searchCat))&&
+           (!searchName||s.name.toLowerCase().includes(searchName));
+  });
+  if(!items.length){el.innerHTML='<div class="empty"><div class="empty-icon">📦</div>Stock items இல்லை</div>';return;}
+  el.innerHTML=items.map(s=>{
+    const mrp=s.mrp||0; const selling=s.selling||0;
+    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;">
+        <div style="flex:1;">
+          <div style="font-weight:700;">${s.name} <span class="badge b-blue">${s.cat}</span>${s.qty<=s.minQty?'<span class="badge b-red" style="margin-left:4px;">⚠️ Low Stock</span>':''}</div>
+          <div style="font-size:0.75rem;color:var(--text2);margin-top:2px;">${s.note||''}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+            ${mrp?`<span class="badge b-blue" style="font-size:0.68rem;">MRP: ₹${mrp.toFixed(2)}</span>`:''}
+            ${selling?`<span class="badge b-green" style="font-size:0.68rem;">Sell: ₹${selling.toFixed(2)}</span>`:''}
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="${s.qty<=s.minQty?'stock-low':''}"><strong style="font-size:1rem;">${s.qty}</strong> <span style="font-size:0.75rem;color:var(--text2);">${s.unit}</span></div>
+          <div style="font-size:0.72rem;color:var(--text2);">Min: ${s.minQty}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 function deleteStock(id){
   if(!confirm('Delete?'))return;
@@ -3145,6 +3191,7 @@ function renderWorkerLangToggle(){
   <button class="btn btn-ghost btn-sm" onclick="setAppLang('en')" style="padding:2px 8px;font-size:0.7rem;">En</button>`;
   bar.appendChild(div);
 }
+
 </script>
 
 <!-- ===== QUICK RATE EDITOR MODAL ===== -->
