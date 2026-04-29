@@ -455,7 +455,7 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
         <div class="grid g3">
           <div><label>Payment Method</label><select id="g-pay" onchange="toggleGiftUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
           <div id="g-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="g-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="g-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
+          <div><label>Payment Status</label><select id="g-paystatus" onchange="applyPayStatus('g')"><option value="paid">✅ Paid</option><option value="pending">⏳ Pending</option></select></div>
         </div>
         <div class="grid g3">
           <div><label>Advance Paid (₹)</label><input type="number" id="g-advance" placeholder="0" oninput="calcGiftBalance()"></div>
@@ -574,7 +574,7 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
         <div class="grid g3">
           <div><label>Payment Method</label><select id="f-pay" onchange="toggleFrameUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
           <div id="f-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="f-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="f-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
+          <div><label>Payment Status</label><select id="f-paystatus" onchange="applyPayStatus('f')"><option value="paid">✅ Paid</option><option value="pending">⏳ Pending</option></select></div>
           <div><label>Advance Paid (₹)</label><input type="number" id="f-advance" placeholder="0" oninput="calcFrameBalance()"></div>
         </div>
         <div class="grid g2">
@@ -780,7 +780,7 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
         <div class="grid g3">
           <div><label>Payment Method</label><select id="st-pay" onchange="toggleStudioUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
           <div id="st-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="st-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="st-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial (Advance)</option><option value="pending">⏳ Pending</option></select></div>
+          <div><label>Payment Status</label><select id="st-paystatus" onchange="applyPayStatus('st')"><option value="paid">✅ Paid</option><option value="pending">⏳ Pending</option></select></div>
         </div>
         <div style="margin-bottom:10px;"><label>Note</label><input type="text" id="st-addr" placeholder="Special requirements..."></div>
         <input type="hidden" id="st-duration" value="Instant">
@@ -836,7 +836,7 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
         <div class="grid g3">
           <div><label>Payment Method</label><select id="sf-pay" onchange="toggleSfUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Pending / Credit</option></select></div>
           <div id="sf-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="sf-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="sf-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
+          <div><label>Payment Status</label><select id="sf-paystatus" onchange="applyPayStatus('sf')"><option value="paid">✅ Paid</option><option value="pending">⏳ Pending</option></select></div>
         </div>
         <div class="grid g2">
           <div>
@@ -3354,6 +3354,32 @@ function toggleGiftDelivered(){
 }
 
 // Xerox: custname handled in main saveXBill above
+
+// ===== PAYMENT STATUS LOGIC (Gift, Frame, Studio only — not Owner/Stock) =====
+const _payMap = {
+  g:  {total:'g-total-display',  adv:'g-advance',    bal:'g-balance-display'},
+  f:  {total:'f-total-display',  adv:'f-advance',     bal:'f-balance-display'},
+  st: {total:'st-total-display', adv:'st-advance',    bal:'st-balance-display'},
+  sf: {total:'sf-total',         adv:'sf-advance',    bal:'sf-balance'}
+};
+function applyPayStatus(p){
+  const m=_payMap[p]; if(!m) return;
+  const paid=document.getElementById(p+'-paystatus').value==='paid';
+  const total=parseFloat(document.getElementById(m.total).value)||0;
+  const adv=document.getElementById(m.adv);
+  const bal=document.getElementById(m.bal);
+  if(paid){
+    adv.value=total; bal.value=0;
+    adv.readOnly=true; bal.readOnly=true;
+    adv.style.opacity='0.6'; adv.style.cursor='not-allowed';
+  } else {
+    adv.readOnly=false;
+    adv.style.opacity=''; adv.style.cursor='';
+    // recalc balance from current advance
+    const a=parseFloat(adv.value)||0;
+    bal.value=Math.max(0,total-a).toFixed(2);
+  }
+}
 
 // ===== INIT QR BUTTONS ON LOAD =====
 document.addEventListener('DOMContentLoaded',function(){
