@@ -143,23 +143,24 @@ body{font-family:'Baloo Thambi 2',sans-serif;background:var(--bg);color:var(--te
 .card{
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);padding:18px;margin-bottom:14px;
+  box-shadow:0 1px 6px rgba(0,0,0,0.04);
 }
 .card-title{
-  font-size:1rem;font-weight:700;margin-bottom:14px;
+  font-size:1rem;font-weight:800;margin-bottom:16px;
   display:flex;align-items:center;gap:8px;
-  padding-bottom:10px;border-bottom:1px solid var(--border);
+  padding-bottom:12px;border-bottom:2px solid var(--border);letter-spacing:0.2px;
 }
 
-label{font-size:0.78rem;font-weight:600;color:var(--text2);margin-bottom:4px;display:block;}
+label{font-size:0.73rem;font-weight:700;color:var(--text2);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:0.3px;}
 input,select,textarea{
   width:100%;padding:9px 12px;
-  background:var(--surface2);border:1.5px solid var(--border);
+  background:var(--surface);border:1.5px solid var(--border);
   border-radius:8px;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none;
-  transition:border 0.2s;
+  transition:border 0.2s,box-shadow 0.2s;
 }
-input:focus,select:focus,textarea:focus{border-color:var(--gold);}
-select option{background:var(--surface2);}
-input:read-only{opacity:0.5;cursor:not-allowed;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,150,10,0.1);}
+select option{background:var(--surface);}
+input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
 
 .grid{display:grid;gap:12px;margin-bottom:12px;}
 .g2{grid-template-columns:1fr 1fr;}
@@ -173,20 +174,21 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
 .btn:hover{filter:brightness(1.12);transform:translateY(-1px);}
 .btn-gold{background:var(--gold);color:#000;}
 .btn-pink{background:var(--pink);color:#fff;}
-.btn-blue{background:var(--blue);color:#000;}
-.btn-green{background:var(--green);color:#000;}
-.btn-orange{background:var(--orange);color:#000;}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-orange{background:var(--orange);color:#fff;}
 .btn-red{background:var(--red);color:#fff;}
 .btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
 .btn-sm{padding:5px 12px;font-size:0.78rem;}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
 .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;filter:none;}
 
 .tbl{width:100%;border-collapse:collapse;}
-.tbl th{background:var(--surface2);color:var(--text2);padding:9px 12px;font-size:0.78rem;text-align:left;border-bottom:1px solid var(--border);}
-.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.85rem;vertical-align:middle;}
-.tbl tr:hover td{background:rgba(255,255,255,0.02);}
-.tbl-wrap{overflow-x:auto;}
+.tbl th{background:linear-gradient(135deg,var(--surface2),#eaeaf4);color:var(--text2);padding:10px 12px;font-size:0.73rem;font-weight:700;text-align:left;border-bottom:2px solid var(--border);text-transform:uppercase;letter-spacing:0.4px;white-space:nowrap;}
+.tbl td{padding:10px 12px;border-bottom:1px solid rgba(208,208,220,0.5);font-size:0.84rem;vertical-align:middle;}
+.tbl tbody tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(200,150,10,0.03);}
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border);}
 
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;}
 .b-gold{background:rgba(245,200,66,0.15);color:var(--gold);}
@@ -198,14 +200,14 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
 .b-purple{background:rgba(206,147,216,0.15);color:var(--purple);}
 
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;}
-.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;}
-.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.stat.s-pink::before{background:var(--pink);}
-.stat.s-blue::before{background:var(--blue);}
-.stat.s-green::before{background:var(--green);}
-.stat.s-gold::before{background:var(--gold);}
-.stat-val{font-size:1.6rem;font-weight:800;margin-bottom:2px;}
-.stat-lbl{font-size:0.75rem;color:var(--text2);}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,0.04);}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:var(--radius) var(--radius) 0 0;}
+.stat.s-pink::before{background:linear-gradient(90deg,var(--pink),#ff6b9d);}
+.stat.s-blue::before{background:linear-gradient(90deg,var(--blue),#00aaee);}
+.stat.s-green::before{background:linear-gradient(90deg,var(--green),#22aa66);}
+.stat.s-gold::before{background:linear-gradient(90deg,var(--gold),var(--orange));}
+.stat-val{font-size:1.7rem;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px;}
+.stat-lbl{font-size:0.74rem;color:var(--text2);font-weight:600;}
 
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;overflow-y:auto;padding:20px;align-items:flex-start;justify-content:center;}
 .modal-bg.open{display:flex;}
@@ -222,7 +224,13 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
 .empty{text-align:center;padding:32px;color:var(--text2);}
 .empty-icon{font-size:2.5rem;margin-bottom:8px;}
 
-.order-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;}
+.order-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;
+  gap:12px;align-items:start;transition:box-shadow 0.18s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.order-card:hover{box-shadow:0 4px 16px rgba(80,20,180,0.08);border-color:rgba(100,50,200,0.2);}
 .order-num{font-size:0.72rem;color:var(--text2);margin-bottom:4px;}
 .order-cust{font-weight:700;font-size:0.95rem;margin-bottom:2px;}
 .order-detail{font-size:0.8rem;color:var(--text2);}
@@ -281,7 +289,49 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
 .frame input:focus,.frame select:focus,.frame textarea:focus{border-color:var(--blue);}
 .xerox input:focus,.xerox select:focus,.xerox textarea:focus{border-color:var(--green);}
 
-/* WORKER RESTRICT OVERLAY */
+/* ===== PROFESSIONAL BILLING UI ===== */
+.bill-section-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px; margin: -18px -18px 16px;
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+  font-weight: 800; font-size: 1rem; letter-spacing: 0.3px;
+}
+.bill-section-header.pink  { background: linear-gradient(135deg,rgba(214,56,112,0.12),rgba(214,56,112,0.04)); border-bottom: 1px solid rgba(214,56,112,0.2); color: var(--pink); }
+.bill-section-header.blue  { background: linear-gradient(135deg,rgba(0,119,187,0.12),rgba(0,119,187,0.04)); border-bottom: 1px solid rgba(0,119,187,0.2); color: var(--blue); }
+.bill-section-header.green { background: linear-gradient(135deg,rgba(26,138,80,0.12),rgba(26,138,80,0.04)); border-bottom: 1px solid rgba(26,138,80,0.2); color: var(--green); }
+.bill-section-header.purple{ background: linear-gradient(135deg,rgba(124,58,173,0.12),rgba(124,58,173,0.04)); border-bottom: 1px solid rgba(124,58,173,0.2); color: var(--purple); }
+
+/* Professional Table */
+.pro-tbl { width:100%; border-collapse: separate; border-spacing: 0; }
+.pro-tbl thead tr { background: linear-gradient(135deg,var(--surface2),#eaeaf4); }
+.pro-tbl th { padding: 11px 14px; font-size: 0.75rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); text-align: left; white-space: nowrap; }
+.pro-tbl td { padding: 11px 14px; border-bottom: 1px solid rgba(208,208,220,0.5); font-size: 0.84rem; vertical-align: middle; }
+.pro-tbl tbody tr:last-child td { border-bottom: none; }
+.pro-tbl tbody tr:hover td { background: rgba(200,150,10,0.04); }
+.pro-tbl .td-id { font-weight: 700; color: var(--gold); font-size: 0.82rem; }
+.pro-tbl .td-cust strong { display: block; font-size: 0.88rem; }
+.pro-tbl .td-cust small { color: var(--text2); font-size: 0.75rem; }
+.pro-tbl .td-amt { font-weight: 800; font-size: 0.95rem; }
+.pro-tbl .td-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+
+/* Field group labels */
+.field-group { margin-bottom: 4px; }
+.field-group label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text2); margin-bottom: 5px; }
+
+/* Summary box */
+.bill-summary-box {
+  background: linear-gradient(135deg,var(--surface2),#f0f0f8);
+  border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 14px; margin-top: 14px; max-width: 300px; margin-left: auto;
+}
+.bill-summary-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.85rem; color: var(--text2); }
+.bill-summary-total { display: flex; justify-content: space-between; padding: 10px 0 0; font-size: 1.1rem; font-weight: 800; border-top: 2px solid var(--border); margin-top: 6px; }
+
+/* Action button strip */
+.bill-actions-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); align-items: center; }
+
+/* ===== END PROFESSIONAL BILLING UI ===== */
+
 .worker-lock{
   position:relative;
 }
@@ -444,7 +494,7 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
           <div><label>Rate per item (₹)</label><input type="number" id="g-rate" placeholder="0" oninput="calcGiftTotal()"></div>
           <div>
             <label>Total Amount (₹)</label>
-            <input type="number" id="g-total-display" placeholder="0" readonly style="font-weight:800;color:var(--gold);">
+            <input type="number" id="g-total-display" placeholder="0" style="font-weight:800;color:var(--gold);" oninput="calcGiftBalance()">
           </div>
         </div>
         <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
@@ -455,11 +505,11 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
         <div class="grid g3">
           <div><label>Payment Method</label><select id="g-pay" onchange="toggleGiftUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
           <div id="g-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="g-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="g-paystatus" onchange="applyPayStatus('g')"><option value="paid">✅ Paid</option><option value="pending">⏳ Pending</option></select></div>
+          <div><label>Payment Status</label><select id="g-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
         </div>
         <div class="grid g3">
           <div><label>Advance Paid (₹)</label><input type="number" id="g-advance" placeholder="0" oninput="calcGiftBalance()"></div>
-          <div><label>Balance (₹)</label><input type="number" id="g-balance-display" placeholder="0" readonly style="color:var(--red);font-weight:700;"></div>
+          <div><label>Balance (₹)</label><input type="number" id="g-balance-display" placeholder="0" style="color:var(--red);font-weight:700;" oninput=""></div>
           <div>
             <label>Shipping Courier <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து புதிய courier சேர்க்கலாம்)</span></label>
             <input type="text" id="g-courier" list="g-courier-list" placeholder="Courier தேர்வு / Type பண்ணவும்" oninput="toggleGiftDelivered();toggleGiftOfflineSale()">
@@ -563,8 +613,8 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
         </div>
         <div class="grid g3" style="margin-top:8px;">
           <div><label>MRP (₹) - Per Item</label><input type="number" id="f-mrp" placeholder="0" oninput="calcFrameTotal()"></div>
-          <div><label>Total Amount (₹)</label><input type="number" id="f-total-display" placeholder="0" readonly style="font-weight:800;color:var(--blue);"></div>
-          <div><label>Balance (₹)</label><input type="number" id="f-balance-display" placeholder="0" readonly style="color:var(--red);font-weight:700;"></div>
+          <div><label>Total Amount (₹)</label><input type="number" id="f-total-display" placeholder="0" style="font-weight:800;color:var(--blue);" oninput="calcFrameBalance()"></div>
+          <div><label>Balance (₹)</label><input type="number" id="f-balance-display" placeholder="0" style="color:var(--red);font-weight:700;"></div>
         </div>
         <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
           <span style="font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</span>
@@ -574,7 +624,7 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
         <div class="grid g3">
           <div><label>Payment Method</label><select id="f-pay" onchange="toggleFrameUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
           <div id="f-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="f-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="f-paystatus" onchange="applyPayStatus('f')"><option value="paid">✅ Paid</option><option value="pending">⏳ Pending</option></select></div>
+          <div><label>Payment Status</label><select id="f-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
           <div><label>Advance Paid (₹)</label><input type="number" id="f-advance" placeholder="0" oninput="calcFrameBalance()"></div>
         </div>
         <div class="grid g2">
@@ -679,13 +729,13 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
       <div class="card">
         <div class="card-title">🧾 Bill Preview</div>
         <div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Item</th><th>Category</th><th>Qty</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="x-bill-body"><tr><td colspan="7" class="empty"><div class="empty-icon">🖨️</div>Item சேர்க்கவில்லை</td></tr></tbody></table></div>
-        <div style="max-width:280px;margin-left:auto;margin-top:12px;">
-          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:0.85rem;color:var(--text2);"><span>Subtotal</span><span id="x-sub">₹0.00</span></div>
-          <div style="display:flex;justify-content:space-between;padding:5px 0;align-items:center;gap:8px;">
-            <span style="font-size:0.85rem;color:var(--text2);">Discount ₹</span>
+        <div class="bill-summary-box">
+          <div class="bill-summary-row"><span>Subtotal</span><span id="x-sub">₹0.00</span></div>
+          <div class="bill-summary-row" style="align-items:center;gap:8px;">
+            <span>Discount ₹</span>
             <input type="number" id="x-disc" value="0" style="width:80px;text-align:right;" oninput="calcXTotal()">
           </div>
-          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:1.1rem;font-weight:800;border-top:1px solid var(--border);margin-top:6px;"><span>மொத்தம்</span><span id="x-grand" style="color:var(--green);">₹0.00</span></div>
+          <div class="bill-summary-total"><span>மொத்தம்</span><span id="x-grand" style="color:var(--green);">₹0.00</span></div>
         </div>
         <div class="grid g2" style="margin-top:10px;">
           <div><label>Payment Method</label><select id="x-pay" onchange="toggleXeUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Pending</option></select></div>
@@ -707,7 +757,7 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
           <div><label>தேடு</label><input type="text" id="x-search" placeholder="தேடவும்..." oninput="renderXHistory()"></div>
           <div><label>Payment Filter</label><select id="x-filter-pay" onchange="renderXHistory()"><option value="">எல்லாம்</option><option value="Cash">Cash</option><option value="UPI / GPay">UPI</option><option value="Pending">Pending</option></select></div>
         </div>
-        <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Bill #</th><th>Date</th><th>Customer</th><th>Reference</th><th>Items</th><th>Payment</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="x-history-body"></tbody></table></div>
+        <div class="tbl-wrap"><table class="tbl pro-tbl"><thead><tr><th>Bill #</th><th>Date</th><th>Customer</th><th>Reference</th><th>Items</th><th>Payment</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="x-history-body"></tbody></table></div>
       </div>
     </div>
 
@@ -728,15 +778,16 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
   <!-- ══ STUDIO ══ -->
   <div class="page studio" id="page-studio">
     <div class="section-tabs">
-      <button class="sec-tab active" onclick="switchSec('studio','new-booking',this)">📷 Photography</button>
+      <button class="sec-tab active" onclick="switchSec('studio','new-booking',this)">📷 Passport Photo</button>
+      <button class="sec-tab" onclick="switchSec('studio','frame-order',this)">🖼️ Frame Order</button>
       <button class="sec-tab" onclick="switchSec('studio','bookings',this)">📋 Bookings</button>
       <button class="sec-tab" onclick="switchSec('studio','report',this)">📊 Report</button>
     </div>
 
-    <!-- PHOTOGRAPHY PAGE -->
+    <!-- PASSPORT PHOTO PAGE -->
     <div class="section studio active" id="studio-new-booking">
       <div class="card">
-        <div class="card-title">📷 <span style="color:var(--purple)">Photography</span> - New Bill</div>
+        <div class="card-title">📷 <span style="color:var(--purple)">Passport Size Photo</span> - Bill</div>
         <div class="grid g3">
           <div><label>Customer பெயர் *</label><input type="text" id="st-cname" placeholder="பெயர்"></div>
           <div><label>Mobile Number *</label><input type="tel" id="st-phone" placeholder="9876543210" maxlength="10"></div>
@@ -762,21 +813,24 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
           <div><label>Photo எடுத்த வருடம் / Occasion</label><input type="text" id="st-package" placeholder="e.g. 2024, Wedding, School..."></div>
           <div><label>No. of Copies / Photos</label><input type="number" id="st-photos" placeholder="0" value="1"></div>
         </div>
-        <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-          <span style="font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</span>
-          <button class="btn btn-ghost btn-sm" onclick="openQREditor('studio')" style="font-size:0.72rem;padding:3px 10px;">✏️ Edit Quick Rates</button>
+        <div style="margin:10px 0 4px;font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('Passport Size Photo',30)">📷 Passport ₹30</button>
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('Visa Photo',50)">🌍 Visa ₹50</button>
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('ID Card Photo',20)">🪪 ID Card ₹20</button>
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('School Photo',25)">🏫 School ₹25</button>
+          <button class="btn btn-ghost btn-sm" onclick="setStRate('Portrait Photography',200)">🎨 Portrait ₹200</button>
         </div>
-        <div id="studio-qr-btns" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
         <div class="grid g4">
           <div><label>Rate (₹)</label><input type="number" id="st-rate" placeholder="0" oninput="calcStudioTotal()"></div>
-          <div><label>Total Amount (₹)</label><input type="number" id="st-total-display" placeholder="0" readonly style="font-weight:800;color:var(--purple);"></div>
+          <div><label>Total Amount (₹)</label><input type="number" id="st-total-display" placeholder="0" style="font-weight:800;color:var(--purple);" oninput="calcStudioBalance()"></div>
           <div><label>Advance Paid (₹)</label><input type="number" id="st-advance" placeholder="0" oninput="calcStudioBalance()"></div>
-          <div><label>Balance (₹)</label><input type="number" id="st-balance-display" placeholder="0" readonly style="color:var(--red);font-weight:700;"></div>
+          <div><label>Balance (₹)</label><input type="number" id="st-balance-display" placeholder="0" style="color:var(--red);font-weight:700;"></div>
         </div>
         <div class="grid g3">
           <div><label>Payment Method</label><select id="st-pay" onchange="toggleStudioUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
           <div id="st-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="st-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="st-paystatus" onchange="applyPayStatus('st')"><option value="paid">✅ Paid</option><option value="pending">⏳ Pending</option></select></div>
+          <div><label>Payment Status</label><select id="st-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial (Advance)</option><option value="pending">⏳ Pending</option></select></div>
         </div>
         <div style="margin-bottom:10px;"><label>Note</label><input type="text" id="st-addr" placeholder="Special requirements..."></div>
         <input type="hidden" id="st-duration" value="Instant">
@@ -788,6 +842,70 @@ input:read-only{opacity:0.5;cursor:not-allowed;}
           <button class="btn" style="background:var(--purple);color:#fff;" onclick="saveStudioBooking()">💾 Bill Save பண்ணு</button>
           <button class="btn btn-ghost" onclick="clearStudioForm()">🗑️ Clear</button>
         </div>
+      </div>
+    </div>
+
+    <!-- STUDIO FRAME ORDER PAGE -->
+    <div class="section studio" id="studio-frame-order">
+      <div class="card">
+        <div class="card-title">🖼️ <span style="color:var(--blue)">Studio Frame Order</span> - Customer விவரம்</div>
+        <div class="grid g3">
+          <div><label>Customer பெயர் *</label><input type="text" id="sf-cname" placeholder="பெயர்"></div>
+          <div><label>Mobile Number *</label><input type="tel" id="sf-phone" placeholder="9876543210" maxlength="10"></div>
+          <div><label>Order Date</label><input type="date" id="sf-date"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🖼️ Frame விவரம்</div>
+        <div class="grid g3">
+          <div>
+            <label>Frame Type <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து custom சேர்க்கலாம்)</span></label>
+            <input type="text" id="sf-type" list="sf-type-list" placeholder="Frame type தேர்வு / Type பண்ணவும்">
+            <datalist id="sf-type-list">
+              <option>Passport Frame</option><option>Photo Frame</option><option>Canvas Print</option><option>Poster Frame</option><option>Shadow Box</option><option>Mirror Frame</option><option>Certificate Frame</option><option>Collage Frame</option><option>Custom Frame</option>
+            </datalist>
+          </div>
+          <div><label>Frame Size</label><input type="text" id="sf-size" list="sf-size-list" placeholder="Size தேர்வு / Type பண்ணவும்">
+            <datalist id="sf-size-list"><option>4×6 inch</option><option>5×7 inch</option><option>6×8 inch</option><option>8×10 inch</option><option>10×12 inch</option><option>A4</option><option>A3</option><option>Custom</option></datalist>
+          </div>
+          <div><label>Quantity</label><input type="number" id="sf-qty" value="1" min="1" oninput="calcSfTotal()"></div>
+        </div>
+        <div style="margin:10px 0 4px;font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Passport Frame','4×6 inch',50)">📷 Passport ₹50</button>
+          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Photo Frame','5×7 inch',100)">🖼️ 5×7 ₹100</button>
+          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Photo Frame','8×10 inch',200)">🖼️ 8×10 ₹200</button>
+          <button class="btn btn-ghost btn-sm" onclick="setSfRate('Canvas Print','A4',350)">🎨 Canvas A4 ₹350</button>
+        </div>
+        <div class="grid g4">
+          <div><label>Rate (₹)</label><input type="number" id="sf-rate" placeholder="0" oninput="calcSfTotal()"></div>
+          <div><label>Total (₹)</label><input type="number" id="sf-total" placeholder="0" readonly style="font-weight:800;color:var(--blue);"></div>
+          <div><label>Advance (₹)</label><input type="number" id="sf-advance" placeholder="0" oninput="calcSfBalance()"></div>
+          <div><label>Balance (₹)</label><input type="number" id="sf-balance" placeholder="0" readonly style="color:var(--red);font-weight:700;"></div>
+        </div>
+        <div class="grid g3">
+          <div><label>Payment Method</label><select id="sf-pay" onchange="toggleSfUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Pending / Credit</option></select></div>
+          <div id="sf-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="sf-upi-id" placeholder="example@upi"></div>
+          <div><label>Payment Status</label><select id="sf-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
+        </div>
+        <div class="grid g2">
+          <div>
+            <label>Courier <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து custom courier சேர்க்கலாம்)</span></label>
+            <input type="text" id="sf-courier" list="sf-courier-list" placeholder="Courier தேர்வு / Type பண்ணவும்">
+            <datalist id="sf-courier-list">
+              <option>-- Self Pickup --</option><option>ST Courier</option><option>DTDC</option><option>Blue Dart</option><option>Delhivery</option><option>India Post</option><option>✅ Delivered</option>
+            </datalist>
+          </div>
+          <div><label>Note</label><input type="text" id="sf-note" placeholder="Special instructions..."></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-blue" onclick="saveSfOrder()">💾 Frame Order Save பண்ணு</button>
+          <button class="btn btn-ghost" onclick="clearSfForm()">🗑️ Clear</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px;">
+        <div class="card-title">📋 Studio Frame Orders</div>
+        <div id="sf-orders-list"><div class="empty"><div class="empty-icon">🖼️</div>Frame orders இல்லை</div></div>
       </div>
     </div>
 
@@ -1176,14 +1294,16 @@ async function loadAllData(){
     }
 
     // Load orders
-    const go = await fbGet('giftOrders'); giftOrders = toArr(go);
-    const fo = await fbGet('frameOrders'); frameOrders = toArr(fo);
-    const xb = await fbGet('xeroxBills'); xeroxBills = toArr(xb);
-    const sb = await fbGet('studioBookings'); studioBookings = toArr(sb);
-    const cr = await fbGet('creditRecords'); creditRecords = toArr(cr);
-    const si = await fbGet('stockItems'); stockItems = toArr(si);
-    const or = await fbGet('ownerRequests'); ownerRequests = toArr(or);
-    const er = await fbGet('employeeRecords'); employeeRecords = toArr(er);
+    const go = await fbGet('giftOrders'); if(go) giftOrders = toArr(go);
+    const fo = await fbGet('frameOrders'); if(fo) frameOrders = toArr(fo);
+    const xb = await fbGet('xeroxBills'); if(xb) xeroxBills = toArr(xb);
+    const sb = await fbGet('studioBookings'); if(sb) studioBookings = toArr(sb);
+    const cr = await fbGet('creditRecords'); if(cr) creditRecords = toArr(cr);
+    const si = await fbGet('stockItems'); if(si) stockItems = toArr(si);
+    const or = await fbGet('ownerRequests'); if(or) ownerRequests = toArr(or);
+    const er = await fbGet('employeeRecords'); if(er) employeeRecords = toArr(er);
+    const br = await fbGet('borrowedRecords'); if(br) borrowedRecords = toArr(br);
+    const sf = await fbGet('sfOrders'); if(sf) sfOrders = toArr(sf);
 
     dbLoaded = true;
   } catch(e){
@@ -1205,11 +1325,11 @@ function showLoadingScreen(show){
   el.style.display = show?'flex':'none';
 }
 
-// ===== SAVE HELPERS =====
-async function saveGiftOrders(){ await fbSet('giftOrders', arrToObj(giftOrders)); }
-async function saveFrameOrders(){ await fbSet('frameOrders', arrToObj(frameOrders)); }
-async function saveXeroxBills(){ await fbSet('xeroxBills', arrToObj(xeroxBills)); }
-async function saveStudioBookings(){ await fbSet('studioBookings', arrToObj(studioBookings)); }
+// ===== SAVE HELPERS — guarded against empty-array overwrites =====
+async function saveGiftOrders(){ if(giftOrders.length||dbLoaded) await fbSet('giftOrders', arrToObj(giftOrders)); }
+async function saveFrameOrders(){ if(frameOrders.length||dbLoaded) await fbSet('frameOrders', arrToObj(frameOrders)); }
+async function saveXeroxBills(){ if(xeroxBills.length||dbLoaded) await fbSet('xeroxBills', arrToObj(xeroxBills)); }
+async function saveStudioBookings(){ if(studioBookings.length||dbLoaded) await fbSet('studioBookings', arrToObj(studioBookings)); }
 async function saveCreditRecords(){ await fbSet('creditRecords', arrToObj(creditRecords)); }
 async function saveStockItems(){ await fbSet('stockItems', arrToObj(stockItems)); }
 async function saveOwnerRequests(){ await fbSet('ownerRequests', arrToObj(ownerRequests)); }
@@ -1343,7 +1463,25 @@ function submitOwnerRequest(){
   updateReqCountBadge();
 }
 
+function saveSession(user){
+  try{ localStorage.setItem('roaji_session', JSON.stringify({user, ts: Date.now()})); }catch(e){}
+}
+function clearSession(){
+  try{ localStorage.removeItem('roaji_session'); }catch(e){}
+}
+function getSession(){
+  try{
+    const raw = localStorage.getItem('roaji_session');
+    if(!raw) return null;
+    const s = JSON.parse(raw);
+    // Session valid for 30 days
+    if(Date.now() - s.ts > 30*24*60*60*1000){ localStorage.removeItem('roaji_session'); return null; }
+    return s.user;
+  }catch(e){ return null; }
+}
+
 function enterApp(){
+  saveSession(currentUser);
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appScreen').style.display='block';
   document.getElementById('headerUserName').textContent = currentUser.name;
@@ -1394,13 +1532,14 @@ function enterApp(){
 }
 
 function doLogout(){
+  clearSession();
   currentUser=null;
   document.getElementById('appScreen').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('owner-email').value='';
   document.getElementById('owner-pass').value='';
-  document.getElementById('worker-name').value='';
-  document.getElementById('worker-pin').value='';
+  const wp=document.getElementById('worker-pin');if(wp)wp.value='';
+  const we=document.getElementById('worker-email-login');if(we)we.value='';
 }
 
 function isOwner(){return currentUser&&currentUser.role==='owner';}
@@ -1568,6 +1707,8 @@ function saveGiftOrder(){
   const qty=parseInt(document.getElementById('g-qty').value)||1;
   const advance=parseFloat(document.getElementById('g-advance').value)||0;
   const mrp=parseFloat(document.getElementById('g-mrp').value)||0;
+  const totalDisplay=parseFloat(document.getElementById('g-total-display').value)||(rate*qty);
+  const balanceDisplay=parseFloat(document.getElementById('g-balance-display').value)||Math.max(0,totalDisplay-advance);
   const upiId=document.getElementById('g-upi-id')?document.getElementById('g-upi-id').value:'';
   const courier=document.getElementById('g-courier').value;
   const isDelivered=courier==='✅ Delivered';
@@ -1581,7 +1722,7 @@ function saveGiftOrder(){
     cat:document.getElementById('g-cat').value,
     prod:document.getElementById('g-prod').value||document.getElementById('g-cat').value,
     customName:'',customDetail:'',
-    qty,rate,mrp,total:rate*qty,advance,balance:Math.max(0,rate*qty-advance),
+    qty,rate,mrp,total:totalDisplay,advance,balance:balanceDisplay,
     payMethod:document.getElementById('g-pay').value,
     upiId,
     payStatus:document.getElementById('g-paystatus').value,
@@ -1875,19 +2016,21 @@ function renderXHistory(){
   const search=(document.getElementById('x-search')||{value:''}).value.toLowerCase();
   const fPay=(document.getElementById('x-filter-pay')||{value:''}).value;
   let data=xeroxBills.filter(b=>{
-    return(!search||b.id.toLowerCase().includes(search)||b.ref.toLowerCase().includes(search))&&(!fPay||b.payMethod===fPay);
+    return(!search||b.id.toLowerCase().includes(search)||(b.ref||'').toLowerCase().includes(search)||((b.custname||'').toLowerCase().includes(search)))&&(!fPay||b.payMethod===fPay);
   }).slice().reverse();
   const tbody=document.getElementById('x-history-body');
   if(!data.length){tbody.innerHTML='<tr><td colspan="8" class="empty">Bills இல்லை</td></tr>';return;}
   tbody.innerHTML=data.map(b=>{
     const locked=!canEdit(b.date);const canDel=canDelete(b.date);
     return `<tr>
-      <td><strong>${b.id}</strong></td><td>${fmtDate(b.date)} ${lockLabel(b.date)}</td>
-      <td>${b.custname||'—'}</td>
-      <td>${b.ref}</td><td>${b.items.length} items</td>
+      <td class="td-id"><strong>${b.id}</strong></td>
+      <td><span style="font-size:0.82rem;">${fmtDate(b.date)}</span> ${lockLabel(b.date)}</td>
+      <td class="td-cust"><strong>${b.custname||'—'}</strong></td>
+      <td style="font-size:0.82rem;color:var(--text2);">${b.ref||'—'}</td>
+      <td><span class="badge b-blue" style="font-size:0.72rem;">${b.items.length} items</span></td>
       <td><span class="badge b-green">${b.payMethod}</span></td>
-      <td><strong style="color:var(--green)">₹${b.total.toFixed(2)}</strong></td>
-      <td style="display:flex;gap:4px;flex-wrap:wrap;">
+      <td class="td-amt" style="color:var(--green)">₹${b.total.toFixed(2)}</td>
+      <td class="td-actions">
         <button class="btn btn-green btn-sm" onclick="showBill('xerox','${b.id}')">🧾</button>
         ${canDel?`<button class="btn btn-red btn-sm" onclick="deleteXBill('${b.id}')">🗑️</button>`:''}
       </td>
@@ -2262,7 +2405,7 @@ function deleteCredit(id){
 }
 
 // BORROWED / LOAN (நாம் வாங்கினது)
-let borrowedRecords = JSON.parse(localStorage.getItem('sm_borrowed')||'[]');
+let borrowedRecords = [];
 function addBorrowed(){
   const from=document.getElementById('br-from').value.trim();
   const phone=document.getElementById('br-phone').value.trim();
@@ -2962,8 +3105,8 @@ document.querySelectorAll('.modal-bg').forEach(mb=>{
 });
 
 // ===== STUDIO FRAME (separate from main Frame page) =====
-let sfOrders = JSON.parse(localStorage.getItem('sm_sfOrders')||'[]');
-function saveSfOrders(){localStorage.setItem('sm_sfOrders',JSON.stringify(sfOrders));fbSet('sfOrders',arrToObj(sfOrders));}
+let sfOrders = [];
+function saveSfOrders(){ fbSet('sfOrders',arrToObj(sfOrders)); }
 
 function calcSfTotal(){
   const rate=parseFloat(document.getElementById('sf-rate').value)||0;
@@ -3094,22 +3237,32 @@ function setAppLang(lang){
 const _origSaveGift=typeof saveGiftOrder==='function'?saveGiftOrder:null;
 function refreshDash(){if(currentUser&&currentUser.role==='owner'){const od=document.getElementById('owner-dash-stats');if(od&&od.offsetParent!==null)renderOwnerDash();}}
 
-// Init sfOrders from Firebase if available
-if(typeof fbRef==='function'||typeof fbGet==='function'){
-  try{
-    const sfRaw=localStorage.getItem('sm_sfOrders');
-    if(!sfRaw||sfRaw==='[]'){sfOrders=[];}
-    else{sfOrders=JSON.parse(sfRaw);}
-  }catch(e){sfOrders=[];}
-}
+// sfOrders loaded from Firebase in loadAllData
+
+
+// ===== SESSION RESTORE ON PAGE LOAD =====
+document.addEventListener('DOMContentLoaded', async function(){
+  const savedUser = getSession();
+  if(savedUser){
+    showLoadingScreen(true);
+    await loadAllData();
+    showLoadingScreen(false);
+    if(dbLoaded){
+      currentUser = savedUser;
+      enterApp();
+      return;
+    }
+  }
+  // No valid session — show login
+});
+
+
 
 // Apply saved language on load
-(function(){
+document.addEventListener('DOMContentLoaded', function(){
   const saved=localStorage.getItem('sm_lang')||'ta';
-  if(saved)setTimeout(()=>setAppLang(saved),500);
-})();
-
-// ===== WORKER SETTINGS LANGUAGE =====
+  if(saved)setTimeout(()=>setAppLang(saved),600);
+});
 // Add language toggle to work screen too (appended via JS since worker screen is shared)
 function renderWorkerLangToggle(){
   const existing=document.getElementById('worker-lang-toggle');
@@ -3177,15 +3330,6 @@ const QR_DEFAULTS = {
     {cat:'Canvas Print', item:'Canvas A4', rate:500},
     {cat:'Certificate Frame', item:'A4 Certificate', rate:200},
     {cat:'Couple Photo', item:'Couple Frame', rate:600}
-  ],
-  studio: [
-    {cat:'Photography', item:'Passport Size Photo', rate:30},
-    {cat:'Photography', item:'Visa Photo', rate:50},
-    {cat:'Photography', item:'ID Card Photo', rate:20},
-    {cat:'Photography', item:'School Photo', rate:25},
-    {cat:'Photography', item:'Portrait Photography', rate:200},
-    {cat:'Photography', item:'Wedding Photography', rate:5000},
-    {cat:'Photography', item:'Baby Shoot', rate:1500}
   ]
 };
 
@@ -3244,7 +3388,7 @@ function saveQRItems(){
 
 function renderQRButtons(section){
   const items=getQRItems(section);
-  const icons={xerox:'📄',gift:'🎁',frame:'🖼️',studio:'📷'};
+  const icons={xerox:'📄',gift:'🎁',frame:'🖼️'};
   const ic=icons[section]||'⚡';
   const btnId=section+'-qr-btns';
   const el=document.getElementById(btnId);
@@ -3258,10 +3402,6 @@ function applyQR(section, cat, item, rate){
     const el=document.getElementById('g-cat');if(el)el.value=cat;
     const pr=document.getElementById('g-prod');if(pr)pr.value=item;
     const re=document.getElementById('g-rate');if(re){re.value=rate;calcGiftTotal();}
-  }
-  else if(section==='studio'){
-    const el=document.getElementById('st-service');if(el)el.value=item;
-    const re=document.getElementById('st-rate');if(re){re.value=rate;calcStudioTotal();}
   }
   else if(section==='frame'){
     const el=document.getElementById('f-type');if(el)el.value=cat;
@@ -3300,38 +3440,11 @@ function toggleGiftDelivered(){
 
 // Xerox: custname handled in main saveXBill above
 
-// ===== PAYMENT STATUS LOGIC (Gift, Frame, Studio only — not Owner/Stock) =====
-const _payMap = {
-  g:  {total:'g-total-display',  adv:'g-advance',    bal:'g-balance-display'},
-  f:  {total:'f-total-display',  adv:'f-advance',     bal:'f-balance-display'},
-  st: {total:'st-total-display', adv:'st-advance',    bal:'st-balance-display'},
-  sf: {total:'sf-total',         adv:'sf-advance',    bal:'sf-balance'}
-};
-function applyPayStatus(p){
-  const m=_payMap[p]; if(!m) return;
-  const paid=document.getElementById(p+'-paystatus').value==='paid';
-  const total=parseFloat(document.getElementById(m.total).value)||0;
-  const adv=document.getElementById(m.adv);
-  const bal=document.getElementById(m.bal);
-  if(paid){
-    adv.value=total; bal.value=0;
-    adv.readOnly=true; bal.readOnly=true;
-    adv.style.opacity='0.6'; adv.style.cursor='not-allowed';
-  } else {
-    adv.readOnly=false;
-    adv.style.opacity=''; adv.style.cursor='';
-    // recalc balance from current advance
-    const a=parseFloat(adv.value)||0;
-    bal.value=Math.max(0,total-a).toFixed(2);
-  }
-}
-
 // ===== INIT QR BUTTONS ON LOAD =====
 document.addEventListener('DOMContentLoaded',function(){
   renderQRButtons('xerox');
   renderQRButtons('gift');
   renderQRButtons('frame');
-  renderQRButtons('studio');
 });
 </script>
 
