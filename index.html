@@ -1,3 +1,6 @@
+
+         
+
 <!DOCTYPE html>
 <html lang="ta">
 <head>
@@ -354,6 +357,50 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
   .stats{grid-template-columns:1fr 1fr;}
   .app-header{padding:10px 12px;}
 }
+
+/* ===== FEATURE: ORDER TYPE TABS (Online/Offline) ===== */
+.order-type-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.order-type-tab{padding:7px 16px;border-radius:20px;font-size:0.82rem;font-weight:700;cursor:pointer;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:inherit;transition:all 0.2s;}
+.order-type-tab.active-online{border-color:var(--blue);background:rgba(0,119,187,0.1);color:var(--blue);}
+.order-type-tab.active-offline{border-color:var(--purple);background:rgba(124,58,173,0.1);color:var(--purple);}
+
+/* ===== FEATURE: ORDERS NAVIGATION TABS ===== */
+.orders-nav-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.orders-nav-tab{padding:7px 16px;border-radius:20px;font-size:0.82rem;font-weight:700;cursor:pointer;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:inherit;transition:all 0.2s;}
+.orders-nav-tab.active{background:var(--gold);border-color:var(--gold);color:#000;}
+.online-card{border-left:3px solid var(--blue);}
+.offline-card{border-left:3px solid var(--purple);}
+
+/* ===== FEATURE: BARCODE TOGGLE ===== */
+.barcode-toggle-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(200,150,10,0.06);border:1px solid rgba(200,150,10,0.2);border-radius:10px;margin-bottom:12px;flex-wrap:wrap;}
+.barcode-toggle-btn{padding:7px 16px;border-radius:8px;font-family:inherit;font-size:0.82rem;font-weight:700;cursor:pointer;border:2px solid var(--border);background:var(--surface2);color:var(--text2);transition:all 0.2s;}
+.barcode-toggle-btn.barcode-active{background:var(--green);border-color:var(--green);color:#fff;}
+#barcode-scanner-area{display:none;background:#000;border-radius:10px;overflow:hidden;margin-bottom:12px;position:relative;}
+#barcode-scanner-area video{width:100%;display:block;max-height:220px;object-fit:cover;}
+#barcode-scanner-area .scanner-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+#barcode-scanner-area .scanner-line{width:80%;height:2px;background:rgba(26,200,80,0.8);animation:scanLine 2s ease-in-out infinite;}
+@keyframes scanLine{0%,100%{transform:translateY(-60px);}50%{transform:translateY(60px);}}
+#barcode-result-badge{display:inline-block;padding:4px 12px;border-radius:6px;background:rgba(26,138,80,0.1);border:1px solid rgba(26,138,80,0.3);color:var(--green);font-size:0.8rem;font-weight:700;margin-left:8px;}
+
+/* ===== FEATURE: TRACKING LINK ===== */
+.tracking-link-box{padding:10px 14px;background:rgba(0,119,187,0.06);border:1px solid rgba(0,119,187,0.2);border-radius:10px;margin-top:8px;}
+.tracking-link-input{font-size:0.78rem;color:var(--blue);word-break:break-all;padding:6px 10px;background:rgba(0,119,187,0.05);border:1px dashed rgba(0,119,187,0.3);border-radius:6px;margin:6px 0;cursor:pointer;}
+
+/* ===== FEATURE: LOW STOCK BADGE ===== */
+.low-stock-alert{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;background:rgba(204,34,34,0.12);color:var(--red);border:1px solid rgba(204,34,34,0.3);}
+#dash-low-stock-banner{display:none;padding:10px 14px;background:rgba(204,34,34,0.08);border:1px solid rgba(204,34,34,0.3);border-radius:10px;margin-bottom:12px;}
+
+/* ===== FEATURE: BARCODE IMAGE on Stock ===== */
+.barcode-img-wrap{text-align:center;padding:10px;background:#fff;border:1px solid var(--border);border-radius:8px;margin-top:8px;}
+.barcode-img-wrap svg{max-width:200px;}
+
+/* ===== FEATURE: BILL PRINT — Unified Rounded Box ===== */
+.unified-invoice{font-family:Arial,sans-serif;max-width:420px;margin:0 auto;border:2px solid #333;border-radius:14px;overflow:hidden;}
+.unified-invoice .inv-header{padding:14px 18px;text-align:center;}
+.unified-invoice .inv-table{width:100%;border-collapse:collapse;}
+.unified-invoice .inv-table th{background:#f5f5f5;padding:7px 10px;font-size:0.75rem;text-align:left;border-bottom:2px solid #ccc;}
+.unified-invoice .inv-table td{padding:6px 10px;border-bottom:1px solid #eee;font-size:0.82rem;}
+.unified-invoice .inv-footer{padding:10px 18px;border-top:2px dashed #ccc;text-align:center;font-size:0.75rem;color:#777;}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-database-compat.js"></script>
@@ -463,15 +510,30 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
     <div class="section gift active" id="gift-new-order">
       <div class="card">
         <div class="card-title">🎁 <span style="color:var(--pink)">Gift Order</span> - Customer விவரம்</div>
+        <!-- ORDER TYPE TOGGLE -->
+        <div style="margin-bottom:10px;">
+          <label>Order Type</label>
+          <div class="order-type-tabs">
+            <button class="order-type-tab active-online" id="g-type-online" onclick="setGiftOrderType('online')">🌐 Online Order</button>
+            <button class="order-type-tab" id="g-type-offline" onclick="setGiftOrderType('offline')">🏪 Offline / In-store</button>
+          </div>
+        </div>
+        <input type="hidden" id="g-order-type" value="online">
         <div class="grid g4">
           <div><label>Customer பெயர் *</label><input type="text" id="g-cname" placeholder="பெயர்"></div>
-          <div><label>Mobile Number *</label><input type="tel" id="g-phone" placeholder="9876543210" maxlength="10"></div>
+          <div><label>Mobile Number *</label><input type="tel" id="g-phone" placeholder="9876543210" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"></div>
           <div><label>Order Date</label><input type="date" id="g-orderdate"></div>
           <div><label>Order No #</label><input type="text" id="g-ordno" readonly></div>
         </div>
         <div class="grid g2">
-          <div><label>Delivery Address *</label><textarea id="g-addr" rows="2" placeholder="வீடு, தெரு, ஊர், PIN"></textarea></div>
+          <div><label>Delivery Address</label><textarea id="g-addr" rows="2" placeholder="வீடு, தெரு, ஊர், PIN"></textarea></div>
           <div><label>Special Note / Gift Message</label><textarea id="g-note" rows="2" placeholder="Birthday wish..."></textarea></div>
+        </div>
+        <!-- ONLINE-ONLY FIELDS -->
+        <div id="g-online-fields">
+          <div class="grid g2">
+            <div><label>Shipping Charges (₹)</label><input type="number" id="g-shipping" placeholder="0" value="0" oninput="calcGiftTotal()"></div>
+          </div>
         </div>
       </div>
       <div class="card">
@@ -505,11 +567,16 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
         <div class="grid g3">
           <div><label>Payment Method</label><select id="g-pay" onchange="toggleGiftUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
           <div id="g-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="g-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="g-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
+          <div><label>Payment Status</label><select id="g-paystatus" onchange="toggleGiftPayFields()"><option value="paid">✅ Paid</option><option value="advance">⚡ Advance</option><option value="pending">⏳ Pending</option></select></div>
         </div>
-        <div class="grid g3">
-          <div><label>Advance Paid (₹)</label><input type="number" id="g-advance" placeholder="0" oninput="calcGiftBalance()"></div>
-          <div><label>Balance (₹)</label><input type="number" id="g-balance-display" placeholder="0" style="color:var(--red);font-weight:700;" oninput=""></div>
+        <div id="g-pay-extra-fields" style="display:none;">
+          <div class="grid g2" style="margin-top:8px;">
+            <div><label>Advance Paid (₹)</label><input type="number" id="g-advance" placeholder="0" oninput="calcGiftBalance()"></div>
+            <div><label>Balance (₹)</label><input type="number" id="g-balance-display" placeholder="0" style="color:var(--red);font-weight:700;" readonly></div>
+          </div>
+        </div>
+        <!-- COURIER — always show; tracking only for online -->
+        <div class="grid g3" style="margin-top:8px;" id="g-courier-section">
           <div>
             <label>Shipping Courier <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து புதிய courier சேர்க்கலாம்)</span></label>
             <input type="text" id="g-courier" list="g-courier-list" placeholder="Courier தேர்வு / Type பண்ணவும்" oninput="toggleGiftDelivered();toggleGiftOfflineSale()">
@@ -517,11 +584,9 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
               <option>-- Self Pickup --</option><option>ST Courier</option><option>DTDC</option><option>Blue Dart</option><option>Delhivery</option><option>India Post</option><option>Ekart</option><option>✅ Delivered</option><option>Other</option>
             </datalist>
           </div>
+          <div id="g-track-field"><label>Tracking ID</label><input type="text" id="g-track" placeholder="Optional"></div>
         </div>
         <div id="g-delivered-note" style="display:none;padding:8px 12px;background:rgba(26,138,80,0.1);border:1px solid rgba(26,138,80,0.3);border-radius:8px;font-size:0.82rem;color:var(--green);font-weight:700;margin-bottom:8px;">✅ கடையில் வந்து வாங்கினார் — Courier தேவையில்லை. Bill Save-ஐ Click பண்ணினதும் Print Option வரும்!</div>
-        <div class="grid g2">
-          <div><label>Tracking ID</label><input type="text" id="g-track" placeholder="Optional"></div>
-        </div>
         <div class="btn-row">
           <button class="btn btn-pink" onclick="saveGiftOrder()">💾 Order Save பண்ணு</button>
           <button class="btn btn-ghost" onclick="clearGiftForm()">🗑️ Clear</button>
@@ -534,9 +599,16 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
       <div class="stats" id="gift-stats"></div>
       <div class="card">
         <div class="card-title">📋 Gift Orders</div>
+        <!-- Orders Navigation Tabs -->
+        <div class="orders-nav-tabs">
+          <button class="orders-nav-tab active" id="g-nav-all" onclick="setGiftOrdersNav('all',this)">📋 All</button>
+          <button class="orders-nav-tab" id="g-nav-online" onclick="setGiftOrdersNav('online',this)">🌐 Online Orders</button>
+          <button class="orders-nav-tab" id="g-nav-offline" onclick="setGiftOrdersNav('offline',this)">🏪 Offline Orders</button>
+        </div>
+        <input type="hidden" id="g-orders-nav-filter" value="all">
         <div class="grid g3" style="margin-bottom:12px;">
           <div><label>தேடு</label><input type="text" id="g-search" placeholder="தேடவும்..." oninput="renderGiftOrders()"></div>
-          <div><label>Payment Filter</label><select id="g-filter-pay" onchange="renderGiftOrders()"><option value="">எல்லாம்</option><option value="paid">Paid</option><option value="partial">Partial</option><option value="pending">Pending</option></select></div>
+          <div><label>Payment Filter</label><select id="g-filter-pay" onchange="renderGiftOrders()"><option value="">எல்லாம்</option><option value="paid">Paid</option><option value="advance">Advance</option><option value="pending">Pending</option></select></div>
           <div><label>Courier Filter</label><select id="g-filter-courier" onchange="renderGiftOrders()"><option value="">எல்லாம்</option><option>-- Self Pickup --</option><option>DTDC</option><option>Blue Dart</option><option>Delhivery</option></select></div>
         </div>
         <div id="gift-orders-list"></div>
@@ -576,15 +648,30 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
     <div class="section frame active" id="frame-new-order">
       <div class="card">
         <div class="card-title">🖼️ <span style="color:var(--blue)">Frame Order</span> - Customer விவரம்</div>
+        <!-- ORDER TYPE TOGGLE -->
+        <div style="margin-bottom:10px;">
+          <label>Order Type</label>
+          <div class="order-type-tabs">
+            <button class="order-type-tab active-online" id="f-type-online" onclick="setFrameOrderType('online')">🌐 Online Order</button>
+            <button class="order-type-tab" id="f-type-offline" onclick="setFrameOrderType('offline')">🏪 Offline / In-store</button>
+          </div>
+        </div>
+        <input type="hidden" id="f-order-type" value="online">
         <div class="grid g4">
           <div><label>Customer பெயர் *</label><input type="text" id="f-cname" placeholder="பெயர்"></div>
-          <div><label>Mobile Number *</label><input type="tel" id="f-phone" placeholder="9876543210" maxlength="10"></div>
+          <div><label>Mobile Number *</label><input type="tel" id="f-phone" placeholder="9876543210" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)"></div>
           <div><label>Order Date</label><input type="date" id="f-orderdate"></div>
           <div><label>Order No #</label><input type="text" id="f-ordno" readonly></div>
         </div>
         <div class="grid g2">
           <div><label>Delivery Address</label><textarea id="f-addr" rows="2" placeholder="வீடு, தெரு, ஊர், PIN"></textarea></div>
           <div><label>Special Instructions</label><textarea id="f-note" rows="2" placeholder="Black frame with white mat..."></textarea></div>
+        </div>
+        <!-- Online-only shipping charges -->
+        <div id="f-online-fields">
+          <div class="grid g2">
+            <div><label>Shipping Charges (₹)</label><input type="number" id="f-shipping" placeholder="0" value="0" oninput="calcFrameTotal()"></div>
+          </div>
         </div>
       </div>
       <div class="card">
@@ -624,10 +711,16 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
         <div class="grid g3">
           <div><label>Payment Method</label><select id="f-pay" onchange="toggleFrameUPI()"><option>Cash</option><option>UPI / GPay</option><option>PhonePe</option><option>Bank Transfer</option><option>Card</option><option>Pending / Credit</option></select></div>
           <div id="f-upi-field" style="display:none;"><label>UPI ID</label><input type="text" id="f-upi-id" placeholder="example@upi"></div>
-          <div><label>Payment Status</label><select id="f-paystatus"><option value="paid">✅ Paid</option><option value="partial">⚡ Partial</option><option value="pending">⏳ Pending</option></select></div>
-          <div><label>Advance Paid (₹)</label><input type="number" id="f-advance" placeholder="0" oninput="calcFrameBalance()"></div>
+          <div><label>Payment Status</label><select id="f-paystatus" onchange="toggleFramePayFields()"><option value="paid">✅ Paid</option><option value="advance">⚡ Advance</option><option value="pending">⏳ Pending</option></select></div>
         </div>
-        <div class="grid g2">
+        <div id="f-pay-extra-fields" style="display:none;">
+          <div class="grid g2" style="margin-top:8px;">
+            <div><label>Advance Paid (₹)</label><input type="number" id="f-advance" placeholder="0" oninput="calcFrameBalance()"></div>
+            <div><label>Balance (₹)</label><input type="number" id="f-balance-display" placeholder="0" style="color:var(--red);font-weight:700;" readonly></div>
+          </div>
+        </div>
+        <!-- Courier — always show; tracking/shipping only for online -->
+        <div class="grid g2" id="f-courier-section" style="margin-top:8px;">
           <div>
             <label>Courier <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து புதிய courier சேர்க்கலாம்)</span></label>
             <input type="text" id="f-courier" list="f-courier-list" placeholder="Courier தேர்வு / Type பண்ணவும்" oninput="toggleFrameDelivered()">
@@ -635,7 +728,7 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
               <option>-- Self Pickup --</option><option>ST Courier</option><option>DTDC</option><option>Blue Dart</option><option>Delhivery</option><option>India Post</option><option>Ekart</option><option>✅ Delivered</option><option>Other</option>
             </datalist>
           </div>
-          <div><label>Tracking ID</label><input type="text" id="f-track" placeholder="Optional"></div>
+          <div id="f-track-field"><label>Tracking ID</label><input type="text" id="f-track" placeholder="Optional"></div>
         </div>
         <div id="f-delivered-note" style="display:none;padding:8px 12px;background:rgba(26,138,80,0.1);border:1px solid rgba(26,138,80,0.3);border-radius:8px;font-size:0.82rem;color:var(--green);font-weight:700;margin-bottom:8px;">✅ கடையில் வந்து வாங்கினார் — Courier தேவையில்லை. Bill Save-ஐ Click பண்ணினதும் Print Option வரும்!</div>
         <div class="btn-row">
@@ -701,6 +794,18 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
       </div>
       <div class="card">
         <div class="card-title">➕ Item சேர்</div>
+        <!-- BARCODE / MANUAL TOGGLE -->
+        <div class="barcode-toggle-bar">
+          <span style="font-size:0.82rem;font-weight:700;color:var(--text2);">Input Mode:</span>
+          <button class="barcode-toggle-btn" id="x-mode-manual-btn" onclick="setXMode('manual')">✍️ Manual Mode</button>
+          <button class="barcode-toggle-btn" id="x-mode-barcode-btn" onclick="setXMode('barcode')">📷 Barcode Mode</button>
+          <span id="barcode-result-badge" style="display:none;"></span>
+        </div>
+        <!-- BARCODE SCANNER AREA -->
+        <div id="barcode-scanner-area">
+          <video id="barcode-video" autoplay playsinline muted></video>
+          <div class="scanner-overlay"><div class="scanner-line"></div></div>
+        </div>
         <div class="grid g4">
           <div>
             <label>Category <span style="font-size:0.7rem;color:var(--purple);">(Type செய்து save)</span></label>
@@ -963,6 +1068,11 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
 
     <!-- DASHBOARD -->
     <div class="section owner-panel active" id="owner-dashboard">
+      <!-- LOW STOCK BANNER -->
+      <div id="dash-low-stock-banner">
+        <div style="font-weight:800;color:var(--red);margin-bottom:6px;">⚠️ Low Stock Alert</div>
+        <div id="dash-low-stock-items" style="font-size:0.82rem;"></div>
+      </div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);">
         <span style="font-size:0.82rem;font-weight:700;color:var(--text2);">📅 தேதி தேர்வு:</span>
         <input type="date" id="dash-date-filter" style="width:auto;padding:6px 12px;font-size:0.88rem;" onchange="renderOwnerDash()">
@@ -1123,6 +1233,20 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
           </div>
         </div>
         <button class="btn btn-gold" onclick="addStock()">➕ Stock சேர்</button>
+        <!-- Test Barcode Scanner (Admin only) -->
+        <div style="margin-top:12px;" id="stk-barcode-section">
+          <div style="font-size:0.82rem;font-weight:700;color:var(--orange);margin-bottom:8px;">📷 Test Barcode Scanner</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <button class="btn btn-ghost btn-sm" onclick="toggleStockScanner()">📷 Open Camera to Test Scan</button>
+            <span style="font-size:0.78rem;color:var(--text2);">Barcode பேஸ்ட் பண்ணி scan செய்து verify பண்ணவும்</span>
+          </div>
+          <div id="stk-scanner-area" style="display:none;margin-top:8px;max-width:340px;">
+            <video id="stk-barcode-video" autoplay playsinline muted style="width:100%;border-radius:8px;background:#000;"></video>
+            <div style="margin-top:6px;font-size:0.8rem;color:var(--text2);">Scanning... barcode-ஐ camera-க்கு முன் வையுங்கள்</div>
+            <div id="stk-scan-result" style="margin-top:6px;font-weight:700;color:var(--green);font-size:0.85rem;"></div>
+            <button class="btn btn-ghost btn-sm" onclick="stopStockScanner()" style="margin-top:6px;">✕ Stop Scanner</button>
+          </div>
+          </div>
       </div>
       <div class="card">
         <div class="card-title">📋 Stock List</div>
@@ -3440,11 +3564,558 @@ function toggleGiftDelivered(){
 
 // Xerox: custname handled in main saveXBill above
 
+// =====================================================================
+// ===== FEATURE 1: ONLINE ORDER TRACKING LINK =========================
+// =====================================================================
+function generateTrackingLink(type, orderId){
+  if(!isOwner()){showNotif('❌ Admin only!','red');return;}
+  let order = (type==='gift'?giftOrders:frameOrders).find(o=>o.id===orderId);
+  if(!order){showNotif('❌ Order not found!','red');return;}
+  if(order.orderType==='offline'){showNotif('❌ Offline orders cannot have tracking links!','red');return;}
+  const token = 'TRK'+Date.now()+Math.random().toString(36).slice(2,8).toUpperCase();
+  order.trackingToken = token;
+  order.trackingTokenCreated = new Date().toISOString();
+  order.trackingLinkExpired = false;
+  if(type==='gift') saveGiftOrders(); else saveFrameOrders();
+  const link = window.location.origin + window.location.pathname + '?track=' + token;
+  showTrackingLinkModal(link, order);
+}
+function showTrackingLinkModal(link, order){
+  const el = document.getElementById('tracking-link-content');
+  el.innerHTML = `
+    <div style="margin-bottom:12px;font-size:0.85rem;color:var(--text2);">Customer இந்த link-ஐ open செய்தால் order status காண்பார்கள். Login தேவையில்லை.</div>
+    <div class="tracking-link-input" onclick="copyToClip('${link}')" title="Click to copy">${link}</div>
+    <button class="btn btn-blue btn-sm" onclick="copyToClip('${link}')" style="margin-top:6px;">📋 Link Copy பண்ணு</button>
+    <div style="margin-top:12px;padding:10px;background:rgba(204,34,34,0.06);border:1px solid rgba(204,34,34,0.2);border-radius:8px;font-size:0.78rem;color:var(--text2);">
+      ⚠️ Order 'Delivered' status-ஆனதும் இந்த link தானாக expire ஆகும்.
+    </div>`;
+  document.getElementById('trackingLinkModal').classList.add('open');
+}
+function copyToClip(text){
+  navigator.clipboard.writeText(text).then(()=>showNotif('📋 Link Copied!'));
+}
+async function loadCustomerTracking(token){
+  const el = document.getElementById('customer-tracking-content');
+  try {
+    const go = await fbGet('giftOrders');
+    const fo = await fbGet('frameOrders');
+    const allOrders = [...toArr(go||{}), ...toArr(fo||{})];
+    const order = allOrders.find(o=>o.trackingToken===token);
+    if(!order){
+      el.innerHTML=`<div style="text-align:center;padding:40px;"><div style="font-size:3rem;">❌</div><div style="font-weight:700;margin-top:10px;color:var(--red);">Invalid or Expired Tracking Link</div><div style="font-size:0.82rem;color:var(--text2);margin-top:6px;">இந்த tracking link invalid அல்லது order deliver ஆகிவிட்டது.</div></div>`;
+      return;
+    }
+    if(order.trackingLinkExpired || order.shipStatus==='delivered'){
+      el.innerHTML=`<div style="text-align:center;padding:40px;"><div style="font-size:3rem;">✅</div><div style="font-weight:700;margin-top:10px;color:var(--green);">Order Delivered!</div><div style="font-size:0.82rem;color:var(--text2);margin-top:6px;">உங்கள் order deliver ஆகிவிட்டது. நன்றி!</div></div>`;
+      return;
+    }
+    const steps=['processing','dispatched','in-transit','out-for-delivery','delivered'];
+    const stepLabels=['⏳ Packing','📦 Shipped','🚚 In Transit','🛵 Out for Delivery','✅ Delivered'];
+    const curIdx=steps.indexOf(order.shipStatus||'processing');
+    el.innerHTML=`<div class="card"><div style="font-weight:800;margin-bottom:12px;font-size:1rem;">Order #${order.id}</div><div style="font-size:0.85rem;color:var(--text2);margin-bottom:4px;">Customer: <strong>${order.cname}</strong></div><div style="font-size:0.85rem;color:var(--text2);margin-bottom:12px;">Date: ${fmtDate(order.date)}</div><div style="margin-bottom:14px;">${stepLabels.map((lbl,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i<steps.length-1?'border-bottom:1px dashed var(--border)':''}"><div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;${i<curIdx?'background:var(--green);color:#fff;':i===curIdx?'background:var(--gold);':'background:var(--border);'}">${i<=curIdx?'✓':'○'}</div><div style="font-size:0.88rem;font-weight:${i===curIdx?800:500};color:${i===curIdx?'var(--text)':i<curIdx?'var(--green)':'var(--text2)'};">${lbl}</div></div>`).join('')}</div>${order.trackId?`<div style="font-size:0.82rem;color:var(--text2);">Tracking ID: <strong>${order.trackId}</strong></div>`:''}</div>`;
+  } catch(e){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--red);">❌ Error loading tracking data.</div>`;
+  }
+}
+function expireTrackingLinkIfDelivered(type, orderId){
+  const data=type==='gift'?giftOrders:frameOrders;
+  const order=data.find(o=>o.id===orderId);
+  if(order&&order.trackingToken&&order.shipStatus==='delivered'){
+    order.trackingLinkExpired=true;
+    if(type==='gift') saveGiftOrders(); else saveFrameOrders();
+  }
+}
+
+// =====================================================================
+// ===== FEATURE 2: BARCODE / MANUAL MODE TOGGLE =======================
+// =====================================================================
+let xMode='manual',barcodeStream=null,barcodeInterval=null;
+function setXMode(mode){
+  xMode=mode;
+  const manBtn=document.getElementById('x-mode-manual-btn');
+  const barBtn=document.getElementById('x-mode-barcode-btn');
+  const scanArea=document.getElementById('barcode-scanner-area');
+  if(mode==='manual'){
+    manBtn.classList.add('barcode-active');barBtn.classList.remove('barcode-active');
+    scanArea.style.display='none';stopBarcodeScanner();
+  } else {
+    barBtn.classList.add('barcode-active');manBtn.classList.remove('barcode-active');
+    scanArea.style.display='block';startBarcodeScanner();
+  }
+}
+async function startBarcodeScanner(){
+  const video=document.getElementById('barcode-video');
+  try {
+    barcodeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    video.srcObject=barcodeStream;
+    if('BarcodeDetector' in window){
+      const detector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','qr_code','upc_a','upc_e']});
+      barcodeInterval=setInterval(async()=>{
+        try{if(video.readyState===video.HAVE_ENOUGH_DATA){const barcodes=await detector.detect(video);if(barcodes.length>0){handleBarcodeScan(barcodes[0].rawValue);}}}catch(e){}
+      },500);
+    }
+  } catch(e){showNotif('❌ Camera access denied!','red');setXMode('manual');}
+}
+function stopBarcodeScanner(){
+  if(barcodeStream){barcodeStream.getTracks().forEach(t=>t.stop());barcodeStream=null;}
+  if(barcodeInterval){clearInterval(barcodeInterval);barcodeInterval=null;}
+}
+function handleBarcodeScan(code){
+  stopBarcodeScanner();setXMode('manual');
+  const stockItem=stockItems.find(s=>s.barcode===code);
+  const badge=document.getElementById('barcode-result-badge');
+  badge.style.display='inline-block';
+  if(stockItem){
+    document.getElementById('x-cat').value=stockItem.cat||'';
+    document.getElementById('x-item').value=stockItem.name;
+    document.getElementById('x-rate').value=stockItem.selling||0;
+    badge.textContent='✅ '+stockItem.name;
+    showNotif('✅ Barcode scanned: '+stockItem.name);
+  } else {
+    badge.textContent='⚠️ Code: '+code;
+    document.getElementById('x-item').value='Item-'+code;
+  }
+}
+
+// =====================================================================
+// ===== FEATURE 3: STOCK BARCODE GENERATION + TEST SCANNER ===========
+// =====================================================================
+function generateBarcode(text){
+  if(!text)return'';
+  let bars='',x=10;const h=50;
+  const chars=(text+'').split('');
+  bars+=`<rect x="${x}" y="5" width="3" height="${h}" fill="#000"/>`;x+=5;
+  bars+=`<rect x="${x}" y="5" width="1" height="${h}" fill="#000"/>`;x+=3;
+  chars.forEach(c=>{
+    const code=c.charCodeAt(0);
+    for(let b=6;b>=0;b--){if((code>>b)&1){bars+=`<rect x="${x}" y="5" width="2" height="${h}" fill="#000"/>`;} x+=3;}
+    x+=1;
+  });
+  bars+=`<rect x="${x}" y="5" width="3" height="${h}" fill="#000"/>`;x+=10;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${x}" height="${h+20}" style="background:#fff">${bars}<text x="${x/2}" y="${h+18}" text-anchor="middle" font-size="10" font-family="monospace" fill="#333">${text}</text></svg>`;
+}
+let stkScannerStream=null;
+function toggleStockScanner(){
+  if(!isOwner()){showNotif('❌ Admin only!','red');return;}
+  const area=document.getElementById('stk-scanner-area');
+  if(area.style.display==='none'||!area.style.display){area.style.display='block';startStockScanner();}
+  else{area.style.display='none';stopStockScanner();}
+}
+async function startStockScanner(){
+  const video=document.getElementById('stk-barcode-video');
+  const result=document.getElementById('stk-scan-result');
+  try {
+    stkScannerStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    video.srcObject=stkScannerStream;
+    if('BarcodeDetector' in window){
+      const detector=new BarcodeDetector({formats:['ean_13','ean_8','code_128','code_39','qr_code','upc_a']});
+      const iv=setInterval(async()=>{
+        if(!stkScannerStream){clearInterval(iv);return;}
+        try{if(video.readyState===video.HAVE_ENOUGH_DATA){const barcodes=await detector.detect(video);if(barcodes.length>0){const code=barcodes[0].rawValue;clearInterval(iv);const match=stockItems.find(s=>s.barcode===code);result.textContent=match?`✅ OK: ${match.name} (Qty: ${match.qty})`:`⚠️ ${code} — Not found in stock`;result.style.color=match?'var(--green)':'var(--orange)';}}}catch(e){}
+      },500);
+    } else {result.textContent='⚠️ BarcodeDetector not supported.';}
+  } catch(e){showNotif('❌ Camera denied!','red');stopStockScanner();}
+}
+function stopStockScanner(){
+  if(stkScannerStream){stkScannerStream.getTracks().forEach(t=>t.stop());stkScannerStream=null;}
+  const area=document.getElementById('stk-scanner-area');if(area)area.style.display='none';
+}
+
+// =====================================================================
+// ===== FEATURE 4: AUTO-DEDUCT STOCK + LOW STOCK ALERT ===============
+// =====================================================================
+function deductStockForItem(itemName, qty){
+  const item=stockItems.find(s=>s.name.toLowerCase()===itemName.toLowerCase());
+  if(item&&item.qty>=0){item.qty=Math.max(0,item.qty-qty);item.lastUpdated=new Date().toISOString();saveStockItems();checkLowStock();}
+}
+function checkLowStock(){
+  const LOW=3;
+  const lowItems=stockItems.filter(s=>s.qty<=LOW&&s.qty>=0);
+  const banner=document.getElementById('dash-low-stock-banner');
+  const itemsEl=document.getElementById('dash-low-stock-items');
+  if(!banner)return;
+  if(lowItems.length){
+    banner.style.display='block';
+    if(itemsEl)itemsEl.innerHTML=lowItems.map(s=>`<span class="low-stock-alert" style="margin:2px 4px;">📦 ${s.name}: ${s.qty} remaining</span>`).join('');
+  } else {banner.style.display='none';}
+}
+
+// =====================================================================
+// ===== FEATURE 7: PAYMENT STATUS LOGIC ===============================
+// =====================================================================
+function toggleGiftPayFields(){
+  const status=document.getElementById('g-paystatus').value;
+  const ef=document.getElementById('g-pay-extra-fields');
+  if(ef)ef.style.display=(status==='advance'||status==='pending')?'block':'none';
+  if(status==='paid'){const a=document.getElementById('g-advance');const b=document.getElementById('g-balance-display');if(a)a.value='0';if(b)b.value='0';}
+}
+function toggleFramePayFields(){
+  const status=document.getElementById('f-paystatus').value;
+  const ef=document.getElementById('f-pay-extra-fields');
+  if(ef)ef.style.display=(status==='advance'||status==='pending')?'block':'none';
+  if(status==='paid'){const a=document.getElementById('f-advance');const b=document.getElementById('f-balance-display');if(a)a.value='0';if(b)b.value='0';}
+}
+
+// =====================================================================
+// ===== FEATURE 8: ORDER TYPE VISIBILITY ==============================
+// =====================================================================
+function setGiftOrderType(type){
+  const el=document.getElementById('g-order-type');if(el)el.value=type;
+  const ob=document.getElementById('g-type-online');const offb=document.getElementById('g-type-offline');
+  const of_=document.getElementById('g-online-fields');const tf=document.getElementById('g-track-field');
+  if(type==='online'){
+    if(ob)ob.className='order-type-tab active-online';if(offb)offb.className='order-type-tab';
+    if(of_)of_.style.display='block';if(tf)tf.style.display='block';
+  } else {
+    if(offb)offb.className='order-type-tab active-offline';if(ob)ob.className='order-type-tab';
+    if(of_)of_.style.display='none';if(tf)tf.style.display='none';
+    const sc=document.getElementById('g-shipping');if(sc)sc.value='0';
+    const tr=document.getElementById('g-track');if(tr)tr.value='';
+  }
+  calcGiftTotal();
+}
+function setFrameOrderType(type){
+  const el=document.getElementById('f-order-type');if(el)el.value=type;
+  const ob=document.getElementById('f-type-online');const offb=document.getElementById('f-type-offline');
+  const of_=document.getElementById('f-online-fields');const tf=document.getElementById('f-track-field');
+  if(type==='online'){
+    if(ob)ob.className='order-type-tab active-online';if(offb)offb.className='order-type-tab';
+    if(of_)of_.style.display='block';if(tf)tf.style.display='block';
+  } else {
+    if(offb)offb.className='order-type-tab active-offline';if(ob)ob.className='order-type-tab';
+    if(of_)of_.style.display='none';if(tf)tf.style.display='none';
+    const sc=document.getElementById('f-shipping');if(sc)sc.value='0';
+    const tr=document.getElementById('f-track');if(tr)tr.value='';
+  }
+  calcFrameTotal();
+}
+
+// =====================================================================
+// ===== FEATURE 9: ORDERS NAVIGATION TABS ============================
+// =====================================================================
+function setGiftOrdersNav(filter, el){
+  const nf=document.getElementById('g-orders-nav-filter');if(nf)nf.value=filter;
+  document.querySelectorAll('.orders-nav-tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderGiftOrders();
+}
+
+// =====================================================================
+// ===== FEATURE 10: UNIFIED INVOICE BILL DESIGN =======================
+// =====================================================================
+function unifiedBill(title, accentColor, shopInfo, invoiceId, date, custInfo, items, grandTotal, payInfo, note){
+  const rows=items.map((it,i)=>`<tr><td style="padding:5px 8px;text-align:center;border-bottom:1px solid #eee;">${i+1}</td><td style="padding:5px 8px;border-bottom:1px solid #eee;">${it.desc}</td><td style="padding:5px 8px;text-align:right;border-bottom:1px solid #eee;">₹${(it.rate||0).toFixed(2)}</td><td style="padding:5px 8px;text-align:center;border-bottom:1px solid #eee;">${it.qty||1}</td><td style="padding:5px 8px;text-align:right;border-bottom:1px solid #eee;font-weight:700;">₹${(it.total||0).toFixed(2)}</td></tr>`).join('');
+  return `<div style="border:2px solid #222;border-radius:14px;overflow:hidden;font-family:Arial,sans-serif;max-width:420px;margin:0 auto;background:#fff;">
+    <div style="padding:12px 16px;text-align:center;border-bottom:2px solid #222;background:${accentColor}0d;">
+      <div style="font-size:0.95rem;font-weight:800;color:${accentColor};">${title}</div>
+      <div style="font-size:0.72rem;color:#666;margin-top:2px;">${shopInfo}</div>
+    </div>
+    <div style="padding:8px 16px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;font-size:0.78rem;">
+      <div><strong>Invoice #:</strong> ${invoiceId}</div><div><strong>Date:</strong> ${date}</div>
+    </div>
+    <div style="padding:6px 16px;border-bottom:1px solid #ddd;font-size:0.78rem;">${custInfo}</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="background:#f5f5f5;">
+        <th style="padding:6px 8px;font-size:0.7rem;text-align:center;border-bottom:2px solid #ddd;">S.No</th>
+        <th style="padding:6px 8px;font-size:0.7rem;text-align:left;border-bottom:2px solid #ddd;">Description</th>
+        <th style="padding:6px 8px;font-size:0.7rem;text-align:right;border-bottom:2px solid #ddd;">Rate</th>
+        <th style="padding:6px 8px;font-size:0.7rem;text-align:center;border-bottom:2px solid #ddd;">Qty</th>
+        <th style="padding:6px 8px;font-size:0.7rem;text-align:right;border-bottom:2px solid #ddd;">Total</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="padding:10px 16px;border-top:2px solid #222;text-align:right;">
+      <div style="font-size:1rem;font-weight:800;color:${accentColor};">Grand Total: ₹${grandTotal.toFixed(2)}</div>
+      <div style="font-size:0.75rem;color:#666;margin-top:2px;">${payInfo}</div>
+    </div>
+    ${note?`<div style="padding:6px 16px;border-top:1px dashed #ddd;font-size:0.72rem;color:#666;">📝 ${note}</div>`:''}
+    <div style="padding:8px 16px;border-top:1px dashed #ccc;text-align:center;font-size:0.7rem;color:#999;">நன்றி! மீண்டும் வாருங்கள் · Thank You!</div>
+  </div>`;
+}
+
+// Override showBill for unified design
+const _prevShowBill = showBill;
+showBill = function(type, id){
+  const shopName=settings.shopName||'Roaji.in';
+  const shopInfo=`${settings.shopAddr||''} ${settings.shopPhone?'📞'+settings.shopPhone:''}`.trim()||shopName;
+  if(type==='gift'){
+    const o=giftOrders.find(x=>x.id===id);if(!o)return;
+    const items=[{desc:`${o.prod} (${o.cat})${o.customName?' — Custom: '+o.customName:''}`,rate:o.rate,qty:o.qty,total:o.rate*(o.qty||1)}];
+    const ship=o.shipping||0;if(ship>0)items.push({desc:'Shipping Charges',rate:ship,qty:1,total:ship});
+    const html=unifiedBill('🎁 GIFT ORDER RECEIPT','#d63870',shopInfo,o.id,fmtDate(o.date),`<strong>${o.cname}</strong> | 📱 ${o.phone}${o.addr?` | ${o.addr}`:''}`,items,o.total,`${o.payMethod} | ${o.payStatus}${o.advance>0?' | Adv: ₹'+o.advance.toFixed(2):''}${o.balance>0?' | Bal: ₹'+o.balance.toFixed(2):''}`,o.note||'');
+    currentPrintHTML=`<div style="padding:20px;">${html}</div>`;
+    document.getElementById('billModalContent').innerHTML=html;
+    document.getElementById('billModal').classList.add('open');
+  } else if(type==='frame'){
+    const o=frameOrders.find(x=>x.id===id);if(!o)return;
+    const items=[{desc:`${o.ftype} · ${o.size}${o.customName?' — "'+o.customName+'"':''}`,rate:o.rate,qty:o.qty,total:o.rate*(o.qty||1)}];
+    const ship=o.shipping||0;if(ship>0)items.push({desc:'Shipping Charges',rate:ship,qty:1,total:ship});
+    const html=unifiedBill('🖼️ FRAME ORDER RECEIPT','#0077bb',shopInfo,o.id,fmtDate(o.date),`<strong>${o.cname}</strong> | 📱 ${o.phone}${o.addr?` | ${o.addr}`:''}`,items,o.total,`${o.payMethod} | ${o.payStatus}${o.advance>0?' | Adv: ₹'+o.advance.toFixed(2):''}${o.balance>0?' | Bal: ₹'+o.balance.toFixed(2):''}`,o.note||'');
+    currentPrintHTML=`<div style="padding:20px;">${html}</div>`;
+    document.getElementById('billModalContent').innerHTML=html;
+    document.getElementById('billModal').classList.add('open');
+  } else {
+    const b=xeroxBills.find(x=>x.id===id);if(!b)return;
+    const items=b.items.map(it=>({desc:it.item+(it.customName?` — "${it.customName}"`:''),rate:it.rate,qty:it.qty,total:it.amt}));
+    const html=unifiedBill('🖨️ XEROX & STATIONERY RECEIPT','#1a8a50',shopInfo,b.id,fmtDate(b.date),`${b.custname||'Walk-in'}${b.ref?` | Ref: ${b.ref}`:''}`,items,b.total,`${b.payMethod}${b.discount>0?' | Disc: ₹'+b.discount.toFixed(2):''}`,b.note||'');
+    currentPrintHTML=`<div style="padding:20px;">${html}</div>`;
+    document.getElementById('billModalContent').innerHTML=html;
+    document.getElementById('billModal').classList.add('open');
+  }
+};
+// Override showStudioBill
+showStudioBill = function(id){
+  const b=studioBookings.find(x=>x.id===id);if(!b)return;
+  const shopName=settings.shopName||'Roaji.in';
+  const shopInfo=`${settings.shopAddr||''} ${settings.shopPhone?'📞'+settings.shopPhone:''}`.trim()||shopName;
+  const items=[{desc:`${b.service}${b.package?' — '+b.package:''}`,rate:b.rate,qty:1,total:b.total}];
+  const html=unifiedBill('🎨 STUDIO RECEIPT','#7c3aad',shopInfo,b.id,fmtDate(b.date),`<strong>${b.cname}</strong> | 📱 ${b.phone}`,items,b.total,`${b.payMethod} | ${b.payStatus}${b.advance>0?' | Adv: ₹'+b.advance.toFixed(2):''}${b.balance>0?' | Bal: ₹'+b.balance.toFixed(2):''}`,b.note||'');
+  currentPrintHTML=`<div style="padding:20px;">${html}</div>`;
+  document.getElementById('billModalContent').innerHTML=html;
+  document.getElementById('billModal').classList.add('open');
+};
+
+// =====================================================================
+// === PATCHES: saveGiftOrder, saveFrameOrder with new feature data ====
+// =====================================================================
+saveGiftOrder = function(){
+  const cname=document.getElementById('g-cname').value.trim();
+  const phone=document.getElementById('g-phone').value.trim();
+  const addr=document.getElementById('g-addr').value.trim();
+  if(!cname){showNotif('❌ Customer பெயர் உள்ளிடவும்!','red');return;}
+  if(!phone){showNotif('❌ Mobile number உள்ளிடவும்!','red');return;}
+  if(!addr){showNotif('❌ Address உள்ளிடவும்!','red');return;}
+  const orderType=document.getElementById('g-order-type')?.value||'online';
+  const rate=parseFloat(document.getElementById('g-rate').value)||0;
+  const qty=parseInt(document.getElementById('g-qty').value)||1;
+  const shipping=orderType==='online'?(parseFloat(document.getElementById('g-shipping')?.value)||0):0;
+  const payStatus=document.getElementById('g-paystatus').value;
+  let advance=0,balance=0;
+  if(payStatus==='advance'||payStatus==='pending'){advance=parseFloat(document.getElementById('g-advance')?.value)||0;}
+  const baseTotal=parseFloat(document.getElementById('g-total-display').value)||(rate*qty);
+  const grandTotal=baseTotal+shipping;
+  balance=payStatus==='paid'?0:Math.max(0,grandTotal-advance);
+  const upiId=document.getElementById('g-upi-id')?.value||'';
+  const courier=document.getElementById('g-courier').value;
+  const isDelivered=courier==='✅ Delivered';
+  const orderDateVal=document.getElementById('g-orderdate').value;
+  const orderDate=orderDateVal?new Date(orderDateVal+'T12:00:00').toISOString():new Date().toISOString();
+  const order={
+    id:document.getElementById('g-ordno').value,date:orderDate,createdBy:currentUser.name,
+    orderType,cname,phone,addr,
+    note:document.getElementById('g-note').value,
+    cat:document.getElementById('g-cat').value,
+    prod:document.getElementById('g-prod').value||document.getElementById('g-cat').value,
+    customName:'',customDetail:'',
+    qty,rate,mrp:parseFloat(document.getElementById('g-mrp').value)||0,
+    total:grandTotal,shipping,advance,balance,
+    payMethod:document.getElementById('g-pay').value,upiId,payStatus,
+    courier:isDelivered?'✅ Delivered':courier,
+    trackId:orderType==='online'?(document.getElementById('g-track')?.value||''):'',
+    shipStatus:isDelivered?'delivered':(document.getElementById('g-track')?.value?'dispatched':'processing')
+  };
+  giftOrders.push(order);saveGiftOrders();
+  showNotif('✅ Gift Order சேமிக்கப்பட்டது!');
+  if(isDelivered){showBill('gift',order.id);const pb=document.getElementById('g-print-btn');if(pb)pb.style.display='inline-flex';}
+  clearGiftForm();genOrderNos();refreshDash();checkLowStock();
+};
+
+saveFrameOrder = function(){
+  const cname=document.getElementById('f-cname').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  if(!cname){showNotif('❌ Customer பெயர்!','red');return;}
+  if(!phone){showNotif('❌ Mobile number!','red');return;}
+  const orderType=document.getElementById('f-order-type')?.value||'online';
+  const rate=parseFloat(document.getElementById('f-rate').value)||0;
+  const qty=parseInt(document.getElementById('f-qty').value)||1;
+  const shipping=orderType==='online'?(parseFloat(document.getElementById('f-shipping')?.value)||0):0;
+  const payStatus=document.getElementById('f-paystatus').value;
+  let advance=0,balance=0;
+  if(payStatus==='advance'||payStatus==='pending'){advance=parseFloat(document.getElementById('f-advance')?.value)||0;}
+  const grandTotal=rate*qty+shipping;
+  balance=payStatus==='paid'?0:Math.max(0,grandTotal-advance);
+  const upiId=document.getElementById('f-upi-id')?.value||'';
+  const size=document.getElementById('f-csize').value||document.getElementById('f-size').value;
+  const orderDateVal=document.getElementById('f-orderdate').value;
+  const orderDate=orderDateVal?new Date(orderDateVal+'T12:00:00').toISOString():new Date().toISOString();
+  const order={
+    id:document.getElementById('f-ordno').value,date:orderDate,createdBy:currentUser.name,
+    orderType,cname,phone,addr:document.getElementById('f-addr').value,note:document.getElementById('f-note').value,
+    ftype:document.getElementById('f-type').value,size,qty,rate,mrp:parseFloat(document.getElementById('f-mrp').value)||0,
+    total:grandTotal,shipping,
+    material:document.getElementById('f-material').value,color:document.getElementById('f-color').value,
+    printing:document.getElementById('f-print').value,
+    customName:document.getElementById('f-customname')?.value||'',
+    customDetail:document.getElementById('f-customdetail')?.value||'',
+    advance,balance,payMethod:document.getElementById('f-pay').value,upiId,payStatus,
+    courier:document.getElementById('f-courier').value,
+    trackId:orderType==='online'?(document.getElementById('f-track')?.value||''):'',
+    shipStatus:document.getElementById('f-track')?.value?'dispatched':'processing'
+  };
+  frameOrders.push(order);saveFrameOrders();
+  showNotif('✅ Frame Order சேமிக்கப்பட்டது!');clearFrameForm();genOrderNos();refreshDash();checkLowStock();
+};
+
+// PATCH saveTracking to expire link on delivered
+const _origSaveTracking2=saveTracking;
+saveTracking=function(){
+  _origSaveTracking2();
+  const type=document.getElementById('tm-type').value;
+  const id=document.getElementById('tm-id').value;
+  const status=document.getElementById('tm-status').value;
+  if(status==='delivered')expireTrackingLinkIfDelivered(type,id);
+};
+
+// PATCH renderGiftOrders to add online/offline tabs + tracking link button
+renderGiftOrders=function(){
+  const search=(document.getElementById('g-search')||{value:''}).value.toLowerCase();
+  const fPay=(document.getElementById('g-filter-pay')||{value:''}).value;
+  const fCourier=(document.getElementById('g-filter-courier')||{value:''}).value;
+  const navFilter=document.getElementById('g-orders-nav-filter')?.value||'all';
+  let data=giftOrders.filter(o=>{
+    const isOnline=!o.orderType||o.orderType==='online';
+    const typeOk=navFilter==='all'||(navFilter==='online'&&isOnline)||(navFilter==='offline'&&o.orderType==='offline');
+    return typeOk&&(!search||o.id.toLowerCase().includes(search)||o.cname.toLowerCase().includes(search)||o.phone.includes(search))&&(!fPay||o.payStatus===fPay)&&(!fCourier||o.courier===fCourier);
+  }).slice().reverse();
+  const el=document.getElementById('gift-orders-list');
+  if(!data.length){el.innerHTML='<div class="empty"><div class="empty-icon">🎁</div>Order இல்லை</div>';return;}
+  el.innerHTML=data.map(o=>{
+    const locked=!canEdit(o.date);const canDel=canDelete(o.date);
+    const isOnline=!o.orderType||o.orderType==='online';
+    const typeBadge=isOnline?'<span class="badge b-blue">🌐 Online</span>':'<span class="badge b-purple">🏪 Offline</span>';
+    const genLinkBtn=isOnline&&isOwner()&&!o.trackingLinkExpired?`<button class="btn btn-ghost btn-sm" onclick="generateTrackingLink('gift','${o.id}')">🔗 ${o.trackingToken?'View Link':'Gen Link'}</button>`:'';
+    return `<div class="order-card ${isOnline?'online-card':'offline-card'}">
+      <div>
+        <div class="order-num">#${o.id} · ${fmtDate(o.date)} ${lockLabel(o.date)}</div>
+        <div style="margin-bottom:4px;">${typeBadge} ${payBadge(o.payStatus)}</div>
+        <div class="order-cust">👤 ${o.cname} &nbsp;<span style="color:var(--text2);font-size:0.82rem;">📱 ${o.phone}</span></div>
+        <div class="order-detail">📦 ${o.prod} (${o.cat}) × ${o.qty}</div>
+        ${o.addr?`<div class="order-detail">📍 ${o.addr}</div>`:''}
+        ${o.advance>0?`<div class="order-detail" style="color:var(--green);">✅ Advance: ₹${o.advance.toFixed(2)}</div>`:''}
+        ${o.balance>0?`<div style="margin-top:4px;font-size:0.78rem;color:var(--red);">⚠️ Balance: ₹${o.balance.toFixed(2)}</div>`:''}
+        ${isOnline&&o.shipping>0?`<div class="order-detail">🚚 Shipping: ₹${o.shipping.toFixed(2)}</div>`:''}
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge b-blue">${o.payMethod}</span>
+          ${o.courier?`<span class="badge b-purple">🚚 ${o.courier}</span>`:''}
+          ${o.shipStatus?shipBadge(o.shipStatus):''}
+        </div>
+        ${o.trackId?`<div style="margin-top:6px;font-size:0.78rem;">Tracking: <span class="track-badge" onclick="copyTrack('${o.trackId}')">${o.trackId}</span></div>`:''}
+      </div>
+      <div class="order-actions">
+        <div class="order-amt">₹${o.total.toFixed(2)}</div>
+        <button class="btn btn-pink btn-sm" onclick="showBill('gift','${o.id}')">🧾 Bill</button>
+        ${!locked?`<button class="btn btn-ghost btn-sm" onclick="openEditModal('gift','${o.id}')">✏️ Edit</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="openTrackModal('gift','${o.id}')">🚚 Track</button>
+        ${genLinkBtn}
+        ${canDel?`<button class="btn btn-red btn-sm" onclick="deleteOrder('gift','${o.id}')">🗑️</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  renderGiftStats();
+};
+
+// PATCH addStock to auto-generate barcode
+const _origAddStock2=addStock;
+addStock=function(){
+  _origAddStock2();
+  const lastItem=stockItems[stockItems.length-1];
+  if(lastItem&&!lastItem.barcode){lastItem.barcode='RJI'+Date.now().toString().slice(-8);saveStockItems();}
+  checkLowStock();
+};
+
+// PATCH saveXBill to deduct stock
+const _origSaveXBill2=saveXBill;
+saveXBill=function(){
+  if(xItems&&xItems.length){xItems.forEach(it=>{if(it.item)deductStockForItem(it.item,it.qty||1);});}
+  _origSaveXBill2();
+};
+
+// PATCH calcGiftTotal to include shipping
+calcGiftTotal=function(){
+  const rate=parseFloat(document.getElementById('g-rate').value)||0;
+  const qty=parseInt(document.getElementById('g-qty').value)||1;
+  const shipping=parseFloat(document.getElementById('g-shipping')?.value)||0;
+  const total=rate*qty+shipping;
+  const td=document.getElementById('g-total-display');if(td)td.value=total.toFixed(2);
+  calcGiftBalance();
+};
+
+// PATCH calcFrameTotal to include shipping
+calcFrameTotal=function(){
+  const rate=parseFloat(document.getElementById('f-rate').value)||0;
+  const qty=parseInt(document.getElementById('f-qty').value)||1;
+  const shipping=parseFloat(document.getElementById('f-shipping')?.value)||0;
+  const total=rate*qty+shipping;
+  const td=document.getElementById('f-total-display');if(td)td.value=total.toFixed(2);
+  calcFrameBalance();
+};
+
+// PATCH enterApp to init new features
+const _origEnterApp2=enterApp;
+enterApp=function(){
+  _origEnterApp2();
+  setTimeout(()=>{
+    checkLowStock();
+    setGiftOrderType('online');
+    setFrameOrderType('online');
+    toggleGiftPayFields();
+    toggleFramePayFields();
+    const mb=document.getElementById('x-mode-manual-btn');if(mb)mb.classList.add('barcode-active');
+  },300);
+};
+
+// =====================================================================
+// ===== FEATURE 5: MOBILE NUMBER VALIDATION (applied on load) =========
+// =====================================================================
+document.addEventListener('DOMContentLoaded',function(){
+  setTimeout(()=>{
+    document.querySelectorAll('input[type="tel"]').forEach(inp=>{
+      inp.addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,10);});
+      inp.setAttribute('maxlength','10');
+    });
+  },500);
+});
+
 // ===== INIT QR BUTTONS ON LOAD =====
 document.addEventListener('DOMContentLoaded',function(){
   renderQRButtons('xerox');
   renderQRButtons('gift');
   renderQRButtons('frame');
+  // Check if this is a customer tracking link visit
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('track');
+  if(token){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('appScreen').style.display='none';
+    document.getElementById('customerTrackingPage').style.display='block';
+    loadCustomerTracking(token);
+  }
 });
 </script>
+
+<!-- ===== TRACKING LINK MODAL ===== -->
+<div class="modal-bg" id="trackingLinkModal">
+  <div class="modal" style="max-width:500px;">
+    <button class="modal-close" onclick="closeModal('trackingLinkModal')">✕</button>
+    <div style="font-size:1rem;font-weight:800;margin-bottom:14px;">🔗 Customer Tracking Link</div>
+    <div id="tracking-link-content"></div>
+  </div>
+</div>
+
+<!-- ===== CUSTOMER TRACKING PAGE ===== -->
+<div id="customerTrackingPage" style="display:none;min-height:100vh;background:var(--bg);padding:20px;font-family:'Baloo Thambi 2',sans-serif;">
+  <div style="max-width:480px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="font-size:2rem;">🛍️</div>
+      <h2 style="font-size:1.3rem;font-weight:800;background:linear-gradient(90deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Roaji.in</h2>
+      <p style="font-size:0.82rem;color:var(--text2);">Order Tracking</p>
+    </div>
+    <div id="customer-tracking-content">
+      <div style="text-align:center;padding:40px;color:var(--text2);">⏳ Loading order details...</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
 
