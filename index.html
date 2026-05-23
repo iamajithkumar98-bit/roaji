@@ -595,6 +595,16 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
             <input type="number" id="g-total-display" placeholder="0" style="font-weight:800;color:var(--gold);" oninput="calcGiftBalance()">
           </div>
         </div>
+        <!-- ── v4: Gift Quick Rates + Barcode Scanner ── -->
+        <div id="gift-quick-rates"></div>
+        <div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="globalScanStart('gift')" style="border:1.5px solid var(--blue);color:var(--blue);">📷 Scan Barcode</button>
+          <span id="gscan-badge" style="display:none;padding:3px 8px;border-radius:6px;font-size:0.78rem;font-weight:700;background:rgba(26,138,80,0.12);color:var(--green);border:1px solid var(--green);"></span>
+        </div>
+        <div id="gscan-area" style="display:none;margin-bottom:12px;border:2px solid var(--blue);border-radius:10px;overflow:hidden;position:relative;">
+          <video id="gscan-video" autoplay playsinline muted style="width:100%;max-height:220px;object-fit:cover;display:block;"></video>
+          <button type="button" onclick="globalScanStop()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:0.78rem;cursor:pointer;">✕ Stop</button>
+        </div>
         <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
           <span style="font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</span>
           <button class="btn btn-ghost btn-sm" onclick="openQREditor('gift')" style="font-size:0.72rem;padding:3px 10px;">✏️ Edit Quick Rates</button>
@@ -739,6 +749,16 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
           <div><label>Total Amount (₹)</label><input type="number" id="f-total-display" placeholder="0" style="font-weight:800;color:var(--blue);" oninput="calcFrameBalance()"></div>
           <div><label>Balance (₹)</label><input type="number" id="f-balance-display" placeholder="0" style="color:var(--red);font-weight:700;"></div>
         </div>
+        <!-- ── v4: Frame Quick Rates + Barcode Scanner ── -->
+        <div id="frame-quick-rates"></div>
+        <div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="globalScanStart('frame')" style="border:1.5px solid var(--blue);color:var(--blue);">📷 Scan Barcode</button>
+          <span id="fscan-badge" style="display:none;padding:3px 8px;border-radius:6px;font-size:0.78rem;font-weight:700;background:rgba(26,138,80,0.12);color:var(--green);border:1px solid var(--green);"></span>
+        </div>
+        <div id="fscan-area" style="display:none;margin-bottom:12px;border:2px solid var(--blue);border-radius:10px;overflow:hidden;position:relative;">
+          <video id="fscan-video" autoplay playsinline muted style="width:100%;max-height:220px;object-fit:cover;display:block;"></video>
+          <button type="button" onclick="globalScanStop()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:0.78rem;cursor:pointer;">✕ Stop</button>
+        </div>
         <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
           <span style="font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</span>
           <button class="btn btn-ghost btn-sm" onclick="openQREditor('frame')" style="font-size:0.72rem;padding:3px 10px;">✏️ Edit Quick Rates</button>
@@ -858,6 +878,8 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
           <div><label>Quantity</label><input type="number" id="x-qty" value="1" min="1"></div>
           <div><label>Rate (₹)</label><input type="number" id="x-rate" placeholder="0" step="0.5"></div>
         </div>
+        <!-- ── v4: Xerox Quick Rates ── -->
+        <div id="xerox-quick-rates"></div>
         <div style="margin:10px 0 4px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
           <span style="font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</span>
           <button class="btn btn-ghost btn-sm" onclick="openQREditor('xerox')" style="font-size:0.72rem;padding:3px 10px;">✏️ Edit Quick Rates</button>
@@ -953,6 +975,16 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
           </div>
           <div><label>Photo எடுத்த வருடம் / Occasion</label><input type="text" id="st-package" placeholder="e.g. 2024, Wedding, School..."></div>
           <div><label>No. of Copies / Photos</label><input type="number" id="st-photos" placeholder="0" value="1"></div>
+        </div>
+        <!-- ── v4: Studio Quick Rates + Barcode Scanner ── -->
+        <div id="studio-quick-rates"></div>
+        <div style="margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="globalScanStart('studio')" style="border:1.5px solid var(--blue);color:var(--blue);">📷 Scan Barcode</button>
+          <span id="sscan-badge" style="display:none;padding:3px 8px;border-radius:6px;font-size:0.78rem;font-weight:700;background:rgba(26,138,80,0.12);color:var(--green);border:1px solid var(--green);"></span>
+        </div>
+        <div id="sscan-area" style="display:none;margin-bottom:12px;border:2px solid var(--blue);border-radius:10px;overflow:hidden;position:relative;">
+          <video id="sscan-video" autoplay playsinline muted style="width:100%;max-height:220px;object-fit:cover;display:block;"></video>
+          <button type="button" onclick="globalScanStop()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:0.78rem;cursor:pointer;">✕ Stop</button>
         </div>
         <div style="margin:10px 0 4px;font-size:0.78rem;color:var(--text2);">⚡ Quick Rate:</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
@@ -1361,20 +1393,15 @@ input[readonly]{background:var(--surface2);opacity:0.7;cursor:not-allowed;}
         <div id="approved-owners-list"></div>
       </div>
 
-      <!-- THEME SWITCHER -->
+      <!-- GLOBAL THEME SWITCHER (v4) -->
       <div class="card" id="theme-switcher-card">
-        <div class="card-title">🎨 Customer-Facing Theme Switcher</div>
-        <div style="font-size:0.8rem;color:var(--text2);margin-bottom:12px;">Admin billing UI remains clean white/gray. These themes apply ONLY when a customer opens their Bill Download or Order Tracking page link.</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="theme-btn-row">
-          <button class="btn btn-ghost theme-btn" id="theme-btn-normal" onclick="applyCustomerTheme('normal',true)">☀️ Normal Day/Night<br><small style="font-weight:400;font-size:0.7rem;">Default clean look</small></button>
-          <button class="btn btn-ghost theme-btn" id="theme-btn-magical" onclick="applyCustomerTheme('magical',true)">✨ Magical Kids<br><small style="font-weight:400;font-size:0.7rem;">Animated colorful</small></button>
-          <button class="btn btn-ghost theme-btn" id="theme-btn-canvas" onclick="applyCustomerTheme('canvas',true)">🎨 Canvas/Frame<br><small style="font-weight:400;font-size:0.7rem;">Artistic dark style</small></button>
-        </div>
-        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);margin-bottom:6px;">Live Preview:</div>
-        <div id="theme-preview-box" style="min-height:80px;border:1px dashed var(--border);border-radius:10px;transition:all 0.4s ease;overflow:hidden;margin-bottom:14px;"></div>
+        <div class="card-title">🎨 Website Theme</div>
+        <div style="font-size:0.8rem;color:var(--text2);margin-bottom:12px;">முழு billing website-ன் background color மாறும்</div>
+        <!-- JS இந்த div-ல் buttons inject செய்யும் (initGlobalThemeSection) -->
+        <div id="global-theme-switcher-area" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
         <div>
           <label>📝 WhatsApp Message Terms / Notes:</label>
-          <textarea id="wa-terms-input" rows="3" style="width:100%;margin-top:6px;font-size:0.82rem;font-family:inherit;" placeholder="e.g. Terms: Payment due on delivery. No refund after processing."></textarea>
+          <textarea id="wa-terms-input" rows="3" style="width:100%;margin-top:6px;font-size:0.82rem;font-family:inherit;" placeholder="e.g. Terms: Payment due on delivery. No refund after processing.">${settings?.waTerms||''}</textarea>
           <button class="btn btn-gold btn-sm" style="margin-top:6px;" onclick="settings.waTerms=document.getElementById('wa-terms-input').value;saveSettings();showNotif('✅ Terms saved!');">💾 Save WhatsApp Terms</button>
         </div>
       </div>
@@ -2161,46 +2188,18 @@ function addXItem(){
   const xcn=document.getElementById('x-customname');if(xcn)xcn.value='';
 }
 function removeXItem(i){xItems.splice(i,1);renderXBillTable();}
-function renderXBillTable() {
-  const tbody = document.getElementById('x-bill-body');
-  if(!xItems.length){ 
-    tbody.innerHTML='<tr><td colspan="7" class="empty"><div class="empty-icon">🖨️</div>Item சேர்க்கவில்லை</td></tr>'; 
-    document.getElementById('x-sub').textContent='₹0.00';
-    document.getElementById('x-grand').textContent='₹0.00';
-    return; 
-  }
-  let subtotal = 0;
-  tbody.innerHTML = xItems.map((it, idx) => {
-    subtotal += it.amt;
-    return `<tr>
-      <td>${idx+1}</td>
-      <td>${it.item}${it.customName?`<br><small style="color:#7c3aad;font-weight:700;">🎨 "${it.customName}"</small>`:''}</td>
-      <td><span class="badge b-green">${it.cat}</span></td>
-      <td><input type="number" value="${it.qty}" min="1" style="width:60px; padding:4px 6px; border:1px solid var(--border); border-radius:6px;" oninput="updateXItemQty(${idx}, this.value)"></td>
-      <td><input type="number" value="${it.rate}" min="0" step="0.5" style="width:70px; padding:4px 6px; border:1px solid var(--border); border-radius:6px;" oninput="updateXItemRate(${idx}, this.value)"></td>
-      <td><strong>₹${it.amt.toFixed(2)}</strong></td>
-      <td><button class="btn btn-red btn-sm" onclick="removeXItem(${idx})">🗑️</button></td>
-    </tr>`;
-  }).join('');
+function renderXBillTable(){
+  const tbody=document.getElementById('x-bill-body');
+  if(!xItems.length){tbody.innerHTML='<tr><td colspan="7" class="empty"><div class="empty-icon">🖨️</div>Item சேர்க்கவில்லை</td></tr>';calcXTotal();return;}
+  tbody.innerHTML=xItems.map((it,i)=>`<tr>
+    <td>${i+1}</td>
+    <td>${it.item}${it.customName?`<br><small style="color:var(--purple);font-weight:700;">🎨 "${it.customName}"</small>`:''}</td>
+    <td><span class="badge b-green">${it.cat}</span></td>
+    <td>${it.qty}</td><td>₹${it.rate.toFixed(2)}</td>
+    <td><strong>₹${it.amt.toFixed(2)}</strong></td>
+    <td><button class="btn btn-red btn-sm" onclick="removeXItem(${i})">🗑️</button></td>
+  </tr>`).join('');
   calcXTotal();
-}
-function updateXItemQty(idx, val) {
-  const q = parseInt(val)||1;
-  xItems[idx].qty = q;
-  xItems[idx].amt = q * xItems[idx].rate;
-  let sub = xItems.reduce((s,i)=>s+i.amt,0);
-  const disc = parseFloat(document.getElementById('x-disc').value)||0;
-  document.getElementById('x-sub').textContent = '₹' + sub.toFixed(2);
-  document.getElementById('x-grand').textContent = '₹' + Math.max(0, sub - disc).toFixed(2);
-}
-function updateXItemRate(idx, val) {
-  const r = parseFloat(val)||0;
-  xItems[idx].rate = r;
-  xItems[idx].amt = xItems[idx].qty * r;
-  let sub = xItems.reduce((s,i)=>s+i.amt,0);
-  const disc = parseFloat(document.getElementById('x-disc').value)||0;
-  document.getElementById('x-sub').textContent = '₹' + sub.toFixed(2);
-  document.getElementById('x-grand').textContent = '₹' + Math.max(0, sub - disc).toFixed(2);
 }
 function calcXTotal(){
   const sub=xItems.reduce((s,i)=>s+i.amt,0);
@@ -2743,36 +2742,40 @@ function calcStkWsPerPc(){
   if(el&&total>0&&qty>0)el.value=(total/qty).toFixed(2);
 }
 function addStock(){
-  const name = document.getElementById('stk-name').value.trim();
-  const qty = parseInt(document.getElementById('stk-qty').value)||0;
-  const min = parseInt(document.getElementById('stk-min').value)||5;
-  const cat = document.getElementById('stk-cat').value;
-  const unit = document.getElementById('stk-unit').value;
-  const selling = parseFloat(document.getElementById('stk-selling').value)||0;
-  if(!name){ showNotif('❌ Item பெயர் கட்டாயம் வேண்டும்!','red'); return; }
-  const generatedBarcode = 'RJI' + Date.now().toString().slice(-8);
-  const newItem = {
-    id: 'STK' + Date.now(),
-    name, qty, minQty: min, cat, unit, selling,
-    mrp: parseFloat(document.getElementById('stk-mrp').value)||0,
-    wsTotal: parseFloat(document.getElementById('stk-ws-total').value)||0,
-    wsPiece: parseFloat(document.getElementById('stk-ws-piece').value)||0,
-    barcode: generatedBarcode,
-    note: document.getElementById('stk-note').value,
-    lastUpdated: new Date().toISOString()
-  };
-  stockItems.push(newItem);
+  const name=document.getElementById('stk-name').value.trim();
+  const qty=parseInt(document.getElementById('stk-qty').value)||0;
+  if(!name){showNotif('❌ Item பெயர் உள்ளிடவும்!','red');return;}
+  const existing=stockItems.find(s=>s.name.toLowerCase()===name.toLowerCase());
+  if(existing){
+    existing.qty+=qty;existing.lastUpdated=new Date().toISOString();
+    // Update prices if provided
+    const mrp=parseFloat(document.getElementById('stk-mrp').value);
+    const wsTotal=parseFloat(document.getElementById('stk-ws-total').value);
+    const wsPiece=parseFloat(document.getElementById('stk-ws-piece').value);
+    const selling=parseFloat(document.getElementById('stk-selling').value);
+    if(mrp)existing.mrp=mrp;
+    if(wsTotal)existing.wsTotal=wsTotal;
+    if(wsPiece)existing.wsPiece=wsPiece;
+    if(selling)existing.selling=selling;
+    showNotif('✅ Stock updated!');
+  } else {
+    stockItems.push({
+      id:'ST'+Date.now(),name,cat:document.getElementById('stk-cat').value,
+      qty,unit:document.getElementById('stk-unit').value,
+      minQty:parseInt(document.getElementById('stk-min').value)||5,
+      mrp:parseFloat(document.getElementById('stk-mrp').value)||0,
+      wsTotal:parseFloat(document.getElementById('stk-ws-total').value)||0,
+      wsPiece:parseFloat(document.getElementById('stk-ws-piece').value)||0,
+      selling:parseFloat(document.getElementById('stk-selling').value)||0,
+      wholesale:parseFloat(document.getElementById('stk-ws-piece').value)||0, // backward compat
+      note:document.getElementById('stk-note').value,
+      lastUpdated:new Date().toISOString()
+    });
+    showNotif('✅ Stock சேர்க்கப்பட்டது!');
+  }
   saveStockItems();
-  showNotif(`✅ ஸ்டாக் சேர்க்கப்பட்டது! பார்-கோடு: ${generatedBarcode}`);
-  document.getElementById('stk-name').value = '';
-  document.getElementById('stk-qty').value = '0';
-  document.getElementById('stk-mrp').value = '0';
-  document.getElementById('stk-ws-total').value = '0';
-  document.getElementById('stk-ws-piece').value = '0';
-  document.getElementById('stk-selling').value = '0';
-  document.getElementById('stk-note').value = '';
+  ['stk-name','stk-qty','stk-min','stk-note','stk-mrp','stk-ws-total','stk-ws-piece','stk-selling'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   renderStockList();
-  renderWorkerStockList();
 }
 function renderStockList(){
   const el=document.getElementById('stock-list');
@@ -4116,9 +4119,14 @@ saveGiftOrder = function(){
     trackId:orderType==='online'?(document.getElementById('g-track')?.value||''):'',
     shipStatus:isDelivered?'delivered':(document.getElementById('g-track')?.value?'dispatched':'processing')
   };
+  // AUTO-GENERATE TRACKING TOKEN on save (Fix 1: no manual Gen Link needed)
+  if(orderType === 'online'){
+    order.trackingToken = 'TRK' + Date.now() + Math.random().toString(36).slice(2,8).toUpperCase();
+    order.trackingTokenCreated = new Date().toISOString();
+    order.trackingLinkExpired = false;
+  }
   giftOrders.push(order);saveGiftOrders();
   showNotif('✅ Gift Order சேமிக்கப்பட்டது!');
-  try { localStorage.removeItem('roaji_draft_backup'); } catch(e){}
   if(isDelivered){showBill('gift',order.id);const pb=document.getElementById('g-print-btn');if(pb)pb.style.display='inline-flex';}
   clearGiftForm();genOrderNos();refreshDash();checkLowStock();
 };
@@ -4155,6 +4163,12 @@ saveFrameOrder = function(){
     trackId:orderType==='online'?(document.getElementById('f-track')?.value||''):'',
     shipStatus:document.getElementById('f-track')?.value?'dispatched':'processing'
   };
+  // AUTO-GENERATE TRACKING TOKEN on save (Fix 1: no manual Gen Link needed)
+  if(orderType === 'online'){
+    order.trackingToken = 'TRK' + Date.now() + Math.random().toString(36).slice(2,8).toUpperCase();
+    order.trackingTokenCreated = new Date().toISOString();
+    order.trackingLinkExpired = false;
+  }
   frameOrders.push(order);saveFrameOrders();
   showNotif('✅ Frame Order சேமிக்கப்பட்டது!');clearFrameForm();genOrderNos();refreshDash();checkLowStock();
 };
@@ -4217,21 +4231,20 @@ renderGiftOrders=function(){
   renderGiftStats();
 };
 
-// addStock barcode generation is native — no patch needed here
+// PATCH addStock to auto-generate barcode
+const _origAddStock2=addStock;
+addStock=function(){
+  _origAddStock2();
+  const lastItem=stockItems[stockItems.length-1];
+  if(lastItem&&!lastItem.barcode){lastItem.barcode='RJI'+Date.now().toString().slice(-8);saveStockItems();}
+  checkLowStock();
+};
 
-// PATCH saveXBill — stock deduction + try-catch (merged)
+// PATCH saveXBill to deduct stock
 const _origSaveXBill2=saveXBill;
 saveXBill=function(){
-  try{
-    if(xItems&&xItems.length){xItems.forEach(it=>{if(it.item)deductStockForItem(it.item,it.qty||1);});}
-    localStorage.setItem('roaji_xbill_pre', JSON.stringify(xItems));
-    _origSaveXBill2();
-    localStorage.removeItem('roaji_xbill_pre');
-    localStorage.removeItem('roaji_draft_backup');
-  }catch(e){
-    showNotif('⚠️ Save failed! Draft preserved.','red');
-    console.error('saveXBill error:',e);
-  }
+  if(xItems&&xItems.length){xItems.forEach(it=>{if(it.item)deductStockForItem(it.item,it.qty||1);});}
+  _origSaveXBill2();
 };
 
 // PATCH calcGiftTotal to include shipping
@@ -4254,7 +4267,7 @@ calcFrameTotal=function(){
   calcFrameBalance();
 };
 
-// PATCH enterApp — UI init + draft restore (merged)
+// PATCH enterApp to init new features
 const _origEnterApp2=enterApp;
 enterApp=function(){
   _origEnterApp2();
@@ -4265,10 +4278,7 @@ enterApp=function(){
     toggleGiftPayFields();
     toggleFramePayFields();
     const mb=document.getElementById('x-mode-manual-btn');if(mb)mb.classList.add('barcode-active');
-    restoreDraftBackup();
-    if(isOwner())renderDeletedOrdersPanel();
-    renderQRButtons('xerox');renderQRButtons('gift');renderQRButtons('frame');
-  },400);
+  },300);
 };
 
 // =====================================================================
@@ -4288,15 +4298,8 @@ document.addEventListener('DOMContentLoaded',function(){
   renderQRButtons('xerox');
   renderQRButtons('gift');
   renderQRButtons('frame');
-  // Check if this is a customer tracking link visit
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('track');
-  if(token){
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('appScreen').style.display='none';
-    document.getElementById('customerTrackingPage').style.display='block';
-    loadCustomerTracking(token);
-  }
+  // Customer tracking page routing is handled by the secure IIFE router above.
+  // No duplicate check needed here.
 });
 </script>
 
@@ -4353,19 +4356,425 @@ document.addEventListener('DOMContentLoaded',function(){
 
 <script>
 // =====================================================================
-// ===== ROAJI.IN — NATIVE INTEGRATED FEATURES (Points 6,8,10,11,12) ==
+// ===== ROAJI.IN v4 — MASTER SCRIPT BLOCK (5 NEW FEATURES) ===========
 // =====================================================================
 
 // ─── Bill modal context store (for WhatsApp) ───
 let _billModalType = '', _billModalId = '';
 function _storeBillModalContext(type, id){ _billModalType=type; _billModalId=id; }
 
-// ─── POINT 9: LocalStorage draft backup ───
+// ─────────────────────────────────────────────────────────────────────
+// FEATURE 1 (FIX): SECURE CUSTOMER TRACKING PAGE ROUTER
+// Completely hides all operator/admin UI when ?track=TOKEN is in URL
+// ─────────────────────────────────────────────────────────────────────
+(function initTrackingPageRouter(){
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('track');
+  if(!token) return;
+
+  // Inject isolation CSS immediately — before DOM ready — to prevent admin flash
+  const lockStyle = document.createElement('style');
+  lockStyle.id = 'customer-isolation-style';
+  lockStyle.textContent = [
+    '#loginScreen',
+    '#appScreen',
+    '.app-header',
+    '.shop-tabs',
+    '.modal-bg',
+    '#notif',
+    '#printFrame',
+    '#barcode-sticker-modal',
+    '#qr-editor-modal',
+    '#trackingLinkModal',
+    '#trackModal',
+    '#billModal',
+    '#editBillModal'
+  ].join(',') + '{ display:none !important; }' +
+  '#customerTrackingPage{ display:block !important; }';
+  document.head.appendChild(lockStyle);
+
+  function activateCustomerMode(){
+    // Double-lock: explicitly set display via JS in case CSS specificity is overridden
+    const hideIds = ['loginScreen','appScreen'];
+    hideIds.forEach(function(id){
+      const el = document.getElementById(id);
+      if(el){ el.style.cssText = 'display:none !important'; }
+    });
+    const track = document.getElementById('customerTrackingPage');
+    if(track){ track.style.cssText = 'display:block'; }
+    // Prevent enterApp / doOwnerLogin / doWorkerLogin from ever showing admin UI
+    window.enterApp = function(){ /* blocked in customer mode */ };
+    window.doOwnerLogin = function(){ /* blocked in customer mode */ };
+    window.doWorkerLogin = function(){ /* blocked in customer mode */ };
+    // Load tracking data
+    if(typeof loadCustomerTracking === 'function'){
+      loadCustomerTracking(token);
+    } else {
+      var maxTries = 20, tries = 0;
+      var iv = setInterval(function(){
+        tries++;
+        if(typeof loadCustomerTracking === 'function'){
+          clearInterval(iv);
+          loadCustomerTracking(token);
+        } else if(tries >= maxTries){
+          clearInterval(iv);
+          var el = document.getElementById('customer-tracking-content');
+          if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:#cc2222;font-weight:700;">❌ Tracking service could not load. Please try again.</div>';
+        }
+      }, 300);
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', activateCustomerMode);
+  } else {
+    activateCustomerMode();
+  }
+})();
+
+// ─────────────────────────────────────────────────────────────────────
+// FEATURE 2: BILL SOFT-DELETE & INLINE EDIT
+// ─────────────────────────────────────────────────────────────────────
+deleteOrder = function(type, id){
+  if(!confirm('இந்த order-ஐ soft-delete பண்ணவா?\nOwner Settings → Restore panel-ல் மீட்டெடுக்கலாம்.')) return;
+  try {
+    const data = type==='gift' ? giftOrders : frameOrders;
+    const idx  = data.findIndex(x=>x.id===id);
+    if(idx === -1){ showNotif('❌ Order not found!','red'); return; }
+    data[idx]._deleted   = true;
+    data[idx]._deletedAt = new Date().toISOString();
+    data[idx]._deletedBy = (typeof currentUser !== 'undefined' && currentUser && currentUser.name) || 'Unknown';
+    if(type==='gift'){
+      saveGiftOrders().then(()=>{
+        renderGiftOrders();
+        renderDeletedOrdersPanel();
+        showNotif('🗑️ Soft-deleted. Settings → Restore panel-ல் recover செய்யலாம்.');
+      }).catch(e=>{ console.error('deleteOrder save error:',e); showNotif('❌ Delete failed, retry.','red'); });
+    } else {
+      saveFrameOrders().then(()=>{
+        renderFrameOrders();
+        renderDeletedOrdersPanel();
+        showNotif('🗑️ Soft-deleted. Settings → Restore panel-ல் recover செய்யலாம்.');
+      }).catch(e=>{ console.error('deleteOrder save error:',e); showNotif('❌ Delete failed, retry.','red'); });
+    }
+  } catch(err){
+    console.error('deleteOrder error:',err);
+    showNotif('❌ Unexpected error during delete.','red');
+  }
+};
+
+function renderDeletedOrdersPanel(){
+  const card = document.getElementById('soft-delete-restore-card');
+  const el   = document.getElementById('deleted-orders-list');
+  if(!el || !card || typeof isOwner === 'undefined' || !isOwner()) return;
+  const deleted = [
+    ...(giftOrders  || []).filter(o=>o._deleted).map(o=>({...o, _type:'gift'})),
+    ...(frameOrders || []).filter(o=>o._deleted).map(o=>({...o, _type:'frame'}))
+  ].sort((a,b)=>new Date(b._deletedAt||0)-new Date(a._deletedAt||0));
+  if(!deleted.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  el.innerHTML = deleted.map(o=>`
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <div>
+        <strong>#${o.id}</strong> — ${o.cname||'Unknown'}
+        <span style="font-size:0.72rem;color:var(--text2);margin-left:8px;">by ${o._deletedBy||'?'} · ${typeof fmtDate==='function'?fmtDate(o._deletedAt):o._deletedAt||''}</span>
+        <div style="font-size:0.78rem;color:var(--text2);">₹${(o.total||0).toFixed(2)} · ${o.payMethod||''}</div>
+      </div>
+      <button class="btn btn-sm" style="background:var(--purple);color:#fff;" onclick="restoreOrder('${o._type}','${o.id}')">↩️ Restore</button>
+    </div>`).join('');
+}
+function restoreOrder(type, id){
+  const data = type==='gift' ? giftOrders : frameOrders;
+  const o    = data.find(x=>x.id===id);
+  if(!o){ showNotif('❌ Not found','red'); return; }
+  delete o._deleted; delete o._deletedAt; delete o._deletedBy;
+  if(type==='gift')  { saveGiftOrders();  renderGiftOrders(); }
+  else               { saveFrameOrders(); renderFrameOrders(); }
+  renderDeletedOrdersPanel();
+  showNotif('✅ Order restored!');
+}
+
+function enableBillInlineEdit(type, orderId){
+  const content = document.getElementById('billModalContent');
+  if(!content) return;
+  const rows = content.querySelectorAll('tbody tr');
+  if(!rows.length) return;
+  function recalcBillTotals(){
+    let grandTotal = 0;
+    rows.forEach(function(row){
+      const rateInput = row.querySelector('.bill-edit-rate');
+      const qtyInput  = row.querySelector('.bill-edit-qty');
+      const totalCell = row.querySelector('.bill-row-total');
+      if(!rateInput || !qtyInput || !totalCell) return;
+      const rate = parseFloat(rateInput.value)||0;
+      const qty  = parseFloat(qtyInput.value)||1;
+      const rowTotal = rate * qty;
+      totalCell.textContent = '₹'+rowTotal.toFixed(2);
+      grandTotal += rowTotal;
+    });
+    content.querySelectorAll('.bill-grand-total').forEach(function(gtEl){
+      gtEl.textContent = 'Grand Total: ₹'+grandTotal.toFixed(2);
+    });
+    return grandTotal;
+  }
+  rows.forEach(function(row){
+    const cells = row.querySelectorAll('td');
+    if(cells.length < 5) return;
+    // Rate cell
+    const rateVal = cells[2].textContent.replace('₹','').trim();
+    const rateInp = document.createElement('input');
+    rateInp.className = 'bill-edit-rate';
+    rateInp.type = 'number'; rateInp.min = '0'; rateInp.step = '0.01';
+    rateInp.value = rateVal;
+    rateInp.style.cssText = 'width:70px;padding:3px 5px;border:1px solid var(--gold);border-radius:5px;font-family:inherit;font-size:0.82rem;text-align:right;';
+    rateInp.addEventListener('input', recalcBillTotals);
+    cells[2].innerHTML = '';
+    cells[2].appendChild(rateInp);
+    // Qty cell
+    const qtyVal = cells[3].textContent.trim();
+    const qtyInp = document.createElement('input');
+    qtyInp.className = 'bill-edit-qty';
+    qtyInp.type = 'number'; qtyInp.min = '1'; qtyInp.step = '1';
+    qtyInp.value = qtyVal;
+    qtyInp.style.cssText = 'width:52px;padding:3px 5px;border:1px solid var(--blue);border-radius:5px;font-family:inherit;font-size:0.82rem;text-align:center;';
+    qtyInp.addEventListener('input', recalcBillTotals);
+    cells[3].innerHTML = '';
+    cells[3].appendChild(qtyInp);
+    // Mark total cell
+    cells[4].classList.add('bill-row-total');
+  });
+  // Mark grand total element
+  content.querySelectorAll('div').forEach(function(el){
+    if(el.style && el.style.color && el.textContent && el.textContent.includes('Grand Total')){
+      el.classList.add('bill-grand-total');
+    }
+  });
+}
+const _origShowBillFeat2 = (typeof showBill === 'function') ? showBill : null;
+showBill = function(type, id){
+  if(_origShowBillFeat2) _origShowBillFeat2(type, id);
+  setTimeout(()=>enableBillInlineEdit(type, id), 120);
+};
+const _origShowStudioBillFeat2 = (typeof showStudioBill === 'function') ? showStudioBill : null;
+showStudioBill = function(id){
+  if(_origShowStudioBillFeat2) _origShowStudioBillFeat2(id);
+  setTimeout(()=>enableBillInlineEdit('studio', id), 120);
+};
+
+// ─────────────────────────────────────────────────────────────────────
+// FEATURE 3: GLOBAL THEME MANAGER
+// ─────────────────────────────────────────────────────────────────────
+const GLOBAL_THEMES = {
+  'default-white': {
+    label: '☀️ Default White',
+    vars: { '--bg':'#f5f5f7', '--surface':'#ffffff', '--surface2':'#f0f0f4', '--border':'#d0d0dc', '--text':'#111118', '--text2':'#55556a' }
+  },
+  'pro-space-dark': {
+    label: '🌌 Pro Space Dark',
+    vars: { '--bg':'#0d0d14', '--surface':'#161622', '--surface2':'#1e1e2e', '--border':'#2a2a40', '--text':'#e8e8f8', '--text2':'#8888aa' }
+  },
+  'warm-studio-cream': {
+    label: '🎨 Warm Studio Cream',
+    vars: { '--bg':'#faf6f1', '--surface':'#fffdf9', '--surface2':'#f5ede0', '--border':'#d8c9b2', '--text':'#2c1a08', '--text2':'#7a5c3a' }
+  }
+};
+function applyGlobalTheme(themeName, withEffect){
+  const theme = GLOBAL_THEMES[themeName];
+  if(!theme){ console.warn('Unknown theme:', themeName); return; }
+  const root = document.documentElement;
+  Object.entries(theme.vars).forEach(([k,v])=>root.style.setProperty(k, v));
+  if(typeof settings !== 'undefined'){
+    settings.globalTheme = themeName;
+    if(typeof saveSettings === 'function') saveSettings();
+  }
+  Object.keys(GLOBAL_THEMES).forEach(k=>{
+    const btn = document.getElementById('global-theme-btn-'+k);
+    if(!btn) return;
+    const isActive = k === themeName;
+    btn.style.borderColor = isActive ? 'var(--gold)' : '';
+    btn.style.background  = isActive ? 'rgba(200,150,10,0.15)' : '';
+    btn.style.fontWeight  = isActive ? '800' : '600';
+    btn.style.color       = isActive ? 'var(--gold)' : '';
+  });
+  if(withEffect){
+    document.body.style.transition = 'background 0.4s ease, color 0.3s ease';
+    setTimeout(()=>{ document.body.style.transition=''; }, 500);
+  }
+  showNotif('✅ Theme → ' + theme.label);
+}
+function initGlobalThemeSection(){
+  const container = document.getElementById('global-theme-switcher-area');
+  if(!container) return;
+  if(!container.hasChildNodes()){
+    container.innerHTML = Object.entries(GLOBAL_THEMES).map(([k,t])=>`
+      <button id="global-theme-btn-${k}" class="btn btn-ghost"
+        onclick="applyGlobalTheme('${k}', true)"
+        style="padding:10px 16px;border-radius:10px;border:2px solid var(--border);
+               font-size:0.88rem;font-weight:600;cursor:pointer;transition:all 0.25s;
+               background:var(--surface);color:var(--text);font-family:inherit;margin:4px;">
+        ${t.label}
+      </button>`).join('');
+  }
+  const saved = (typeof settings!=='undefined' && settings.globalTheme) || 'default-white';
+  applyGlobalTheme(saved, false);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// FEATURE 4: STOCK CATEGORY AUTO-SYNC
+// ─────────────────────────────────────────────────────────────────────
+function syncStockDatalistsAll(){
+  if(typeof stockItems === 'undefined' || !Array.isArray(stockItems)) return;
+  const cats  = [...new Set(stockItems.map(s=>(s.cat||'').trim()).filter(Boolean))].sort();
+  const names = [...new Set(stockItems.map(s=>(s.name||'').trim()).filter(Boolean))].sort();
+  const catDatalistIds  = ['g-cat-list', 'f-type-list', 'x-cat-list', 's-service-list'];
+  const itemDatalistIds = ['g-prod-list', 'f-ftype-list', 'x-item-list', 's-package-list'];
+  catDatalistIds.forEach(dlId=>{
+    let dl = document.getElementById(dlId);
+    if(!dl){ dl = document.createElement('datalist'); dl.id = dlId; document.body.appendChild(dl); }
+    dl.innerHTML = cats.map(c=>`<option value="${c}">`).join('');
+  });
+  itemDatalistIds.forEach(dlId=>{
+    let dl = document.getElementById(dlId);
+    if(!dl){ dl = document.createElement('datalist'); dl.id = dlId; document.body.appendChild(dl); }
+    dl.innerHTML = names.map(n=>`<option value="${n}">`).join('');
+  });
+  const attachMap = { 'g-cat':'g-cat-list', 'g-prod':'g-prod-list', 'f-type':'f-type-list', 'x-cat':'x-cat-list', 'x-item':'x-item-list', 's-service':'s-service-list' };
+  Object.entries(attachMap).forEach(([inputId, dlId])=>{
+    const inp = document.getElementById(inputId);
+    if(inp && !inp.getAttribute('list')) inp.setAttribute('list', dlId);
+  });
+}
+const _origAddStock = (typeof addStock === 'function') ? addStock : null;
+addStock = function(){
+  if(_origAddStock) _origAddStock();
+  setTimeout(syncStockDatalistsAll, 200);
+};
+const _origSaveStockItems = (typeof saveStockItems === 'function') ? saveStockItems : null;
+saveStockItems = function(){
+  if(_origSaveStockItems) _origSaveStockItems();
+  setTimeout(syncStockDatalistsAll, 100);
+};
+
+// ─────────────────────────────────────────────────────────────────────
+// FEATURE 5: GLOBAL BARCODE SCAN CONTROLLER + QUICK RATE BUTTONS
+// ─────────────────────────────────────────────────────────────────────
+const GlobalScan = (function(){
+  let _stream = null, _interval = null, _activeForm = null;
+  const FORM_MAP = {
+    gift:   { cat:'g-cat',     item:'g-prod',    rate:'g-rate', video:'gscan-video', badge:'gscan-badge', area:'gscan-area' },
+    frame:  { cat:'f-type',    item:'f-type',    rate:'f-rate', video:'fscan-video', badge:'fscan-badge', area:'fscan-area' },
+    xerox:  { cat:'x-cat',     item:'x-item',    rate:'x-rate', video:'xscan-video', badge:'xscan-badge', area:'xscan-area' },
+    studio: { cat:'s-service', item:'s-package', rate:'s-rate', video:'sscan-video', badge:'sscan-badge', area:'sscan-area' }
+  };
+  async function start(formKey){
+    const map = FORM_MAP[formKey];
+    if(!map){ console.warn('Unknown form key:', formKey); return; }
+    _activeForm = formKey;
+    const area  = document.getElementById(map.area);
+    const video = document.getElementById(map.video);
+    if(!area || !video){ showNotif('⚠️ Scanner area not found!','red'); return; }
+    area.style.display = 'block';
+    try {
+      _stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment' } });
+      video.srcObject = _stream;
+      video.play();
+      if('BarcodeDetector' in window){
+        const detector = new BarcodeDetector({ formats:['ean_13','ean_8','code_128','code_39','qr_code','upc_a','upc_e'] });
+        _interval = setInterval(async()=>{
+          if(!_stream){ clearInterval(_interval); return; }
+          try{ if(video.readyState >= video.HAVE_ENOUGH_DATA){ const barcodes = await detector.detect(video); if(barcodes.length > 0){ handleScan(barcodes[0].rawValue, formKey); } } }catch(e){}
+        }, 500);
+      } else {
+        showNotif('⚠️ BarcodeDetector support இல்லை.','red');
+        stop();
+      }
+    } catch(e){ showNotif('❌ Camera access denied!','red'); stop(); }
+  }
+  function stop(){
+    if(_stream)  { _stream.getTracks().forEach(t=>t.stop()); _stream=null; }
+    if(_interval){ clearInterval(_interval); _interval=null; }
+    if(_activeForm){
+      const map = FORM_MAP[_activeForm];
+      const area = map && document.getElementById(map.area);
+      if(area) area.style.display='none';
+      _activeForm = null;
+    }
+  }
+  function handleScan(code, formKey){
+    stop();
+    const map   = FORM_MAP[formKey];
+    const badge = map && document.getElementById(map.badge);
+    if(badge){ badge.style.display='inline-block'; }
+    const stockItem = (typeof stockItems!=='undefined') ? stockItems.find(s=>s.barcode===code) : null;
+    if(stockItem){
+      const catEl  = map && document.getElementById(map.cat);
+      const itemEl = map && document.getElementById(map.item);
+      const rateEl = map && document.getElementById(map.rate);
+      if(catEl)  catEl.value  = stockItem.cat  || '';
+      if(itemEl) itemEl.value = stockItem.name;
+      if(rateEl) rateEl.value = stockItem.selling || stockItem.rate || 0;
+      if(badge)  badge.textContent = '✅ ' + stockItem.name;
+      showNotif('✅ Scanned: ' + stockItem.name);
+      if(formKey==='gift'   && typeof calcGiftTotal ==='function') calcGiftTotal();
+      if(formKey==='frame'  && typeof calcFrameTotal==='function') calcFrameTotal();
+      if(formKey==='xerox'  && typeof calcXBillTotal==='function') calcXBillTotal();
+    } else {
+      if(badge)  badge.textContent = '⚠️ Code: ' + code;
+      const itemEl = map && document.getElementById(map.item);
+      if(itemEl) itemEl.value = 'Item-' + code;
+      showNotif('⚠️ Stock-ல் barcode இல்லை: ' + code, 'red');
+    }
+  }
+  return { start, stop, handleScan };
+})();
+function globalScanStart(formKey){ GlobalScan.start(formKey); }
+function globalScanStop()        { GlobalScan.stop();          }
+
+function renderQuickRateButtons(containerId, rateInputId, recalcFn){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  const QUICK_RATES = [49,99,149,199,249,299,399,499,599,799,999,1499,1999];
+  // Build DOM nodes directly (avoids inline onclick string escaping issues on mobile)
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'margin:8px 0 12px 0;';
+  const label = document.createElement('div');
+  label.style.cssText = 'font-size:0.72rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;';
+  label.textContent = '⚡ Quick Rate';
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px;';
+  QUICK_RATES.forEach(function(r){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-ghost btn-sm';
+    btn.textContent = '₹' + r;
+    btn.style.cssText = 'padding:4px 10px;border-radius:8px;font-size:0.78rem;font-weight:700;border:1.5px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:all 0.15s;font-family:inherit;-webkit-tap-highlight-color:transparent;';
+    btn.addEventListener('touchstart', function(){ this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'; }, {passive:true});
+    btn.addEventListener('touchend',   function(){ this.style.borderColor='var(--border)'; this.style.color='var(--text)'; }, {passive:true});
+    btn.addEventListener('mouseenter', function(){ this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'; });
+    btn.addEventListener('mouseleave', function(){ this.style.borderColor='var(--border)'; this.style.color='var(--text)'; });
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var inp = document.getElementById(rateInputId);
+      if(inp){ inp.value = r; }
+      if(typeof window[recalcFn] === 'function'){ window[recalcFn](); }
+      else if(typeof recalcFn === 'function'){ recalcFn(); }
+    });
+    btnRow.appendChild(btn);
+  });
+  wrapper.appendChild(label);
+  wrapper.appendChild(btnRow);
+  container.innerHTML = '';
+  container.appendChild(wrapper);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// PRESERVED: LocalStorage Draft Backup
+// ─────────────────────────────────────────────────────────────────────
 window.addEventListener('beforeunload', () => {
   try {
     localStorage.setItem('roaji_draft_backup', JSON.stringify({
       ts: Date.now(),
-      xItems: JSON.parse(JSON.stringify(xItems||[])),
+      xItems: JSON.parse(JSON.stringify((typeof xItems!=='undefined'?xItems:[]))),
       gCname: document.getElementById('g-cname')?.value||'',
       gPhone: document.getElementById('g-phone')?.value||'',
       xCustname: document.getElementById('x-custname')?.value||''
@@ -4380,32 +4789,34 @@ function restoreDraftBackup(){
     if(Date.now()-b.ts > 2*60*60*1000) return;
     if(b.xItems && b.xItems.length){
       xItems = b.xItems;
-      renderXBillTable();
+      if(typeof renderXBillTable==='function') renderXBillTable();
       showNotif('📋 Draft restored from backup!');
     }
   } catch(e){}
 }
 
-// ─── POINT 8: Global Total Search ───
+// ─────────────────────────────────────────────────────────────────────
+// PRESERVED: Global Total Search
+// ─────────────────────────────────────────────────────────────────────
 function globalTotalSearch(query){
   const el = document.getElementById('global-search-results');
   if(!el) return;
   if(!query || query.length < 2){ el.innerHTML=''; return; }
   const q = query.toLowerCase();
   const results = [];
-  giftOrders.filter(o=>!o._deleted).forEach(o=>{
+  (giftOrders||[]).filter(o=>!o._deleted).forEach(o=>{
     if(o.id.toLowerCase().includes(q)||o.cname.toLowerCase().includes(q)||(o.phone||'').includes(q)||(o.cat||'').toLowerCase().includes(q))
       results.push({type:'🎁 Gift', id:o.id, name:o.cname, phone:o.phone, total:o.total, date:o.date});
   });
-  frameOrders.filter(o=>!o._deleted).forEach(o=>{
+  (frameOrders||[]).filter(o=>!o._deleted).forEach(o=>{
     if(o.id.toLowerCase().includes(q)||o.cname.toLowerCase().includes(q)||(o.phone||'').includes(q)||(o.ftype||'').toLowerCase().includes(q))
       results.push({type:'🖼️ Frame', id:o.id, name:o.cname, phone:o.phone, total:o.total, date:o.date});
   });
-  xeroxBills.forEach(b=>{
+  (xeroxBills||[]).forEach(b=>{
     if(b.id.toLowerCase().includes(q)||(b.custname||'').toLowerCase().includes(q)||(b.ref||'').toLowerCase().includes(q))
       results.push({type:'🖨️ Xerox', id:b.id, name:b.custname||b.ref||'Walk-in', phone:'', total:b.total, date:b.date});
   });
-  studioBookings.forEach(b=>{
+  (studioBookings||[]).forEach(b=>{
     if(b.id.toLowerCase().includes(q)||b.cname.toLowerCase().includes(q)||(b.phone||'').includes(q)||(b.service||'').toLowerCase().includes(q))
       results.push({type:'🎨 Studio', id:b.id, name:b.cname, phone:b.phone, total:b.total, date:b.date});
   });
@@ -4420,65 +4831,19 @@ function globalTotalSearch(query){
         <span class="badge b-blue" style="font-size:0.68rem;">${r.type}</span>
         <strong style="margin-left:8px;font-size:0.88rem;">${r.name||'—'}</strong>
         ${r.phone?`<span style="color:var(--text2);font-size:0.78rem;margin-left:6px;">📱${r.phone}</span>`:''}
-        <div style="font-size:0.72rem;color:var(--text2);margin-top:2px;">#${r.id} · ${fmtDate(r.date)}</div>
+        <div style="font-size:0.72rem;color:var(--text2);margin-top:2px;">#${r.id} · ${typeof fmtDate==='function'?fmtDate(r.date):r.date}</div>
       </div>
       <strong style="color:var(--gold);white-space:nowrap;">₹${(r.total||0).toFixed(0)}</strong>
     </div>`).join('');
 }
 
-// ─── POINT 8: Soft Delete logic ───
-const _origDeleteOrder = deleteOrder;
-deleteOrder = function(type, id){
-  if(!confirm('இந்த order soft-delete பண்ணவா? Owner panel-ல் restore செய்யலாம்.')) return;
-  const data = type==='gift' ? giftOrders : frameOrders;
-  const o = data.find(x=>x.id===id);
-  if(o){
-    o._deleted = true;
-    o._deletedAt = new Date().toISOString();
-    o._deletedBy = currentUser?.name || 'Unknown';
-    if(type==='gift'){saveGiftOrders();renderGiftOrders();}
-    else{saveFrameOrders();renderFrameOrders();}
-    showNotif('🗑️ Soft-deleted. Settings → Restore panel-ல் recover செய்யலாம்.');
-    renderDeletedOrdersPanel();
-  }
-};
-
-function renderDeletedOrdersPanel(){
-  const card = document.getElementById('soft-delete-restore-card');
-  const el = document.getElementById('deleted-orders-list');
-  if(!el || !card || !isOwner()) return;
-  const deleted = [
-    ...giftOrders.filter(o=>o._deleted).map(o=>({...o, _type:'gift'})),
-    ...frameOrders.filter(o=>o._deleted).map(o=>({...o, _type:'frame'}))
-  ].sort((a,b)=>new Date(b._deletedAt||0)-new Date(a._deletedAt||0));
-  if(!deleted.length){ card.style.display='none'; return; }
-  card.style.display='block';
-  el.innerHTML = deleted.map(o=>`
-    <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;">
-      <div>
-        <strong>#${o.id}</strong> — ${o.cname||'Unknown'}
-        <span style="font-size:0.72rem;color:var(--text2);margin-left:8px;">by ${o._deletedBy||'?'} · ${fmtDate(o._deletedAt)}</span>
-        <div style="font-size:0.78rem;color:var(--text2);">₹${(o.total||0).toFixed(2)} · ${o.payMethod||''}</div>
-      </div>
-      <button class="btn btn-sm" style="background:var(--purple);color:#fff;" onclick="restoreOrder('${o._type}','${o.id}')">↩️ Restore</button>
-    </div>`).join('');
-}
-function restoreOrder(type, id){
-  const data = type==='gift' ? giftOrders : frameOrders;
-  const o = data.find(x=>x.id===id);
-  if(!o) return;
-  delete o._deleted; delete o._deletedAt; delete o._deletedBy;
-  if(type==='gift'){saveGiftOrders();renderGiftOrders();}
-  else{saveFrameOrders();renderFrameOrders();}
-  renderDeletedOrdersPanel();
-  showNotif('✅ Order restored!');
-}
-
-// ─── POINT 6: Barcode Sticker Generator ───
+// ─────────────────────────────────────────────────────────────────────
+// PRESERVED: Barcode Sticker Generator
+// ─────────────────────────────────────────────────────────────────────
 function openBarcodeStickerGen(stockId){
-  const s = stockItems.find(x=>x.id===stockId);
+  const s = (typeof stockItems!=='undefined') ? stockItems.find(x=>x.id===stockId) : null;
   if(!s) return;
-  if(!s.barcode){ s.barcode='RJI'+s.id.slice(-8); saveStockItems(); }
+  if(!s.barcode){ s.barcode='RJI'+s.id.slice(-8); if(typeof saveStockItems==='function') saveStockItems(); }
   document.getElementById('bsm-name').textContent = s.name;
   document.getElementById('bsm-code').textContent = s.barcode;
   renderStickerPreview(s.barcode, s.name);
@@ -4487,8 +4852,8 @@ function openBarcodeStickerGen(stockId){
 function renderStickerPreview(code, name){
   const w = parseInt(document.getElementById('bsm-width')?.value||50);
   const h = parseInt(document.getElementById('bsm-height')?.value||25);
-  const svg = generateBarcode(code);
-  const el = document.getElementById('bsm-preview');
+  const svg = (typeof generateBarcode==='function') ? generateBarcode(code) : '';
+  const el  = document.getElementById('bsm-preview');
   if(el) el.innerHTML=`
     <div style="width:${w}mm;min-height:${h}mm;border:1px dashed #ccc;padding:3px 6px;display:inline-block;text-align:center;background:#fff;font-family:monospace;box-sizing:border-box;">
       <div style="font-size:${Math.max(7,Math.floor(h/3))}px;font-weight:700;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
@@ -4496,12 +4861,12 @@ function renderStickerPreview(code, name){
     </div>`;
 }
 function printBarcodeStickers(){
-  const code = document.getElementById('bsm-code')?.textContent||'';
-  const name = document.getElementById('bsm-name')?.textContent||'';
+  const code  = document.getElementById('bsm-code')?.textContent||'';
+  const name  = document.getElementById('bsm-name')?.textContent||'';
   const count = parseInt(document.getElementById('bsm-count')?.value||1);
-  const w = document.getElementById('bsm-width')?.value||50;
-  const h = document.getElementById('bsm-height')?.value||25;
-  const svg = generateBarcode(code);
+  const w     = document.getElementById('bsm-width')?.value||50;
+  const h     = document.getElementById('bsm-height')?.value||25;
+  const svg   = (typeof generateBarcode==='function') ? generateBarcode(code) : '';
   const stickers = Array(Math.min(count,100)).fill(0).map(()=>`
     <div style="width:${w}mm;min-height:${h}mm;border:1px solid #ccc;padding:3px 6px;display:inline-block;text-align:center;margin:2mm;font-family:monospace;vertical-align:top;box-sizing:border-box;background:#fff;">
       <div style="font-size:${Math.max(7,Math.floor(parseInt(h)/3))}px;font-weight:700;margin-bottom:1px;overflow:hidden;">${name}</div>
@@ -4510,104 +4875,137 @@ function printBarcodeStickers(){
   const pw = window.open('','_blank');
   pw.document.write(`<html><head><title>Barcode Stickers</title><style>@page{size:A4;margin:8mm}body{margin:0;font-family:monospace;}</style></head><body>${stickers}</body></html>`);
   pw.document.close();
-  setTimeout(()=>{pw.print();},300);
+  setTimeout(()=>{ pw.print(); },300);
 }
 
-// ─── POINT 11: WhatsApp Message Generator ───
+// ─────────────────────────────────────────────────────────────────────
+// PRESERVED: WhatsApp Message Generator
+// ─────────────────────────────────────────────────────────────────────
 function sendWhatsAppBill(){
   const type = _billModalType, id = _billModalId;
   let order = null;
-  if(type==='gift') order = giftOrders.find(o=>o.id===id);
-  else if(type==='frame') order = frameOrders.find(o=>o.id===id);
-  else if(type==='studio') order = studioBookings.find(o=>o.id===id);
-  else if(type==='xerox'){ const b=xeroxBills.find(o=>o.id===id); if(b) order={cname:b.custname||'Customer',phone:'',id:b.id,total:b.total,balance:0}; }
+  if(type==='gift')        order = (giftOrders||[]).find(o=>o.id===id);
+  else if(type==='frame')  order = (frameOrders||[]).find(o=>o.id===id);
+  else if(type==='studio') order = (studioBookings||[]).find(o=>o.id===id);
+  else if(type==='xerox'){
+    const b=(xeroxBills||[]).find(o=>o.id===id);
+    if(b) order={cname:b.custname||'Customer',phone:'',id:b.id,total:b.total,balance:0};
+  }
   if(!order){ showNotif('❌ Order data not found','red'); return; }
-  const shopName = settings.shopName || 'Roaji.in';
-  const phone = (order.phone||order.whatsapp||'').replace(/\D/g,'').slice(-10);
-  const terms = settings.waTerms || 'Terms: Payment due on delivery.';
+  const shopName  = (typeof settings!=='undefined' && settings.shopName) || 'Roaji.in';
+  const shopAddr  = (typeof settings!=='undefined' && settings.shopAddr) || '';
+  const shopPhone = (typeof settings!=='undefined' && settings.shopPhone) || '';
+  const phone     = (order.phone||order.whatsapp||'').replace(/\D/g,'').slice(-10);
+  const terms     = (typeof settings!=='undefined' && settings.waTerms) || 'Terms: Payment due on delivery.';
+  const baseURL   = window.location.origin + window.location.pathname;
+
+  // Build tracking link if token exists (auto-generated on save)
   const trackLink = order.trackingToken
-    ? (window.location.origin + window.location.pathname + '?track=' + order.trackingToken)
+    ? (baseURL + '?track=' + order.trackingToken)
     : '';
+
+  // Build a direct "view & print bill" link — opens the track page which shows full bill details
+  // Customer can use browser Print (Ctrl+P / Share→Print) from that page to get PDF
+  const billViewLink = trackLink || baseURL;
+
+  // Determine paid / balance status
+  const isPaid = !order.balance || order.balance <= 0;
+  const payLine = isPaid
+    ? '✅ *Payment: Fully Paid*'
+    : `💳 *Advance Paid* | ⚠️ Balance Due: *₹${(order.balance||0).toFixed(2)}*`;
+
   const msg =
-`🛍️ *${shopName}*
+`🛍️ *${shopName}*${shopAddr?' · '+shopAddr:''}${shopPhone?' · 📞'+shopPhone:''}
 
-Hello *${order.cname||'Customer'}*! 🙏
+Vanakkam *${order.cname||'Customer'}*! 🙏
 
-✅ *Order Confirmed!*
-📋 Bill ID: *${order.id}*
-💰 Total: *₹${(order.total||0).toFixed(2)}*${order.balance>0?`
-⚠️ Balance Due: *₹${order.balance.toFixed(2)}*`:''}
+━━━━━━━━━━━━━━━━━━━━
+✅ *Bill Confirmed!*
+━━━━━━━━━━━━━━━━━━━━
+📋 Bill ID : *${order.id}*
+💰 Total   : *₹${(order.total||0).toFixed(2)}*
+${payLine}
 ${trackLink?`
-🔍 *Track your order:*
-${trackLink}
-`:''}
+━━━━━━━━━━━━━━━━━━━━
+📦 *Live Order Tracking:*
+👉 ${trackLink}
+_(Open link → see real-time status)_
+
+🧾 *View & Download Bill PDF:*
+👉 ${billViewLink}
+_(Open link → Browser menu → Print → Save as PDF)_
+`:`
+🧾 *Your Bill Reference:* ${order.id}`}
+━━━━━━━━━━━━━━━━━━━━
 📝 ${terms}
 
-_Thank you for shopping with ${shopName}!_ 😊`;
+_Thank you for choosing ${shopName}! 😊_
+_மீண்டும் வாருங்கள்!_`;
 
-  if(!phone){ navigator.clipboard.writeText(msg).then(()=>showNotif('📋 WhatsApp message copied!')); return; }
+  if(!phone){
+    navigator.clipboard.writeText(msg).then(()=>showNotif('📋 WhatsApp message copied!'));
+    return;
+  }
   window.open('https://api.whatsapp.com/send?phone=91'+phone+'&text='+encodeURIComponent(msg),'_blank');
 }
 
-// ─── POINT 12: Customer Theme Switcher ───
-const CUSTOMER_THEMES = {
-  normal:  {label:'☀️ Normal Day/Night', bg:'linear-gradient(135deg,#f8f9fa,#e9ecef)', accent:'#c8960a'},
-  magical: {label:'✨ Magical Kids',      bg:'linear-gradient(135deg,#ff9ff3,#ffeaa7,#a29bfe)', accent:'#e84393'},
-  canvas:  {label:'🎨 Canvas/Frame',     bg:'linear-gradient(135deg,#2d3436,#636e72,#b2bec3)', accent:'#fdcb6e'}
-};
-function applyCustomerTheme(name, withEffect){
-  settings.customerTheme = name;
-  saveSettings();
-  // Update button states
-  Object.keys(CUSTOMER_THEMES).forEach(k=>{
-    const btn = document.getElementById('theme-btn-'+k);
-    if(btn){ btn.style.borderColor=k===name?'var(--gold)':''; btn.style.color=k===name?'var(--gold)':''; btn.style.fontWeight=k===name?'800':''; }
-  });
-  // Live preview
-  const preview = document.getElementById('theme-preview-box');
-  if(!preview) return;
-  const t = CUSTOMER_THEMES[name];
-  if(withEffect){
-    preview.style.transform='scale(0.92)'; preview.style.opacity='0.3';
-    setTimeout(()=>{ preview.style.transform=''; preview.style.opacity=''; },350);
-  }
-  preview.innerHTML=`
-    <div style="padding:20px;text-align:center;background:${t.bg};border-radius:10px;font-weight:700;color:${name==='canvas'?'#fff':'#222'};">
-      ${t.label}<br><small style="font-weight:400;font-size:0.75rem;">Customer tracking / bill page-ல் இந்த theme காட்டும்</small>
-    </div>`;
-  showNotif('✨ Theme → ' + t.label);
-}
-function initThemeSection(){
-  const cur = settings.customerTheme || 'normal';
-  applyCustomerTheme(cur, false);
-  const ta = document.getElementById('wa-terms-input');
-  if(ta) ta.value = settings.waTerms || '';
-}
-
-// ─── Patch switchSec to init settings panel ───
-const _origSwitchSecNative = switchSec;
+// ─────────────────────────────────────────────────────────────────────
+// PATCH: switchSec — Settings tab init
+// ─────────────────────────────────────────────────────────────────────
+const _origSwitchSecV4 = (typeof switchSec === 'function') ? switchSec : null;
 switchSec = function(shop, sec, el){
-  _origSwitchSecNative(shop, sec, el);
-  if(sec==='settings') setTimeout(()=>{ initThemeSection(); renderDeletedOrdersPanel(); }, 100);
-  if(sec==='dashboard') setTimeout(()=>{ checkLowStock(); }, 100);
+  if(_origSwitchSecV4) _origSwitchSecV4(shop, sec, el);
+  if(sec==='settings'){
+    setTimeout(()=>{
+      initGlobalThemeSection();
+      renderDeletedOrdersPanel();
+    }, 100);
+  }
+  if(sec==='dashboard'){
+    setTimeout(()=>{ if(typeof checkLowStock==='function') checkLowStock(); }, 100);
+  }
 };
 
-// enterApp patch merged into script 1 block above — no duplicate needed
-
-// saveXBill patch merged into script 1 block above — no duplicate needed
-
-// saveGiftOrder draft clear merged into saveGiftOrder function above — no duplicate needed
-
-// renderGiftOrders soft-delete filter is native in the renderGiftOrders patch above — no duplicate needed
-
-// renderFrameOrders soft-delete filter handled natively — no duplicate needed
-
-// ─── Patch Today btn in dashboard to use IST ───
-document.addEventListener('DOMContentLoaded', function(){
-  // Override the Today button onclick to use IST
+// ─────────────────────────────────────────────────────────────────────
+// PATCH: enterApp — App load init
+// ─────────────────────────────────────────────────────────────────────
+const _origEnterAppV4 = (typeof enterApp === 'function') ? enterApp : null;
+enterApp = function(){
+  if(_origEnterAppV4) _origEnterAppV4();
   setTimeout(()=>{
-    const todayBtns = document.querySelectorAll('[onclick*="new Date().toISOString().split"]');
-    todayBtns.forEach(btn=>{
+    if(typeof checkLowStock==='function')          checkLowStock();
+    if(typeof setGiftOrderType==='function')       setGiftOrderType('online');
+    if(typeof setFrameOrderType==='function')      setFrameOrderType('online');
+    if(typeof toggleGiftPayFields==='function')    toggleGiftPayFields();
+    if(typeof toggleFramePayFields==='function')   toggleFramePayFields();
+    const mb = document.getElementById('x-mode-manual-btn');
+    if(mb) mb.classList.add('barcode-active');
+    restoreDraftBackup();
+    if(typeof isOwner==='function' && isOwner()) renderDeletedOrdersPanel();
+    if(typeof renderQRButtons==='function'){
+      renderQRButtons('xerox'); renderQRButtons('gift'); renderQRButtons('frame');
+    }
+    syncStockDatalistsAll();
+    renderQuickRateButtons('gift-quick-rates',   'g-rate', 'calcGiftTotal');
+    renderQuickRateButtons('frame-quick-rates',  'f-rate', 'calcFrameTotal');
+    renderQuickRateButtons('xerox-quick-rates',  'x-rate', 'calcXBillTotal');
+    renderQuickRateButtons('studio-quick-rates', 's-rate', 'calcStudioTotal');
+    initGlobalThemeSection();
+  }, 400);
+};
+
+// ─────────────────────────────────────────────────────────────────────
+// PATCH: DOMContentLoaded — Mobile & IST fixes
+// ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(()=>{
+    document.querySelectorAll('input[type="tel"]').forEach(inp=>{
+      inp.addEventListener('input',function(){ this.value=this.value.replace(/\D/g,'').slice(0,10); });
+      inp.setAttribute('maxlength','10');
+    });
+  }, 500);
+  setTimeout(()=>{
+    document.querySelectorAll('[onclick*="new Date().toISOString().split"]').forEach(btn=>{
       if(btn.textContent.includes('Today')){
         btn.setAttribute('onclick',
           "document.getElementById('dash-date-filter').value=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'});renderOwnerDash();");
@@ -4616,7 +5014,7 @@ document.addEventListener('DOMContentLoaded', function(){
   }, 800);
 });
 
-console.log('✅ Roaji.in — All native features loaded successfully');
+console.log('✅ Roaji.in v4 — All 5 Features Loaded + Bug Fixes Applied (Auto-Token, WA-PDF, Delete-Fix, Customer-Isolation, Mobile-QR)!');
 </script>
 
 </body>
