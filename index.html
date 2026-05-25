@@ -10701,14 +10701,20 @@ function initFirebaseAuthU17(){
       console.log('🔐 Firebase Auth UID:', _currentUID);
       // Check if user has settings (new vs returning)
       const existingSettings = await fbGetU('settings');
-      if(!existingSettings){
-        // New account — trigger onboarding
+      // Skip wizard if: no settings at all (new account), OR
+      // settings exist but setup was never completed
+      const setupAlreadyDone = existingSettings &&
+        (existingSettings.isSetupComplete === true ||
+         existingSettings.onboardingDone  === true ||
+         existingSettings.shopName);  // any saved shop name = already configured
+      if(!existingSettings || !setupAlreadyDone){
+        // New account or incomplete setup — trigger onboarding
         _pendingNewUserEmail = user.email || '';
         // Load minimal data first
         await loadAllDataForUID(_currentUID);
         showOnboarding(user.email || '');
       }
-      // else: returning user, normal login flow continues
+      // else: returning user with completed setup, normal login flow continues
     } else {
       _currentUID = null;
     }
@@ -10745,6 +10751,14 @@ function initFirebaseAuthU17(){
       // Reload data under UID scope
       await loadAllDataForUID(_currentUID);
       showLoadingScreen(false);
+      // Hide onboarding modal if it somehow opened (belt-and-suspenders)
+      const _obm = document.getElementById('onboarding-modal');
+      if(_obm && _obm.classList.contains('open')){
+        // Only hide if settings show setup was already done
+        if(settings && (settings.isSetupComplete || settings.onboardingDone || settings.shopName)){
+          _obm.classList.remove('open');
+        }
+      }
       enterApp();
     } catch(e){
       showLoadingScreen(false);
@@ -10812,7 +10826,8 @@ async function finishOnboarding(showDemo){
   settings.shopPhone      = shopPhone;
   settings.shopAddr       = shopAddr;
   settings.bizModules     = { gift: hasGift, frame: hasFrame, xerox: hasXerox, studio: hasStudio, stationery: hasStationery };
-  settings.onboardingDone = true;
+  settings.onboardingDone    = true;
+  settings.isSetupComplete   = true;   // permanent flag — wizard never shows again
 
   await saveSettings();
 
@@ -26648,6 +26663,87 @@ console.log('   INTEGRITY: Parts 1–5 + Phase 1–6 fully intact. Firebase path
 })();
 
 } // end _p6adm_loaded guard
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SETUP WIZARD BYPASS — One-time migration for existing owners
+     Marks isSetupComplete=true in Firebase so wizard never shows again
+     for accounts that have already configured their shop.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+// Run after enterApp so all functions are available
+function roajiMarkSetupDone(){
+  // Only runs once per account — if already marked, skip
+  if(typeof settings === 'undefined' || !settings) return;
+  if(settings.isSetupComplete === true) return;
+
+  // If shop name exists OR onboardingDone is set, this is an existing owner
+  var isExistingOwner = !!(
+    (settings.shopName && settings.shopName.length > 0) ||
+    settings.onboardingDone === true
+  );
+
+  if(isExistingOwner){
+    settings.isSetupComplete = true;
+    // Persist to Firebase
+    if(typeof saveSettings === 'function'){
+      try { saveSettings(); } catch(e){}
+    }
+    // Forcefully close the wizard if it somehow opened
+    var modal = document.getElementById('onboarding-modal');
+    if(modal && modal.classList.contains('open')){
+      modal.classList.remove('open');
+      console.log('[BYPASS] Setup wizard closed — existing owner detected, isSetupComplete set.');
+    }
+  }
+}
+
+// Wire into enterApp (existing owners login through enterApp)
+var _origEnterAppBypass = (typeof enterApp === 'function') ? enterApp : null;
+function tryPatchBypass(){
+  if(typeof enterApp !== 'function') return false;
+  if(enterApp._bypassWired) return true;
+  var _prev = enterApp;
+  window.enterApp = function(){
+    _prev.apply(this, arguments);
+    // Run after brief delay so settings are loaded
+    setTimeout(roajiMarkSetupDone, 500);
+  };
+  window.enterApp._bypassWired = true;
+  return true;
+}
+
+// Also run immediately on DOMContentLoaded + after short delay (catches 24h token re-login)
+document.addEventListener('DOMContentLoaded', function(){
+  if(!tryPatchBypass()){
+    var t = setInterval(function(){
+      if(tryPatchBypass()) clearInterval(t);
+    }, 200);
+  }
+  // Also watch for the modal appearing and close it if setup already done
+  var observer = new MutationObserver(function(mutations){
+    mutations.forEach(function(m){
+      m.addedNodes.forEach(function(n){
+        if(n.id === 'onboarding-modal' || (n.classList && n.classList.contains('open'))){
+          setTimeout(roajiMarkSetupDone, 100);
+        }
+      });
+    });
+    // Also catch class changes on the modal
+    var modal = document.getElementById('onboarding-modal');
+    if(modal && modal.classList.contains('open')){
+      setTimeout(roajiMarkSetupDone, 100);
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+});
+
+console.log('[BYPASS] Setup wizard one-time migration script loaded.');
+})();
 </script>
 
 </body>
