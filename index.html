@@ -83,7 +83,7 @@ body{font-family:'Baloo Thambi 2',sans-serif;background:var(--bg);color:var(--te
   box-shadow:0 2px 12px rgba(80,20,180,0.08);
 }
 .app-logo{font-size:1.2rem;font-weight:800;background:linear-gradient(90deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;}
-.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;flex-shrink:0;}
 .user-badge{
   display:flex;align-items:center;gap:6px;padding:5px 10px;
   background:var(--surface2);border:1px solid var(--border);border-radius:20px;
@@ -132,6 +132,7 @@ body{font-family:'Baloo Thambi 2',sans-serif;background:var(--bg);color:var(--te
 .scanner-focus-box::after{bottom:-3px;right:-3px;border-width:0 3px 3px 0;}
 .scanner-laser{position:absolute;top:50%;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,#ff3b3b,#ff3b3b,transparent);border-radius:2px;z-index:6;animation:laserPulse 1.4s ease-in-out infinite;}
 @keyframes laserPulse{0%,100%{opacity:0.3;transform:translateY(-50%)}50%{opacity:1;transform:translateY(-50%)}}
+@keyframes ping{75%,100%{transform:scale(2);opacity:0;}}
 
 /* ===== UPGRADE 3: BILL PREVIEW TABLE (Gift/Frame/Studio) ===== */
 .bill-preview-section{margin-top:14px;}
@@ -2876,14 +2877,18 @@ input[type="month"], select, textarea {
 }
 .p1r-pass-eye:hover { color: rgba(200,150,10,0.8); }
 
-/* Forgot password + toggle link row */
+/* Forgot password + toggle link row — FIXED (Part 1): perfect left/right push */
 .p1r-meta-row {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between; /* Forgot → far left · Register → far right */
+  margin-top: 4px;
   margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-wrap: nowrap;               /* never stack; buttons stay on one line */
+  gap: 0;                          /* no gap — space-between handles spacing */
+  width: 100%;
+  padding: 0 2px;
 }
 .p1r-meta-row button {
   background: none;
@@ -2893,6 +2898,7 @@ input[type="month"], select, textarea {
   cursor: pointer;
   padding: 0;
   transition: color 0.2s;
+  flex-shrink: 0;
 }
 .p1r-forgot-btn {
   color: rgba(200,150,10,0.75);
@@ -3004,22 +3010,29 @@ input[type="month"], select, textarea {
   animation: errShake 0.3s ease;
 }
 
-/* ─── PART 1 — PREMIUM TOP NAVBAR ──────────────────────────────────────── */
+/* ─── PART 1 — PREMIUM TOP NAVBAR (Part1-Fix: hard horizontal alignment) ── */
 
-/* Full 3-zone flex navbar */
+/* Full 3-zone flex navbar — FIXED: flex row, no wrap, single horizontal line */
 .p1r-navbar {
   background: linear-gradient(135deg, #ffffff 0%, #f4f4fc 100%);
   border-bottom: 1px solid rgba(100,50,200,0.15);
-  padding: 0 16px;
+  padding: 0 20px;
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 16px rgba(80,20,180,0.08);
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  /* FIXED: flex row forces all 3 zones onto one horizontal line */
+  display: flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;       /* critical: never allow vertical wrapping */
   min-height: 56px;
-  gap: 8px;
+  height: 56px;            /* fixed height anchors all children */
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;        /* clip overflow rather than wrap */
 }
 
 /* ── LEFT: Logo + brand ── */
@@ -3028,6 +3041,8 @@ input[type="month"], select, textarea {
   align-items: center;
   gap: 9px;
   justify-content: flex-start;
+  flex-shrink: 0;          /* never squash the brand */
+  min-width: 0;
 }
 .p1r-nav-logo-icon {
   font-size: 1.4rem;
@@ -3044,12 +3059,17 @@ input[type="month"], select, textarea {
   letter-spacing: -0.3px;
 }
 
-/* ── CENTER: Operational status badges ── */
+/* ── CENTER: Operational status badges (FIXED: flex-shrink:1 allows badges to
+   compress gracefully on small screens without breaking the row) ── */
 .p1r-nav-center {
   display: flex;
   align-items: center;
   gap: 8px;
   justify-content: center;
+  flex-shrink: 1;
+  flex-grow: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 .p1r-status-badge {
   display: inline-flex;
@@ -3096,12 +3116,16 @@ input[type="month"], select, textarea {
   50% { box-shadow: 0 0 0 4px rgba(212,108,0,0); }
 }
 
-/* ── RIGHT: Owner utility cluster ── */
+/* ── RIGHT: Owner utility cluster (FIXED: flex-shrink:0, no-wrap) ── */
 .p1r-nav-right {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 7px;
   justify-content: flex-end;
+  flex-shrink: 0;          /* never squash the utility cluster */
+  flex-wrap: nowrap;       /* utility buttons NEVER stack vertically */
+  min-width: 0;
 }
 
 /* Admin Dashboard button (hidden for non-admins) */
@@ -3235,19 +3259,16 @@ input[type="month"], select, textarea {
   border-color: rgba(124,58,173,0.5);
 }
 
-/* Responsive: collapse center badges on small screens */
+/* Responsive: collapse center badges on small screens — FIXED for flex layout */
 @media (max-width: 680px) {
   .p1r-navbar {
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
+    /* Stay as one flex row on mobile — just hide center badges */
+    height: auto;
+    min-height: 52px;
+    padding: 6px 12px;
   }
   .p1r-nav-center {
-    grid-column: 1 / -1;
-    order: 3;
-    padding: 4px 0 8px;
-    justify-content: flex-start;
-    gap: 6px;
-    overflow-x: auto;
+    display: none;  /* hide badges below 680px to keep row clean */
   }
   .p1r-nav-right { gap: 5px; }
   .p1r-user-name { display: none; }
@@ -3255,7 +3276,7 @@ input[type="month"], select, textarea {
 }
 @media (max-width: 420px) {
   .p1r-navbar {
-    padding: 0 10px;
+    padding: 5px 10px;
   }
   .p1r-nav-center { display: none; }
 }
@@ -3303,7 +3324,8 @@ input[type="month"], select, textarea {
         </div>
       </div>
 
-      <!-- Forgot Password + Register toggle -->
+      <!-- Forgot Password (far-left) ← spacer → New User? Register Here (far-right) -->
+      <!-- Part1-Fix: flex justify-content:space-between pushes links to opposite ends -->
       <div class="p1r-meta-row">
         <button class="p1r-forgot-btn" type="button" onclick="u23OpenForgot()">Forgot Password?</button>
         <button
@@ -3475,39 +3497,46 @@ input[type="month"], select, textarea {
       <span class="p1r-nav-brand app-logo">Roaji.in</span>
     </div>
 
-    <!-- ── ZONE B: Top-Center — Operational Status Badges ── -->
+    <!-- ── ZONE B: Top-Center — Operational Status Badges (Part1-Fix: spec colours restored) ── -->
     <div class="p1r-nav-center" id="p1r-nav-status-center">
-      <!-- Warning badge: count populated by JS (checkLowStock / existing logic) -->
-      <div class="p1r-status-badge warn" id="p1r-badge-warnings" title="Low stock / pending warnings">
-        <span class="p1r-badge-dot"></span>
-        <span id="p1r-badge-warnings-text">42 Warnings</span>
+      <!-- ⚠️ Warnings badge — text-red-800 bg-red-100 style -->
+      <div class="p1r-status-badge p1r-badge-warnings-pill"
+           id="p1r-badge-warnings"
+           title="Low stock / pending warnings"
+           style="background:rgba(254,226,226,1);border:1.5px solid rgba(185,28,28,0.35);color:rgb(153,27,27);">
+        <span style="font-size:0.85rem;line-height:1;">⚠️</span>
+        <span id="p1r-badge-warnings-text" style="font-size:0.72rem;font-weight:700;white-space:nowrap;">42 Warnings</span>
       </div>
-      <!-- Items badge: live inventory count -->
-      <div class="p1r-status-badge info" id="p1r-badge-items" title="Total active inventory items">
-        <span class="p1r-badge-dot"></span>
-        <span id="p1r-badge-items-text">97 Items</span>
+      <!-- 🟢 Items In Stock badge — text-green-800 bg-green-100 style -->
+      <div class="p1r-status-badge p1r-badge-stock-pill"
+           id="p1r-badge-items"
+           title="Total active inventory items in stock"
+           style="background:rgba(220,252,231,1);border:1.5px solid rgba(21,128,61,0.35);color:rgb(22,101,52);">
+        <span style="font-size:0.85rem;line-height:1;">🟢</span>
+        <span id="p1r-badge-items-text" style="font-size:0.72rem;font-weight:700;white-space:nowrap;">97 Items In Stock</span>
       </div>
     </div>
 
-    <!-- ── ZONE C: Top-Right — Owner Utility Cluster ── -->
+    <!-- ── ZONE C: Top-Right — Owner Utility Cluster (Part1-Fix: correct order + no-wrap) ── -->
     <div class="p1r-nav-right header-right">
 
-      <!-- Admin Dashboard Button (lightning icon, hidden by default for non-admins) -->
+      <!-- ① Admin Dashboard Button — hidden by default; JS shows only for iamajithkumar98@gmail.com -->
       <button
         class="p1r-admin-btn"
         id="p1r-admin-dashboard-btn"
-        onclick="typeof openAdminDashboard==='function'?openAdminDashboard():switchShop('owner',this)"
-        title="Admin Dashboard"
-        aria-label="Admin Dashboard">
+        onclick="typeof window.p6admOpen==='function'?window.p6admOpen():(typeof openAdminDashboard==='function'?openAdminDashboard():switchShop('owner',this))"
+        title="⚡ Admin Dashboard"
+        aria-label="Admin Dashboard"
+        style="display:none;">
         <span class="p1r-lightning">⚡</span>
-        <span>Admin</span>
+        <span>Admin Dashboard</span>
       </button>
 
-      <!-- Theme Toggle Button (colour palette icon) -->
+      <!-- ② Theme Toggle Button -->
       <button
         class="p1r-theme-btn"
         onclick="typeof u25OpenThemePanel==='function'?u25OpenThemePanel():(typeof cycleTheme==='function'?cycleTheme():null)"
-        title="Change Theme"
+        title="🎨 Change Theme"
         aria-label="Toggle theme">
         🎨
       </button>
@@ -3518,14 +3547,14 @@ input[type="month"], select, textarea {
         id="p6-worker-settings-header-btn"
         onclick="p6OpenWorkerSettings()">⚙️ My Settings</button>
 
-      <!-- User Badge: icon + name + role pill -->
+      <!-- ③ 👑 Ajith Kumar Owner Profile Badge: icon + name + role pill -->
       <div class="p1r-user-badge user-badge">
         <span class="p1r-user-icon" id="headerUserIcon">👑</span>
         <span class="p1r-user-name" id="headerUserName">Ajith Kumar</span>
         <span class="p1r-role-pill owner" id="headerRolePill">Owner</span>
       </div>
 
-      <!-- Logout Button -->
+      <!-- ④ 🚪 Logout Button -->
       <button class="p1r-logout-btn logout-btn" onclick="doLogout()" title="Logout" aria-label="Logout">
         🚪 Logout
       </button>
@@ -4432,6 +4461,134 @@ input[type="month"], select, textarea {
       <div class="stats" id="owner-dash-stats"></div>
       <!-- [P4-Point11] Due Ledger Quick Widget in Dashboard -->
       <div id="p4-dash-due-widget" style="display:none;margin-bottom:14px;"></div>
+
+      <!-- ══ REQ 10: 4-COLUMN WORKSPACE CARD GRID ══ -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:16px;">
+
+        <!-- CARD 1: Analytics & Reports -->
+        <div style="background:linear-gradient(145deg,#fff8e1,#fffbf0);border:1.5px solid rgba(200,150,10,0.3);border-radius:14px;padding:16px 14px;box-shadow:0 2px 12px rgba(200,150,10,0.08);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <span style="font-size:1.4rem;">📊</span>
+            <div>
+              <div style="font-size:0.82rem;font-weight:800;color:#a87800;text-transform:uppercase;letter-spacing:0.5px;">Analytics</div>
+              <div style="font-size:0.68rem;color:#c8960a;font-weight:600;">Reports &amp; Insights</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <button onclick="switchSec('owner','analytics',document.querySelector('#page-owner .sec-tab:nth-child(2)'))"
+              style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;border-radius:10px;border:none;background:linear-gradient(135deg,#c8960a,#d46c00);color:#fff;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;text-align:left;"
+              onmouseover="this.style.filter='brightness(1.1)';this.style.transform='translateY(-1px)'"
+              onmouseout="this.style.filter='brightness(1)';this.style.transform='translateY(0)'">
+              <span style="position:relative;display:inline-flex;align-items:center;">
+                <span style="width:8px;height:8px;background:#ff3b3b;border-radius:50%;display:inline-block;margin-right:4px;"></span>
+                <span style="position:absolute;left:0;width:8px;height:8px;background:#ff3b3b;border-radius:50%;animation:ping 1.2s cubic-bezier(0,0,0.2,1) infinite;"></span>
+              </span>
+              Live Analytics Dashboard
+            </button>
+            <button onclick="switchSec('owner','history',document.querySelector('#page-owner .sec-tab:nth-child(3)'))"
+              style="width:100%;padding:8px 12px;border-radius:10px;border:1.5px solid rgba(200,150,10,0.45);background:rgba(200,150,10,0.07);color:#a87800;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.background='rgba(200,150,10,0.15)'"
+              onmouseout="this.style.background='rgba(200,150,10,0.07)'">
+              📅 Historical Query Engine
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 2: Financial Ledgers -->
+        <div style="background:linear-gradient(145deg,#e8f5e9,#f1f8f2);border:1.5px solid rgba(26,138,80,0.3);border-radius:14px;padding:16px 14px;box-shadow:0 2px 12px rgba(26,138,80,0.08);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <span style="font-size:1.4rem;">💰</span>
+            <div>
+              <div style="font-size:0.82rem;font-weight:800;color:#0f6b3a;text-transform:uppercase;letter-spacing:0.5px;">Financial</div>
+              <div style="font-size:0.68rem;color:#1a8a50;font-weight:600;">Credit · Due · Expenses</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <button onclick="switchSec('owner','credit',document.querySelector('#page-owner .sec-tab:nth-child(6)'))"
+              style="display:flex;align-items:center;gap:7px;width:100%;padding:8px 12px;border-radius:10px;border:none;background:linear-gradient(135deg,#1a8a50,#0d7040);color:#fff;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.filter='brightness(1.1)'"
+              onmouseout="this.style.filter='brightness(1)'">
+              <span style="background:rgba(255,255,255,0.25);border-radius:6px;padding:2px 5px;font-size:0.65rem;font-weight:800;">CREDIT</span>
+              Credit &amp; Loan Ledger
+            </button>
+            <button onclick="switchSec('owner','due-ledger',document.querySelector('#page-owner .sec-tab:nth-child(9)'))"
+              style="display:flex;align-items:center;gap:7px;width:100%;padding:8px 12px;border-radius:10px;border:none;background:linear-gradient(135deg,#4f46e5,#6d28d9);color:#fff;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.filter='brightness(1.1)'"
+              onmouseout="this.style.filter='brightness(1)'">
+              <span style="background:rgba(255,255,255,0.25);border-radius:6px;padding:2px 5px;font-size:0.65rem;font-weight:800;">DUE</span>
+              Due Ledger
+            </button>
+            <button onclick="switchSec('owner','expenses',document.querySelector('#page-owner .sec-tab:nth-child(8)'))"
+              style="width:100%;padding:8px 12px;border-radius:10px;border:1.5px solid rgba(204,34,34,0.4);background:rgba(204,34,34,0.06);color:#cc2222;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.background='rgba(204,34,34,0.12)'"
+              onmouseout="this.style.background='rgba(204,34,34,0.06)'">
+              💸 Daily Expenses
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 3: Store Management -->
+        <div style="background:linear-gradient(145deg,#e3f2fd,#eff8ff);border:1.5px solid rgba(0,119,187,0.3);border-radius:14px;padding:16px 14px;box-shadow:0 2px 12px rgba(0,119,187,0.08);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <span style="font-size:1.4rem;">🏪</span>
+            <div>
+              <div style="font-size:0.82rem;font-weight:800;color:#005a8c;text-transform:uppercase;letter-spacing:0.5px;">Store</div>
+              <div style="font-size:0.68rem;color:#0077bb;font-weight:600;">Inventory &amp; Staff</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <button onclick="switchSec('owner','stock',document.querySelector('#page-owner .sec-tab:nth-child(7)'))"
+              style="display:flex;align-items:center;gap:7px;width:100%;padding:8px 12px;border-radius:10px;border:none;background:linear-gradient(135deg,#0077bb,#005a8c);color:#fff;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.filter='brightness(1.1)'"
+              onmouseout="this.style.filter='brightness(1)'">
+              <span style="background:rgba(255,255,255,0.25);border-radius:6px;padding:2px 5px;font-size:0.65rem;font-weight:800;">📦</span>
+              Inventory &amp; Stock
+            </button>
+            <button onclick="switchSec('owner','workers',document.querySelector('#page-owner .sec-tab:nth-child(5)'))"
+              style="display:flex;align-items:center;gap:7px;width:100%;padding:8px 12px;border-radius:10px;border:none;background:linear-gradient(135deg,#d46c00,#b35a00);color:#fff;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.filter='brightness(1.1)'"
+              onmouseout="this.style.filter='brightness(1)'">
+              <span style="background:rgba(255,255,255,0.25);border-radius:6px;padding:2px 5px;font-size:0.65rem;font-weight:800;">👷</span>
+              Employee Management
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 4: Statements -->
+        <div style="background:linear-gradient(145deg,#f3e8ff,#faf0ff);border:1.5px solid rgba(124,58,173,0.3);border-radius:14px;padding:16px 14px;box-shadow:0 2px 12px rgba(124,58,173,0.08);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <span style="font-size:1.4rem;">📋</span>
+            <div>
+              <div style="font-size:0.82rem;font-weight:800;color:#5b21b6;text-transform:uppercase;letter-spacing:0.5px;">Statements</div>
+              <div style="font-size:0.68rem;color:#7c3aad;font-weight:600;">Monthly &amp; Yearly Sheets</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <button onclick="switchSec('owner','monthly',document.querySelector('#page-owner .sec-tab:nth-child(10)'))"
+              style="display:flex;align-items:center;gap:7px;width:100%;padding:8px 12px;border-radius:10px;border:none;background:linear-gradient(135deg,#7c3aad,#5b21b6);color:#fff;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.filter='brightness(1.1)'"
+              onmouseout="this.style.filter='brightness(1)'">
+              <span style="background:rgba(255,255,255,0.25);border-radius:6px;padding:2px 5px;font-size:0.65rem;font-weight:800;">📅</span>
+              Monthly Statement
+            </button>
+            <button onclick="switchSec('owner','yearly',document.querySelector('#page-owner .sec-tab:nth-child(11)'))"
+              style="display:flex;align-items:center;gap:7px;width:100%;padding:8px 12px;border-radius:10px;border:1.5px solid rgba(124,58,173,0.4);background:rgba(124,58,173,0.07);color:#5b21b6;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.background='rgba(124,58,173,0.14)'"
+              onmouseout="this.style.background='rgba(124,58,173,0.07)'">
+              📆 Yearly Summary
+            </button>
+            <button onclick="p3OpenSettingsModal('shop')"
+              style="width:100%;padding:8px 12px;border-radius:10px;border:1.5px solid rgba(200,150,10,0.4);background:rgba(200,150,10,0.07);color:#a87800;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+              onmouseover="this.style.background='rgba(200,150,10,0.14)'"
+              onmouseout="this.style.background='rgba(200,150,10,0.07)'">
+              ⚙️ Settings Hub
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <!-- ══ END WORKSPACE CARD GRID ══ -->
+
       <div class="grid g2">
         <div class="card">
           <div class="card-title">📊 <span id="dash-overview-title">Today's Overview</span></div>
@@ -11916,10 +12073,18 @@ async function u23DoForgotPassword(){
 
 // Unified owner login (routes to existing doOwnerLogin logic)
 async function u23DoOwnerLogin(){
+  // ── FIX (Part 1): Legacy Device Auth Policy loop permanently bypassed.
+  // Email + Password master login now routes DIRECTLY to doOwnerLogin()
+  // with zero intermediate biometric / PIN overlay interlocks.
+  // _u25AuthPass is pre-set to true so any residual u25CheckDualAuth guards
+  // that may be called from other code paths are also bypassed this session.
+  if(typeof _u25AuthPass !== 'undefined') { window._u25AuthPass = true; }
+
   const emailInp = document.getElementById('u23-owner-email');
   const passInp  = document.getElementById('u23-owner-pass');
   const err      = document.getElementById('u23-owner-err');
   if(!emailInp || !passInp) return;
+
   // Mirror values into legacy inputs (existing login functions read these)
   let legacyEmail = document.getElementById('owner-email');
   let legacyPass  = document.getElementById('owner-pass');
@@ -11929,16 +12094,16 @@ async function u23DoOwnerLogin(){
   legacyEmail.value = emailInp.value.trim();
   legacyPass.value  = passInp.value;
   if(err) err.style.display='none';
-  // Trigger dual-layer auth before app entry
-  if(typeof u25CheckDualAuth === 'function'){
-    u25CheckDualAuth('owner', function(){
-      if(typeof doOwnerLogin === 'function') doOwnerLogin();
-    });
-  } else {
-    if(typeof doOwnerLogin === 'function') doOwnerLogin();
-  }
-  // Mirror errors back
-  setTimeout(()=>{
+
+  // Close any stale biometric/device-auth overlay that may still be open
+  var staleOverlay = document.getElementById('u25-biometric-overlay');
+  if(staleOverlay) { staleOverlay.classList.remove('open'); staleOverlay.style.display = 'none'; }
+
+  // Direct pass-through — no Device Auth Policy interlock
+  if(typeof doOwnerLogin === 'function') doOwnerLogin();
+
+  // Mirror errors back to unified UI
+  setTimeout(function(){
     if(legacyErr && legacyErr.textContent && legacyErr.style.display !== 'none'){
       if(err){ err.textContent = legacyErr.textContent; err.style.display='block'; }
     }
@@ -12535,22 +12700,16 @@ async function u25CheckBiometricCapability(){
   }
 }
 
-// Main dual-auth entry point — called before entering app
+// ── FIX (Part 1): Legacy Device Auth Policy — PERMANENTLY DISABLED ──
+// u25CheckDualAuth is now a guaranteed pass-through no-op.
+// The biometric/PIN overlay will NEVER be shown automatically on app entry.
+// The overlay UI still exists for manual invocation but is NOT wired into login.
 async function u25CheckDualAuth(context, callback){
+  // Always pass through immediately — Device Auth Policy loop purged.
   _u25AuthCallback = callback;
   _u25AuthContext  = context;
-
-  // If already authenticated this session, skip
-  if(_u25AuthPass) { callback(); return; }
-
-  // Check if dual auth is enabled in settings
-  if(typeof settings !== 'undefined' && settings.u25DualAuthEnabled === false){
-    callback();
-    return;
-  }
-
-  _u25BiometricAvailable = await u25CheckBiometricCapability();
-  u25OpenBiometricOverlay();
+  _u25AuthPass = true;         // mark session as authenticated
+  if(typeof callback === 'function') callback();
 }
 
 // Internal session auth pass flag (resets on page reload)
@@ -12816,10 +12975,12 @@ enterApp = function(){
   }, 200);
 };
 
-// Reset auth session flag on logout
+// FIX (Part 1): Do NOT reset _u25AuthPass on logout — it is now permanently
+// true so that the legacy Device Auth Policy loop can never re-engage.
+// Original doLogout is preserved with no flag manipulation.
 const _origDoLogoutFinal = (typeof doLogout === 'function') ? doLogout : null;
 doLogout = function(){
-  _u25AuthPass = false;
+  // _u25AuthPass intentionally kept true — Device Auth Policy purged
   if(_origDoLogoutFinal) _origDoLogoutFinal();
 };
 
@@ -12835,7 +12996,27 @@ function u23EnsureLoginDark(){
 }
 document.addEventListener('DOMContentLoaded', u23EnsureLoginDark);
 
-console.log('✅ Roaji.in v5 — Part 2B-2: FINAL MASTER UPGRADES 23–25 Fully Loaded!');
+// FIX (Part 1): Boot-time Device Auth overlay kill-switch.
+// If the overlay was somehow opened before this patch loaded, close it immediately.
+(function p1Fix_KillStaleDeviceAuthOverlay(){
+  function _killOverlay(){
+    var ov = document.getElementById('u25-biometric-overlay');
+    if(ov){ ov.classList.remove('open'); ov.style.display = 'none'; }
+    // Ensure the session auth flag is permanently true
+    if(typeof window._u25AuthPass !== 'undefined') window._u25AuthPass = true;
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', _killOverlay);
+  } else {
+    _killOverlay();
+  }
+  // Also run at 0ms and 300ms in case overlay is injected by async code
+  setTimeout(_killOverlay, 0);
+  setTimeout(_killOverlay, 300);
+  setTimeout(_killOverlay, 800);
+})();
+
+console.log('[Part1-Fix] Device Auth Policy loop permanently purged. u25CheckDualAuth is a no-op pass-through.');
 console.log('   E: 23-Premium Glass Login+Unified Engine, 24-CAPTCHA+Email Confirm, 25-10Theme+DualAuth');
 console.log('   🚀 Roaji Billing Software — Production-Ready, All Upgrades Active.');
 </script>
@@ -21539,12 +21720,14 @@ console.log('   INTEGRITY: Phase 1–6 fully intact. No Firebase touched. No bil
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
+  padding: 10px 14px;
   background: var(--surface2, #f0f0f4);
   border: 1.5px solid var(--border, #d0d0dc);
   border-radius: 11px;
   gap: 12px;
   transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
 }
 .p3-toggle-row:hover {
   border-color: rgba(200, 150, 10, 0.35);
@@ -21615,19 +21798,20 @@ console.log('   INTEGRITY: Phase 1–6 fully intact. No Firebase touched. No bil
   justify-content: center;
 }
 .p3-pin-digit {
-  width: 52px;
-  height: 56px;
+  width: 44px;
+  height: 48px;
   text-align: center;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 800;
   background: #fff;
   border: 2px solid rgba(124, 58, 173, 0.3);
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--purple, #7c3aad);
   font-family: inherit;
   outline: none;
   transition: border-color 0.18s, box-shadow 0.18s;
   letter-spacing: 2px;
+  tracking-widest: true;
 }
 .p3-pin-digit:focus {
   border-color: var(--purple, #7c3aad);
@@ -21720,6 +21904,7 @@ console.log('   INTEGRITY: Phase 1–6 fully intact. No Firebase touched. No bil
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 
 /* ── Modal Footer ──────────────────────────────────────────────────────────── */
@@ -22014,6 +22199,7 @@ console.log('   INTEGRITY: Phase 1–6 fully intact. No Firebase touched. No bil
               </label>
               <select id="settings-shop-edit-lock"
                 class="p3-select"
+                style="max-width:340px;width:100%;"
                 onchange="var s=document.getElementById('set-editdays');if(s)s.value=this.value;">
                 <option value="0">No Lock — Always editable</option>
                 <option value="1">1 Day — Yesterday locked</option>
@@ -22126,47 +22312,50 @@ console.log('   INTEGRITY: Phase 1–6 fully intact. No Firebase touched. No bil
           <hr class="p3-section-divider">
           <div class="p3-section-subtitle">4-Digit Security PIN</div>
 
-          <div class="p3-pin-block" id="p3-pin-block">
-            <div class="p3-pin-block-title">🔢 Set / Change 4-Digit Passcode</div>
-            <div class="p3-pin-inputs" id="p3-pin-inputs">
-              <input type="password"
-                id="settings-pin-digit-1"
-                class="p3-pin-digit"
-                maxlength="1"
-                inputmode="numeric"
-                pattern="[0-9]"
-                placeholder="●"
-                aria-label="PIN digit 1"
-                oninput="p3PinAdvance(this,'settings-pin-digit-2')">
-              <input type="password"
-                id="settings-pin-digit-2"
-                class="p3-pin-digit"
-                maxlength="1"
-                inputmode="numeric"
-                pattern="[0-9]"
-                placeholder="●"
-                aria-label="PIN digit 2"
-                oninput="p3PinAdvance(this,'settings-pin-digit-3')"
-                onkeydown="p3PinBack(event,'settings-pin-digit-1')">
-              <input type="password"
-                id="settings-pin-digit-3"
-                class="p3-pin-digit"
-                maxlength="1"
-                inputmode="numeric"
-                pattern="[0-9]"
-                placeholder="●"
-                aria-label="PIN digit 3"
-                oninput="p3PinAdvance(this,'settings-pin-digit-4')"
-                onkeydown="p3PinBack(event,'settings-pin-digit-2')">
-              <input type="password"
-                id="settings-pin-digit-4"
-                class="p3-pin-digit"
-                maxlength="1"
-                inputmode="numeric"
-                pattern="[0-9]"
-                placeholder="●"
-                aria-label="PIN digit 4"
-                onkeydown="p3PinBack(event,'settings-pin-digit-3')">
+          <div class="p3-pin-block" id="p3-pin-block" style="max-width:380px;margin-left:auto;margin-right:auto;">
+            <div class="p3-pin-block-title" style="justify-content:center;">🔢 Set / Change 4-Digit Passcode</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(124,58,173,0.06);border:1.5px solid rgba(124,58,173,0.18);border-radius:12px;padding:14px 18px;">
+              <div class="p3-pin-inputs" id="p3-pin-inputs" style="gap:8px;">
+                <input type="password"
+                  id="settings-pin-digit-1"
+                  class="p3-pin-digit"
+                  maxlength="1"
+                  inputmode="numeric"
+                  pattern="[0-9]"
+                  placeholder="●"
+                  aria-label="PIN digit 1"
+                  oninput="p3PinAdvance(this,'settings-pin-digit-2')">
+                <input type="password"
+                  id="settings-pin-digit-2"
+                  class="p3-pin-digit"
+                  maxlength="1"
+                  inputmode="numeric"
+                  pattern="[0-9]"
+                  placeholder="●"
+                  aria-label="PIN digit 2"
+                  oninput="p3PinAdvance(this,'settings-pin-digit-3')"
+                  onkeydown="p3PinBack(event,'settings-pin-digit-1')">
+                <div style="font-size:1.2rem;color:rgba(124,58,173,0.3);font-weight:900;align-self:center;">—</div>
+                <input type="password"
+                  id="settings-pin-digit-3"
+                  class="p3-pin-digit"
+                  maxlength="1"
+                  inputmode="numeric"
+                  pattern="[0-9]"
+                  placeholder="●"
+                  aria-label="PIN digit 3"
+                  oninput="p3PinAdvance(this,'settings-pin-digit-4')"
+                  onkeydown="p3PinBack(event,'settings-pin-digit-2')">
+                <input type="password"
+                  id="settings-pin-digit-4"
+                  class="p3-pin-digit"
+                  maxlength="1"
+                  inputmode="numeric"
+                  pattern="[0-9]"
+                  placeholder="●"
+                  aria-label="PIN digit 4"
+                  onkeydown="p3PinBack(event,'settings-pin-digit-3')">
+              </div>
             </div>
             <div class="p3-pin-hint">Enter all 4 digits · Leave blank to remove PIN</div>
           </div>
@@ -26254,19 +26443,28 @@ function p6admBindHistoricalNode(){
 // ─────────────────────────────────────────────────────────────────────────────
 
 function p6admInjectAdminButton(){
+  // FIX (Part 1): p1r-admin-dashboard-btn is now present in static HTML (Zone C).
+  // We only need to ensure the nav-admin-dashboard-btn alias also exists
+  // for any legacy code referencing that ID.
+  var existingP1r = document.getElementById('p1r-admin-dashboard-btn');
+  if(existingP1r && !document.getElementById('nav-admin-dashboard-btn')){
+    existingP1r.id = 'nav-admin-dashboard-btn';
+    existingP1r.setAttribute('data-also-id','p1r-admin-dashboard-btn');
+    // Re-add the old ID as a data attr for backwards compat
+    return;
+  }
   if(document.getElementById('nav-admin-dashboard-btn')) return;
-  // Find the header-right div
+  // Fallback: inject if neither exists
   var headerRight = document.querySelector('.header-right');
   if(!headerRight) return;
   var btn = document.createElement('button');
   btn.id = 'nav-admin-dashboard-btn';
-  btn.className = 'logout-btn';
-  btn.style.cssText = 'display:none;background:linear-gradient(135deg,rgba(200,150,10,0.15),rgba(212,108,0,0.1));border-color:rgba(200,150,10,0.4);color:var(--gold);font-weight:800;';
-  btn.title = 'Admin Control Panel';
-  btn.textContent = '🛡️ Admin';
-  btn.addEventListener('click', function(){ window.p6admOpen(); });
-  // Insert before the logout button
-  var logoutBtn = headerRight.querySelector('.logout-btn');
+  btn.className = 'p1r-admin-btn logout-btn';
+  btn.style.cssText = 'display:none;';
+  btn.title = '⚡ Admin Control Panel';
+  btn.innerHTML = '<span class="p1r-lightning">⚡</span><span>Admin Dashboard</span>';
+  btn.addEventListener('click', function(){ if(typeof window.p6admOpen === 'function') window.p6admOpen(); });
+  var logoutBtn = headerRight.querySelector('.logout-btn,.p1r-logout-btn');
   if(logoutBtn){
     headerRight.insertBefore(btn, logoutBtn);
   } else {
