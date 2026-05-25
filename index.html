@@ -3021,18 +3021,18 @@ input[type="month"], select, textarea {
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 16px rgba(80,20,180,0.08);
-  /* FIXED: flex row forces all 3 zones onto one horizontal line */
+  /* FIXED: strict single horizontal row — zones never stack vertically */
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: nowrap;       /* critical: never allow vertical wrapping */
+  flex-wrap: nowrap;       /* NEVER wrap to a second row */
   min-height: 56px;
-  height: 56px;            /* fixed height anchors all children */
-  gap: 12px;
+  height: 56px;            /* fixed height anchors all children to one row */
+  gap: 10px;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden;        /* clip overflow rather than wrap */
+  overflow: visible;       /* allow badge tooltips to overflow without clipping */
 }
 
 /* ── LEFT: Logo + brand ── */
@@ -3041,8 +3041,8 @@ input[type="month"], select, textarea {
   align-items: center;
   gap: 9px;
   justify-content: flex-start;
-  flex-shrink: 0;          /* never squash the brand */
-  min-width: 0;
+  flex: 0 0 auto;          /* fixed size — never grow or shrink */
+  min-width: 110px;
 }
 .p1r-nav-logo-icon {
   font-size: 1.4rem;
@@ -3059,15 +3059,16 @@ input[type="month"], select, textarea {
   letter-spacing: -0.3px;
 }
 
-/* ── CENTER: Operational status badges (FIXED: flex-shrink:1 allows badges to
-   compress gracefully on small screens without breaking the row) ── */
+/* ── CENTER: Operational status badges ──
+   flex-grow:1 lets the center zone absorb available space;
+   flex-shrink:1 lets it compress before pushing other zones off-row.
+   overflow:hidden hides any badge that cannot fit rather than wrapping. */
 .p1r-nav-center {
   display: flex;
   align-items: center;
   gap: 8px;
   justify-content: center;
-  flex-shrink: 1;
-  flex-grow: 0;
+  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
 }
@@ -3116,15 +3117,17 @@ input[type="month"], select, textarea {
   50% { box-shadow: 0 0 0 4px rgba(212,108,0,0); }
 }
 
-/* ── RIGHT: Owner utility cluster (FIXED: flex-shrink:0, no-wrap) ── */
+/* ── RIGHT: Owner utility cluster ──
+   flex:0 0 auto prevents shrinking so buttons are always fully visible;
+   flex-wrap:nowrap ensures they NEVER stack vertically regardless of resolution. */
 .p1r-nav-right {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 7px;
   justify-content: flex-end;
-  flex-shrink: 0;          /* never squash the utility cluster */
-  flex-wrap: nowrap;       /* utility buttons NEVER stack vertically */
+  flex: 0 0 auto;          /* never grow, never shrink */
+  flex-wrap: nowrap;       /* utility buttons stay on one row always */
   min-width: 0;
 }
 
@@ -3259,16 +3262,18 @@ input[type="month"], select, textarea {
   border-color: rgba(124,58,173,0.5);
 }
 
-/* Responsive: collapse center badges on small screens — FIXED for flex layout */
+/* Responsive: hide center badges on small screens; left+right always stay on one row */
 @media (max-width: 680px) {
   .p1r-navbar {
-    /* Stay as one flex row on mobile — just hide center badges */
-    height: auto;
+    /* Single row maintained — just tighten padding */
+    height: 52px;
     min-height: 52px;
-    padding: 6px 12px;
+    padding: 0 10px;
+    gap: 6px;
+    flex-wrap: nowrap;    /* enforce: never wrap even on mobile */
   }
   .p1r-nav-center {
-    display: none;  /* hide badges below 680px to keep row clean */
+    display: none;  /* hide status badges below 680px — keeps row uncluttered */
   }
   .p1r-nav-right { gap: 5px; }
   .p1r-user-name { display: none; }
@@ -3276,9 +3281,12 @@ input[type="month"], select, textarea {
 }
 @media (max-width: 420px) {
   .p1r-navbar {
-    padding: 5px 10px;
+    padding: 0 8px;
+    gap: 4px;
+    flex-wrap: nowrap;    /* absolute: no wrapping at any width */
   }
   .p1r-nav-center { display: none; }
+  .p1r-logout-btn span:first-child { display: none; } /* hide logout icon label on tiny screens */
 }
 </style>
 
@@ -10701,20 +10709,21 @@ function initFirebaseAuthU17(){
       console.log('🔐 Firebase Auth UID:', _currentUID);
       // Check if user has settings (new vs returning)
       const existingSettings = await fbGetU('settings');
-      // Skip wizard if: no settings at all (new account), OR
-      // settings exist but setup was never completed
-      const setupAlreadyDone = existingSettings &&
-        (existingSettings.isSetupComplete === true ||
-         existingSettings.onboardingDone  === true ||
-         existingSettings.shopName);  // any saved shop name = already configured
-      if(!existingSettings || !setupAlreadyDone){
-        // New account or incomplete setup — trigger onboarding
+      // Wizard is shown ONLY when none of the three completion signals exist.
+      // Any one of them being present means setup was already completed.
+      const setupAlreadyDone = !!(existingSettings && (
+        existingSettings.isSetupComplete === true ||
+        existingSettings.onboardingDone  === true ||
+        (existingSettings.shopName && existingSettings.shopName.length > 0)
+      ));
+      if(existingSettings && !setupAlreadyDone){
+        // Genuinely new account with no prior setup — trigger onboarding
         _pendingNewUserEmail = user.email || '';
         // Load minimal data first
         await loadAllDataForUID(_currentUID);
         showOnboarding(user.email || '');
       }
-      // else: returning user with completed setup, normal login flow continues
+      // else: returning user with completed setup — normal login flow continues
     } else {
       _currentUID = null;
     }
@@ -11036,8 +11045,15 @@ enterApp = function(){
     if(settings && settings.bizModules){
       applyModuleVisibility(settings.bizModules);
     }
-    // Upgrade 18: if new user (no onboardingDone flag), show onboarding
-    if(currentUser && currentUser.role === 'owner' && settings && !settings.onboardingDone){
+    // Upgrade 18: show onboarding ONLY when no setup has ever been completed.
+    // Guard checks all three canonical completion flags so returning owners
+    // (who may have only one flag set) are never shown the wizard again.
+    var _setupDone = settings && (
+      settings.isSetupComplete === true ||
+      settings.onboardingDone  === true ||
+      (settings.shopName && settings.shopName.length > 0)
+    );
+    if(currentUser && currentUser.role === 'owner' && settings && !_setupDone){
       setTimeout(() => showOnboarding(currentUser.email || ''), 600);
     }
   }, 500);
@@ -12703,7 +12719,19 @@ function u25OpenThemePanel(){
 let _u25AuthCallback = null;
 let _u25AuthContext  = null; // 'owner' | 'employee'
 let _u25BiometricAvailable = false;
-let _u25AuthPassed = false;   // Prevents re-challenge within same session
+let _u25AuthPassed = true;   // Always true — biometric/device-auth layer permanently removed
+
+// ─── BOOT: hide any residual biometric overlay immediately ───────────────────
+(function _purgeStaleOverlayOnBoot(){
+  function _hideBioOverlay(){
+    var ov = document.getElementById('u25-biometric-overlay');
+    if(ov){ ov.classList.remove('open'); ov.style.display = 'none'; }
+  }
+  _hideBioOverlay();
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', _hideBioOverlay);
+  }
+})();
 
 // Check biometric availability
 async function u25CheckBiometricCapability(){
@@ -12728,7 +12756,7 @@ async function u25CheckDualAuth(context, callback){
 }
 
 // Internal session auth pass flag (resets on page reload)
-let _u25AuthPass = false;
+let _u25AuthPass = true;  // Device Auth Policy permanently removed — always authenticated
 
 // Open the biometric auth overlay
 function u25OpenBiometricOverlay(){
@@ -14099,27 +14127,30 @@ function p2PatchSaveHelpers() {
 /**
  * PATCH — Override doOwnerLogin to provision tenant node and load tenant data.
  * Original login authentication logic (Phase 1) is preserved.
+ * FIX: All legacy input reads are null-guarded to prevent runtime exceptions
+ * when the P1-style hidden inputs are not yet in the DOM.
  */
 const _p2_origOwnerLogin = (typeof doOwnerLogin === 'function') ? doOwnerLogin : null;
 doOwnerLogin = async function() {
-  const email = document.getElementById('owner-email').value.trim().toLowerCase();
-  const pass  = document.getElementById('owner-pass').value;
-  const err   = document.getElementById('owner-err');
+  // Null-safe reads for both the new unified UI and the legacy hidden inputs
+  const emailEl = document.getElementById('owner-email') || document.getElementById('u23-owner-email');
+  const passEl  = document.getElementById('owner-pass')  || document.getElementById('u23-owner-pass');
+  const err     = document.getElementById('owner-err')   || document.getElementById('u23-owner-err');
+  const email   = emailEl ? emailEl.value.trim().toLowerCase() : '';
+  const pass    = passEl  ? passEl.value : '';
   if (!email || !pass) {
-    err.textContent = '❌ Mail ID மற்றும் Password உள்ளிடவும்!';
-    err.style.display = 'block'; return;
+    if(err){ err.textContent = '❌ Mail ID மற்றும் Password உள்ளிடவும்!'; err.style.display = 'block'; }
+    return;
   }
   showLoadingScreen(true);
-  // First: load root-level approvedOwners for auth (backward compat)
-  const ao = await fbGet('approvedOwners');
+  // Load root-level approvedOwners for auth (backward compat)
+  const ao = await fbGet('approvedOwners').catch(()=>null);
   if (ao) approvedOwners = Array.isArray(ao) ? ao : toArr(ao);
   // Also check legacy embedded list
   const match = approvedOwners.find(o => o.email.toLowerCase() === email && o.password === pass);
   showLoadingScreen(false);
   if (!match) {
-    err.textContent = '❌ Mail ID அல்லது Password தவறு!';
-    err.style.display = 'block';
-    setTimeout(() => err.style.display = 'none', 3000);
+    if(err){ err.textContent = '❌ Mail ID அல்லது Password தவறு!'; err.style.display = 'block'; setTimeout(() => err.style.display = 'none', 3000); }
     return;
   }
   // Set currentUser before provisioning (p2TenantRoot needs it)
@@ -14131,11 +14162,30 @@ doOwnerLogin = async function() {
     package: match.package || 'studio'
   };
   // Provision tenant namespace (idempotent — safe to call every login)
-  await p2ProvisionTenant(currentUser);
+  await p2ProvisionTenant(currentUser).catch(()=>{});
   // Patch save helpers to tenant namespace
   p2PatchSaveHelpers();
-  // Load all data from tenant namespace
-  await p2LoadTenantData();
+  // Load all data from tenant namespace.
+  // Safe UID path resolution: if p2LoadTenantData fails for the current UID,
+  // it falls back to the legacy sanitised-email path automatically.
+  try {
+    await p2LoadTenantData();
+  } catch(loadErr) {
+    console.warn('[P2] Tenant data load failed, attempting legacy path fallback:', loadErr);
+    try {
+      // Derive legacy path from email (same sanitisation logic as p2SanitizeEmail)
+      var legacyPath = 'users/' + email.replace(/@/g,'_at_').replace(/\./g,'_dot_').replace(/[^a-zA-Z0-9_]/g,'_');
+      var legacyData = await fbGet(legacyPath).catch(()=>null);
+      if(legacyData && typeof legacyData === 'object'){
+        // Merge any available legacy keys into local state
+        if(legacyData.settings)   { try { settings = Object.assign({}, settings, legacyData.settings); } catch(e){} }
+        if(legacyData.billOrders) { try { billOrders = Array.isArray(legacyData.billOrders) ? legacyData.billOrders : toArr(legacyData.billOrders); } catch(e){} }
+        console.log('[P2] Legacy path fallback loaded:', legacyPath);
+      }
+    } catch(fallbackErr) {
+      console.warn('[P2] Legacy fallback also failed — proceeding with local state:', fallbackErr);
+    }
+  }
   // Update package from tenant manifest if not yet set
   if (!currentUser.package) currentUser.package = 'studio';
   enterApp();
@@ -22327,10 +22377,10 @@ console.log('   INTEGRITY: Phase 1–6 fully intact. No Firebase touched. No bil
           <hr class="p3-section-divider">
           <div class="p3-section-subtitle">4-Digit Security PIN</div>
 
-          <div class="p3-pin-block" id="p3-pin-block" style="max-width:380px;margin-left:auto;margin-right:auto;">
-            <div class="p3-pin-block-title" style="justify-content:center;">🔢 Set / Change 4-Digit Passcode</div>
-            <div style="display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(124,58,173,0.06);border:1.5px solid rgba(124,58,173,0.18);border-radius:12px;padding:14px 18px;">
-              <div class="p3-pin-inputs" id="p3-pin-inputs" style="gap:8px;">
+          <div class="p3-pin-block" id="p3-pin-block" style="max-width:300px;">
+            <div class="p3-pin-block-title">🔢 Set / Change 4-Digit Passcode</div>
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(124,58,173,0.06);border:1.5px solid rgba(124,58,173,0.18);border-radius:12px;padding:12px 16px;">
+              <div class="p3-pin-inputs" id="p3-pin-inputs" style="gap:8px;display:flex;align-items:center;">
                 <input type="password"
                   id="settings-pin-digit-1"
                   class="p3-pin-digit"
@@ -25625,24 +25675,55 @@ function p6admToggleAdminBtn(){
 
 function p6admCheckSetupComplete(){
   if(!p6admIsPrimaryOwner()) return;
-  // Historical Firestore path node for primary owner
-  var ownerNode = 'users/iamajithkumar98_at_gmail_dot_com';
+  // Closure helper: forcefully close all known wizard/setup modal elements
+  function _closeAllSetupModals(){
+    var ids = ['setupWizardModal','setupWizard','onboarding-modal'];
+    ids.forEach(function(id){
+      var el = document.getElementById(id);
+      if(el){
+        el.style.display = 'none';
+        el.classList.remove('open');
+      }
+    });
+    console.log('[P6ADM] All setup wizard modals closed.');
+  }
+  // Fast path: if local settings already confirm setup is done, act immediately
+  if(typeof settings !== 'undefined' && settings &&
+     (settings.isSetupComplete === true || settings.onboardingDone === true ||
+      (settings.shopName && settings.shopName.length > 0))){
+    _closeAllSetupModals();
+    return;
+  }
+  // Slow path: read Firestore to confirm
   try {
-    if(typeof db !== 'undefined' && db && typeof db.ref === 'function'){
-      db.ref(ownerNode + '/profile').get().then(function(snap){
-        if(snap && snap.exists()){
-          var profile = snap.val();
-          if(profile && profile.isSetupComplete === true){
-            // Bypass setup wizard — hide any setup modal
-            var setupModal = document.getElementById('setupWizardModal');
-            if(setupModal) setupModal.style.display = 'none';
-            var setupOverlay = document.getElementById('setupWizard');
-            if(setupOverlay) setupOverlay.style.display = 'none';
-            console.log('[P6ADM] Setup wizard bypassed — isSetupComplete=true');
+    var database = p6admGetDb();
+    if(database && typeof database.ref === 'function'){
+      // Try UID-scoped path first; fall back to legacy sanitised-email path
+      var ownerEmail = (currentUser && currentUser.email) || '';
+      var legacySanitised = ownerEmail
+        .replace(/@/g,'_at_').replace(/\./g,'_dot_').replace(/[^a-zA-Z0-9_]/g,'_');
+      var nodesToCheck = [];
+      if(typeof _currentUID !== 'undefined' && _currentUID){
+        nodesToCheck.push('users/' + _currentUID + '/settings');
+      }
+      if(legacySanitised){
+        nodesToCheck.push('users/' + legacySanitised + '/profile');
+        nodesToCheck.push('users/' + legacySanitised + '/settings');
+      }
+      var checked = 0;
+      nodesToCheck.forEach(function(nodePath){
+        database.ref(nodePath).get().then(function(snap){
+          checked++;
+          if(snap && snap.exists()){
+            var d = snap.val();
+            if(d && (d.isSetupComplete === true || d.onboardingDone === true ||
+                     (d.shopName && d.shopName.length > 0))){
+              _closeAllSetupModals();
+            }
           }
-        }
-      }).catch(function(e){
-        console.warn('[P6ADM] Setup check error:', e);
+        }).catch(function(e){
+          console.warn('[P6ADM] Setup check error on path ' + nodePath + ':', e);
+        });
       });
     }
   } catch(e){
@@ -26519,11 +26600,18 @@ function p6admPatchEnterApp(){
 function p6admBindHistoricalNode(){
   var database = p6admGetDb();
   if(!database) return;
-  var ownerPath = 'users/iamajithkumar98_at_gmail_dot_com';
+  // Derive the legacy sanitised-email path from the authenticated owner's email
+  // so this function works correctly for any primary owner account.
+  var ownerEmail = (currentUser && currentUser.email) || '';
+  if(!ownerEmail){ console.warn('[P6ADM] bindHistoricalNode: no owner email — skipped.'); return; }
+  var ownerPath = 'users/' + ownerEmail
+    .replace(/@/g,'_at_')
+    .replace(/\./g,'_dot_')
+    .replace(/[^a-zA-Z0-9_]/g,'_');
   // Write last-seen timestamp to confirm the node is alive and bound
   database.ref(ownerPath + '/lastLogin').set({
     ts: new Date().toISOString(),
-    email: (currentUser && currentUser.email) || '',
+    email: ownerEmail,
     version: 'v6-final'
   }).catch(function(e){
     console.warn('[P6ADM] Historical node write error:', e);
@@ -26724,22 +26812,44 @@ document.addEventListener('DOMContentLoaded', function(){
       if(tryPatchBypass()) clearInterval(t);
     }, 200);
   }
-  // Also watch for the modal appearing and close it if setup already done
+
+  // Close the onboarding modal whenever it gains the 'open' class,
+  // but only when setup has already been completed (any of the three flags).
+  function _guardWizardOpen(){
+    var modal = document.getElementById('onboarding-modal');
+    if(!modal || !modal.classList.contains('open')) return;
+    var done = typeof settings !== 'undefined' && settings && (
+      settings.isSetupComplete === true ||
+      settings.onboardingDone  === true ||
+      (settings.shopName && settings.shopName.length > 0)
+    );
+    if(done){
+      modal.classList.remove('open');
+      console.log('[BYPASS] Wizard suppressed by MutationObserver — setup already complete.');
+      roajiMarkSetupDone(); // also persist the flag if not yet written
+    }
+  }
+
+  // Watch for class-attribute mutations on the modal + child additions anywhere in body
   var observer = new MutationObserver(function(mutations){
     mutations.forEach(function(m){
-      m.addedNodes.forEach(function(n){
-        if(n.id === 'onboarding-modal' || (n.classList && n.classList.contains('open'))){
-          setTimeout(roajiMarkSetupDone, 100);
-        }
-      });
+      if(m.type === 'attributes' && m.attributeName === 'class' &&
+         m.target && m.target.id === 'onboarding-modal'){
+        setTimeout(_guardWizardOpen, 60);
+      }
+      if(m.type === 'childList'){
+        m.addedNodes.forEach(function(n){
+          if(n.id === 'onboarding-modal') setTimeout(_guardWizardOpen, 60);
+        });
+      }
     });
-    // Also catch class changes on the modal
-    var modal = document.getElementById('onboarding-modal');
-    if(modal && modal.classList.contains('open')){
-      setTimeout(roajiMarkSetupDone, 100);
-    }
+    // Belt-and-suspenders: check on every batch
+    setTimeout(_guardWizardOpen, 100);
   });
-  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  observer.observe(document.body, {
+    childList: true, subtree: true,
+    attributes: true, attributeFilter: ['class']
+  });
 });
 
 console.log('[BYPASS] Setup wizard one-time migration script loaded.');
