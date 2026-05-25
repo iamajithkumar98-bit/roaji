@@ -14408,6 +14408,19 @@ function p2BuildInventoryEntryForm() {
 
   // Insert the new card at the TOP of owner-stock section (before existing content)
   stockSection.insertBefore(card, stockSection.firstChild);
+
+  // ── Auto-select the first allowed type so p2SelectedType is never null ──
+  // Runs after a microtask tick so the DOM buttons are fully attached.
+  setTimeout(function(){
+    var allowedTypes = (typeof p2GetAllowedTypes === 'function') ? p2GetAllowedTypes() : ['Studio'];
+    var firstAllowed = allowedTypes[0] || 'Studio';
+    if(typeof p2SelectType === 'function'){
+      p2SelectType(firstAllowed);
+    } else {
+      // Fallback: set variable directly if function not yet defined
+      p2SelectedType = firstAllowed;
+    }
+  }, 0);
 }
 
 /* ── Package logic ── */
@@ -14493,6 +14506,24 @@ function p2UpdatePackageBadge() {
 async function p2AddInventoryItem() {
   const name = document.getElementById('p2-stk-name').value.trim();
   if (!name) { showNotif('❌ Item பெயர் உள்ளிடவும்!', 'red'); return; }
+
+  // ── Recover type from active button if p2SelectedType is null ──
+  if (!p2SelectedType) {
+    var activeBtn = document.querySelector('.p2-type-btn[class*="active-"]');
+    if (activeBtn) {
+      var match = activeBtn.className.match(/active-(\w+)/);
+      if (match) {
+        var typeMap = { gift:'Gift', studio:'Studio', xerox:'Xerox', frame:'Frame', stationery:'Stationery' };
+        p2SelectedType = typeMap[match[1]] || match[1].charAt(0).toUpperCase() + match[1].slice(1);
+      }
+    }
+    // Final fallback: use first allowed type for this package
+    if (!p2SelectedType) {
+      var allowed = (typeof p2GetAllowedTypes === 'function') ? p2GetAllowedTypes() : ['Studio'];
+      p2SelectedType = allowed[0] || 'Studio';
+    }
+  }
+
   if (!p2SelectedType) { showNotif('❌ Type select பண்ணவும்!', 'red'); return; }
 
   const qty     = parseInt(document.getElementById('p2-stk-qty').value)    || 0;
@@ -14922,6 +14953,10 @@ switchSec = function(shop, sec, el) {
   if (_p2_origSwitchSec) _p2_origSwitchSec(shop, sec, el);
   if (shop === 'owner' && sec === 'stock') {
     setTimeout(() => {
+      // Ensure tenant-scoped save helpers are active before any form interaction
+      if (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'owner') {
+        p2PatchSaveHelpers();
+      }
       p2BuildInventoryEntryForm();
       p2UpdatePackageBadge();
       p2SyncInventoryCatDatalist();
@@ -26853,6 +26888,199 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 console.log('[BYPASS] Setup wizard one-time migration script loaded.');
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     ROAJI DATA MIGRATION — One-time safe merge of ALL legacy paths
+     into the canonical tenant path: users/<sanitizedEmail>/
+     ─────────────────────────────────────────────────────────────────────
+     Reads from:
+       1. Root level          → giftOrders/, stockItems/, settings/, …
+       2. UID path            → roaji-software/USERS/<uid>/…
+       3. Old tenant path     → users/iamajithkumar98_at_gmail_dot_com/…
+     Merges ALL into canonical tenant path (p2TenantRoot).
+     Marks migration done in Firebase so it NEVER runs again.
+     Zero data deletion — originals kept until you manually clean up.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+// ── All data keys we need to migrate ─────────────────────────────────────────
+var MIGRATE_KEYS = [
+  'giftOrders', 'frameOrders', 'xeroxBills', 'studioBookings',
+  'creditRecords', 'stockItems', 'ownerRequests', 'employeeRecords',
+  'borrowedRecords', 'sfOrders', 'stationeryBills', 'settings', 'approvedOwners'
+];
+
+// ── Merge two Firebase objects (obj = {key: record}) ─────────────────────────
+// Canonical records win; legacy records fill in missing keys only.
+function mergeObjs(canonical, legacy){
+  if(!legacy) return canonical || {};
+  if(!canonical) return legacy;
+  var merged = Object.assign({}, legacy); // start with legacy
+  Object.keys(canonical).forEach(function(k){ merged[k] = canonical[k]; }); // canonical wins
+  return merged;
+}
+
+// ── Settings merge: canonical fields win, legacy fills gaps ──────────────────
+function mergeSettings(canonical, legacy){
+  if(!legacy) return canonical || {};
+  if(!canonical) return legacy;
+  return Object.assign({}, legacy, canonical); // canonical wins
+}
+
+// ── Core migration function ───────────────────────────────────────────────────
+async function roajiMigrateData(){
+  // Guard: only run for owner sessions
+  if(typeof currentUser === 'undefined' || !currentUser || currentUser.role !== 'owner') return;
+  if(typeof db === 'undefined' || !db) return;
+
+  // Determine canonical tenant path
+  var ownerEmail = currentUser.email || '';
+  if(!ownerEmail){ console.warn('[MIGRATE] No owner email — skipped.'); return; }
+
+  var sanitized = ownerEmail.toLowerCase()
+    .replace(/\./g,'_dot_').replace(/@/g,'_at_').replace(/[^a-z0-9_]/g,'_');
+  var canonicalRoot = 'users/' + sanitized;
+
+  // Check if migration already completed
+  try {
+    var doneSnap = await db.ref(canonicalRoot + '/_migrationDone').get();
+    if(doneSnap && doneSnap.exists() && doneSnap.val() === true){
+      console.log('[MIGRATE] ✅ Already migrated — skipping.');
+      return;
+    }
+  } catch(e){ /* proceed even if check fails */ }
+
+  // Determine UID path (Upgrade 17 path)
+  var uid = (typeof _currentUID !== 'undefined' && _currentUID) ? _currentUID : null;
+  var uidRoot = uid ? ('roaji-software/USERS/' + uid) : null;
+
+  console.log('[MIGRATE] 🚀 Starting one-time data migration...');
+  console.log('[MIGRATE]    Root path      → <key>');
+  console.log('[MIGRATE]    UID path       → ' + (uidRoot || 'N/A'));
+  console.log('[MIGRATE]    Tenant path    → ' + canonicalRoot + '/<key>');
+
+  var migratedCount = 0;
+  var errors = [];
+
+  for(var i = 0; i < MIGRATE_KEYS.length; i++){
+    var key = MIGRATE_KEYS[i];
+    try {
+      // Read from all three legacy paths in parallel
+      var reads = [
+        db.ref(key).get().catch(function(){ return null; }),                                      // root
+        uidRoot ? db.ref(uidRoot + '/' + key).get().catch(function(){ return null; }) : Promise.resolve(null), // UID
+        db.ref(canonicalRoot + '/' + key).get().catch(function(){ return null; })                 // current tenant (may already have data)
+      ];
+      var results = await Promise.all(reads);
+
+      var rootVal    = (results[0] && results[0].exists()) ? results[0].val() : null;
+      var uidVal     = (results[1] && results[1].exists()) ? results[1].val() : null;
+      var tenantVal  = (results[2] && results[2].exists()) ? results[2].val() : null;
+
+      // Skip entirely if no data exists anywhere for this key
+      if(!rootVal && !uidVal && !tenantVal){ continue; }
+
+      var merged;
+      if(key === 'settings'){
+        // Settings: careful merge preserving user preferences
+        merged = mergeSettings(tenantVal, mergeSettings(uidVal, rootVal));
+        // Always mark setup as complete since this is an existing owner
+        merged.isSetupComplete = true;
+        merged.onboardingDone  = true;
+      } else if(key === 'approvedOwners'){
+        // approvedOwners: keep canonical if it exists; legacy fallback
+        merged = tenantVal || uidVal || rootVal;
+      } else {
+        // Orders/records: merge all three, canonical wins on conflicts
+        var step1 = mergeObjs(uidVal, rootVal);    // UID over root
+        merged    = mergeObjs(tenantVal, step1);   // tenant over both
+      }
+
+      // Write merged result to canonical tenant path
+      await db.ref(canonicalRoot + '/' + key).set(merged);
+      migratedCount++;
+      console.log('[MIGRATE] ✅ ' + key + ' merged → ' + canonicalRoot + '/' + key);
+
+    } catch(err){
+      errors.push(key + ': ' + (err.message || err));
+      console.warn('[MIGRATE] ⚠️ Failed to migrate ' + key + ':', err);
+    }
+  }
+
+  // Mark migration as complete so it never reruns
+  try {
+    await db.ref(canonicalRoot + '/_migrationDone').set(true);
+    await db.ref(canonicalRoot + '/_migrationTs').set(new Date().toISOString());
+    await db.ref(canonicalRoot + '/_migratedKeys').set(migratedCount);
+  } catch(e){ console.warn('[MIGRATE] Could not write migration marker:', e); }
+
+  // Reload data from canonical path so app shows merged data immediately
+  try {
+    if(typeof p2LoadTenantData === 'function'){
+      await p2LoadTenantData();
+      console.log('[MIGRATE] 🔄 Tenant data reloaded after migration.');
+    }
+    // Also reload via UID path if available
+    if(uid && typeof loadAllDataForUID === 'function'){
+      await loadAllDataForUID(uid);
+    }
+    // Refresh the UI
+    if(typeof renderOwnerDash === 'function')   setTimeout(renderOwnerDash,   200);
+    if(typeof renderStockList === 'function')   setTimeout(renderStockList,   300);
+    if(typeof updateLowStockBadge === 'function') setTimeout(updateLowStockBadge, 400);
+  } catch(e){ console.warn('[MIGRATE] Reload after migration failed:', e); }
+
+  if(errors.length === 0){
+    console.log('[MIGRATE] ✅ Migration complete! ' + migratedCount + ' collections merged into ' + canonicalRoot);
+    if(typeof showNotif === 'function'){
+      showNotif('✅ உங்க பழைய data எல்லாம் safely migrate ஆச்சு! (' + migratedCount + ' collections)', 'green');
+    }
+  } else {
+    console.warn('[MIGRATE] ⚠️ Migration done with ' + errors.length + ' error(s):', errors);
+    if(typeof showNotif === 'function'){
+      showNotif('⚠️ Migration mostly done — ' + errors.length + ' items failed. Console பாருங்க.', 'orange');
+    }
+  }
+}
+
+// ── Wire migration into enterApp ──────────────────────────────────────────────
+// Runs once after login, with a small delay so all patches are applied first.
+function tryWireMigration(){
+  if(typeof enterApp !== 'function') return false;
+  if(enterApp._migrationWired) return true;
+  var _prev = enterApp;
+  window.enterApp = function(){
+    _prev.apply(this, arguments);
+    // Run migration after all other enterApp patches have fired
+    setTimeout(function(){
+      roajiMigrateData().catch(function(e){
+        console.warn('[MIGRATE] Top-level error:', e);
+      });
+    }, 2000); // 2s delay ensures p2PatchSaveHelpers + UID are ready
+  };
+  window.enterApp._migrationWired = true;
+  window.enterApp._bypassWired    = _prev._bypassWired || false;
+  return true;
+}
+
+// Wire on DOMContentLoaded with retry
+document.addEventListener('DOMContentLoaded', function(){
+  if(!tryWireMigration()){
+    var t = setInterval(function(){
+      if(tryWireMigration()) clearInterval(t);
+    }, 250);
+  }
+});
+
+// Also expose as manual trigger (e.g. from browser console: roajiRunMigration())
+window.roajiRunMigration = roajiMigrateData;
+
+console.log('[MIGRATE] Data migration script loaded. Will run automatically on next login.');
+console.log('[MIGRATE] Manual trigger: roajiRunMigration() in browser console.');
 })();
 </script>
 
