@@ -22813,6 +22813,21 @@ function p3SyncFromLegacy() {
     if (st) st.checked = ps.printSplitDetail !== false;
   }
 
+  // Security — PIN lock toggle + saved PIN
+  var pinToggleEl = g('settings-pin-lock-toggle');
+  if (pinToggleEl && typeof settings !== 'undefined' && settings) {
+    pinToggleEl.checked = !!settings.pinLockEnabled;
+  }
+  // Populate PIN digits if a saved securityPin exists
+  if (typeof settings !== 'undefined' && settings && settings.securityPin &&
+      /^\d{4}$/.test(String(settings.securityPin))) {
+    var savedDigits = String(settings.securityPin).split('');
+    ['settings-pin-digit-1','settings-pin-digit-2',
+     'settings-pin-digit-3','settings-pin-digit-4'].forEach(function(id, i){
+      var el = g(id); if (el) el.value = savedDigits[i] || '';
+    });
+  }
+
   // WhatsApp
   sv('settings-wa-domain',  'p5b2b-domain-inp');
   sv('settings-wa-sender',  'p5b2b-shopwa-inp');
@@ -22932,11 +22947,37 @@ window.p3CommitSettings = function() {
   if(waS && g('p5b2b-shopwa-inp')) g('p5b2b-shopwa-inp').value = waS.value;
   if(waF && g('p5b2b-footer-inp')) g('p5b2b-footer-inp').value = waF.value;
 
+  // ── Security PIN lock settings (screen-lock PIN, separate from worker login PIN) ──
+  var pinToggle = g('settings-pin-lock-toggle');
+  if (pinToggle) {
+    if (typeof settings !== 'undefined' && settings) {
+      settings.pinLockEnabled = !!pinToggle.checked;
+    }
+  }
+  // Collect digits from the 4 PIN boxes (settings-pin-digit-1..4)
+  var pinIds = ['settings-pin-digit-1','settings-pin-digit-2',
+                'settings-pin-digit-3','settings-pin-digit-4'];
+  var pinCombined = pinIds.map(function(id){
+    var el = g(id); return (el && el.value) ? el.value.trim() : '';
+  }).join('');
+  if (/^\d{4}$/.test(pinCombined)) {
+    if (typeof settings !== 'undefined' && settings) {
+      settings.securityPin = pinCombined;
+    }
+  } else if (pinCombined === '') {
+    // All digits cleared = owner wants to remove the PIN
+    if (typeof settings !== 'undefined' && settings) {
+      delete settings.securityPin;
+    }
+  }
+
   // ── Invoke existing save functions if available ──
   if (typeof saveSettingsUI === 'function')  try { saveSettingsUI();  } catch(e) {}
   if (typeof p5aSaveGSTProfile === 'function') try { p5aSaveGSTProfile(); } catch(e) {}
   if (typeof p5aSavePrintSettings === 'function') try { p5aSavePrintSettings(); } catch(e) {}
   if (typeof p5b2bSaveConfig === 'function') try { p5b2bSaveConfig(); } catch(e) {}
+  // Persist PIN lock state to Firebase via saveSettings
+  if (typeof saveSettings === 'function') try { saveSettings(); } catch(e) {}
 
   // Close modal
   p3CloseSettingsModal();
@@ -23091,22 +23132,48 @@ var _p4a_loaded = true;
   // ───────────────────────────────────────────────────────────────────────────
 
   /**
-   * Return the current 4-digit security PIN.
-   * Priority order:
-   *   1. #settings-security-pin  (Part 3 Settings Modal live input)
-   *   2. settings.workerPin      (legacy in-memory settings object)
-   *   3. '1234'                  (safe fallback if nothing configured)
+   * Check whether the owner has explicitly ENABLED the PIN lock toggle.
+   * Returns true only when #settings-pin-lock-toggle is checked OR
+   * settings.pinLockEnabled === true (persisted value).
+   * DEFAULT = false — PIN screen NEVER appears unless owner turns it on.
+   */
+  function p4aIsPinLockEnabled() {
+    var toggleEl = document.getElementById('settings-pin-lock-toggle');
+    if (toggleEl && toggleEl.checked) return true;
+    if (typeof settings !== 'undefined' && settings && settings.pinLockEnabled === true) return true;
+    return false;
+  }
+
+  /**
+   * Return the 4-digit screen-lock PIN, or null when:
+   *   • PIN lock toggle is OFF (never configured by owner), OR
+   *   • No valid 4-digit screen-lock PIN has been saved.
+   * Returning null tells the lifecycle check to SKIP the overlay entirely.
+   *
+   * NOTE: settings.workerPin is the WORKER *login* PIN, NOT the owner
+   * screen-lock. They are intentionally kept separate.
    */
   function p4aGetConfiguredPin() {
-    var p3Input = document.getElementById('settings-security-pin');
-    if (p3Input && p3Input.value && /^\d{4}$/.test(p3Input.value.trim())) {
-      return p3Input.value.trim();
+    // Gate 1 — toggle must be explicitly ON
+    if (!p4aIsPinLockEnabled()) return null;
+
+    // Gate 2 — a real screen-lock PIN must exist
+    // Priority: dedicated settings.securityPin field
+    if (typeof settings !== 'undefined' && settings && settings.securityPin &&
+        /^\d{4}$/.test(String(settings.securityPin).trim())) {
+      return String(settings.securityPin).trim();
     }
-    if (typeof settings !== 'undefined' && settings && settings.workerPin &&
-        /^\d{4}$/.test(String(settings.workerPin).trim())) {
-      return String(settings.workerPin).trim();
-    }
-    return '1234';
+    // Fallback: live Part-3 digit inputs (settings-pin-digit-1..4)
+    var ids = ['settings-pin-digit-1','settings-pin-digit-2',
+               'settings-pin-digit-3','settings-pin-digit-4'];
+    var combined = ids.map(function(id){
+      var el = document.getElementById(id);
+      return (el && el.value) ? el.value.trim() : '';
+    }).join('');
+    if (/^\d{4}$/.test(combined)) return combined;
+
+    // No valid PIN configured — never lock the screen
+    return null;
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -23401,6 +23468,13 @@ var _p4a_loaded = true;
     var entered = _pinBuffer.join('');
     var correct = p4aGetConfiguredPin();
 
+    // If PIN lock is disabled or no PIN configured, dismiss overlay immediately
+    if (correct === null) {
+      p4aClearPinPending();
+      p4aDismissOverlay();
+      return;
+    }
+
     if (entered === correct) {
       // ✅ Correct PIN
       p4aClearPinPending();
@@ -23678,8 +23752,12 @@ var _p4a_loaded = true;
     }
 
     // App IS visible — check if we need PIN re-verification
-    if (p4aIsPinPending()) {
+    // Only show overlay if PIN lock is enabled AND a valid PIN is configured
+    if (p4aIsPinPending() && p4aIsPinLockEnabled() && p4aGetConfiguredPin() !== null) {
       p4aShowOverlay();
+    } else {
+      // PIN lock not active — clear any stale pending flag silently
+      p4aClearPinPending();
     }
   }
 
@@ -23688,8 +23766,8 @@ var _p4a_loaded = true;
    * The PIN overlay will be demanded on next focus.
    */
   function p4aOnSessionPause() {
-    // Only set pending if a valid daily token exists (i.e. user is logged in)
-    if (p4aReadDailyToken()) {
+    // Only set pending if: user is logged in AND PIN lock is explicitly enabled
+    if (p4aReadDailyToken() && p4aIsPinLockEnabled()) {
       p4aSetPinPending();
     }
   }
