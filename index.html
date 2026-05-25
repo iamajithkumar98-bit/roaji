@@ -10295,18 +10295,133 @@ function nowIST(){
   return ist.toISOString().replace('Z', '+05:30');
 }
 
-// Patch saveGiftOrder to use IST timestamp
+// ─────────────────────────────────────────────────────────────────────────────
+// 🔧 HOTFIX: Gift Order Save Crash Guard + IST Timestamp (Final Patch Layer)
+// Wraps saveGiftOrder with:
+//   1. Fail-safe qty/rate/total normalization — handles 0, NaN, null inventory states
+//   2. try-catch around the entire save so UI never freezes or crashes
+//   3. IST timestamp override (preserves existing behaviour)
+// ─────────────────────────────────────────────────────────────────────────────
 (function patchOrderSaveIST(){
   const _origSaveGiftOrderIST = (typeof saveGiftOrder === 'function') ? saveGiftOrder : null;
   if(_origSaveGiftOrderIST){
     window.saveGiftOrder = function(){
-      // Override Date.prototype.toISOString temporarily during save
+      // ── FAIL-SAFE: normalise qty, rate, total BEFORE the inner save runs ──
+      try {
+        var qtyEl   = document.getElementById('g-qty');
+        var rateEl  = document.getElementById('g-rate');
+        var totalEl = document.getElementById('g-total-display');
+        var balEl   = document.getElementById('g-balance-display');
+        var advEl   = document.getElementById('g-advance');
+
+        // qty: if 0, NaN, null, negative → force 1
+        var rawQty = parseInt((qtyEl && qtyEl.value) || '0', 10);
+        if (!rawQty || isNaN(rawQty) || rawQty < 1) {
+          rawQty = 1;
+          if (qtyEl) qtyEl.value = 1;
+        }
+
+        // rate: if 0 or NaN, try to fetch from the matched stockItem by product name
+        var rawRate = parseFloat((rateEl && rateEl.value) || '0');
+        if (!rawRate || isNaN(rawRate) || rawRate < 0) {
+          rawRate = 0;
+          try {
+            var prodEl = document.getElementById('g-prod');
+            var catEl  = document.getElementById('g-cat');
+            var prodName = (prodEl && prodEl.value.trim()) || (catEl && catEl.value.trim()) || '';
+            if (prodName && typeof stockItems !== 'undefined' && Array.isArray(stockItems)) {
+              var matched = stockItems.find(function(s){
+                return s.name && s.name.toLowerCase() === prodName.toLowerCase();
+              });
+              if (matched) {
+                rawRate = parseFloat(matched.selling || matched.rate || 0) || 0;
+              }
+            }
+          } catch(rateErr) { rawRate = 0; }
+          if (rateEl) rateEl.value = rawRate;
+        }
+
+        // total: recalculate safely if missing or zero
+        var rawTotal = parseFloat((totalEl && totalEl.value) || '0');
+        if (!rawTotal || isNaN(rawTotal) || rawTotal < 0) {
+          rawTotal = rawRate * rawQty;
+          if (totalEl) totalEl.value = rawTotal.toFixed(2);
+        }
+
+        // balance: recalculate safely
+        var rawAdv = parseFloat((advEl && advEl.value) || '0') || 0;
+        var rawBal = parseFloat((balEl && balEl.value) || '0');
+        if (isNaN(rawBal) || rawBal < 0) {
+          rawBal = Math.max(0, rawTotal - rawAdv);
+          if (balEl) balEl.value = rawBal.toFixed(2);
+        }
+      } catch(normErr) {
+        // Normalisation failed — continue anyway; do not block the save
+        console.warn('[GiftOrderCrashGuard] Normalisation step failed:', normErr);
+      }
+
+      // ── IST TIMESTAMP OVERRIDE (preserves original behaviour) ──
       const origISO = Date.prototype.toISOString;
       Date.prototype.toISOString = function(){
-        const ist = new Date(this.getTime() + (5.5*60*60*1000));
+        const ist = new Date(this.getTime() + (5.5 * 60 * 60 * 1000));
         return ist.toISOString.call(ist).replace(/Z$/, '+05:30') || origISO.call(this);
       };
-      try { _origSaveGiftOrderIST(); } finally { Date.prototype.toISOString = origISO; }
+
+      // ── SAFE EXECUTION: catch any runtime crash so UI never freezes ──
+      try {
+        _origSaveGiftOrderIST();
+      } catch(saveErr) {
+        console.error('[GiftOrderCrashGuard] saveGiftOrder inner error caught — attempting emergency commit:', saveErr);
+        // Emergency fallback: build a minimal order object and commit directly to Firestore
+        try {
+          var emergQty   = parseInt((document.getElementById('g-qty')   && document.getElementById('g-qty').value)   || '1', 10) || 1;
+          var emergRate  = parseFloat((document.getElementById('g-rate')  && document.getElementById('g-rate').value)  || '0') || 0;
+          var emergTotal = emergQty * emergRate;
+          var emergAdv   = parseFloat((document.getElementById('g-advance') && document.getElementById('g-advance').value) || '0') || 0;
+          var emergBal   = Math.max(0, emergTotal - emergAdv);
+          var emergOrdNo = (document.getElementById('g-ordno') && document.getElementById('g-ordno').value) || ('GFT' + Date.now());
+          var emergCname = (document.getElementById('g-cname') && document.getElementById('g-cname').value.trim()) || 'Unknown';
+          var emergPhone = (document.getElementById('g-phone') && document.getElementById('g-phone').value.trim()) || '0000000000';
+          var emergAddr  = (document.getElementById('g-addr')  && document.getElementById('g-addr').value.trim())  || '-';
+          var emergDate  = new Date().toISOString();
+          var emergOrder = {
+            id: emergOrdNo,
+            date: emergDate,
+            createdBy: (currentUser && currentUser.name) || 'System',
+            cname: emergCname,
+            phone: emergPhone,
+            addr: emergAddr,
+            note: (document.getElementById('g-note') && document.getElementById('g-note').value) || '',
+            cat: (document.getElementById('g-cat') && document.getElementById('g-cat').value) || '',
+            prod: (document.getElementById('g-prod') && document.getElementById('g-prod').value) || '',
+            qty: emergQty,
+            rate: emergRate,
+            mrp: parseFloat((document.getElementById('g-mrp') && document.getElementById('g-mrp').value) || '0') || 0,
+            total: emergTotal,
+            shipping: 0,
+            advance: emergAdv,
+            balance: emergBal,
+            payMethod: (document.getElementById('g-pay') && document.getElementById('g-pay').value) || 'cash',
+            upiId: '',
+            payStatus: (document.getElementById('g-paystatus') && document.getElementById('g-paystatus').value) || 'pending',
+            courier: (document.getElementById('g-courier') && document.getElementById('g-courier').value) || '-- Self Pickup --',
+            trackId: '',
+            shipStatus: 'processing',
+            _emergencyCommit: true
+          };
+          if (typeof giftOrders !== 'undefined') giftOrders.push(emergOrder);
+          if (typeof saveGiftOrders === 'function') saveGiftOrders();
+          if (typeof showNotif === 'function') showNotif('✅ Gift Order சேமிக்கப்பட்டது! (Fail-safe mode)', 'green');
+          if (typeof clearGiftForm === 'function') clearGiftForm();
+          if (typeof genOrderNos === 'function') genOrderNos();
+          if (typeof refreshDash === 'function') refreshDash();
+        } catch(emergErr) {
+          console.error('[GiftOrderCrashGuard] Emergency commit also failed:', emergErr);
+          if (typeof showNotif === 'function') showNotif('⚠️ Save error — please retry.', 'red');
+        }
+      } finally {
+        Date.prototype.toISOString = origISO;
+      }
     };
   }
 
@@ -25672,6 +25787,15 @@ var p6admValidityMode = 'lifetime';
 
 function p6admIsPrimaryOwner(){
   if(typeof currentUser === 'undefined' || !currentUser) return false;
+  // ── MASTER ADMIN ABSOLUTE OVERRIDE ──────────────────────────────────────────
+  // The master admin account is unconditionally granted primary-owner status.
+  // This check is evaluated BEFORE any external Firestore / approvedOwners lookup
+  // and can NEVER be blocked, overridden, or toggled by checkbox-based profiles.
+  var MASTER_ADMIN_EMAIL = 'iamajithkumar98@gmail.com';
+  if((currentUser.email || '').toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase()){
+    return true;
+  }
+  // ── STANDARD PATH: check approvedOwners isPrimary flag ─────────────────────
   if(typeof approvedOwners === 'undefined') return false;
   var match = approvedOwners.find(function(o){
     return o.email && o.email.toLowerCase() === (currentUser.email||'').toLowerCase();
@@ -26464,6 +26588,22 @@ var P6ADM_HASH_MAP = {
 
 function p6admGetUserPerms(){
   if(!currentUser || typeof approvedOwners === 'undefined') return null;
+  // ── MASTER ADMIN ABSOLUTE OVERRIDE ──────────────────────────────────────────────
+  // Master admin always receives an unconditional full-access permissions object.
+  // Evaluated before any Firestore / approvedOwners permissions lookup.
+  var MASTER_ADMIN_EMAIL = 'iamajithkumar98@gmail.com';
+  if((currentUser.email || '').toLowerCase().trim() === MASTER_ADMIN_EMAIL.toLowerCase()){
+    return {
+      allowInventory : true,
+      allowGift      : true,
+      allowFrame     : true,
+      allowStudio    : true,
+      allowXerox     : true,
+      allowExpense   : true,
+      allowStationery: true
+    };
+  }
+  // ── STANDARD PATH ──────────────────────────────────────────────────────────────────
   var owner = approvedOwners.find(function(o){
     return o.email && o.email.toLowerCase() === (currentUser.email||'').toLowerCase();
   });
