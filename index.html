@@ -28422,6 +28422,12 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
      ownerName: header-ல் காட்ட, ownerEmail: Firebase path-க்கு
   ───────────────────────────────────────────────────────────────────────*/
   function p3aOpenWelcome(ownerName, ownerEmail){
+    /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
+    var _MASTER = 'iamajithkumar98@gmail.com';
+    if(ownerEmail && ownerEmail.toLowerCase() === _MASTER){
+      console.log('[P3A] Master Admin — p3aOpenWelcome() BLOCKED entirely.');
+      return;
+    }
     const overlay = document.getElementById('p3a-welcome-overlay');
     if(!overlay) return;
 
@@ -29722,6 +29728,12 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
      3. PRICING OVERLAY: திரை காட்டு / மறை
      ══════════════════════════════════════════════════════════════════════ */
   function p3bOpenPricing(){
+    /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
+    const _cu5 = p3bGetCurrentUser();
+    if(_cu5 && _cu5.email && _cu5.email.toLowerCase() === P3B_MASTER_ADMIN){
+      p3bLog('Master Admin — p3bOpenPricing() BLOCKED entirely.');
+      return;
+    }
     const overlay = document.getElementById('p3b-pricing-overlay');
     if(!overlay) return;
     /* தேர்வை reset செய் */
@@ -30169,6 +30181,11 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
        (p3aCloseWelcome call ஆகும் நேரம் watch செய்)
   */
   function p3bWaitForSetupThenShowPricing(userEmail){
+    /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
+    if(!userEmail || userEmail.toLowerCase() === P3B_MASTER_ADMIN){
+      p3bLog('Master Admin — p3bWaitForSetupThenShowPricing BLOCKED.');
+      return;
+    }
     p3bFbGet('users/' + p3bSanitizeEmail(userEmail) + '/isSetupComplete')
       .then(function(isComplete){
         if(isComplete === true){
@@ -30183,7 +30200,11 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
           p3bPollForWelcomeClose();
         }
       })
-      .catch(function(){ setTimeout(p3bOpenPricing, 500); });
+      .catch(function(){
+        const _cu = p3bGetCurrentUser();
+        if(_cu && _cu.email && _cu.email.toLowerCase() === P3B_MASTER_ADMIN) return;
+        setTimeout(p3bOpenPricing, 500);
+      });
   }
 
   /*
@@ -30195,16 +30216,22 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
       const welcomeEl = document.getElementById('p3a-welcome-overlay');
       if(!welcomeEl || !welcomeEl.classList.contains('p3a-show')){
         clearInterval(pollTimer);
-        /* இரண்டு விநாடி பிறகு Pricing காட்டு */
         setTimeout(function(){
-          /* இப்போதும் client registered இல்லையா என்று மீண்டும் சோதி */
           const curUser = p3bGetCurrentUser();
           if(!curUser || !curUser.email) return;
+          /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
+          if(curUser.email.toLowerCase() === P3B_MASTER_ADMIN){
+            p3bLog('Master Admin — p3bPollForWelcomeClose pricing BLOCKED.');
+            return;
+          }
           p3bFbGet(P3B_CLIENTS_PATH + '/' + p3bSanitizeEmail(curUser.email))
             .then(function(data){
               if(!data) p3bOpenPricing();
             })
-            .catch(function(){ p3bOpenPricing(); });
+            .catch(function(){
+              /* catch-லும் master admin check */
+              if(curUser.email.toLowerCase() !== P3B_MASTER_ADMIN) p3bOpenPricing();
+            });
         }, 1200);
       }
     }, 500);
@@ -30339,6 +30366,11 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
 
       /* Regular owner: client registered ஆனாரா? */
       if(curUser.role === 'owner'){
+        /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
+        if(curUser.email && curUser.email.toLowerCase() === P3B_MASTER_ADMIN){
+          p3bLog('Master Admin session restore — pricing check SKIPPED.');
+          return;
+        }
         p3bFbGet(P3B_CLIENTS_PATH + '/' + p3bSanitizeEmail(curUser.email))
           .then(function(data){
             if(!data){
@@ -30474,7 +30506,8 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
 </html>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
-     PART V9-FIX: Login Logic Bug Fix & Master Admin Free Access
+     PART V10-FIX: Login Logic Bug Fix & Master Admin Absolute Exemption
+     ALL overlays permanently blocked for iamajithkumar98@gmail.com
      ═══════════════════════════════════════════════════════════════════════ -->
 <script>
 (function(){
@@ -30525,7 +30558,7 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
     }, 2000);
   });
 
-  [1500,3000].forEach(function(d){
+  [1500,3000,5000].forEach(function(d){
     setTimeout(function(){
       v9BlockOverlaysForMaster();
       if(v9IsMasterAdmin()){
@@ -30535,6 +30568,50 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
     }, d);
   });
 
-  console.log('[V9] Master Admin Protection Module loaded — iamajithkumar98@gmail.com');
+  /* ── loginScreen-ல் overlays இல்லை என்று உறுதி செய் ── */
+  /* Login screen visible இருக்கும்போது overlays show ஆகாமல் இருக்க */
+  document.addEventListener('DOMContentLoaded', function(){
+    /* Login screen-ல் overlays monitor செய் */
+    var OVERLAY_IDS = ['p3a-welcome-overlay','p3b-pricing-overlay','p3b-checkout-overlay'];
+    var loginScreenEl = document.getElementById('loginScreen');
+
+    /* loginScreen visible ஆக இருக்கும்போது overlays force-hide */
+    function v9EnsureOverlaysHiddenOnLogin(){
+      if(!loginScreenEl) return;
+      var loginVisible = (loginScreenEl.style.display !== 'none' && loginScreenEl.style.display !== '');
+      /* loginScreen flex/block ஆக இருந்தால் overlays மறை */
+      if(loginVisible || !document.getElementById('appScreen') ||
+         document.getElementById('appScreen').style.display === 'none'){
+        OVERLAY_IDS.forEach(function(id){
+          var el = document.getElementById(id);
+          if(el && (el.classList.contains('p3a-show') || el.classList.contains('p3b-show') ||
+                    el.style.display === 'flex')){
+            el.style.display = 'none';
+            el.classList.remove('p3a-show','p3b-show','active');
+          }
+        });
+      }
+    }
+
+    /* Interval-ல் check செய் — login screen-ல் overlays வராமல் */
+    var loginGuardInterval = setInterval(function(){
+      var appEl = document.getElementById('appScreen');
+      if(appEl && appEl.style.display !== 'none'){
+        /* App loaded — இனி login guard தேவையில்லை */
+        clearInterval(loginGuardInterval);
+        return;
+      }
+      v9EnsureOverlaysHiddenOnLogin();
+    }, 300);
+
+    /* 30 வினாடிகளுக்கு பிறகு interval நிறுத்து */
+    setTimeout(function(){ clearInterval(loginGuardInterval); }, 30000);
+  });
+
+  console.log('[V10] Master Admin Absolute Exemption Module loaded — iamajithkumar98@gmail.com');
+  console.log('[V10] ✅ Welcome overlay — BLOCKED for master admin');
+  console.log('[V10] ✅ Pricing overlay — BLOCKED for master admin');
+  console.log('[V10] ✅ Login screen — overlays hidden before login');
+  console.log('[V10] ✅ New users only — overlays shown after login for non-master');
 })();
 </script>
