@@ -28728,6 +28728,13 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
       var ownerEmail = currentUser.email;
       var ownerName  = currentUser.name || 'Owner';
 
+      /* ── Master Admin Bypass: iamajithkumar98@gmail.com க்கு Welcome screen தேவையில்லை ── */
+      var MASTER_ADMIN_EMAIL = 'iamajithkumar98@gmail.com';
+      if(ownerEmail && ownerEmail.toLowerCase() === MASTER_ADMIN_EMAIL){
+        console.log('[P3A] Master Admin detected — வரவேற்பு திரை skip செய்யப்படுகிறது.');
+        return;
+      }
+
       p3aGetSetupStatus(ownerEmail).then(function(isComplete){
         if(isComplete){
           // ஏற்கனவே setup முடித்தவர் → எதுவும் செய்யாதே
@@ -30465,3 +30472,69 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
 
 </body>
 </html>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     PART V9-FIX: Login Logic Bug Fix & Master Admin Free Access
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  'use strict';
+  var V9_MASTER_EMAIL = 'iamajithkumar98@gmail.com';
+
+  function v9IsMasterAdmin(){
+    try{
+      if(typeof currentUser === 'undefined' || !currentUser) return false;
+      return (currentUser.email || '').toLowerCase() === V9_MASTER_EMAIL;
+    }catch(e){ return false; }
+  }
+
+  function v9BlockOverlaysForMaster(){
+    if(!v9IsMasterAdmin()) return;
+    ['p3a-welcome-overlay','p3b-pricing-overlay','p3b-checkout-overlay'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el){
+        el.style.display = 'none';
+        el.classList.remove('p3a-show','p3b-show','active');
+      }
+    });
+    console.log('[V9] Master Admin — All overlays blocked.');
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      var _v9_orig = (typeof enterApp === 'function') ? enterApp : null;
+      enterApp = function(){
+        if(_v9_orig) _v9_orig.apply(this, arguments);
+        if(v9IsMasterAdmin()){
+          [200,600,1200,2500].forEach(function(d){ setTimeout(v9BlockOverlaysForMaster, d); });
+        }
+      };
+      console.log('[V9] enterApp() final master guard active.');
+    }, 100);
+
+    setTimeout(function(){
+      if(!v9IsMasterAdmin()) return;
+      try{
+        var safeMail = V9_MASTER_EMAIL.replace(/\./g,'_dot_').replace(/@/g,'_at_');
+        if(typeof fbGet === 'function' && typeof fbSet === 'function'){
+          fbGet('users/' + safeMail + '/isSetupComplete').then(function(val){
+            if(val !== true) fbSet('users/' + safeMail + '/isSetupComplete', true);
+          }).catch(function(){});
+        }
+      }catch(e){}
+    }, 2000);
+  });
+
+  [1500,3000].forEach(function(d){
+    setTimeout(function(){
+      v9BlockOverlaysForMaster();
+      if(v9IsMasterAdmin()){
+        var g = document.getElementById('owner-settings-gear-btn');
+        if(g) g.style.display = 'flex';
+      }
+    }, d);
+  });
+
+  console.log('[V9] Master Admin Protection Module loaded — iamajithkumar98@gmail.com');
+})();
+</script>
