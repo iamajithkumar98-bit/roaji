@@ -30530,113 +30530,268 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
 </body>
 </html>
 
-<!-- ═══════════════════════════════════════════════════════════════════════
-     PART V10-FIX: Login Logic Bug Fix & Master Admin Absolute Exemption
-     ALL overlays permanently blocked for iamajithkumar98@gmail.com
-     ═══════════════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PART V12-FIX: முதன்மை அட்மின் முழு விலக்கு — இறுதி திருத்தம்
+     ─────────────────────────────────────────────────────────────────────────
+     பிழை விவரம்:
+       V10 script-ல் enterApp() wrap DOMContentLoaded + 100ms delay-ல்
+       நடந்தது. ஆனால் p3aOpenWelcome() மற்றும் p3bWaitForSetupThenShowPricing()
+       ஆகியவை admin email-ஐ சரியாகச் சரிபார்க்காமல் overlays காட்டின.
+       குறிப்பாக p3bWaitForSetupThenShowPricing() function-ல் catch block
+       master admin check இன்றி p3bOpenPricing() call செய்தது — இதுவே பிழை.
+
+     தீர்வு (V12):
+       1. enterApp() — SYNCHRONOUS wrap (DOMContentLoaded தேவையில்லை):
+          Script parse ஆகும் நேரத்திலேயே wrap செய்கிறோம்.
+       2. p3aOpenWelcome() — direct override: master admin என்றால் return.
+       3. p3bOpenPricing() — direct override: master admin என்றால் return.
+       4. p3bWaitForSetupThenShowPricing() — direct override: master admin
+          என்றால் உடனே return (catch block பிழையும் சரி).
+       5. MutationObserver — overlays DOM-ல் தோன்றும்போது force-hide.
+       6. Firebase isSetupComplete — master admin-க்கு true எழுது (ஒருமுறை).
+       7. Periodic sweep — 10 விநாடிக்கு ஒரு முறை overlays மறை.
+     ═══════════════════════════════════════════════════════════════════════════ -->
 <script>
 (function(){
   'use strict';
-  var V9_MASTER_EMAIL = 'iamajithkumar98@gmail.com';
 
-  function v9IsMasterAdmin(){
+  /* ══════════════════════════════════════════════════════
+     § 0. மாறிலி — முதன்மை அட்மின் மின்னஞ்சல்
+  ══════════════════════════════════════════════════════ */
+  var V12_MASTER = 'iamajithkumar98@gmail.com';
+  var V12_OVERLAY_IDS = ['p3a-welcome-overlay','p3b-pricing-overlay','p3b-checkout-overlay'];
+
+  /* ══════════════════════════════════════════════════════
+     § 1. உதவி: தற்போதைய user master admin-ஆ?
+  ══════════════════════════════════════════════════════ */
+  function v12IsMaster(){
     try{
       if(typeof currentUser === 'undefined' || !currentUser) return false;
-      return (currentUser.email || '').toLowerCase() === V9_MASTER_EMAIL;
+      return (currentUser.email || '').toLowerCase().trim() === V12_MASTER;
     }catch(e){ return false; }
   }
 
-  function v9BlockOverlaysForMaster(){
-    if(!v9IsMasterAdmin()) return;
-    ['p3a-welcome-overlay','p3b-pricing-overlay','p3b-checkout-overlay'].forEach(function(id){
+  /* ══════════════════════════════════════════════════════
+     § 2. Overlays force-hide (DOM element-ஐ மறை)
+  ══════════════════════════════════════════════════════ */
+  function v12HideAllOverlays(){
+    V12_OVERLAY_IDS.forEach(function(id){
       var el = document.getElementById(id);
-      if(el){
-        el.style.display = 'none';
-        el.classList.remove('p3a-show','p3b-show','active');
-      }
+      if(!el) return;
+      el.style.cssText += ';display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;z-index:-9999!important;';
+      el.classList.remove('p3a-show','p3b-show','active','show');
     });
-    console.log('[V9] Master Admin — All overlays blocked.');
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){
-      var _v9_orig = (typeof enterApp === 'function') ? enterApp : null;
-      enterApp = function(){
-        if(_v9_orig) _v9_orig.apply(this, arguments);
-        if(v9IsMasterAdmin()){
-          [200,600,1200,2500].forEach(function(d){ setTimeout(v9BlockOverlaysForMaster, d); });
-        }
-      };
-      console.log('[V9] enterApp() final master guard active.');
-    }, 100);
-
-    setTimeout(function(){
-      if(!v9IsMasterAdmin()) return;
-      try{
-        var safeMail = V9_MASTER_EMAIL.replace(/\./g,'_dot_').replace(/@/g,'_at_');
-        if(typeof fbGet === 'function' && typeof fbSet === 'function'){
-          fbGet('users/' + safeMail + '/isSetupComplete').then(function(val){
-            if(val !== true) fbSet('users/' + safeMail + '/isSetupComplete', true);
-          }).catch(function(){});
-        }
-      }catch(e){}
-    }, 2000);
-  });
-
-  [1500,3000,5000].forEach(function(d){
-    setTimeout(function(){
-      v9BlockOverlaysForMaster();
-      if(v9IsMasterAdmin()){
-        var g = document.getElementById('owner-settings-gear-btn');
-        if(g) g.style.display = 'flex';
-      }
-    }, d);
-  });
-
-  /* ── loginScreen-ல் overlays இல்லை என்று உறுதி செய் ── */
-  /* Login screen visible இருக்கும்போது overlays show ஆகாமல் இருக்க */
-  document.addEventListener('DOMContentLoaded', function(){
-    /* Login screen-ல் overlays monitor செய் */
-    var OVERLAY_IDS = ['p3a-welcome-overlay','p3b-pricing-overlay','p3b-checkout-overlay'];
-    var loginScreenEl = document.getElementById('loginScreen');
-
-    /* loginScreen visible ஆக இருக்கும்போது overlays force-hide */
-    function v9EnsureOverlaysHiddenOnLogin(){
-      if(!loginScreenEl) return;
-      var loginVisible = (loginScreenEl.style.display !== 'none' && loginScreenEl.style.display !== '');
-      /* loginScreen flex/block ஆக இருந்தால் overlays மறை */
-      if(loginVisible || !document.getElementById('appScreen') ||
-         document.getElementById('appScreen').style.display === 'none'){
-        OVERLAY_IDS.forEach(function(id){
-          var el = document.getElementById(id);
-          if(el && (el.classList.contains('p3a-show') || el.classList.contains('p3b-show') ||
-                    el.style.display === 'flex')){
-            el.style.display = 'none';
-            el.classList.remove('p3a-show','p3b-show','active');
-          }
+  /* ══════════════════════════════════════════════════════
+     § 3. enterApp() — IMMEDIATE synchronous wrap
+          (DOMContentLoaded தேவையில்லை — script parse நேரத்திலேயே)
+  ══════════════════════════════════════════════════════ */
+  (function v12WrapEnterApp(){
+    if(typeof enterApp !== 'function'){ return; }
+    if(enterApp._v12Patched){ return; }
+    var _orig = enterApp;
+    enterApp = function(){
+      /* 1. அனைத்து பழைய enterApp logic முதலில் இயங்கட்டும் */
+      _orig.apply(this, arguments);
+      /* 2. Master admin என்றால் overlays உடனே தடு */
+      if(v12IsMaster()){
+        /* உடனடி hide */
+        v12HideAllOverlays();
+        /* gear button காட்டு */
+        var gear = document.getElementById('owner-settings-gear-btn');
+        if(gear) gear.style.display = 'flex';
+        /* தாமதமான hide (async Firebase calls பிறகும் overlays வராமல்) */
+        [100,300,600,1000,1800,3000,5000].forEach(function(d){
+          setTimeout(v12HideAllOverlays, d);
         });
+        /* Firebase: isSetupComplete = true — overlays trigger ஆகாமல் */
+        setTimeout(function(){
+          try{
+            var safeMail = V12_MASTER.replace(/\./g,'_dot_').replace(/@/g,'_at_');
+            if(typeof fbGet==='function' && typeof fbSet==='function'){
+              fbGet('users/'+safeMail+'/isSetupComplete').then(function(val){
+                if(val !== true) return fbSet('users/'+safeMail+'/isSetupComplete', true);
+              }).catch(function(){
+                try{ fbSet('users/'+safeMail+'/isSetupComplete', true); }catch(e){}
+              });
+            }
+          }catch(e){}
+        }, 800);
+        console.log('[V12] ✅ Master Admin login — Welcome & Pricing overlays தடுக்கப்பட்டன.');
       }
-    }
+    };
+    enterApp._v12Patched = true;
+    console.log('[V12] enterApp() — V12 master guard wrap பிணைக்கப்பட்டது (synchronous).');
+  })();
 
-    /* Interval-ல் check செய் — login screen-ல் overlays வராமல் */
-    var loginGuardInterval = setInterval(function(){
-      var appEl = document.getElementById('appScreen');
-      if(appEl && appEl.style.display !== 'none'){
-        /* App loaded — இனி login guard தேவையில்லை */
-        clearInterval(loginGuardInterval);
+  /* ══════════════════════════════════════════════════════
+     § 4. p3aOpenWelcome() — Direct override
+          (Welcome overlay function-ஐயே தடு)
+  ══════════════════════════════════════════════════════ */
+  (function v12PatchP3aOpenWelcome(){
+    var _origFn = (typeof window.p3aOpenWelcome === 'function') ? window.p3aOpenWelcome : null;
+    window.p3aOpenWelcome = function(ownerName, ownerEmail){
+      /* master admin email-ஐ நேரடியாக சரிபார்க்கிறோம் */
+      var mail = (ownerEmail || '').toLowerCase().trim();
+      if(mail === V12_MASTER || v12IsMaster()){
+        console.log('[V12] p3aOpenWelcome() — Master Admin-க்கு Welcome overlay BLOCKED.');
+        return; /* உடனே திரும்பு — overlay திறக்காதே */
+      }
+      if(_origFn) _origFn.apply(this, arguments);
+    };
+    /* function define ஆகாவிட்டால் DOMContentLoaded-ல் மீண்டும் முயல் */
+    if(!_origFn){
+      document.addEventListener('DOMContentLoaded', function(){
+        setTimeout(v12PatchP3aOpenWelcome, 50);
+      });
+    }
+  })();
+
+  /* ══════════════════════════════════════════════════════
+     § 5. p3bOpenPricing() — Direct override
+          (Pricing overlay function-ஐயே தடு)
+  ══════════════════════════════════════════════════════ */
+  (function v12PatchP3bOpenPricing(){
+    var _origFn = (typeof window.p3bOpenPricing === 'function') ? window.p3bOpenPricing : null;
+    window.p3bOpenPricing = function(){
+      if(v12IsMaster()){
+        console.log('[V12] p3bOpenPricing() — Master Admin-க்கு Pricing overlay BLOCKED.');
         return;
       }
-      v9EnsureOverlaysHiddenOnLogin();
-    }, 300);
+      if(_origFn) _origFn.apply(this, arguments);
+    };
+    if(!_origFn){
+      document.addEventListener('DOMContentLoaded', function(){
+        setTimeout(v12PatchP3bOpenPricing, 50);
+      });
+    }
+  })();
 
-    /* 30 வினாடிகளுக்கு பிறகு interval நிறுத்து */
-    setTimeout(function(){ clearInterval(loginGuardInterval); }, 30000);
+  /* ══════════════════════════════════════════════════════
+     § 6. p3bWaitForSetupThenShowPricing() — Direct override
+          (இந்த function-தான் V10-ல் catch block பிழை ஏற்படுத்தியது)
+  ══════════════════════════════════════════════════════ */
+  (function v12PatchP3bWait(){
+    var _origFn = (typeof window.p3bWaitForSetupThenShowPricing === 'function')
+                    ? window.p3bWaitForSetupThenShowPricing : null;
+    window.p3bWaitForSetupThenShowPricing = function(userEmail){
+      /* Master admin email வந்தால் — எந்தவொரு pricing overlay-உம் வேண்டாம் */
+      var mail = (userEmail || '').toLowerCase().trim();
+      if(mail === V12_MASTER || v12IsMaster()){
+        console.log('[V12] p3bWaitForSetupThenShowPricing() — Master Admin-க்கு BLOCKED.');
+        return;
+      }
+      if(_origFn) _origFn.apply(this, arguments);
+    };
+    if(!_origFn){
+      document.addEventListener('DOMContentLoaded', function(){
+        setTimeout(v12PatchP3bWait, 50);
+      });
+    }
+  })();
+
+  /* ══════════════════════════════════════════════════════
+     § 7. MutationObserver — overlays DOM-ல் தோன்றினால் உடனே மறை
+          (எந்த async path-லும் overlay வந்தாலும் பிடிக்கும்)
+  ══════════════════════════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', function(){
+
+    function v12ObserveOverlays(){
+      var observer = new MutationObserver(function(){
+        if(!v12IsMaster()) return;
+        var needsHide = false;
+        V12_OVERLAY_IDS.forEach(function(id){
+          var el = document.getElementById(id);
+          if(!el) return;
+          var isVisible = el.classList.contains('p3a-show') ||
+                          el.classList.contains('p3b-show') ||
+                          el.classList.contains('active') ||
+                          (el.style.display && el.style.display !== 'none');
+          if(isVisible) needsHide = true;
+        });
+        if(needsHide){
+          v12HideAllOverlays();
+          console.log('[V12] MutationObserver — overlay detected & blocked for Master Admin.');
+        }
+      });
+      observer.observe(document.body, { childList:true, subtree:true, attributes:true, attributeFilter:['class','style'] });
+    }
+
+    v12ObserveOverlays();
+
+    /* ── DOMContentLoaded-ல் enterApp re-wrap (session restore path-க்கு) ── */
+    setTimeout(function(){
+      if(typeof enterApp === 'function' && !enterApp._v12Patched){
+        var _orig2 = enterApp;
+        enterApp = function(){
+          _orig2.apply(this, arguments);
+          if(v12IsMaster()){
+            v12HideAllOverlays();
+            [100,300,600,1200,2500].forEach(function(d){ setTimeout(v12HideAllOverlays,d); });
+          }
+        };
+        enterApp._v12Patched = true;
+        console.log('[V12] enterApp() — DOMContentLoaded re-wrap (session restore guard).');
+      }
+    }, 0);
+
+    /* ── function overrides DOMContentLoaded-ல் உறுதிப்படுத்து ── */
+    setTimeout(function(){
+      /* p3aOpenWelcome re-patch */
+      if(typeof window.p3aOpenWelcome === 'function' && !window.p3aOpenWelcome._v12){
+        var _ow = window.p3aOpenWelcome;
+        window.p3aOpenWelcome = function(on, oe){
+          if((oe||'').toLowerCase().trim()===V12_MASTER||v12IsMaster()){return;}
+          _ow.apply(this,arguments);
+        };
+        window.p3aOpenWelcome._v12 = true;
+      }
+      /* p3bOpenPricing re-patch */
+      if(typeof window.p3bOpenPricing === 'function' && !window.p3bOpenPricing._v12){
+        var _op = window.p3bOpenPricing;
+        window.p3bOpenPricing = function(){
+          if(v12IsMaster()){return;}
+          _op.apply(this,arguments);
+        };
+        window.p3bOpenPricing._v12 = true;
+      }
+      /* p3bWaitForSetupThenShowPricing re-patch */
+      if(typeof window.p3bWaitForSetupThenShowPricing === 'function' && !window.p3bWaitForSetupThenShowPricing._v12){
+        var _ws = window.p3bWaitForSetupThenShowPricing;
+        window.p3bWaitForSetupThenShowPricing = function(ue){
+          if((ue||'').toLowerCase().trim()===V12_MASTER||v12IsMaster()){return;}
+          _ws.apply(this,arguments);
+        };
+        window.p3bWaitForSetupThenShowPricing._v12 = true;
+      }
+      console.log('[V12] DOMContentLoaded — அனைத்து function overrides உறுதிப்படுத்தப்பட்டன.');
+    }, 200);
+
+    /* ── Periodic sweep — 10 விநாடிக்கு ஒரு முறை (fail-safe) ── */
+    var v12SweepCount = 0;
+    var v12SweepTimer = setInterval(function(){
+      v12SweepCount++;
+      if(v12SweepCount > 20){ clearInterval(v12SweepTimer); return; } /* 200 விநாடிக்கு பிறகு நிறுத்து */
+      if(v12IsMaster()) v12HideAllOverlays();
+    }, 10000);
+
   });
 
-  console.log('[V10] Master Admin Absolute Exemption Module loaded — iamajithkumar98@gmail.com');
-  console.log('[V10] ✅ Welcome overlay — BLOCKED for master admin');
-  console.log('[V10] ✅ Pricing overlay — BLOCKED for master admin');
-  console.log('[V10] ✅ Login screen — overlays hidden before login');
-  console.log('[V10] ✅ New users only — overlays shown after login for non-master');
+  /* ══════════════════════════════════════════════════════
+     § 8. Console சான்றிதழ்
+  ══════════════════════════════════════════════════════ */
+  console.log('╔══════════════════════════════════════════════════════════╗');
+  console.log('║  ROAJI V12-FIX — Master Admin Absolute Exemption Guard  ║');
+  console.log('╠══════════════════════════════════════════════════════════╣');
+  console.log('║  Master Admin : iamajithkumar98@gmail.com               ║');
+  console.log('║  [§3] enterApp()                    — Synchronous wrap  ║');
+  console.log('║  [§4] p3aOpenWelcome()              — Welcome BLOCKED   ║');
+  console.log('║  [§5] p3bOpenPricing()              — Pricing BLOCKED   ║');
+  console.log('║  [§6] p3bWaitForSetupThenShowPricing() — BLOCKED       ║');
+  console.log('║  [§7] MutationObserver              — Real-time block   ║');
+  console.log('║  Firebase: isSetupComplete=true     — Auto-set          ║');
+  console.log('╚══════════════════════════════════════════════════════════╝');
+
 })();
 </script>
