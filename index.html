@@ -12577,7 +12577,11 @@ async function u25CheckDualAuth(context, callback){
   if(_u25AuthPass) { callback(); return; }
 
   // Check if dual auth is enabled in settings
-  if(typeof settings !== 'undefined' && settings.u25DualAuthEnabled === false){
+  // V11: Default-ஆக disabled — பயனர் manually enable செய்யும்வரை skip
+  if(typeof settings === 'undefined' || !settings ||
+     settings.u25DualAuthEnabled === false ||
+     settings.u25DualAuthEnabled === undefined ||
+     settings.u25DualAuthEnabled === null){
     callback();
     return;
   }
@@ -23288,6 +23292,11 @@ var _p4a_loaded = true;
    * Populates the user name pill from currentUser or the daily token.
    */
   function p4aShowOverlay() {
+    /* V11: PIN lock disabled — overlay காட்டாதே */
+    if (!window._p4aPinLockEnabled) {
+      console.log('[P4A-V11] PIN overlay blocked — PIN lock disabled.');
+      return;
+    }
     p4aInjectPinOverlay();
     p4aResetPinBuffer();
     _pinBlocked = false;
@@ -23472,7 +23481,15 @@ var _p4a_loaded = true;
    *   B) Daily token valid + pin NOT pending → re-hydrate user silently and let app run
    *   C) Daily token valid + pin pending → show PIN overlay
    */
+  /* ── V11: Global PIN lock disable flag ── */
+  window._p4aPinLockEnabled = false; /* true ஆக மாற்றும்போது PIN lock இயங்கும் */
+
   function p4aLifecycleCheck() {
+    /* V11: PIN lock disable ஆக இருந்தால் skip செய் */
+    if (!window._p4aPinLockEnabled) {
+      console.log('[P4A-V11] Lifecycle check skipped — PIN lock disabled.');
+      return;
+    }
     // Skip check if app is hidden (avoids spurious trigger on blur → focus)
     if (document.hidden) return;
 
@@ -23532,6 +23549,8 @@ var _p4a_loaded = true;
    * The PIN overlay will be demanded on next focus.
    */
   function p4aOnSessionPause() {
+    /* V11: PIN lock disabled — session pause-ல் PIN pending set ஆகாது */
+    if (!window._p4aPinLockEnabled) return;
     // Only set pending if a valid daily token exists (i.e. user is logged in)
     if (p4aReadDailyToken()) {
       p4aSetPinPending();
@@ -23543,18 +23562,33 @@ var _p4a_loaded = true;
   // ───────────────────────────────────────────────────────────────────────────
 
   function p4aBoot() {
-    // 1. Wire form toggle links
-    p4aWireFormToggles();
+    /*
+     * ══════════════════════════════════════════════════════════════════
+     * V11 DISABLE: PIN Lock system தற்காலிகமாக முடக்கப்பட்டுள்ளது.
+     * காரணம்: பயனர் manually enable செய்யும்வரை PIN screen வரக்கூடாது.
+     * Settings-ல் PIN feature enable செய்தால் மட்டுமே செயல்படும்.
+     *
+     * DISABLED:
+     *   • p4aLifecycleCheck() — page load PIN check
+     *   • visibilitychange / focus / blur PIN listeners
+     *   • p4aOnSessionPause() — tab switch PIN trigger
+     *
+     * KEPT ACTIVE (safe):
+     *   • p4aWireFormToggles() — login form toggle links
+     *   • p4aWireLogoutButton() — logout button wiring
+     *   • p4aPatchEnterApp() — daily token write (session tracking)
+     *   • p4aPatchDoLogout() — token clear on logout
+     * ══════════════════════════════════════════════════════════════════
+     */
 
-    // 2. Wire logout button (if present in DOM at this point)
+    // Form toggle links — இவை PIN system-க்கு தொடர்பில்லாதவை, safe
+    p4aWireFormToggles();
     p4aWireLogoutButton();
 
-    // 3. Attempt to patch enterApp / doLogout — retry if not yet defined
+    // enterApp / doLogout patching — daily token மட்டும் (PIN overlay இல்லை)
     var enterPatched  = p4aPatchEnterApp();
     var logoutPatched = p4aPatchDoLogout();
-
     if (!enterPatched || !logoutPatched) {
-      // Functions not yet available (script order); retry up to 20× at 250ms
       var attempts = 0;
       var retryTimer = setInterval(function () {
         attempts++;
@@ -23566,26 +23600,17 @@ var _p4a_loaded = true;
       }, 250);
     }
 
-    // 4. Wire visibility / focus listeners for PIN enforcement
+    /* ── PIN Lock Events — DISABLED (பயனர் enable செய்யும்வரை) ──
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden) {
-        p4aOnSessionPause();
-      } else {
-        // Small delay — let the DOM settle after browser restores the tab
-        setTimeout(p4aLifecycleCheck, 80);
-      }
+      if (document.hidden) { p4aOnSessionPause(); }
+      else { setTimeout(p4aLifecycleCheck, 80); }
     });
-
-    window.addEventListener('focus', function () {
-      setTimeout(p4aLifecycleCheck, 80);
-    });
-
-    window.addEventListener('blur', function () {
-      p4aOnSessionPause();
-    });
-
-    // 5. Initial lifecycle check (handles page-load & refresh scenarios)
+    window.addEventListener('focus', function () { setTimeout(p4aLifecycleCheck, 80); });
+    window.addEventListener('blur',  function () { p4aOnSessionPause(); });
     p4aLifecycleCheck();
+    ── END DISABLED ── */
+
+    console.log('[P4A-V11] PIN Lock System முடக்கப்பட்டுள்ளது. Settings-ல் enable செய்யவும்.');
   }
 
   // ───────────────────────────────────────────────────────────────────────────
