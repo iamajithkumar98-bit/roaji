@@ -28396,6 +28396,20 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
      Firebase: owner-க்கான isSetupComplete flag படி
   ───────────────────────────────────────────────────────────────────────*/
   async function p3aGetSetupStatus(ownerEmail){
+    /* ══ MASTER ADMIN HARDCODED BYPASS ══
+       iamajithkumar98@gmail.com-க்கு Firebase check இல்லாமலே
+       எப்போதும் true திரும்பும் — Welcome screen வராது. */
+    var _MA = 'iamajithkumar98@gmail.com';
+    if(ownerEmail && ownerEmail.toLowerCase().trim() === _MA){
+      console.log('[P3A-V12] Master Admin — isSetupComplete forced TRUE (no Firebase check).');
+      try{
+        const _safeMail = p3aSanitizeEmail(ownerEmail);
+        fbGet('users/' + _safeMail + '/isSetupComplete').then(function(val){
+          if(val !== true) fbSet('users/' + _safeMail + '/isSetupComplete', true);
+        }).catch(function(){});
+      }catch(e){}
+      return true;
+    }
     try{
       const safeMail = p3aSanitizeEmail(ownerEmail);
       const val = await fbGet('users/' + safeMail + '/isSetupComplete');
@@ -30167,6 +30181,9 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
         /* ── Regular Owner: Pricing check ── */
         if(userRole !== 'owner') return;
 
+        /* ══ V12-FIX: Master Admin-க்கு pricing check வேண்டாம் ══ */
+        if(userEmail && userEmail.toLowerCase().trim() === P3B_MASTER_ADMIN) return;
+
         /* registered_clients-ல் இந்த user இருக்கிறாரா? */
         p3bFbGet(P3B_CLIENTS_PATH + '/' + p3bSanitizeEmail(userEmail))
           .then(function(clientData){
@@ -30226,8 +30243,10 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
         }
       })
       .catch(function(){
+        /* ══ V12-FIX: catch-லும் master admin check — இதுதான் V10-ல் பிழை ══ */
         const _cu = p3bGetCurrentUser();
         if(_cu && _cu.email && _cu.email.toLowerCase() === P3B_MASTER_ADMIN) return;
+        if(!_cu || !_cu.email) return; /* user இல்லாவிட்டால் pricing வேண்டாம் */
         setTimeout(p3bOpenPricing, 500);
       });
   }
