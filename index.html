@@ -12577,11 +12577,7 @@ async function u25CheckDualAuth(context, callback){
   if(_u25AuthPass) { callback(); return; }
 
   // Check if dual auth is enabled in settings
-  // V11: Default-ஆக disabled — பயனர் manually enable செய்யும்வரை skip
-  if(typeof settings === 'undefined' || !settings ||
-     settings.u25DualAuthEnabled === false ||
-     settings.u25DualAuthEnabled === undefined ||
-     settings.u25DualAuthEnabled === null){
+  if(typeof settings !== 'undefined' && settings.u25DualAuthEnabled === false){
     callback();
     return;
   }
@@ -23292,11 +23288,6 @@ var _p4a_loaded = true;
    * Populates the user name pill from currentUser or the daily token.
    */
   function p4aShowOverlay() {
-    /* V11: PIN lock disabled — overlay காட்டாதே */
-    if (!window._p4aPinLockEnabled) {
-      console.log('[P4A-V11] PIN overlay blocked — PIN lock disabled.');
-      return;
-    }
     p4aInjectPinOverlay();
     p4aResetPinBuffer();
     _pinBlocked = false;
@@ -23481,15 +23472,7 @@ var _p4a_loaded = true;
    *   B) Daily token valid + pin NOT pending → re-hydrate user silently and let app run
    *   C) Daily token valid + pin pending → show PIN overlay
    */
-  /* ── V11: Global PIN lock disable flag ── */
-  window._p4aPinLockEnabled = false; /* true ஆக மாற்றும்போது PIN lock இயங்கும் */
-
   function p4aLifecycleCheck() {
-    /* V11: PIN lock disable ஆக இருந்தால் skip செய் */
-    if (!window._p4aPinLockEnabled) {
-      console.log('[P4A-V11] Lifecycle check skipped — PIN lock disabled.');
-      return;
-    }
     // Skip check if app is hidden (avoids spurious trigger on blur → focus)
     if (document.hidden) return;
 
@@ -23549,8 +23532,6 @@ var _p4a_loaded = true;
    * The PIN overlay will be demanded on next focus.
    */
   function p4aOnSessionPause() {
-    /* V11: PIN lock disabled — session pause-ல் PIN pending set ஆகாது */
-    if (!window._p4aPinLockEnabled) return;
     // Only set pending if a valid daily token exists (i.e. user is logged in)
     if (p4aReadDailyToken()) {
       p4aSetPinPending();
@@ -23562,33 +23543,18 @@ var _p4a_loaded = true;
   // ───────────────────────────────────────────────────────────────────────────
 
   function p4aBoot() {
-    /*
-     * ══════════════════════════════════════════════════════════════════
-     * V11 DISABLE: PIN Lock system தற்காலிகமாக முடக்கப்பட்டுள்ளது.
-     * காரணம்: பயனர் manually enable செய்யும்வரை PIN screen வரக்கூடாது.
-     * Settings-ல் PIN feature enable செய்தால் மட்டுமே செயல்படும்.
-     *
-     * DISABLED:
-     *   • p4aLifecycleCheck() — page load PIN check
-     *   • visibilitychange / focus / blur PIN listeners
-     *   • p4aOnSessionPause() — tab switch PIN trigger
-     *
-     * KEPT ACTIVE (safe):
-     *   • p4aWireFormToggles() — login form toggle links
-     *   • p4aWireLogoutButton() — logout button wiring
-     *   • p4aPatchEnterApp() — daily token write (session tracking)
-     *   • p4aPatchDoLogout() — token clear on logout
-     * ══════════════════════════════════════════════════════════════════
-     */
-
-    // Form toggle links — இவை PIN system-க்கு தொடர்பில்லாதவை, safe
+    // 1. Wire form toggle links
     p4aWireFormToggles();
+
+    // 2. Wire logout button (if present in DOM at this point)
     p4aWireLogoutButton();
 
-    // enterApp / doLogout patching — daily token மட்டும் (PIN overlay இல்லை)
+    // 3. Attempt to patch enterApp / doLogout — retry if not yet defined
     var enterPatched  = p4aPatchEnterApp();
     var logoutPatched = p4aPatchDoLogout();
+
     if (!enterPatched || !logoutPatched) {
+      // Functions not yet available (script order); retry up to 20× at 250ms
       var attempts = 0;
       var retryTimer = setInterval(function () {
         attempts++;
@@ -23600,17 +23566,26 @@ var _p4a_loaded = true;
       }, 250);
     }
 
-    /* ── PIN Lock Events — DISABLED (பயனர் enable செய்யும்வரை) ──
+    // 4. Wire visibility / focus listeners for PIN enforcement
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden) { p4aOnSessionPause(); }
-      else { setTimeout(p4aLifecycleCheck, 80); }
+      if (document.hidden) {
+        p4aOnSessionPause();
+      } else {
+        // Small delay — let the DOM settle after browser restores the tab
+        setTimeout(p4aLifecycleCheck, 80);
+      }
     });
-    window.addEventListener('focus', function () { setTimeout(p4aLifecycleCheck, 80); });
-    window.addEventListener('blur',  function () { p4aOnSessionPause(); });
-    p4aLifecycleCheck();
-    ── END DISABLED ── */
 
-    console.log('[P4A-V11] PIN Lock System முடக்கப்பட்டுள்ளது. Settings-ல் enable செய்யவும்.');
+    window.addEventListener('focus', function () {
+      setTimeout(p4aLifecycleCheck, 80);
+    });
+
+    window.addEventListener('blur', function () {
+      p4aOnSessionPause();
+    });
+
+    // 5. Initial lifecycle check (handles page-load & refresh scenarios)
+    p4aLifecycleCheck();
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -28396,20 +28371,6 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
      Firebase: owner-க்கான isSetupComplete flag படி
   ───────────────────────────────────────────────────────────────────────*/
   async function p3aGetSetupStatus(ownerEmail){
-    /* ══ MASTER ADMIN HARDCODED BYPASS ══
-       iamajithkumar98@gmail.com-க்கு Firebase check இல்லாமலே
-       எப்போதும் true திரும்பும் — Welcome screen வராது. */
-    var _MA = 'iamajithkumar98@gmail.com';
-    if(ownerEmail && ownerEmail.toLowerCase().trim() === _MA){
-      console.log('[P3A-V12] Master Admin — isSetupComplete forced TRUE (no Firebase check).');
-      try{
-        const _safeMail = p3aSanitizeEmail(ownerEmail);
-        fbGet('users/' + _safeMail + '/isSetupComplete').then(function(val){
-          if(val !== true) fbSet('users/' + _safeMail + '/isSetupComplete', true);
-        }).catch(function(){});
-      }catch(e){}
-      return true;
-    }
     try{
       const safeMail = p3aSanitizeEmail(ownerEmail);
       const val = await fbGet('users/' + safeMail + '/isSetupComplete');
@@ -28461,12 +28422,6 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
      ownerName: header-ல் காட்ட, ownerEmail: Firebase path-க்கு
   ───────────────────────────────────────────────────────────────────────*/
   function p3aOpenWelcome(ownerName, ownerEmail){
-    /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
-    var _MASTER = 'iamajithkumar98@gmail.com';
-    if(ownerEmail && ownerEmail.toLowerCase() === _MASTER){
-      console.log('[P3A] Master Admin — p3aOpenWelcome() BLOCKED entirely.');
-      return;
-    }
     const overlay = document.getElementById('p3a-welcome-overlay');
     if(!overlay) return;
 
@@ -28772,13 +28727,6 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
       // 3. Async check (enterApp sync function ஆனதால் — அதனுள் await இல்லை)
       var ownerEmail = currentUser.email;
       var ownerName  = currentUser.name || 'Owner';
-
-      /* ── Master Admin Bypass: iamajithkumar98@gmail.com க்கு Welcome screen தேவையில்லை ── */
-      var MASTER_ADMIN_EMAIL = 'iamajithkumar98@gmail.com';
-      if(ownerEmail && ownerEmail.toLowerCase() === MASTER_ADMIN_EMAIL){
-        console.log('[P3A] Master Admin detected — வரவேற்பு திரை skip செய்யப்படுகிறது.');
-        return;
-      }
 
       p3aGetSetupStatus(ownerEmail).then(function(isComplete){
         if(isComplete){
@@ -29767,12 +29715,6 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
      3. PRICING OVERLAY: திரை காட்டு / மறை
      ══════════════════════════════════════════════════════════════════════ */
   function p3bOpenPricing(){
-    /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
-    const _cu5 = p3bGetCurrentUser();
-    if(_cu5 && _cu5.email && _cu5.email.toLowerCase() === P3B_MASTER_ADMIN){
-      p3bLog('Master Admin — p3bOpenPricing() BLOCKED entirely.');
-      return;
-    }
     const overlay = document.getElementById('p3b-pricing-overlay');
     if(!overlay) return;
     /* தேர்வை reset செய் */
@@ -30181,9 +30123,6 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
         /* ── Regular Owner: Pricing check ── */
         if(userRole !== 'owner') return;
 
-        /* ══ V12-FIX: Master Admin-க்கு pricing check வேண்டாம் ══ */
-        if(userEmail && userEmail.toLowerCase().trim() === P3B_MASTER_ADMIN) return;
-
         /* registered_clients-ல் இந்த user இருக்கிறாரா? */
         p3bFbGet(P3B_CLIENTS_PATH + '/' + p3bSanitizeEmail(userEmail))
           .then(function(clientData){
@@ -30223,11 +30162,6 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
        (p3aCloseWelcome call ஆகும் நேரம் watch செய்)
   */
   function p3bWaitForSetupThenShowPricing(userEmail){
-    /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
-    if(!userEmail || userEmail.toLowerCase() === P3B_MASTER_ADMIN){
-      p3bLog('Master Admin — p3bWaitForSetupThenShowPricing BLOCKED.');
-      return;
-    }
     p3bFbGet('users/' + p3bSanitizeEmail(userEmail) + '/isSetupComplete')
       .then(function(isComplete){
         if(isComplete === true){
@@ -30242,13 +30176,7 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
           p3bPollForWelcomeClose();
         }
       })
-      .catch(function(){
-        /* ══ V12-FIX: catch-லும் master admin check — இதுதான் V10-ல் பிழை ══ */
-        const _cu = p3bGetCurrentUser();
-        if(_cu && _cu.email && _cu.email.toLowerCase() === P3B_MASTER_ADMIN) return;
-        if(!_cu || !_cu.email) return; /* user இல்லாவிட்டால் pricing வேண்டாம் */
-        setTimeout(p3bOpenPricing, 500);
-      });
+      .catch(function(){ setTimeout(p3bOpenPricing, 500); });
   }
 
   /*
@@ -30260,22 +30188,16 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
       const welcomeEl = document.getElementById('p3a-welcome-overlay');
       if(!welcomeEl || !welcomeEl.classList.contains('p3a-show')){
         clearInterval(pollTimer);
+        /* இரண்டு விநாடி பிறகு Pricing காட்டு */
         setTimeout(function(){
+          /* இப்போதும் client registered இல்லையா என்று மீண்டும் சோதி */
           const curUser = p3bGetCurrentUser();
           if(!curUser || !curUser.email) return;
-          /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
-          if(curUser.email.toLowerCase() === P3B_MASTER_ADMIN){
-            p3bLog('Master Admin — p3bPollForWelcomeClose pricing BLOCKED.');
-            return;
-          }
           p3bFbGet(P3B_CLIENTS_PATH + '/' + p3bSanitizeEmail(curUser.email))
             .then(function(data){
               if(!data) p3bOpenPricing();
             })
-            .catch(function(){
-              /* catch-லும் master admin check */
-              if(curUser.email.toLowerCase() !== P3B_MASTER_ADMIN) p3bOpenPricing();
-            });
+            .catch(function(){ p3bOpenPricing(); });
         }, 1200);
       }
     }, 500);
@@ -30410,11 +30332,6 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
 
       /* Regular owner: client registered ஆனாரா? */
       if(curUser.role === 'owner'){
-        /* ══ MASTER ADMIN ABSOLUTE EXEMPTION ══ */
-        if(curUser.email && curUser.email.toLowerCase() === P3B_MASTER_ADMIN){
-          p3bLog('Master Admin session restore — pricing check SKIPPED.');
-          return;
-        }
         p3bFbGet(P3B_CLIENTS_PATH + '/' + p3bSanitizeEmail(curUser.email))
           .then(function(data){
             if(!data){
@@ -30543,303 +30460,6 @@ console.log('   [1.5] p1LockDataPathForSuperAdmin() — Data path iamajithkumar9
   console.log('✅ PART 3-C — Gear Icon Access Control loaded.');
   console.log('   Owner login  → ⚙️ gear காட்டு, Worker settings மறை');
   console.log('   Worker login → ⚙️ gear மறை,  Worker settings காட்டு');
-})();
-</script>
-
-
-<!-- ═══════════════════════════════════════════════════════════════════════
-     ROAJI V13-PATCH-1: Gift/Frame Multi-Item Bill Total Sync Fix
-     பிரச்சனை: addGiftBillItem() → preview-ல் grand total காட்டுகிறது,
-     ஆனால் g-total-display input update ஆகவில்லை → save-ல் 0 போகிறது.
-     தீர்வு: renderGiftBillPreview() override — g-total-display sync.
-     ═══════════════════════════════════════════════════════════════════════ -->
-<script>
-(function(){
-  'use strict';
-
-  /* ── renderGiftBillPreview — total sync override ── */
-  window.renderGiftBillPreview = function(){
-    var tbody   = document.getElementById('gift-bill-body');
-    var preview = document.getElementById('gift-bill-preview');
-    if(!tbody) return;
-    if(!giftBillItems || !giftBillItems.length){
-      if(preview) preview.style.display = 'none';
-      return;
-    }
-    if(preview) preview.style.display = 'block';
-    var grand = 0;
-    tbody.innerHTML = giftBillItems.map(function(it, i){
-      grand += (it.amt || 0);
-      return '<tr>'
-        + '<td>' + (i+1) + '</td>'
-        + '<td>' + (it.prod || '—') + '</td>'
-        + '<td>' + (it.cat  || '—') + '</td>'
-        + '<td><input class="bill-item-qty-inp" type="number" value="' + it.qty + '" min="1" oninput="updateGiftBillItem(' + i + ','qty',this.value)"></td>'
-        + '<td><input class="bill-item-rate-inp" type="number" value="' + it.rate + '" min="0" oninput="updateGiftBillItem(' + i + ','rate',this.value)"></td>'
-        + '<td style="font-weight:700;">\u20B9' + (it.amt||0).toFixed(2) + '</td>'
-        + '<td><button class="bill-item-del-btn" onclick="removeGiftBillItem(' + i + ')">\uD83D\uDDD1\uFE0F</button></td>'
-        + '</tr>';
-    }).join('');
-    var grandEl = document.getElementById('gift-bill-grand');
-    if(grandEl) grandEl.textContent = '\u20B9' + grand.toFixed(2);
-    /* KEY FIX: g-total-display + g-balance-display sync */
-    var shipping = parseFloat((document.getElementById('g-shipping')||{value:'0'}).value)||0;
-    var grandWithShipping = grand + shipping;
-    var tdEl = document.getElementById('g-total-display');
-    if(tdEl) tdEl.value = grandWithShipping.toFixed(2);
-    var advance = parseFloat((document.getElementById('g-advance')||{value:'0'}).value)||0;
-    var balance = Math.max(0, grandWithShipping - advance);
-    var bdEl = document.getElementById('g-balance-display');
-    if(bdEl) bdEl.value = balance.toFixed(2);
-  };
-
-  /* ── renderFrameBillPreview — total sync override ── */
-  window.renderFrameBillPreview = function(){
-    var tbody   = document.getElementById('frame-bill-body');
-    var preview = document.getElementById('frame-bill-preview');
-    if(!tbody) return;
-    if(!frameBillItems || !frameBillItems.length){
-      if(preview) preview.style.display = 'none';
-      return;
-    }
-    if(preview) preview.style.display = 'block';
-    var grand = 0;
-    tbody.innerHTML = frameBillItems.map(function(it, i){
-      grand += (it.amt || 0);
-      return '<tr>'
-        + '<td>' + (i+1) + '</td>'
-        + '<td>' + (it.ftype || '—') + '</td>'
-        + '<td>' + (it.size  || '—') + '</td>'
-        + '<td><input class="bill-item-qty-inp" type="number" value="' + it.qty + '" min="1" oninput="updateFrameBillItem(' + i + ','qty',this.value)"></td>'
-        + '<td><input class="bill-item-rate-inp" type="number" value="' + it.rate + '" min="0" oninput="updateFrameBillItem(' + i + ','rate',this.value)"></td>'
-        + '<td style="font-weight:700;">\u20B9' + (it.amt||0).toFixed(2) + '</td>'
-        + '<td><button class="bill-item-del-btn" onclick="removeFrameBillItem(' + i + ')">\uD83D\uDDD1\uFE0F</button></td>'
-        + '</tr>';
-    }).join('');
-    var grandEl = document.getElementById('frame-bill-grand');
-    if(grandEl) grandEl.textContent = '\u20B9' + grand.toFixed(2);
-    var shipping = parseFloat((document.getElementById('f-shipping')||{value:'0'}).value)||0;
-    var grandWithShipping = grand + shipping;
-    var tdEl = document.getElementById('f-total-display');
-    if(tdEl) tdEl.value = grandWithShipping.toFixed(2);
-    var advance = parseFloat((document.getElementById('f-advance')||{value:'0'}).value)||0;
-    var balance = Math.max(0, grandWithShipping - advance);
-    var bdEl = document.getElementById('f-balance-display');
-    if(bdEl) bdEl.value = balance.toFixed(2);
-  };
-
-  /* ── addGiftBillItem — validation + post-add reset ── */
-  window.addGiftBillItem = function(){
-    var prod = (document.getElementById('g-prod')||{value:''}).value.trim();
-    var cat  = (document.getElementById('g-cat') ||{value:''}).value.trim();
-    var qty  = parseInt((document.getElementById('g-qty') ||{value:'1'}).value)||1;
-    var rate = parseFloat((document.getElementById('g-rate')||{value:'0'}).value)||0;
-    var label = prod || cat;
-    if(!label){
-      if(typeof showNotif==='function') showNotif('\u274C Product பெயர் அல்லது Category உள்ளிடவும்!','red');
-      return;
-    }
-    giftBillItems.push({ prod: prod||cat, cat: cat, qty: qty, rate: rate, amt: qty*rate });
-    renderGiftBillPreview();
-    /* rate + prod மட்டும் clear, qty=1 reset */
-    var rEl=document.getElementById('g-rate'); if(rEl) rEl.value='';
-    var pEl=document.getElementById('g-prod'); if(pEl) pEl.value='';
-    var qEl=document.getElementById('g-qty');  if(qEl) qEl.value=1;
-    if(typeof calcGiftTotal==='function') calcGiftTotal();
-  };
-
-  /* ── updateGiftBillItem ── */
-  window.updateGiftBillItem = function(i, field, val){
-    if(!giftBillItems[i]) return;
-    giftBillItems[i][field] = parseFloat(val)||0;
-    giftBillItems[i].amt    = giftBillItems[i].qty * giftBillItems[i].rate;
-    renderGiftBillPreview();
-  };
-
-  /* ── removeGiftBillItem ── */
-  window.removeGiftBillItem = function(i){
-    giftBillItems.splice(i,1);
-    renderGiftBillPreview();
-    if(!giftBillItems.length && typeof calcGiftTotal==='function') calcGiftTotal();
-  };
-
-  console.log('[V13-P1] \u2705 Gift/Frame Bill Preview Total Sync loaded');
-})();
-</script>
-
-<!-- ═══════════════════════════════════════════════════════════════════════
-     ROAJI V13-PATCH-2: Master Admin Final Overlay Block
-     பிரச்சனை: p3aOpenWelcome — IIFE closure-க்குள், window expose இல்லை.
-     தீர்வு: CSS !important + MutationObserver + enterApp wrap.
-     ═══════════════════════════════════════════════════════════════════════ -->
-<script>
-(function(){
-  'use strict';
-  var MASTER = 'iamajithkumar98@gmail.com';
-  var OVERLAY_IDS = ['p3a-welcome-overlay','p3b-pricing-overlay','p3b-checkout-overlay'];
-
-  function isMasterAdmin(){
-    try{
-      return typeof currentUser!=='undefined' && currentUser
-        && (currentUser.email||'').toLowerCase().trim()===MASTER;
-    }catch(e){ return false; }
-  }
-
-  /* CSS !important override */
-  function injectMasterCSS(){
-    if(document.getElementById('v13-master-css')) return;
-    var s = document.createElement('style');
-    s.id = 'v13-master-css';
-    s.textContent =
-      '#p3a-welcome-overlay.v13-blocked,' +
-      '#p3b-pricing-overlay.v13-blocked,' +
-      '#p3b-checkout-overlay.v13-blocked {' +
-      '  display:none!important;' +
-      '  visibility:hidden!important;' +
-      '  pointer-events:none!important;' +
-      '  z-index:-99999!important;' +
-      '}';
-    (document.head || document.documentElement).appendChild(s);
-  }
-
-  /* Inline style + class block */
-  function forceHide(){
-    if(!isMasterAdmin()) return;
-    OVERLAY_IDS.forEach(function(id){
-      var el = document.getElementById(id);
-      if(!el) return;
-      el.classList.add('v13-blocked');
-      el.classList.remove('p3a-show','p3b-show','active','show','open');
-      el.style.cssText = 'display:none!important;visibility:hidden!important;pointer-events:none!important;position:fixed!important;z-index:-99999!important;';
-    });
-  }
-
-  /* MutationObserver */
-  function startObserver(){
-    var target = document.body || document.documentElement;
-    if(!target) return;
-    new MutationObserver(function(muts){
-      if(!isMasterAdmin()) return;
-      var act = false;
-      muts.forEach(function(m){
-        if(m.target && OVERLAY_IDS.indexOf(m.target.id)>-1) act=true;
-        if(m.addedNodes) m.addedNodes.forEach(function(n){ if(n.id && OVERLAY_IDS.indexOf(n.id)>-1) act=true; });
-      });
-      if(act) forceHide();
-    }).observe(target,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']});
-  }
-
-  /* Firebase isSetupComplete = true */
-  function writeSetupComplete(){
-    setTimeout(function(){
-      try{
-        var safe = MASTER.replace(/\./g,'_dot_').replace(/@/g,'_at_');
-        if(typeof fbGet==='function' && typeof fbSet==='function'){
-          fbGet('users/'+safe+'/isSetupComplete').then(function(v){
-            if(v!==true) fbSet('users/'+safe+'/isSetupComplete',true);
-          }).catch(function(){ try{fbSet('users/'+safe+'/isSetupComplete',true);}catch(e){} });
-        }
-      }catch(e){}
-    },1500);
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    injectMasterCSS();
-    startObserver();
-
-    setTimeout(function(){
-      if(typeof enterApp!=='function') return;
-      if(enterApp._v13OverlayPatched) return;
-      var _orig = enterApp;
-      enterApp = function(){
-        _orig.apply(this, arguments);
-        if(isMasterAdmin()){
-          forceHide();
-          [50,150,300,600,1000,1800,3000].forEach(function(d){ setTimeout(forceHide,d); });
-          writeSetupComplete();
-        }
-      };
-      enterApp._v13OverlayPatched = true;
-
-      /* Session restore — already logged in */
-      if(isMasterAdmin()){
-        forceHide();
-        [100,300,700,1500].forEach(function(d){ setTimeout(forceHide,d); });
-        writeSetupComplete();
-      }
-      console.log('[V13-P2] \u2705 Master Admin overlay block active');
-    }, 0);
-  });
-})();
-</script>
-
-<!-- ═══════════════════════════════════════════════════════════════════════
-     ROAJI V13-PATCH-3: Master Admin Old Data Load Trigger Fix
-     பிரச்சனை: dbLoaded=false இருந்தால் render functions skip ஆகும்.
-     தீர்வு: login + session restore இரண்டிலும் loadAllData + render.
-     ═══════════════════════════════════════════════════════════════════════ -->
-<script>
-(function(){
-  'use strict';
-  var MASTER = 'iamajithkumar98@gmail.com';
-
-  function isMaster(){
-    try{
-      return typeof currentUser!=='undefined' && currentUser
-        && (currentUser.email||'').toLowerCase().trim()===MASTER;
-    }catch(e){ return false; }
-  }
-
-  function triggerAllRenders(){
-    try{
-      if(typeof renderGiftOrders    ==='function') renderGiftOrders();
-      if(typeof renderFrameOrders   ==='function') renderFrameOrders();
-      if(typeof renderXHistory      ==='function') renderXHistory();
-      if(typeof renderStudioBookings==='function') renderStudioBookings();
-      if(typeof renderGiftStats     ==='function') renderGiftStats();
-      if(typeof renderFrameStats    ==='function') renderFrameStats();
-      if(typeof renderXStats        ==='function') renderXStats();
-      if(typeof renderStudioStats   ==='function') renderStudioStats();
-      if(typeof renderOwnerDash     ==='function') renderOwnerDash();
-      if(typeof renderCreditList    ==='function') renderCreditList();
-      if(typeof renderStockList     ==='function') renderStockList();
-      if(typeof renderApprovedOwners==='function') renderApprovedOwners();
-      if(typeof checkLowStock       ==='function') checkLowStock();
-      if(typeof genOrderNos         ==='function') genOrderNos();
-      console.log('[V13-P3] \u2705 All render functions triggered');
-    }catch(e){ console.warn('[V13-P3] Render error:',e); }
-  }
-
-  async function masterDataLoad(){
-    if(!isMaster()) return;
-    if(typeof dbLoaded!=='undefined' && dbLoaded){
-      setTimeout(triggerAllRenders,100); return;
-    }
-    try{
-      if(typeof loadAllData==='function'){
-        await loadAllData();
-        setTimeout(triggerAllRenders,200);
-      }
-    }catch(e){ console.warn('[V13-P3] loadAllData error:',e); }
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){
-      if(typeof enterApp!=='function') return;
-      if(enterApp._v13DataPatched) return;
-      var _orig = enterApp;
-      enterApp = function(){
-        _orig.apply(this, arguments);
-        if(isMaster()) setTimeout(masterDataLoad,400);
-      };
-      enterApp._v13DataPatched = true;
-
-      /* Session restore */
-      setTimeout(function(){ if(isMaster()) masterDataLoad(); }, 800);
-
-      console.log('[V13-P3] \u2705 Master Admin data load trigger active');
-    }, 50);
-  });
 })();
 </script>
 
