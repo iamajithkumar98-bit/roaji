@@ -1408,18 +1408,24 @@
        All writes route exclusively to roaji_v2_users / roaji_v2_bills.
     ══════════════════════════════════════════════════════════════════ */
 
+    /* ── PART ESG-1: Enterprise SaaS Guard — Master Owner Constant ── */
+    const ROAJI_MASTER_EMAIL = 'iamajithkumar98@gmail.com';
+
     /* ── Auth: Email/Password sign-up ────────────────────────────── */
-    /* PART 9B-2: storeId defaults to uid (owner's primary store).    */
-    /* Callers may pass an explicit storeId for pre-assigned branches. */
+    /* PART 9B-2 + ESG-1: storeId defaults to uid.                    */
+    /* Master email → status 'master'. Standard users → 'pending'.    */
     async function roajiV2SignUp({ email, password, fullName, businessName, phone, role, storeId }) {
       if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
       const cred            = await roajiV2Auth.createUserWithEmailAndPassword(email, password);
       const uid             = cred.user.uid;
-      /* 9B-2: default primary storeId = uid so every owner has a named
-         tenant namespace even before they create a named branch.       */
-      const resolvedStoreId = (storeId && storeId.trim()) || uid;
+      const isMaster        = (email || '').toLowerCase().trim() === ROAJI_MASTER_EMAIL.toLowerCase();
+      const resolvedStoreId = (storeId && storeId.trim()) || (isMaster ? 'ROAJI_MAIN' : uid);
 
-      /* Stamp user profile with primary storeId & tenant version */
+      /* ESG-1: Master gets 'master' status + full store access.
+         Standard new users get 'pending' until Master approves.      */
+      const accountStatus   = isMaster ? 'master' : 'pending';
+      const allowedStores   = isMaster ? ['ROAJI_MAIN'] : ['ROAJI_MAIN', resolvedStoreId];
+
       await roajiV2Firestore
         .collection(ROAJI_V2_COLLECTION_USERS)
         .doc(uid)
@@ -1429,64 +1435,84 @@
           businessName:   businessName   || '',
           email:          email          || '',
           phone:          phone          || '',
-          role:           role           || 'Owner',
-          plan:           'free',
-          status:         'active',
-          /* ── PART 9B-2: primary tenant fields ── */
+          role:           isMaster ? 'Master Admin' : (role || 'Owner'),
+          plan:           isMaster ? 'lifetime' : 'free',
+          status:         accountStatus,
+          /* ── PART 9B-2 + ESG-1: tenant fields ── */
           primaryStoreId: resolvedStoreId,
-          allowedStores:  ['ROAJI_MAIN', resolvedStoreId], /* ROAJI-FIX: prevents indexOf crash on new profiles */
-          storeIds:       [resolvedStoreId], /* array for multi-branch owners */
+          allowedStores:  allowedStores,  /* ESG-FIX: prevents indexOf crash */
+          storeIds:       [resolvedStoreId],
+          /* ESG-1: subscription tracking */
+          subscriptionPlan:      isMaster ? 'lifetime' : 'none',
+          subscriptionExpiresAt: null,
+          subscriptionAlertSent: false,
           createdAt:      firebase.firestore.FieldValue.serverTimestamp(),
           updatedAt:      firebase.firestore.FieldValue.serverTimestamp(),
           _schemaVersion: 'v2',
-          _tenantVersion: 'v2-mt',
+          _tenantVersion: 'v2-mt-esg1',
         });
 
-      /* 9B-2: Set the active tenant context immediately on sign-up */
       roajiV2SetActiveTenant(uid, resolvedStoreId);
-
       await cred.user.updateProfile({ displayName: fullName || email });
       return cred.user;
     }
 
     /* ── Auth: Email/Password sign-in ────────────────────────────── */
-    /* PART 9B-2: Restores ownerUid + primaryStoreId into the active
-       tenant context so every subsequent query is properly scoped.   */
+    /* PART 9B-2 + ESG-1: Restores tenant context + ESG status fields. */
     async function roajiV2SignIn({ email, password }) {
       if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
-      const cred    = await roajiV2Auth.signInWithEmailAndPassword(email, password);
-      const uid     = cred.user.uid;
-      const docRef  = roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid);
-      const snap    = await docRef.get();
+      const isMaster  = (email || '').toLowerCase().trim() === ROAJI_MASTER_EMAIL.toLowerCase();
+      const cred      = await roajiV2Auth.signInWithEmailAndPassword(email, password);
+      const uid       = cred.user.uid;
+      const docRef    = roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid);
+      const snap      = await docRef.get();
 
       if (snap.exists) {
-        /* Refresh last-login timestamp */
         await docRef.update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp() });
-        const profile = snap.data();
-        /* 9B-2: Restore tenant context from stored primaryStoreId */
+        let profile = snap.data();
+        /* ESG-1: If this is the master email but Firestore still has old status, upgrade it */
+        if (isMaster && profile.status !== 'master') {
+          await docRef.update({
+            status: 'master', role: 'Master Admin', plan: 'lifetime',
+            allowedStores: (profile.allowedStores && profile.allowedStores.length)
+              ? profile.allowedStores : ['ROAJI_MAIN'],
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+          profile = { ...profile, status: 'master', role: 'Master Admin', plan: 'lifetime',
+            allowedStores: (profile.allowedStores && profile.allowedStores.length)
+              ? profile.allowedStores : ['ROAJI_MAIN'] };
+        }
+        /* ESG-FIX: guarantee allowedStores is always an array */
+        if (!Array.isArray(profile.allowedStores) || !profile.allowedStores.length) {
+          const fallback = ['ROAJI_MAIN', profile.primaryStoreId || uid];
+          await docRef.update({ allowedStores: fallback });
+          profile = { ...profile, allowedStores: fallback };
+        }
         const resolvedStoreId = profile.primaryStoreId || uid;
         roajiV2SetActiveTenant(uid, resolvedStoreId);
         return { firebaseUser: cred.user, profile };
       } else {
-        /* First login after manual account creation — scaffold a profile */
-        const resolvedStoreId = uid; /* owner primary store = uid */
+        /* First login after manual account creation — scaffold profile */
+        const resolvedStoreId = isMaster ? 'ROAJI_MAIN' : uid;
         const profile = {
           uid,
-          email:          cred.user.email || email,
-          fullName:       cred.user.displayName || '',
-          businessName:   '',
-          phone:          '',
-          role:           'Owner',
-          plan:           'free',
-          status:         'active',
-          /* 9B-2: Tenant fields on auto-scaffold */
-          primaryStoreId: resolvedStoreId,
-          allowedStores:  ['ROAJI_MAIN', resolvedStoreId], /* ROAJI-FIX: prevents indexOf crash on scaffolded profiles */
-          storeIds:       [resolvedStoreId],
-          createdAt:      firebase.firestore.FieldValue.serverTimestamp(),
-          lastLoginAt:    firebase.firestore.FieldValue.serverTimestamp(),
-          _schemaVersion: 'v2',
-          _tenantVersion: 'v2-mt',
+          email:                cred.user.email || email,
+          fullName:             cred.user.displayName || '',
+          businessName:         '',
+          phone:                '',
+          role:                 isMaster ? 'Master Admin' : 'Owner',
+          plan:                 isMaster ? 'lifetime' : 'free',
+          status:               isMaster ? 'master' : 'pending',
+          primaryStoreId:       resolvedStoreId,
+          allowedStores:        isMaster ? ['ROAJI_MAIN'] : ['ROAJI_MAIN', resolvedStoreId],
+          storeIds:             [resolvedStoreId],
+          subscriptionPlan:     isMaster ? 'lifetime' : 'none',
+          subscriptionExpiresAt: null,
+          subscriptionAlertSent: false,
+          createdAt:            firebase.firestore.FieldValue.serverTimestamp(),
+          lastLoginAt:          firebase.firestore.FieldValue.serverTimestamp(),
+          _schemaVersion:       'v2',
+          _tenantVersion:       'v2-mt-esg1',
         };
         await docRef.set(profile);
         roajiV2SetActiveTenant(uid, resolvedStoreId);
@@ -1859,6 +1885,46 @@
         .update({ ...safeUpdates, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     }
 
+    /* ── ESG-1: Firestore helpers for Master Admin panel ───────────── */
+
+    /* Fetch ALL user profiles (master-only) */
+    async function roajiV2GetAllUsers() {
+      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
+      const snap = await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).get();
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+
+    /* Approve a pending user and set their status to 'active' */
+    async function roajiV2ApproveUser(uid, extraFields = {}) {
+      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
+      await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).update({
+        status: 'active',
+        ...extraFields,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+
+    /* Update allowedStores array for a specific user (master-only) */
+    async function roajiV2SetUserAllowedStores(uid, allowedStores) {
+      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
+      if (!Array.isArray(allowedStores)) throw new Error('allowedStores must be an array.');
+      await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).update({
+        allowedStores,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+
+    /* Set a subscription plan + expiry for a user */
+    async function roajiV2SetSubscription(uid, plan, expiresAt) {
+      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
+      await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).update({
+        subscriptionPlan:      plan,
+        subscriptionExpiresAt: expiresAt, /* JS Date or null */
+        subscriptionAlertSent: false,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+
     /* ── Expose on window for React (Babel script can't import modules) */
     window.RoajiV2Store = {
       ready:               () => roajiV2Ready,
@@ -1906,6 +1972,12 @@
       safeBillsQuery:   roajiV2SafeBillsQuery,
       safeWritePayload: roajiV2SafeWritePayload,
       safeDocGuard:     roajiV2SafeDocGuard,
+      /* ── ESG-1: Master Admin helpers ─────────────────────────────── */
+      MASTER_EMAIL:           ROAJI_MASTER_EMAIL,
+      getAllUsers:             roajiV2GetAllUsers,
+      approveUser:            roajiV2ApproveUser,
+      setUserAllowedStores:   roajiV2SetUserAllowedStores,
+      setSubscription:        roajiV2SetSubscription,
     };
   </script>
 
@@ -6703,20 +6775,21 @@
             const { firebaseUser, profile } = await window.RoajiV2Store.signIn({ email, password });
             setLoading(false);
             onSuccess && onSuccess({
-              uid:          firebaseUser.uid,
-              email:        firebaseUser.email,
-              displayName:  firebaseUser.displayName || (profile && profile.fullName) || email,
-              businessName: (profile && profile.businessName) || '',
-              role:         (profile && profile.role) || 'Owner',
-              plan:         (profile && profile.plan) || 'free',
-              status:       (profile && profile.status) || 'active',
-              /* ROAJI-FIX: carry stored tenant fields so (userData?.allowedStores || []).indexOf(storeId)
-                 is always safe — falls back to baseline ROAJI_MAIN for legacy profiles */
-              primaryStoreId: (profile && profile.primaryStoreId) || 'ROAJI_MAIN',
-              allowedStores:  (profile && Array.isArray(profile.allowedStores) && profile.allowedStores.length)
-                                ? profile.allowedStores
-                                : ['ROAJI_MAIN', firebaseUser.uid],
-              _source:      'roaji_v2_firebase',
+              uid:                   firebaseUser.uid,
+              email:                 firebaseUser.email,
+              displayName:           firebaseUser.displayName || (profile && profile.fullName) || email,
+              businessName:          (profile && profile.businessName) || '',
+              role:                  (profile && profile.role) || 'Owner',
+              plan:                  (profile && profile.plan) || 'free',
+              status:                (profile && profile.status) || 'pending',
+              /* ESG-1: tenant + subscription fields with safe fallbacks */
+              primaryStoreId:        (profile && profile.primaryStoreId) || 'ROAJI_MAIN',
+              allowedStores:         (profile && Array.isArray(profile.allowedStores) && profile.allowedStores.length)
+                                       ? profile.allowedStores
+                                       : ['ROAJI_MAIN', firebaseUser.uid],
+              subscriptionPlan:      (profile && profile.subscriptionPlan) || 'none',
+              subscriptionExpiresAt: (profile && profile.subscriptionExpiresAt) || null,
+              _source:               'roaji_v2_firebase',
             });
           } catch (err) {
             setLoading(false);
@@ -6912,18 +6985,19 @@
             });
             setLoading(false);
             onSuccess && onSuccess({
-              uid:            firebaseUser.uid,
-              email:          firebaseUser.email,
-              displayName:    form.fullName || firebaseUser.email,
-              businessName:   form.businessName,
-              role:           form.role,
-              plan:           'free',
-              status:         'active',
-              /* ROAJI-FIX: force-inject baseline tenant payload on Create Account so
-                 (userData?.allowedStores || []).indexOf(storeId) never fires on undefined */
-              primaryStoreId: 'ROAJI_MAIN',
-              allowedStores:  ['ROAJI_MAIN', firebaseUser.uid],
-              _source:        'roaji_v2_firebase',
+              uid:                   firebaseUser.uid,
+              email:                 firebaseUser.email,
+              displayName:           form.fullName || firebaseUser.email,
+              businessName:          form.businessName,
+              role:                  form.role,
+              plan:                  'free',
+              /* ESG-1: new accounts start as 'pending' unless master email */
+              status:                firebaseUser.email.toLowerCase().trim() === (window.RoajiV2Store && window.RoajiV2Store.MASTER_EMAIL || 'iamajithkumar98@gmail.com') ? 'master' : 'pending',
+              primaryStoreId:        firebaseUser.email.toLowerCase().trim() === (window.RoajiV2Store && window.RoajiV2Store.MASTER_EMAIL || 'iamajithkumar98@gmail.com') ? 'ROAJI_MAIN' : firebaseUser.uid,
+              allowedStores:         ['ROAJI_MAIN', firebaseUser.uid],
+              subscriptionPlan:      'none',
+              subscriptionExpiresAt: null,
+              _source:               'roaji_v2_firebase',
             });
           } catch (err) {
             setLoading(false);
@@ -14977,20 +15051,584 @@ Thank you for your business! 🙏
     };
 
     /* ════════════════════════════════════════════════════════════════════
-       AUTH ROOT — top-level screen router
+       ESG-1 — PENDING LOCK SCREEN
+       Shown to any standard user whose status is still 'pending'.
+    ════════════════════════════════════════════════════════════════════ */
+    const PendingLockScreen = ({ user, onSignOut }) => (
+      <div style={{
+        minHeight:'100vh', display:'flex', flexDirection:'column',
+        alignItems:'center', justifyContent:'center',
+        background:'linear-gradient(135deg,#05011a 0%,#0a0520 50%,#05011a 100%)',
+        padding:'1.5rem', position:'relative', overflow:'hidden',
+      }}>
+        <AuthBlobs />
+        {/* Neon ring */}
+        <div style={{
+          position:'absolute', width:420, height:420, borderRadius:'50%',
+          border:'1.5px solid rgba(0,245,212,0.12)',
+          boxShadow:'0 0 80px rgba(0,245,212,0.06), inset 0 0 80px rgba(124,58,237,0.06)',
+          animation:'pulse-glow 3s ease-in-out infinite',
+        }} />
+        <div className="animate-fadeSlideUp" style={{
+          position:'relative', zIndex:2,
+          width:'100%', maxWidth:460,
+          background:'rgba(8,4,24,0.88)',
+          border:'1px solid rgba(0,245,212,0.22)',
+          borderRadius:'1.5rem',
+          padding:'2.8rem 2.4rem',
+          backdropFilter:'blur(32px)',
+          WebkitBackdropFilter:'blur(32px)',
+          boxShadow:'0 0 0 1px rgba(0,245,212,0.08), 0 32px 80px rgba(0,0,0,0.75), 0 0 60px rgba(0,245,212,0.06)',
+          textAlign:'center',
+        }}>
+          {/* Lock icon */}
+          <div style={{
+            width:72, height:72, borderRadius:'1.1rem', margin:'0 auto 1.5rem',
+            background:'linear-gradient(135deg,rgba(0,245,212,0.14) 0%,rgba(124,58,237,0.14) 100%)',
+            border:'1px solid rgba(0,245,212,0.30)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize:'2rem',
+            boxShadow:'0 0 32px rgba(0,245,212,0.14)',
+          }}>🔒</div>
+
+          <div style={{
+            fontSize:'0.68rem', fontWeight:700, letterSpacing:'0.14em',
+            color:'var(--c-teal)', textTransform:'uppercase', marginBottom:'0.6rem',
+          }}>Account Status</div>
+
+          <h2 style={{
+            fontSize:'1.35rem', fontWeight:800, lineHeight:1.25, marginBottom:'0.9rem',
+            background:'linear-gradient(135deg,#00f5d4 0%,#7c3aed 100%)',
+            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+            backgroundClip:'text',
+          }}>Account Awaiting Master Verification</h2>
+
+          <p style={{ fontSize:'0.84rem', color:'rgba(148,163,184,0.80)', lineHeight:1.75, marginBottom:'1.8rem' }}>
+            Your account has been successfully registered and is currently under review.<br />
+            <strong style={{ color:'rgba(0,245,212,0.85)' }}>Please contact the administrator</strong> at<br />
+            <span style={{ fontFamily:'var(--ff-mono)', color:'#a78bfa', fontSize:'0.82rem' }}>iamajithkumar98@gmail.com</span><br />
+            to request activation of your workspace.
+          </p>
+
+          {/* User chip */}
+          <div style={{
+            display:'inline-flex', alignItems:'center', gap:'0.6rem',
+            padding:'0.5rem 1rem', borderRadius:'99px',
+            background:'rgba(124,58,237,0.12)', border:'1px solid rgba(124,58,237,0.28)',
+            fontSize:'0.78rem', color:'#a78bfa', marginBottom:'1.8rem',
+          }}>
+            <span style={{ width:7, height:7, borderRadius:'50%', background:'#f59e0b', display:'inline-block' }} />
+            {user.email}
+          </div>
+
+          <button onClick={onSignOut} style={{
+            width:'100%', padding:'0.78rem', borderRadius:'0.65rem',
+            background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.10)',
+            color:'rgba(148,163,184,0.70)', fontSize:'0.88rem', fontWeight:600,
+            fontFamily:'var(--ff-main)', cursor:'pointer',
+            transition:'all 0.2s',
+          }}
+            onMouseOver={e => { e.currentTarget.style.background='rgba(255,255,255,0.08)'; e.currentTarget.style.color='#f1f5f9'; }}
+            onMouseOut={e  => { e.currentTarget.style.background='rgba(255,255,255,0.04)'; e.currentTarget.style.color='rgba(148,163,184,0.70)'; }}
+          >Sign Out</button>
+        </div>
+      </div>
+    );
+
+    /* ════════════════════════════════════════════════════════════════════
+       ESG-1 — MASTER ADMIN DASHBOARD
+       Full enterprise control panel — accessible ONLY to the master email.
+    ════════════════════════════════════════════════════════════════════ */
+    const MasterAdminDashboard = ({ user, onSignOut }) => {
+      const { useState: uState, useEffect: uEffect, useRef: uRef } = React;
+      const [section,      setSection]      = uState('pending');
+      const [users,        setUsers]        = uState([]);
+      const [loadingUsers, setLoadingUsers] = uState(true);
+      const [toast,        setToast]        = uState('');
+      const [storeInputs,  setStoreInputs]  = uState({});   // uid → tag input string
+      const [subPlan,      setSubPlan]      = uState({});   // uid → selected plan
+      const [pwMode,       setPwMode]       = uState(false);
+      const [newPw,        setNewPw]        = uState('');
+      const [newPwConfirm, setNewPwConfirm] = uState('');
+      const [pwMsg,        setPwMsg]        = uState('');
+
+      const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3200); };
+
+      /* ── Load all users ── */
+      const loadUsers = async () => {
+        setLoadingUsers(true);
+        try {
+          if (window.RoajiV2Store && window.RoajiV2Store.ready()) {
+            const all = await window.RoajiV2Store.getAllUsers();
+            setUsers(all.filter(u => u.status !== 'master'));
+          }
+        } catch(e) { showToast('⚠ Could not load users: ' + e.message); }
+        setLoadingUsers(false);
+      };
+
+      uEffect(() => { loadUsers(); }, []);
+
+      /* ── Subscription expiry checker — fires on load ── */
+      uEffect(() => {
+        const now = Date.now();
+        const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
+        users.forEach(u => {
+          if (u.subscriptionExpiresAt && !u.subscriptionAlertSent) {
+            const exp = u.subscriptionExpiresAt.toDate ? u.subscriptionExpiresAt.toDate().getTime()
+                      : new Date(u.subscriptionExpiresAt).getTime();
+            if (exp - now <= THREE_DAYS && exp > now) {
+              showToast(`⚠ ${u.fullName || u.email} subscription expires in < 3 days!`);
+            }
+          }
+        });
+      }, [users]);
+
+      /* ── Approve user ── */
+      const handleApprove = async (uid) => {
+        try {
+          await window.RoajiV2Store.approveUser(uid);
+          showToast('✓ User activated successfully.');
+          loadUsers();
+        } catch(e) { showToast('✗ Approval failed: ' + e.message); }
+      };
+
+      /* ── Save store mapping ── */
+      const handleSaveStores = async (uid) => {
+        const raw = storeInputs[uid] || '';
+        const stores = raw.split(',').map(s => s.trim()).filter(Boolean);
+        if (!stores.length) { showToast('⚠ Enter at least one Store ID.'); return; }
+        try {
+          await window.RoajiV2Store.setUserAllowedStores(uid, stores);
+          showToast('✓ Store mapping saved.');
+          loadUsers();
+        } catch(e) { showToast('✗ Failed: ' + e.message); }
+      };
+
+      /* ── Set subscription ── */
+      const handleSetSubscription = async (uid) => {
+        const plan = subPlan[uid];
+        if (!plan) { showToast('⚠ Select a plan first.'); return; }
+        let expiresAt = null;
+        const now = new Date();
+        if (plan === '1month')  { expiresAt = new Date(now.setMonth(now.getMonth() + 1)); }
+        if (plan === '1year')   { expiresAt = new Date(now.setFullYear(now.getFullYear() + 1)); }
+        if (plan === 'lifetime'){ expiresAt = null; }
+        try {
+          await window.RoajiV2Store.setSubscription(uid, plan, expiresAt);
+          showToast('✓ Subscription updated.');
+          loadUsers();
+        } catch(e) { showToast('✗ Failed: ' + e.message); }
+      };
+
+      /* ── Change master password ── */
+      const handleChangePw = async () => {
+        if (newPw.length < 6)          { setPwMsg('Min 6 characters.'); return; }
+        if (newPw !== newPwConfirm)    { setPwMsg('Passwords do not match.'); return; }
+        try {
+          const fbUser = window.roajiV2Auth && window.roajiV2Auth.currentUser;
+          if (fbUser) { await fbUser.updatePassword(newPw); }
+          setPwMsg('✓ Password updated successfully.');
+          setNewPw(''); setNewPwConfirm('');
+          setTimeout(() => { setPwMode(false); setPwMsg(''); }, 2000);
+        } catch(e) { setPwMsg('✗ ' + (e.message || 'Failed. Re-authenticate and try again.')); }
+      };
+
+      const pending  = users.filter(u => u.status === 'pending');
+      const active   = users.filter(u => u.status === 'active');
+      const allUsers = users;
+
+      /* ── Styles ── */
+      const cardS = {
+        background:'rgba(8,4,24,0.80)', border:'1px solid rgba(255,255,255,0.08)',
+        borderRadius:'1rem', padding:'1.2rem', marginBottom:'0.85rem',
+      };
+      const badgeS = (color) => ({
+        display:'inline-flex', alignItems:'center', gap:5,
+        padding:'2px 10px', borderRadius:'99px', fontSize:'0.67rem', fontWeight:700,
+        letterSpacing:'0.06em', textTransform:'uppercase',
+        background:`rgba(${color},0.13)`, border:`1px solid rgba(${color},0.30)`,
+        color:`rgb(${color})`,
+      });
+      const btnS = (accent='124,58,237') => ({
+        padding:'0.42rem 0.9rem', borderRadius:'0.5rem', border:'none', cursor:'pointer',
+        background:`rgba(${accent},0.20)`, color:`rgb(${accent})`,
+        fontSize:'0.73rem', fontWeight:700, fontFamily:'var(--ff-main)',
+        border:`1px solid rgba(${accent},0.35)`,
+        transition:'all 0.15s',
+      });
+      const inputS = {
+        width:'100%', padding:'0.5rem 0.8rem',
+        background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.10)',
+        borderRadius:'0.5rem', color:'#f1f5f9', fontSize:'0.8rem',
+        fontFamily:'var(--ff-main)', outline:'none',
+      };
+
+      const navItems = [
+        { id:'pending',  label:'🕐 Pending Ledger',       badge: pending.length },
+        { id:'stores',   label:'🗄 Store Mapping'          },
+        { id:'subs',     label:'📅 Subscriptions'           },
+        { id:'pw',       label:'🔑 Change Password'         },
+      ];
+
+      return (
+        <div style={{
+          minHeight:'100vh', display:'flex', flexDirection:'column',
+          background:'linear-gradient(135deg,#05011a 0%,#0a0520 50%,#05011a 100%)',
+          fontFamily:'var(--ff-main)', color:'#f1f5f9',
+        }}>
+          {/* ── Top bar ── */}
+          <div style={{
+            display:'flex', alignItems:'center', justifyContent:'space-between',
+            padding:'0.85rem 1.5rem',
+            background:'rgba(6,2,18,0.92)', borderBottom:'1px solid rgba(0,245,212,0.14)',
+            backdropFilter:'blur(24px)', position:'sticky', top:0, zIndex:200,
+          }}>
+            <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
+              <div style={{
+                width:38, height:38, borderRadius:'0.6rem',
+                background:'linear-gradient(135deg,rgba(0,245,212,0.25) 0%,rgba(124,58,237,0.25) 100%)',
+                border:'1px solid rgba(0,245,212,0.30)',
+                display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.1rem',
+                boxShadow:'0 0 20px rgba(0,245,212,0.12)',
+              }}>⚡</div>
+              <div>
+                <div style={{ fontSize:'0.7rem', fontWeight:700, letterSpacing:'0.12em', color:'var(--c-teal)', textTransform:'uppercase' }}>Master Admin</div>
+                <div style={{ fontSize:'0.9rem', fontWeight:800 }}>Roaji Enterprise Guard</div>
+              </div>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:'0.75rem' }}>
+              <span style={{ fontSize:'0.74rem', color:'rgba(148,163,184,0.6)' }}>{user.email}</span>
+              <button onClick={onSignOut} style={{ ...btnS('239,68,68'), fontSize:'0.72rem' }}>Sign Out</button>
+            </div>
+          </div>
+
+          {/* ── Body ── */}
+          <div style={{ display:'flex', flex:1, overflow:'hidden' }}>
+
+            {/* Sidebar nav */}
+            <nav style={{
+              width:210, flexShrink:0,
+              background:'rgba(6,2,18,0.70)', borderRight:'1px solid rgba(255,255,255,0.06)',
+              padding:'1.2rem 0.75rem', display:'flex', flexDirection:'column', gap:'0.35rem',
+            }}>
+              {navItems.map(n => {
+                const active = section === n.id;
+                return (
+                  <button key={n.id} onClick={() => setSection(n.id)} style={{
+                    display:'flex', alignItems:'center', justifyContent:'space-between',
+                    padding:'0.55rem 0.85rem', borderRadius:'0.6rem', border:'none', cursor:'pointer',
+                    background: active ? 'rgba(0,245,212,0.12)' : 'transparent',
+                    color: active ? 'var(--c-teal)' : 'rgba(148,163,184,0.70)',
+                    fontSize:'0.78rem', fontWeight: active ? 700 : 500,
+                    fontFamily:'var(--ff-main)',
+                    transition:'all 0.15s',
+                    borderLeft: active ? '2px solid var(--c-teal)' : '2px solid transparent',
+                  }}>
+                    <span>{n.label}</span>
+                    {n.badge > 0 && (
+                      <span style={{
+                        background:'rgba(239,68,68,0.85)', color:'#fff', borderRadius:'99px',
+                        fontSize:'0.62rem', fontWeight:800, padding:'1px 7px', minWidth:18, textAlign:'center',
+                      }}>{n.badge}</span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Main content */}
+            <main style={{ flex:1, overflowY:'auto', padding:'1.5rem 1.8rem' }}>
+
+              {/* ── TOAST ── */}
+              {toast && (
+                <div style={{
+                  position:'fixed', top:'5rem', right:'1.5rem', zIndex:9999,
+                  background:'rgba(8,4,24,0.97)', border:'1px solid rgba(0,245,212,0.35)',
+                  borderRadius:'0.75rem', padding:'0.75rem 1.2rem',
+                  fontSize:'0.8rem', color:'var(--c-teal)',
+                  boxShadow:'0 8px 32px rgba(0,0,0,0.6)',
+                  animation:'fadeSlideDown 0.25s ease',
+                }}>{toast}</div>
+              )}
+
+              {/* ═══════════════════════════════════════════════════
+                  SECTION 1 — PENDING VERIFICATION LEDGER
+              ═══════════════════════════════════════════════════ */}
+              {section === 'pending' && (
+                <div>
+                  <div style={{ marginBottom:'1.4rem' }}>
+                    <h2 style={{ fontSize:'1.15rem', fontWeight:800, marginBottom:'0.2rem' }}>Pending Verification Ledger</h2>
+                    <p style={{ fontSize:'0.78rem', color:'rgba(148,163,184,0.60)' }}>
+                      Client accounts awaiting your approval. Activate to grant workspace access.
+                    </p>
+                  </div>
+
+                  {loadingUsers ? (
+                    <div style={{ textAlign:'center', color:'rgba(148,163,184,0.5)', padding:'3rem 0', fontSize:'0.82rem' }}>Loading users…</div>
+                  ) : pending.length === 0 ? (
+                    <div style={{ ...cardS, textAlign:'center', padding:'2.5rem', color:'rgba(148,163,184,0.45)', fontSize:'0.82rem' }}>
+                      ✓ No pending accounts — all users are activated.
+                    </div>
+                  ) : pending.map(u => (
+                    <div key={u.id} style={cardS}>
+                      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'0.8rem', flexWrap:'wrap' }}>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.3rem' }}>
+                            <span style={{ fontSize:'0.88rem', fontWeight:700 }}>{u.fullName || '(No name)'}</span>
+                            <span style={badgeS('245,158,11')}>Pending</span>
+                          </div>
+                          <div style={{ fontSize:'0.74rem', color:'rgba(148,163,184,0.60)', fontFamily:'var(--ff-mono)' }}>{u.email}</div>
+                          <div style={{ fontSize:'0.72rem', color:'rgba(148,163,184,0.45)', marginTop:'0.2rem' }}>
+                            {u.businessName && <span>🏢 {u.businessName} · </span>}
+                            <span>Role: {u.role || 'Owner'}</span>
+                            {u.createdAt && <span> · Registered: {u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('en-IN') : '—'}</span>}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleApprove(u.id)}
+                          style={{ ...btnS('0,245,212'), padding:'0.52rem 1.1rem', fontSize:'0.76rem' }}
+                          onMouseOver={e => e.currentTarget.style.background='rgba(0,245,212,0.30)'}
+                          onMouseOut={e  => e.currentTarget.style.background='rgba(0,245,212,0.20)'}
+                        >✓ Approve & Activate</button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Active users summary */}
+                  {active.length > 0 && (
+                    <div style={{ marginTop:'1.5rem' }}>
+                      <div style={{ fontSize:'0.72rem', fontWeight:700, letterSpacing:'0.1em', color:'rgba(148,163,184,0.45)', textTransform:'uppercase', marginBottom:'0.65rem' }}>
+                        Active Users ({active.length})
+                      </div>
+                      {active.map(u => (
+                        <div key={u.id} style={{ ...cardS, padding:'0.8rem 1rem', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'0.5rem', flexWrap:'wrap' }}>
+                          <div>
+                            <span style={{ fontSize:'0.82rem', fontWeight:600 }}>{u.fullName || u.email}</span>
+                            <span style={{ fontSize:'0.72rem', color:'rgba(148,163,184,0.5)', marginLeft:'0.6rem', fontFamily:'var(--ff-mono)' }}>{u.email}</span>
+                          </div>
+                          <span style={badgeS('52,211,153')}>Active</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ═══════════════════════════════════════════════════
+                  SECTION 2 — DYNAMIC STORE MAPPING CONFIG
+              ═══════════════════════════════════════════════════ */}
+              {section === 'stores' && (
+                <div>
+                  <div style={{ marginBottom:'1.4rem' }}>
+                    <h2 style={{ fontSize:'1.15rem', fontWeight:800, marginBottom:'0.2rem' }}>Dynamic Store Mapping Config</h2>
+                    <p style={{ fontSize:'0.78rem', color:'rgba(148,163,184,0.60)' }}>
+                      Bind permitted Store IDs to each user's profile. Comma-separate multiple IDs (e.g. ROAJI_MAIN, STORE_002).
+                    </p>
+                  </div>
+                  {loadingUsers ? (
+                    <div style={{ textAlign:'center', color:'rgba(148,163,184,0.5)', padding:'3rem 0', fontSize:'0.82rem' }}>Loading…</div>
+                  ) : allUsers.length === 0 ? (
+                    <div style={{ ...cardS, textAlign:'center', padding:'2.5rem', color:'rgba(148,163,184,0.45)', fontSize:'0.82rem' }}>No user accounts found.</div>
+                  ) : allUsers.map(u => (
+                    <div key={u.id} style={cardS}>
+                      <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.75rem', flexWrap:'wrap' }}>
+                        <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{u.fullName || u.email}</span>
+                        <span style={{ fontSize:'0.72rem', color:'rgba(148,163,184,0.5)', fontFamily:'var(--ff-mono)' }}>{u.email}</span>
+                        <span style={u.status === 'active' ? badgeS('52,211,153') : badgeS('245,158,11')}>{u.status}</span>
+                      </div>
+                      {/* Current tags */}
+                      <div style={{ display:'flex', flexWrap:'wrap', gap:'0.35rem', marginBottom:'0.75rem' }}>
+                        {(u.allowedStores || []).map(s => (
+                          <span key={s} style={{
+                            padding:'2px 10px', borderRadius:'99px', fontSize:'0.68rem', fontWeight:700,
+                            background:'rgba(0,245,212,0.10)', border:'1px solid rgba(0,245,212,0.25)',
+                            color:'var(--c-teal)', fontFamily:'var(--ff-mono)',
+                          }}>{s}</span>
+                        ))}
+                        {(!u.allowedStores || !u.allowedStores.length) && (
+                          <span style={{ fontSize:'0.72rem', color:'rgba(239,68,68,0.65)' }}>⚠ No stores assigned</span>
+                        )}
+                      </div>
+                      {/* Edit input */}
+                      <div style={{ display:'flex', gap:'0.6rem', alignItems:'center', flexWrap:'wrap' }}>
+                        <input
+                          style={{ ...inputS, flex:1, minWidth:180 }}
+                          placeholder={(u.allowedStores || []).join(', ') || 'ROAJI_MAIN, STORE_002'}
+                          value={storeInputs[u.id] !== undefined ? storeInputs[u.id] : (u.allowedStores || []).join(', ')}
+                          onChange={e => setStoreInputs(p => ({ ...p, [u.id]: e.target.value }))}
+                        />
+                        <button
+                          onClick={() => handleSaveStores(u.id)}
+                          style={btnS('0,245,212')}
+                          onMouseOver={e => e.currentTarget.style.background='rgba(0,245,212,0.30)'}
+                          onMouseOut={e  => e.currentTarget.style.background='rgba(0,245,212,0.20)'}
+                        >Save Mapping</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* ═══════════════════════════════════════════════════
+                  SECTION 3 — SUBSCRIPTION EXPIRY COUNTER
+              ═══════════════════════════════════════════════════ */}
+              {section === 'subs' && (
+                <div>
+                  <div style={{ marginBottom:'1.4rem' }}>
+                    <h2 style={{ fontSize:'1.15rem', fontWeight:800, marginBottom:'0.2rem' }}>Subscription Expiry Counter</h2>
+                    <p style={{ fontSize:'0.78rem', color:'rgba(148,163,184,0.60)' }}>
+                      Assign pass windows to users. Warning alerts fire automatically 3 days before expiry.
+                    </p>
+                  </div>
+                  {loadingUsers ? (
+                    <div style={{ textAlign:'center', color:'rgba(148,163,184,0.5)', padding:'3rem 0', fontSize:'0.82rem' }}>Loading…</div>
+                  ) : allUsers.map(u => {
+                    const expRaw = u.subscriptionExpiresAt;
+                    const expDate = expRaw ? (expRaw.toDate ? expRaw.toDate() : new Date(expRaw)) : null;
+                    const daysLeft = expDate ? Math.ceil((expDate.getTime() - Date.now()) / 86400000) : null;
+                    const isExpired = daysLeft !== null && daysLeft <= 0;
+                    const isWarning = daysLeft !== null && daysLeft > 0 && daysLeft <= 3;
+                    return (
+                      <div key={u.id} style={cardS}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.7rem', flexWrap:'wrap' }}>
+                          <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{u.fullName || u.email}</span>
+                          <span style={{ fontSize:'0.72rem', color:'rgba(148,163,184,0.5)', fontFamily:'var(--ff-mono)' }}>{u.email}</span>
+                        </div>
+                        {/* Current plan */}
+                        <div style={{ display:'flex', alignItems:'center', gap:'0.85rem', marginBottom:'0.8rem', flexWrap:'wrap' }}>
+                          <span style={badgeS(
+                            u.subscriptionPlan === 'lifetime' ? '52,211,153'
+                            : u.subscriptionPlan === '1year'  ? '96,165,250'
+                            : u.subscriptionPlan === '1month' ? '167,139,250'
+                            : '100,116,139'
+                          )}>{u.subscriptionPlan || 'none'}</span>
+
+                          {u.subscriptionPlan === 'lifetime' && (
+                            <span style={{ fontSize:'0.72rem', color:'#34d399', fontWeight:600 }}>♾ Never expires</span>
+                          )}
+                          {expDate && !isExpired && !isWarning && (
+                            <span style={{ fontSize:'0.72rem', color:'rgba(148,163,184,0.60)' }}>
+                              Expires: {expDate.toLocaleDateString('en-IN')} ({daysLeft}d left)
+                            </span>
+                          )}
+                          {isWarning && (
+                            <span style={{ fontSize:'0.72rem', color:'#f59e0b', fontWeight:700, animation:'pulse-glow-amber 1.5s ease-in-out infinite' }}>
+                              ⚠ Expires in {daysLeft} day{daysLeft === 1 ? '' : 's'}!
+                            </span>
+                          )}
+                          {isExpired && (
+                            <span style={{ fontSize:'0.72rem', color:'#f87171', fontWeight:700 }}>✗ Expired</span>
+                          )}
+                        </div>
+                        {/* Plan selector */}
+                        <div style={{ display:'flex', gap:'0.5rem', alignItems:'center', flexWrap:'wrap' }}>
+                          {['1month','1year','lifetime'].map(p => (
+                            <button key={p} onClick={() => setSubPlan(prev => ({ ...prev, [u.id]: p }))} style={{
+                              padding:'0.38rem 0.85rem', borderRadius:'0.5rem', border:'none', cursor:'pointer',
+                              fontSize:'0.72rem', fontWeight:700, fontFamily:'var(--ff-main)',
+                              background: subPlan[u.id] === p ? 'rgba(124,58,237,0.30)' : 'rgba(255,255,255,0.04)',
+                              color: subPlan[u.id] === p ? '#a78bfa' : 'rgba(148,163,184,0.65)',
+                              border: subPlan[u.id] === p ? '1px solid rgba(124,58,237,0.40)' : '1px solid rgba(255,255,255,0.08)',
+                              transition:'all 0.15s',
+                            }}>
+                              {p === '1month' ? '1 Month' : p === '1year' ? '1 Year' : '♾ Lifetime'}
+                            </button>
+                          ))}
+                          <button
+                            onClick={() => handleSetSubscription(u.id)}
+                            style={{ ...btnS('124,58,237'), marginLeft:'0.2rem' }}
+                            onMouseOver={e => e.currentTarget.style.background='rgba(124,58,237,0.35)'}
+                            onMouseOut={e  => e.currentTarget.style.background='rgba(124,58,237,0.20)'}
+                          >Apply</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* ═══════════════════════════════════════════════════
+                  SECTION 4 — CHANGE MASTER PASSWORD
+              ═══════════════════════════════════════════════════ */}
+              {section === 'pw' && (
+                <div>
+                  <div style={{ marginBottom:'1.4rem' }}>
+                    <h2 style={{ fontSize:'1.15rem', fontWeight:800, marginBottom:'0.2rem' }}>Change Master Password</h2>
+                    <p style={{ fontSize:'0.78rem', color:'rgba(148,163,184,0.60)' }}>
+                      Update the secure password for the master account ({user.email}).
+                    </p>
+                  </div>
+                  <div style={{ ...cardS, maxWidth:440 }}>
+                    <div style={{ marginBottom:'1rem' }}>
+                      <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'rgba(148,163,184,0.55)', marginBottom:'0.4rem' }}>New Password</label>
+                      <input type="password" value={newPw} onChange={e => setNewPw(e.target.value)} style={inputS} placeholder="Min 6 characters" />
+                    </div>
+                    <div style={{ marginBottom:'1.2rem' }}>
+                      <label style={{ display:'block', fontSize:'0.7rem', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'rgba(148,163,184,0.55)', marginBottom:'0.4rem' }}>Confirm Password</label>
+                      <input type="password" value={newPwConfirm} onChange={e => setNewPwConfirm(e.target.value)} style={inputS} placeholder="Repeat password" />
+                    </div>
+                    {pwMsg && (
+                      <div style={{
+                        padding:'0.55rem 0.85rem', borderRadius:'0.45rem', marginBottom:'1rem', fontSize:'0.78rem',
+                        background: pwMsg.startsWith('✓') ? 'rgba(52,211,153,0.10)' : 'rgba(239,68,68,0.10)',
+                        border: pwMsg.startsWith('✓') ? '1px solid rgba(52,211,153,0.28)' : '1px solid rgba(239,68,68,0.28)',
+                        color: pwMsg.startsWith('✓') ? '#34d399' : '#f87171',
+                      }}>{pwMsg}</div>
+                    )}
+                    <button onClick={handleChangePw} style={{
+                      width:'100%', padding:'0.72rem', borderRadius:'0.6rem', border:'none', cursor:'pointer',
+                      background:'linear-gradient(135deg,rgba(0,245,212,0.25) 0%,rgba(124,58,237,0.25) 100%)',
+                      border:'1px solid rgba(0,245,212,0.35)',
+                      color:'var(--c-teal)', fontSize:'0.88rem', fontWeight:700, fontFamily:'var(--ff-main)',
+                      boxShadow:'0 4px 20px rgba(0,245,212,0.10)',
+                      transition:'all 0.2s',
+                    }}
+                      onMouseOver={e => e.currentTarget.style.boxShadow='0 6px 28px rgba(0,245,212,0.22)'}
+                      onMouseOut={e  => e.currentTarget.style.boxShadow='0 4px 20px rgba(0,245,212,0.10)'}
+                    >Update Password</button>
+                  </div>
+                </div>
+              )}
+
+            </main>
+          </div>
+        </div>
+      );
+    };
+
+    /* ════════════════════════════════════════════════════════════════════
+       AUTH ROOT — ESG-1 top-level screen router
+       Routes: master → MasterAdminDashboard
+               pending → PendingLockScreen
+               active  → AppShell
+               unauth  → LoginScreen / SignUpScreen
     ════════════════════════════════════════════════════════════════════ */
     const AuthRoot = () => {
-      const [screen,    setScreen]    = useState('login');   // 'login' | 'signup'
-      const [authUser,  setAuthUser]  = useState(null);
+      const [screen,   setScreen]   = useState('login');   // 'login' | 'signup'
+      const [authUser, setAuthUser] = useState(null);
 
       if (authUser) {
         const handleSignOut = async () => {
-          /* PART 9B-1: Firebase V2 sign-out */
           if (window.RoajiV2Store && window.RoajiV2Store.ready()) {
             try { await window.RoajiV2Store.signOut(); } catch(_) {}
           }
           setAuthUser(null);
         };
+
+        const status = authUser.status || 'pending';
+
+        /* Master email → full admin dashboard */
+        if (status === 'master' ||
+            (authUser.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com') {
+          return <MasterAdminDashboard user={authUser} onSignOut={handleSignOut} />;
+        }
+
+        /* Pending → lock screen */
+        if (status === 'pending') {
+          return <PendingLockScreen user={authUser} onSignOut={handleSignOut} />;
+        }
+
+        /* Active → normal app */
         return <AppShell user={authUser} onSignOut={handleSignOut} />;
       }
 
