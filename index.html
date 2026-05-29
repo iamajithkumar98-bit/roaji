@@ -1434,7 +1434,7 @@
           status:         'active',
           /* ── PART 9B-2: primary tenant fields ── */
           primaryStoreId: resolvedStoreId,
-          allowedStores:  [resolvedStoreId], /* ROAJI-FIX: provisioned on sign-up to prevent indexOf crash */
+          allowedStores:  ['ROAJI_MAIN', resolvedStoreId], /* ROAJI-FIX: prevents indexOf crash on new profiles */
           storeIds:       [resolvedStoreId], /* array for multi-branch owners */
           createdAt:      firebase.firestore.FieldValue.serverTimestamp(),
           updatedAt:      firebase.firestore.FieldValue.serverTimestamp(),
@@ -1481,7 +1481,7 @@
           status:         'active',
           /* 9B-2: Tenant fields on auto-scaffold */
           primaryStoreId: resolvedStoreId,
-          allowedStores:  [resolvedStoreId], /* ROAJI-FIX: provisioned on scaffold to prevent indexOf crash */
+          allowedStores:  ['ROAJI_MAIN', resolvedStoreId], /* ROAJI-FIX: prevents indexOf crash on scaffolded profiles */
           storeIds:       [resolvedStoreId],
           createdAt:      firebase.firestore.FieldValue.serverTimestamp(),
           lastLoginAt:    firebase.firestore.FieldValue.serverTimestamp(),
@@ -6710,9 +6710,9 @@
               role:         (profile && profile.role) || 'Owner',
               plan:         (profile && profile.plan) || 'free',
               status:       (profile && profile.status) || 'active',
-              /* ROAJI-FIX: carry through stored tenant fields so session
-                 validators can safely call (user.allowedStores || []).indexOf() */
-              primaryStoreId: (profile && profile.primaryStoreId) || firebaseUser.uid,
+              /* ROAJI-FIX: carry stored tenant fields so (userData?.allowedStores || []).indexOf(storeId)
+                 is always safe — falls back to baseline ROAJI_MAIN for legacy profiles */
+              primaryStoreId: (profile && profile.primaryStoreId) || 'ROAJI_MAIN',
               allowedStores:  (profile && Array.isArray(profile.allowedStores) && profile.allowedStores.length)
                                 ? profile.allowedStores
                                 : ['ROAJI_MAIN', firebaseUser.uid],
@@ -6919,10 +6919,9 @@
               role:           form.role,
               plan:           'free',
               status:         'active',
-              /* ROAJI-FIX: provision safe tenant defaults for new registrations
-                 so that any downstream session validator calling
-                 (user.allowedStores || []).indexOf(storeId) never sees undefined */
-              primaryStoreId: firebaseUser.uid,
+              /* ROAJI-FIX: force-inject baseline tenant payload on Create Account so
+                 (userData?.allowedStores || []).indexOf(storeId) never fires on undefined */
+              primaryStoreId: 'ROAJI_MAIN',
               allowedStores:  ['ROAJI_MAIN', firebaseUser.uid],
               _source:        'roaji_v2_firebase',
             });
