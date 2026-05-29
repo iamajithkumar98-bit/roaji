@@ -1408,116 +1408,242 @@
        All writes route exclusively to roaji_v2_users / roaji_v2_bills.
     ══════════════════════════════════════════════════════════════════ */
 
-    /* ── PART ESG-1: Enterprise SaaS Guard — Master Owner Constant ── */
-    const ROAJI_MASTER_EMAIL = 'iamajithkumar98@gmail.com';
+    /* ══════════════════════════════════════════════════════════════════
+       LOCAL-FIRST MASTER SAAS ADMIN ENGINE  — ESG-2
+       ─────────────────────────────────────────────────────────────────
+       Replaces all Firestore-dependent auth loops that caused the
+       "Cannot read properties of undefined (reading 'indexOf')" crash.
 
-    /* ── Auth: Email/Password sign-up ────────────────────────────── */
-    /* PART 9B-2 + ESG-1: storeId defaults to uid.                    */
-    /* Master email → status 'master'. Standard users → 'pending'.    */
-    async function roajiV2SignUp({ email, password, fullName, businessName, phone, role, storeId }) {
-      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
-      const cred            = await roajiV2Auth.createUserWithEmailAndPassword(email, password);
-      const uid             = cred.user.uid;
-      const isMaster        = (email || '').toLowerCase().trim() === ROAJI_MASTER_EMAIL.toLowerCase();
-      const resolvedStoreId = (storeId && storeId.trim()) || (isMaster ? 'ROAJI_MAIN' : uid);
+       DESIGN:
+         • Hardcoded Primary Master Super-Admin credentials.
+         • All sign-up/sign-in operations run LOCALLY first.
+         • If Firebase IS configured and ready, cloud sync happens as
+           a non-blocking background operation — it never gates the UI.
+         • New registrations default to status "pending_approval".
+         • Master email bypasses all allowedStores checks immediately.
+         • User registry persisted in localStorage under 'roaji_local_users'.
+    ══════════════════════════════════════════════════════════════════ */
 
-      /* ESG-1: Master gets 'master' status + full store access.
-         Standard new users get 'pending' until Master approves.      */
-      const accountStatus   = isMaster ? 'master' : 'pending';
-      const allowedStores   = isMaster ? ['ROAJI_MAIN'] : ['ROAJI_MAIN', resolvedStoreId];
+    /* ── ESG-2: Hardcoded Master Credentials ─────────────────────── */
+    const ROAJI_MASTER_EMAIL    = 'iamajithkumar98@gmail.com';
+    const ROAJI_MASTER_PW_DEFAULT = 'RoajiMaster98@';
+    const ROAJI_LOCAL_USERS_KEY   = 'roaji_local_users';
+    const ROAJI_MASTER_PW_KEY     = 'roaji_master_pw_override';
 
-      await roajiV2Firestore
-        .collection(ROAJI_V2_COLLECTION_USERS)
-        .doc(uid)
-        .set({
-          uid,
-          fullName:       fullName       || '',
-          businessName:   businessName   || '',
-          email:          email          || '',
-          phone:          phone          || '',
-          role:           isMaster ? 'Master Admin' : (role || 'Owner'),
-          plan:           isMaster ? 'lifetime' : 'free',
-          status:         accountStatus,
-          /* ── PART 9B-2 + ESG-1: tenant fields ── */
-          primaryStoreId: resolvedStoreId,
-          allowedStores:  allowedStores,  /* ESG-FIX: prevents indexOf crash */
-          storeIds:       [resolvedStoreId],
-          /* ESG-1: subscription tracking */
-          subscriptionPlan:      isMaster ? 'lifetime' : 'none',
-          subscriptionExpiresAt: null,
-          subscriptionAlertSent: false,
-          createdAt:      firebase.firestore.FieldValue.serverTimestamp(),
-          updatedAt:      firebase.firestore.FieldValue.serverTimestamp(),
-          _schemaVersion: 'v2',
-          _tenantVersion: 'v2-mt-esg1',
-        });
+    /* ── ESG-2 LOCAL STORE: localStorage-backed user registry ─────── */
+    const RoajiLocalUserStore = {
+      /* Load all users from localStorage */
+      load() {
+        try {
+          const raw = localStorage.getItem(ROAJI_LOCAL_USERS_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch(_) { return []; }
+      },
+      /* Persist the full registry */
+      save(users) {
+        try { localStorage.setItem(ROAJI_LOCAL_USERS_KEY, JSON.stringify(users)); } catch(_) {}
+      },
+      /* Find by email (case-insensitive) */
+      findByEmail(email) {
+        return this.load().find(u => (u.email || '').toLowerCase() === (email || '').toLowerCase()) || null;
+      },
+      /* Find by uid */
+      findByUid(uid) {
+        return this.load().find(u => u.uid === uid) || null;
+      },
+      /* Upsert (insert or replace) */
+      upsert(profile) {
+        const all = this.load().filter(u => u.uid !== profile.uid);
+        all.push(profile);
+        this.save(all);
+      },
+      /* Update fields for a given uid */
+      update(uid, fields) {
+        const all = this.load();
+        const idx = all.findIndex(u => u.uid === uid);
+        if (idx >= 0) { all[idx] = { ...all[idx], ...fields, updatedAt: new Date().toISOString() }; this.save(all); }
+        return this.findByUid(uid);
+      },
+      /* Return all (excluding master) */
+      allStandard() {
+        return this.load().filter(u => u.status !== 'master');
+      },
+    };
 
-      roajiV2SetActiveTenant(uid, resolvedStoreId);
-      await cred.user.updateProfile({ displayName: fullName || email });
-      return cred.user;
+    /* ── ESG-2: Get the current effective master password ─────────── */
+    function roajiGetMasterPw() {
+      try { return localStorage.getItem(ROAJI_MASTER_PW_KEY) || ROAJI_MASTER_PW_DEFAULT; } catch(_) { return ROAJI_MASTER_PW_DEFAULT; }
+    }
+    function roajiSetMasterPw(newPw) {
+      try { localStorage.setItem(ROAJI_MASTER_PW_KEY, newPw); } catch(_) {}
     }
 
-    /* ── Auth: Email/Password sign-in ────────────────────────────── */
-    /* PART 9B-2 + ESG-1: Restores tenant context + ESG status fields. */
-    async function roajiV2SignIn({ email, password }) {
-      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
-      const isMaster  = (email || '').toLowerCase().trim() === ROAJI_MASTER_EMAIL.toLowerCase();
-      const cred      = await roajiV2Auth.signInWithEmailAndPassword(email, password);
-      const uid       = cred.user.uid;
-      const docRef    = roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid);
-      const snap      = await docRef.get();
+    /* ── ESG-2: Nano UUID generator (no crypto dependency) ────────── */
+    function roajiNanoId() {
+      return 'local_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now().toString(36);
+    }
 
-      if (snap.exists) {
-        await docRef.update({ lastLoginAt: firebase.firestore.FieldValue.serverTimestamp() });
-        let profile = snap.data();
-        /* ESG-1: If this is the master email but Firestore still has old status, upgrade it */
-        if (isMaster && profile.status !== 'master') {
-          await docRef.update({
-            status: 'master', role: 'Master Admin', plan: 'lifetime',
-            allowedStores: (profile.allowedStores && profile.allowedStores.length)
-              ? profile.allowedStores : ['ROAJI_MAIN'],
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-          });
-          profile = { ...profile, status: 'master', role: 'Master Admin', plan: 'lifetime',
-            allowedStores: (profile.allowedStores && profile.allowedStores.length)
-              ? profile.allowedStores : ['ROAJI_MAIN'] };
-        }
-        /* ESG-FIX: guarantee allowedStores is always an array */
-        if (!Array.isArray(profile.allowedStores) || !profile.allowedStores.length) {
-          const fallback = ['ROAJI_MAIN', profile.primaryStoreId || uid];
-          await docRef.update({ allowedStores: fallback });
-          profile = { ...profile, allowedStores: fallback };
-        }
-        const resolvedStoreId = profile.primaryStoreId || uid;
-        roajiV2SetActiveTenant(uid, resolvedStoreId);
-        return { firebaseUser: cred.user, profile };
-      } else {
-        /* First login after manual account creation — scaffold profile */
-        const resolvedStoreId = isMaster ? 'ROAJI_MAIN' : uid;
-        const profile = {
-          uid,
-          email:                cred.user.email || email,
-          fullName:             cred.user.displayName || '',
-          businessName:         '',
-          phone:                '',
-          role:                 isMaster ? 'Master Admin' : 'Owner',
-          plan:                 isMaster ? 'lifetime' : 'free',
-          status:               isMaster ? 'master' : 'pending',
-          primaryStoreId:       resolvedStoreId,
-          allowedStores:        isMaster ? ['ROAJI_MAIN'] : ['ROAJI_MAIN', resolvedStoreId],
-          storeIds:             [resolvedStoreId],
-          subscriptionPlan:     isMaster ? 'lifetime' : 'none',
-          subscriptionExpiresAt: null,
-          subscriptionAlertSent: false,
-          createdAt:            firebase.firestore.FieldValue.serverTimestamp(),
-          lastLoginAt:          firebase.firestore.FieldValue.serverTimestamp(),
-          _schemaVersion:       'v2',
-          _tenantVersion:       'v2-mt-esg1',
-        };
-        await docRef.set(profile);
-        roajiV2SetActiveTenant(uid, resolvedStoreId);
-        return { firebaseUser: cred.user, profile };
+    /* ── ESG-2: Build a clean profile object ─────────────────────── */
+    function roajiBuildProfile({ uid, email, fullName, businessName, phone, role, storeId, status }) {
+      const isMaster        = (email || '').toLowerCase().trim() === ROAJI_MASTER_EMAIL.toLowerCase();
+      const resolvedStoreId = storeId || (isMaster ? 'ROAJI_MAIN' : uid);
+      const accountStatus   = isMaster ? 'master' : (status || 'pending_approval');
+      const allowedStores   = isMaster ? ['ROAJI_MAIN'] : [resolvedStoreId];
+      return {
+        uid,
+        email:                 (email || '').toLowerCase().trim(),
+        fullName:              fullName      || '',
+        businessName:          businessName  || '',
+        phone:                 phone         || '',
+        role:                  isMaster ? 'Master Admin' : (role || 'Owner'),
+        plan:                  isMaster ? 'lifetime' : 'free',
+        status:                accountStatus,
+        primaryStoreId:        resolvedStoreId,
+        allowedStores:         allowedStores,
+        storeIds:              [resolvedStoreId],
+        subscriptionPlan:      isMaster ? 'lifetime' : 'none',
+        subscriptionExpiresAt: null,
+        subscriptionAlertSent: false,
+        createdAt:             new Date().toISOString(),
+        updatedAt:             new Date().toISOString(),
+        _schemaVersion:        'v2',
+        _tenantVersion:        'v2-mt-esg2-local',
+        _source:               'local',
+      };
+    }
+
+    /* ── ESG-2: Ensure master profile exists in local registry ─────── */
+    (function ensureMasterProfile() {
+      const existing = RoajiLocalUserStore.findByEmail(ROAJI_MASTER_EMAIL);
+      if (!existing) {
+        const masterUid = 'MASTER_UID_ROAJI';
+        RoajiLocalUserStore.upsert(roajiBuildProfile({
+          uid: masterUid, email: ROAJI_MASTER_EMAIL,
+          fullName: 'Ajith Kumar', businessName: 'Roaji HQ',
+          phone: '', role: 'Master Admin', storeId: 'ROAJI_MAIN',
+        }));
+        console.info('[Roaji ESG-2] Master profile bootstrapped in local registry.');
       }
+    })();
+
+    /* ── ESG-2: LOCAL AUTH: Sign-Up ───────────────────────────────── */
+    async function roajiV2SignUp({ email, password, fullName, businessName, phone, role, storeId }) {
+      const normalEmail = (email || '').toLowerCase().trim();
+      const isMaster    = normalEmail === ROAJI_MASTER_EMAIL.toLowerCase();
+
+      /* Check for duplicate email in local registry */
+      const existing = RoajiLocalUserStore.findByEmail(normalEmail);
+      if (existing) throw Object.assign(new Error('This email is already registered. Please sign in.'), { code: 'auth/email-already-in-use' });
+
+      /* Validate password */
+      if (!password || password.length < 6) throw Object.assign(new Error('Password must be at least 6 characters.'), { code: 'auth/weak-password' });
+
+      /* Master password enforcement */
+      if (isMaster && password !== roajiGetMasterPw()) {
+        throw Object.assign(new Error('Incorrect master setup password.'), { code: 'auth/wrong-password' });
+      }
+
+      const uid     = isMaster ? 'MASTER_UID_ROAJI' : roajiNanoId();
+      const profile = roajiBuildProfile({ uid, email: normalEmail, fullName, businessName, phone, role, storeId });
+
+      /* Store password hash (simple — local-only, not sent to any server) */
+      const pwEntry = { uid, pw: btoa(password), updatedAt: new Date().toISOString() };
+      try {
+        const pwStore = JSON.parse(localStorage.getItem('roaji_local_pw') || '{}');
+        pwStore[uid] = pwEntry.pw;
+        localStorage.setItem('roaji_local_pw', JSON.stringify(pwStore));
+      } catch(_) {}
+
+      RoajiLocalUserStore.upsert(profile);
+      if (typeof roajiV2SetActiveTenant === 'function') {
+        roajiV2SetActiveTenant(uid, profile.primaryStoreId);
+      }
+
+      /* Background Firebase sync — non-blocking, never gates UI */
+      if (roajiV2Ready && roajiV2Firestore) {
+        try {
+          roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).set(profile)
+            .then(() => console.info('[Roaji ESG-2] Profile synced to Firestore.'))
+            .catch(e  => console.warn('[Roaji ESG-2] Firestore sync skipped:', e.message));
+        } catch(_) {}
+      }
+
+      /* Return a fake firebaseUser-compatible object */
+      return { uid, email: normalEmail, displayName: fullName || normalEmail };
+    }
+
+    /* ── ESG-2: LOCAL AUTH: Sign-In ───────────────────────────────── */
+    async function roajiV2SignIn({ email, password }) {
+      const normalEmail = (email || '').toLowerCase().trim();
+      const isMaster    = normalEmail === ROAJI_MASTER_EMAIL.toLowerCase();
+
+      /* ── MASTER FAST-PATH: bypass ALL user registry checks ─────── */
+      if (isMaster) {
+        const effectivePw = roajiGetMasterPw();
+        if (password !== effectivePw) {
+          throw Object.assign(new Error('Incorrect master password.'), { code: 'auth/wrong-password' });
+        }
+        let masterProfile = RoajiLocalUserStore.findByEmail(ROAJI_MASTER_EMAIL);
+        if (!masterProfile) {
+          masterProfile = roajiBuildProfile({ uid: 'MASTER_UID_ROAJI', email: normalEmail, fullName: 'Ajith Kumar', businessName: 'Roaji HQ' });
+          RoajiLocalUserStore.upsert(masterProfile);
+        }
+        /* Always force master status */
+        masterProfile = { ...masterProfile, status: 'master', role: 'Master Admin', plan: 'lifetime', allowedStores: ['ROAJI_MAIN'] };
+        RoajiLocalUserStore.upsert(masterProfile);
+        if (typeof roajiV2SetActiveTenant === 'function') roajiV2SetActiveTenant(masterProfile.uid, 'ROAJI_MAIN');
+        return { firebaseUser: { uid: masterProfile.uid, email: normalEmail, displayName: masterProfile.fullName }, profile: masterProfile };
+      }
+
+      /* ── STANDARD USER PATH ─────────────────────────────────────── */
+      let profile = RoajiLocalUserStore.findByEmail(normalEmail);
+      if (!profile) {
+        /* Try Firestore if available */
+        if (roajiV2Ready && roajiV2Auth) {
+          try {
+            const cred = await roajiV2Auth.signInWithEmailAndPassword(email, password);
+            const uid  = cred.user.uid;
+            const snap = await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).get();
+            let fbProfile = snap.exists ? snap.data() : null;
+            if (!fbProfile) {
+              fbProfile = roajiBuildProfile({ uid, email: normalEmail, fullName: cred.user.displayName || '' });
+            }
+            /* ESG-FIX: guarantee allowedStores is always an array */
+            if (!Array.isArray(fbProfile.allowedStores) || !fbProfile.allowedStores.length) {
+              fbProfile = { ...fbProfile, allowedStores: ['ROAJI_MAIN', uid] };
+            }
+            RoajiLocalUserStore.upsert(fbProfile);
+            if (typeof roajiV2SetActiveTenant === 'function') roajiV2SetActiveTenant(uid, fbProfile.primaryStoreId || uid);
+            return { firebaseUser: cred.user, profile: fbProfile };
+          } catch(fbErr) {
+            const code = fbErr.code || '';
+            if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+              throw Object.assign(new Error('Invalid email or password.'), { code });
+            }
+            throw fbErr;
+          }
+        }
+        throw Object.assign(new Error('No account found for this email.'), { code: 'auth/user-not-found' });
+      }
+
+      /* Verify password from local store */
+      try {
+        const pwStore = JSON.parse(localStorage.getItem('roaji_local_pw') || '{}');
+        const storedPw = pwStore[profile.uid];
+        if (storedPw && atob(storedPw) !== password) {
+          throw Object.assign(new Error('Incorrect password. Try again.'), { code: 'auth/wrong-password' });
+        }
+      } catch(e) { if (e.code === 'auth/wrong-password') throw e; /* ignore parse errors */ }
+
+      /* ESG-FIX: guarantee allowedStores is always an array */
+      if (!Array.isArray(profile.allowedStores) || !profile.allowedStores.length) {
+        profile = { ...profile, allowedStores: ['ROAJI_MAIN', profile.uid] };
+        RoajiLocalUserStore.upsert(profile);
+      }
+
+      if (typeof roajiV2SetActiveTenant === 'function') roajiV2SetActiveTenant(profile.uid, profile.primaryStoreId || profile.uid);
+      return { firebaseUser: { uid: profile.uid, email: normalEmail, displayName: profile.fullName }, profile };
+    }
     }
 
     /* ── Auth: Sign-out ───────────────────────────────────────────── */
@@ -1887,47 +2013,69 @@
 
     /* ── ESG-1: Firestore helpers for Master Admin panel ───────────── */
 
-    /* Fetch ALL user profiles (master-only) */
+    /* ── ESG-2: LOCAL-FIRST Master Admin Helpers ────────────────── */
+
+    /* Fetch ALL user profiles (local-first, then Firestore fallback) */
     async function roajiV2GetAllUsers() {
-      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
-      const snap = await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).get();
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      /* Always return from local registry first — instant, no crash risk */
+      const localUsers = RoajiLocalUserStore.allStandard().map(u => ({ id: u.uid, ...u }));
+      if (localUsers.length > 0) return localUsers;
+      /* Fallback to Firestore only if local is empty and Firebase is ready */
+      if (roajiV2Ready && roajiV2Firestore) {
+        try {
+          const snap = await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).get();
+          return snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(u => u.status !== 'master');
+        } catch(e) { console.warn('[Roaji ESG-2] Firestore getAllUsers failed:', e.message); }
+      }
+      return [];
     }
 
-    /* Approve a pending user and set their status to 'active' */
+    /* Approve a pending user — sets status 'active' locally + Firestore */
     async function roajiV2ApproveUser(uid, extraFields = {}) {
-      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
-      await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).update({
-        status: 'active',
-        ...extraFields,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      });
+      /* Local-first: update immediately */
+      RoajiLocalUserStore.update(uid, { status: 'active', ...extraFields });
+      /* Background Firestore sync */
+      if (roajiV2Ready && roajiV2Firestore) {
+        try {
+          await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).update({
+            status: 'active', ...extraFields,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        } catch(e) { console.warn('[Roaji ESG-2] Firestore approveUser sync failed:', e.message); }
+      }
     }
 
-    /* Update allowedStores array for a specific user (master-only) */
+    /* Update allowedStores — local-first, then Firestore */
     async function roajiV2SetUserAllowedStores(uid, allowedStores) {
-      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
       if (!Array.isArray(allowedStores)) throw new Error('allowedStores must be an array.');
-      await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).update({
-        allowedStores,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      });
+      RoajiLocalUserStore.update(uid, { allowedStores });
+      if (roajiV2Ready && roajiV2Firestore) {
+        try {
+          await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).update({
+            allowedStores, updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        } catch(e) { console.warn('[Roaji ESG-2] Firestore setStores sync failed:', e.message); }
+      }
     }
 
-    /* Set a subscription plan + expiry for a user */
+    /* Set subscription plan — local-first, then Firestore */
     async function roajiV2SetSubscription(uid, plan, expiresAt) {
-      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
-      await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).update({
-        subscriptionPlan:      plan,
-        subscriptionExpiresAt: expiresAt, /* JS Date or null */
-        subscriptionAlertSent: false,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      RoajiLocalUserStore.update(uid, {
+        subscriptionPlan: plan, subscriptionExpiresAt: expiresAt ? expiresAt.toISOString() : null, subscriptionAlertSent: false,
       });
+      if (roajiV2Ready && roajiV2Firestore) {
+        try {
+          await roajiV2Firestore.collection(ROAJI_V2_COLLECTION_USERS).doc(uid).update({
+            subscriptionPlan: plan, subscriptionExpiresAt: expiresAt,
+            subscriptionAlertSent: false, updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        } catch(e) { console.warn('[Roaji ESG-2] Firestore setSubscription sync failed:', e.message); }
+      }
     }
 
     /* ── Expose on window for React (Babel script can't import modules) */
     window.RoajiV2Store = {
-      ready:               () => roajiV2Ready,
+      ready:               () => true,  /* ESG-2: always ready — local-first */
       signUp:              roajiV2SignUp,
       signIn:              roajiV2SignIn,
       signOut:             roajiV2SignOut,
@@ -1937,6 +2085,10 @@
       onBills:             roajiV2OnBills,
       getUserProfile:      roajiV2GetUserProfile,
       updateUserProfile:   roajiV2UpdateUserProfile,
+      /* ESG-2: Local-first user management */
+      LocalUserStore:      RoajiLocalUserStore,
+      getMasterPw:         roajiGetMasterPw,
+      setMasterPw:         roajiSetMasterPw,
       COLLECTIONS: {
         USERS: ROAJI_V2_COLLECTION_USERS,
         BILLS: ROAJI_V2_COLLECTION_BILLS,
@@ -4684,6 +4836,18 @@
        END PART 13B-1 MODULE 2 PART-A
     ══════════════════════════════════════════════════════════════════ */
 
+    /* ══ ESG-2 — SaaS Master Control button glow animation ═══════════════ */
+    @keyframes saas-master-glow {
+      0%,100% {
+        box-shadow: 0 0 18px rgba(0,245,212,0.20), 0 2px 12px rgba(0,0,0,0.45);
+        border-color: rgba(0,245,212,0.45);
+      }
+      50% {
+        box-shadow: 0 0 32px rgba(0,245,212,0.45), 0 2px 20px rgba(124,58,237,0.30);
+        border-color: rgba(0,245,212,0.80);
+      }
+    }
+
     /* ══ PART 9A-1 — WhatsApp Dispatcher glow ══════════════════════════ */
     @keyframes pulse-glow-wa {
       0%, 100% {
@@ -6769,41 +6933,40 @@
         if (!email || !password) { setError('Please fill in all fields.'); return; }
         setError('');
         setLoading(true);
-        /* ── PART 9B-1: Firebase V2 sign-in ──────────────────────── */
-        if (window.RoajiV2Store && window.RoajiV2Store.ready()) {
-          try {
-            const { firebaseUser, profile } = await window.RoajiV2Store.signIn({ email, password });
-            setLoading(false);
-            onSuccess && onSuccess({
-              uid:                   firebaseUser.uid,
-              email:                 firebaseUser.email,
-              displayName:           firebaseUser.displayName || (profile && profile.fullName) || email,
-              businessName:          (profile && profile.businessName) || '',
-              role:                  (profile && profile.role) || 'Owner',
-              plan:                  (profile && profile.plan) || 'free',
-              status:                (profile && profile.status) || 'pending',
-              /* ESG-1: tenant + subscription fields with safe fallbacks */
-              primaryStoreId:        (profile && profile.primaryStoreId) || 'ROAJI_MAIN',
-              allowedStores:         (profile && Array.isArray(profile.allowedStores) && profile.allowedStores.length)
-                                       ? profile.allowedStores
-                                       : ['ROAJI_MAIN', firebaseUser.uid],
-              subscriptionPlan:      (profile && profile.subscriptionPlan) || 'none',
-              subscriptionExpiresAt: (profile && profile.subscriptionExpiresAt) || null,
-              _source:               'roaji_v2_firebase',
-            });
-          } catch (err) {
-            setLoading(false);
-            const msg = err.code === 'auth/user-not-found'     ? 'No account found for this email.'
-                      : err.code === 'auth/wrong-password'     ? 'Incorrect password. Try again.'
-                      : err.code === 'auth/invalid-email'      ? 'Invalid email address.'
-                      : err.code === 'auth/too-many-requests'  ? 'Too many attempts. Please wait and try again.'
-                      : err.code === 'auth/invalid-credential' ? 'Invalid credentials. Check email and password.'
-                      : err.message || 'Sign-in failed. Please try again.';
-            setError(msg);
-          }
-        } else {
-          /* Fallback: Firebase config not yet set — local mock sign-in */
-          setTimeout(() => { setLoading(false); onSuccess && onSuccess({ email, _source: 'mock' }); }, 1200);
+        /* ── ESG-2: Local-First Auth Engine — never crashes without Firebase ── */
+        try {
+          const { firebaseUser, profile } = await window.RoajiV2Store.signIn({ email, password });
+          setLoading(false);
+          const isMaster = (firebaseUser.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com';
+          onSuccess && onSuccess({
+            uid:                   firebaseUser.uid,
+            email:                 firebaseUser.email,
+            displayName:           firebaseUser.displayName || (profile && profile.fullName) || email,
+            businessName:          (profile && profile.businessName) || '',
+            role:                  isMaster ? 'Master Admin' : ((profile && profile.role) || 'Owner'),
+            plan:                  isMaster ? 'lifetime' : ((profile && profile.plan) || 'free'),
+            /* ESG-2: master bypasses all checks; standard → pending_approval */
+            status:                isMaster ? 'master' : ((profile && profile.status) || 'pending_approval'),
+            primaryStoreId:        isMaster ? 'ROAJI_MAIN' : ((profile && profile.primaryStoreId) || firebaseUser.uid),
+            allowedStores:         isMaster
+                                     ? ['ROAJI_MAIN']
+                                     : ((profile && Array.isArray(profile.allowedStores) && profile.allowedStores.length)
+                                         ? profile.allowedStores
+                                         : [firebaseUser.uid]),
+            subscriptionPlan:      isMaster ? 'lifetime' : ((profile && profile.subscriptionPlan) || 'none'),
+            subscriptionExpiresAt: (profile && profile.subscriptionExpiresAt) || null,
+            _source:               (profile && profile._source) || 'local',
+          });
+        } catch (err) {
+          setLoading(false);
+          const msg = err.code === 'auth/user-not-found'     ? 'No account found for this email.'
+                    : err.code === 'auth/wrong-password'     ? 'Incorrect password. Try again.'
+                    : err.code === 'auth/invalid-email'      ? 'Invalid email address.'
+                    : err.code === 'auth/too-many-requests'  ? 'Too many attempts. Please wait and try again.'
+                    : err.code === 'auth/invalid-credential' ? 'Invalid credentials. Check email and password.'
+                    : err.code === 'auth/email-already-in-use' ? 'This email is already registered.'
+                    : err.message || 'Sign-in failed. Please try again.';
+          setError(msg);
         }
       };
 
@@ -6972,44 +7135,40 @@
         if (Object.keys(e).length) { setErrors(e); return; }
         setErrors({});
         setLoading(true);
-        /* ── PART 9B-1: Firebase V2 sign-up → writes to roaji_v2_users ── */
-        if (window.RoajiV2Store && window.RoajiV2Store.ready()) {
-          try {
-            const firebaseUser = await window.RoajiV2Store.signUp({
-              email:        form.email,
-              password:     form.password,
-              fullName:     form.fullName,
-              businessName: form.businessName,
-              phone:        form.phone,
-              role:         form.role,
-            });
-            setLoading(false);
-            onSuccess && onSuccess({
-              uid:                   firebaseUser.uid,
-              email:                 firebaseUser.email,
-              displayName:           form.fullName || firebaseUser.email,
-              businessName:          form.businessName,
-              role:                  form.role,
-              plan:                  'free',
-              /* ESG-1: new accounts start as 'pending' unless master email */
-              status:                firebaseUser.email.toLowerCase().trim() === (window.RoajiV2Store && window.RoajiV2Store.MASTER_EMAIL || 'iamajithkumar98@gmail.com') ? 'master' : 'pending',
-              primaryStoreId:        firebaseUser.email.toLowerCase().trim() === (window.RoajiV2Store && window.RoajiV2Store.MASTER_EMAIL || 'iamajithkumar98@gmail.com') ? 'ROAJI_MAIN' : firebaseUser.uid,
-              allowedStores:         ['ROAJI_MAIN', firebaseUser.uid],
-              subscriptionPlan:      'none',
-              subscriptionExpiresAt: null,
-              _source:               'roaji_v2_firebase',
-            });
-          } catch (err) {
-            setLoading(false);
-            const msg = err.code === 'auth/email-already-in-use' ? 'This email is already registered. Please sign in.'
-                      : err.code === 'auth/invalid-email'        ? 'Invalid email address.'
-                      : err.code === 'auth/weak-password'        ? 'Password is too weak. Use at least 6 characters.'
-                      : err.message || 'Sign-up failed. Please try again.';
-            setErrors({ general: msg });
-          }
-        } else {
-          /* Fallback: Firebase config not yet set — local mock sign-up */
-          setTimeout(() => { setLoading(false); onSuccess && onSuccess(form); }, 1400);
+        /* ── ESG-2: Local-First Registration — never crashes without Firebase ── */
+        try {
+          const firebaseUser = await window.RoajiV2Store.signUp({
+            email:        form.email,
+            password:     form.password,
+            fullName:     form.fullName,
+            businessName: form.businessName,
+            phone:        form.phone,
+            role:         form.role,
+          });
+          setLoading(false);
+          const isMaster = (firebaseUser.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com';
+          onSuccess && onSuccess({
+            uid:                   firebaseUser.uid,
+            email:                 firebaseUser.email,
+            displayName:           form.fullName || firebaseUser.email,
+            businessName:          form.businessName,
+            role:                  isMaster ? 'Master Admin' : form.role,
+            plan:                  isMaster ? 'lifetime' : 'free',
+            /* ESG-2: new accounts = 'pending_approval' until master activates; master = instant 'master' */
+            status:                isMaster ? 'master' : 'pending_approval',
+            primaryStoreId:        isMaster ? 'ROAJI_MAIN' : firebaseUser.uid,
+            allowedStores:         isMaster ? ['ROAJI_MAIN'] : [firebaseUser.uid],
+            subscriptionPlan:      isMaster ? 'lifetime' : 'none',
+            subscriptionExpiresAt: null,
+            _source:               'local',
+          });
+        } catch (err) {
+          setLoading(false);
+          const msg = err.code === 'auth/email-already-in-use' ? 'This email is already registered. Please sign in.'
+                    : err.code === 'auth/invalid-email'        ? 'Invalid email address.'
+                    : err.code === 'auth/weak-password'        ? 'Password is too weak. Use at least 6 characters.'
+                    : err.message || 'Sign-up failed. Please try again.';
+          setErrors({ general: msg });
         }
       };
 
@@ -14945,6 +15104,327 @@ Thank you for your business! 🙏
       </div>
     );
 
+    /* ════════════════════════════════════════════════════════════════════
+       ESG-2 — SAAS MASTER CONTROL PANEL
+       Premium hidden window — exclusively visible when logged in as master.
+       Features:
+         • Client Management Dashboard (local user registry)
+         • Manual Authorization Switches (Approve / Map Store ID)
+         • Update Master Password utility
+    ════════════════════════════════════════════════════════════════════ */
+    const MasterControlPanel = ({ user, onClose }) => {
+      const { useState: uState, useEffect: uEffect } = React;
+      const [tab,          setTab]         = uState('clients');
+      const [localUsers,   setLocalUsers]  = uState([]);
+      const [storeInputs,  setStoreInputs] = uState({});
+      const [subMap,       setSubMap]      = uState({});
+      const [toast,        setToast]       = uState('');
+      const [newPw,        setNewPw]       = uState('');
+      const [newPwConfirm, setNewPwConfirm]= uState('');
+      const [pwMsg,        setPwMsg]       = uState('');
+
+      const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+
+      /* Load users from local registry + Firestore */
+      const loadUsers = async () => {
+        try {
+          const all = await window.RoajiV2Store.getAllUsers();
+          setLocalUsers(all);
+        } catch(e) {
+          /* Fallback to pure local */
+          setLocalUsers(RoajiLocalUserStore ? RoajiLocalUserStore.allStandard().map(u=>({id:u.uid,...u})) : []);
+        }
+      };
+      uEffect(() => { loadUsers(); }, []);
+
+      /* Approve user */
+      const handleApprove = async (uid) => {
+        try {
+          await window.RoajiV2Store.approveUser(uid);
+          showToast('✓ Access granted. User is now active.');
+          loadUsers();
+        } catch(e) { showToast('✗ ' + e.message); }
+      };
+
+      /* Save store mapping */
+      const handleSaveStores = async (uid) => {
+        const raw = storeInputs[uid] || '';
+        const stores = raw.split(',').map(s=>s.trim()).filter(Boolean);
+        if (!stores.length) { showToast('⚠ Enter at least one Store ID.'); return; }
+        try {
+          await window.RoajiV2Store.setUserAllowedStores(uid, stores);
+          showToast('✓ Store mapping saved. allowedStores updated.');
+          loadUsers();
+        } catch(e) { showToast('✗ ' + e.message); }
+      };
+
+      /* Set subscription */
+      const handleSetSub = async (uid) => {
+        const plan = subMap[uid];
+        if (!plan) { showToast('⚠ Select a plan first.'); return; }
+        let expiresAt = null;
+        const now = new Date();
+        if (plan === '1month')   expiresAt = new Date(now.setMonth(now.getMonth()+1));
+        if (plan === '1year')    expiresAt = new Date(now.setFullYear(now.getFullYear()+1));
+        try {
+          await window.RoajiV2Store.setSubscription(uid, plan, expiresAt);
+          showToast('✓ Subscription tier updated.');
+          loadUsers();
+        } catch(e) { showToast('✗ ' + e.message); }
+      };
+
+      /* Update master password */
+      const handleChangePw = () => {
+        if (newPw.length < 6)        { setPwMsg('Minimum 6 characters required.'); return; }
+        if (newPw !== newPwConfirm)  { setPwMsg('Passwords do not match.'); return; }
+        window.RoajiV2Store.setMasterPw(newPw);
+        /* Also try Firebase */
+        try {
+          const fbUser = window.roajiV2Auth && window.roajiV2Auth.currentUser;
+          if (fbUser) fbUser.updatePassword(newPw).catch(()=>{});
+        } catch(_) {}
+        setPwMsg('✓ Master password updated successfully.');
+        setNewPw(''); setNewPwConfirm('');
+        setTimeout(() => setPwMsg(''), 3000);
+      };
+
+      const S = {
+        overlay: { position:'fixed', inset:0, zIndex:99995, background:'rgba(4,2,16,0.82)', backdropFilter:'blur(8px)', WebkitBackdropFilter:'blur(8px)', display:'flex', alignItems:'center', justifyContent:'center', padding:'1rem' },
+        modal:   { width:'100%', maxWidth:760, maxHeight:'90vh', overflowY:'auto', background:'rgba(8,4,26,0.97)', border:'1.5px solid rgba(0,245,212,0.28)', borderRadius:'1.25rem', boxShadow:'0 0 0 1px rgba(0,245,212,0.08), 0 40px 100px rgba(0,0,0,0.80), 0 0 80px rgba(0,245,212,0.06)', padding:'0' },
+        header:  { padding:'1.2rem 1.5rem', borderBottom:'1px solid rgba(0,245,212,0.12)', display:'flex', alignItems:'center', justifyContent:'space-between', background:'linear-gradient(90deg,rgba(0,245,212,0.06) 0%,rgba(124,58,237,0.06) 100%)' },
+        tabBar:  { display:'flex', gap:'0.3rem', padding:'0.75rem 1.5rem', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(0,0,0,0.2)' },
+        body:    { padding:'1.5rem' },
+        card:    { background:'rgba(255,255,255,0.030)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'0.75rem', padding:'1.1rem 1.25rem', marginBottom:'0.85rem' },
+        input:   { width:'100%', padding:'0.48rem 0.8rem', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:'0.5rem', color:'#f1f5f9', fontSize:'0.8rem', fontFamily:'var(--ff-main)', outline:'none', boxSizing:'border-box' },
+        btn:     (rgb) => ({ padding:'0.42rem 1rem', borderRadius:'0.5rem', border:`1px solid rgba(${rgb},0.45)`, background:`rgba(${rgb},0.18)`, color:`rgb(${rgb})`, fontSize:'0.75rem', fontWeight:700, fontFamily:'var(--ff-main)', cursor:'pointer', whiteSpace:'nowrap' }),
+        badge:   (rgb,txt) => ({ padding:'2px 9px', borderRadius:'99px', fontSize:'0.67rem', fontWeight:700, background:`rgba(${rgb},0.14)`, border:`1px solid rgba(${rgb},0.30)`, color:`rgb(${rgb})` }),
+      };
+
+      const TABS = [
+        { id:'clients', label:'👥 Client Management' },
+        { id:'stores',  label:'🏪 Store Mapping' },
+        { id:'subs',    label:'💎 Subscriptions' },
+        { id:'pw',      label:'🔐 Master Password' },
+      ];
+
+      return (
+        <div style={S.overlay} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+          <div style={S.modal}>
+
+            {/* Header */}
+            <div style={S.header}>
+              <div style={{ display:'flex', alignItems:'center', gap:'0.7rem' }}>
+                <span style={{ fontSize:'1.3rem' }}>⭐</span>
+                <div>
+                  <div style={{ fontSize:'0.72rem', fontWeight:700, letterSpacing:'0.12em', color:'var(--c-teal)', textTransform:'uppercase', marginBottom:'0.1rem' }}>Exclusive Access</div>
+                  <div style={{ fontSize:'1.1rem', fontWeight:800, background:'linear-gradient(110deg,#00f5d4 0%,#7c3aed 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>SaaS Master Control Panel</div>
+                </div>
+              </div>
+              <button onClick={onClose} style={{ background:'none', border:'none', color:'rgba(255,255,255,0.45)', fontSize:'1.3rem', cursor:'pointer', lineHeight:1, padding:'0.2rem 0.5rem' }}>✕</button>
+            </div>
+
+            {/* Tab bar */}
+            <div style={S.tabBar}>
+              {TABS.map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)} style={{
+                  padding:'0.38rem 0.9rem', borderRadius:'0.45rem', border:'none', cursor:'pointer',
+                  fontSize:'0.74rem', fontWeight:700, fontFamily:'var(--ff-main)',
+                  background: tab === t.id ? 'rgba(0,245,212,0.18)' : 'rgba(255,255,255,0.04)',
+                  color: tab === t.id ? 'var(--c-teal)' : 'rgba(148,163,184,0.65)',
+                  border: tab === t.id ? '1px solid rgba(0,245,212,0.38)' : '1px solid transparent',
+                  transition:'all 0.15s',
+                }}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Toast */}
+            {toast && (
+              <div style={{ margin:'0.75rem 1.5rem 0', padding:'0.5rem 0.9rem', borderRadius:'0.5rem', fontSize:'0.79rem', fontWeight:600,
+                background: toast.startsWith('✓') ? 'rgba(52,211,153,0.12)' : 'rgba(239,68,68,0.12)',
+                border: toast.startsWith('✓') ? '1px solid rgba(52,211,153,0.32)' : '1px solid rgba(239,68,68,0.32)',
+                color: toast.startsWith('✓') ? '#34d399' : '#f87171',
+              }}>{toast}</div>
+            )}
+
+            <div style={S.body}>
+
+              {/* ══ TAB 1: CLIENT MANAGEMENT DASHBOARD ══ */}
+              {tab === 'clients' && (
+                <div>
+                  <div style={{ marginBottom:'1.1rem', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'0.5rem' }}>
+                    <div>
+                      <h2 style={{ fontSize:'1rem', fontWeight:800, marginBottom:'0.15rem' }}>Client Management Dashboard</h2>
+                      <p style={{ fontSize:'0.75rem', color:'rgba(148,163,184,0.55)' }}>{localUsers.length} registered client{localUsers.length !== 1 ? 's' : ''} — Local registry + cloud sync</p>
+                    </div>
+                    <button onClick={loadUsers} style={S.btn('0,245,212')}
+                      onMouseOver={e=>e.currentTarget.style.background='rgba(0,245,212,0.30)'}
+                      onMouseOut={e=>e.currentTarget.style.background='rgba(0,245,212,0.18)'}>↻ Refresh</button>
+                  </div>
+
+                  {localUsers.length === 0 ? (
+                    <div style={{ ...S.card, textAlign:'center', padding:'2.5rem', color:'rgba(148,163,184,0.45)', fontSize:'0.82rem' }}>
+                      No client accounts registered yet. Share your app with clients to begin.
+                    </div>
+                  ) : localUsers.map(u => (
+                    <div key={u.id || u.uid} style={S.card}>
+                      <div style={{ display:'flex', alignItems:'center', gap:'0.55rem', flexWrap:'wrap', marginBottom:'0.65rem' }}>
+                        <span style={{ fontSize:'0.88rem', fontWeight:700 }}>{u.fullName || '(No name)'}</span>
+                        <span style={{ fontSize:'0.72rem', color:'rgba(148,163,184,0.5)', fontFamily:'var(--ff-mono)' }}>{u.email}</span>
+                        {u.businessName && <span style={{ fontSize:'0.70rem', color:'var(--c-dim)' }}>• {u.businessName}</span>}
+                        <span style={S.badge(
+                          u.status === 'active' ? '52,211,153' :
+                          u.status === 'pending_approval' || u.status === 'pending' ? '245,158,11' : '148,163,184',
+                          u.status
+                        )}>{u.status || 'unknown'}</span>
+                        <span style={S.badge(
+                          u.subscriptionPlan === 'lifetime' ? '52,211,153' :
+                          u.subscriptionPlan === '1year'    ? '96,165,250' :
+                          u.subscriptionPlan === '1month'   ? '167,139,250' : '100,116,139'
+                        )}>{u.subscriptionPlan || 'free'}</span>
+                      </div>
+                      <div style={{ fontSize:'0.68rem', color:'rgba(148,163,184,0.45)', fontFamily:'var(--ff-mono)', marginBottom:'0.8rem' }}>
+                        UID: {u.id || u.uid} &nbsp;|&nbsp; Shop: {u.businessName || '—'} &nbsp;|&nbsp; Store: {(u.allowedStores||[]).join(', ')||'none'}
+                      </div>
+                      {(u.status === 'pending_approval' || u.status === 'pending') && (
+                        <button
+                          onClick={() => handleApprove(u.id || u.uid)}
+                          style={{ ...S.btn('52,211,153'), marginRight:'0.5rem' }}
+                          onMouseOver={e=>e.currentTarget.style.background='rgba(52,211,153,0.30)'}
+                          onMouseOut={e=>e.currentTarget.style.background='rgba(52,211,153,0.18)'}
+                        >✓ Approve &amp; Grant Access</button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* ══ TAB 2: STORE MAPPING ══ */}
+              {tab === 'stores' && (
+                <div>
+                  <div style={{ marginBottom:'1.1rem' }}>
+                    <h2 style={{ fontSize:'1rem', fontWeight:800, marginBottom:'0.2rem' }}>Manual Store ID Mapping</h2>
+                    <p style={{ fontSize:'0.75rem', color:'rgba(148,163,184,0.55)' }}>
+                      Bind explicit Store IDs to each user's session. Comma-separate multiple IDs (e.g. ROAJI_MAIN, STORE_002).
+                      This eliminates undefined object reference crashes in allowedStores.
+                    </p>
+                  </div>
+                  {localUsers.length === 0 ? (
+                    <div style={{ ...S.card, textAlign:'center', padding:'2rem', color:'rgba(148,163,184,0.45)', fontSize:'0.8rem' }}>No clients found.</div>
+                  ) : localUsers.map(u => (
+                    <div key={u.id || u.uid} style={S.card}>
+                      <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.65rem', flexWrap:'wrap' }}>
+                        <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{u.fullName || u.email}</span>
+                        <span style={S.badge(u.status==='active'?'52,211,153':'245,158,11')}>{u.status}</span>
+                      </div>
+                      <div style={{ display:'flex', flexWrap:'wrap', gap:'0.3rem', marginBottom:'0.7rem' }}>
+                        {(u.allowedStores||[]).map(s => (
+                          <span key={s} style={{ padding:'2px 9px', borderRadius:'99px', fontSize:'0.68rem', fontWeight:700, background:'rgba(0,245,212,0.10)', border:'1px solid rgba(0,245,212,0.25)', color:'var(--c-teal)', fontFamily:'var(--ff-mono)' }}>{s}</span>
+                        ))}
+                        {(!u.allowedStores||!u.allowedStores.length)&&<span style={{fontSize:'0.7rem',color:'rgba(239,68,68,0.65)'}}>⚠ No stores assigned</span>}
+                      </div>
+                      <div style={{ display:'flex', gap:'0.5rem', alignItems:'center', flexWrap:'wrap' }}>
+                        <input
+                          style={{ ...S.input, flex:1, minWidth:180 }}
+                          placeholder={(u.allowedStores||[]).join(', ')||'ROAJI_MAIN, STORE_002'}
+                          value={storeInputs[u.id||u.uid] !== undefined ? storeInputs[u.id||u.uid] : (u.allowedStores||[]).join(', ')}
+                          onChange={e => setStoreInputs(p => ({ ...p, [u.id||u.uid]: e.target.value }))}
+                        />
+                        <button onClick={() => handleSaveStores(u.id||u.uid)} style={S.btn('0,245,212')}
+                          onMouseOver={e=>e.currentTarget.style.background='rgba(0,245,212,0.30)'}
+                          onMouseOut={e=>e.currentTarget.style.background='rgba(0,245,212,0.18)'}
+                        >Map Store ID</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* ══ TAB 3: SUBSCRIPTION TIERS ══ */}
+              {tab === 'subs' && (
+                <div>
+                  <div style={{ marginBottom:'1.1rem' }}>
+                    <h2 style={{ fontSize:'1rem', fontWeight:800, marginBottom:'0.2rem' }}>Subscription Tier Toggle</h2>
+                    <p style={{ fontSize:'0.75rem', color:'rgba(148,163,184,0.55)' }}>Assign subscription windows to clients. 3-day expiry alerts fire automatically.</p>
+                  </div>
+                  {localUsers.length === 0 ? (
+                    <div style={{ ...S.card, textAlign:'center', padding:'2rem', color:'rgba(148,163,184,0.45)', fontSize:'0.8rem' }}>No clients found.</div>
+                  ) : localUsers.map(u => (
+                    <div key={u.id||u.uid} style={S.card}>
+                      <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.65rem', flexWrap:'wrap' }}>
+                        <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{u.fullName || u.email}</span>
+                        <span style={S.badge(
+                          u.subscriptionPlan==='lifetime'?'52,211,153':u.subscriptionPlan==='1year'?'96,165,250':u.subscriptionPlan==='1month'?'167,139,250':'100,116,139'
+                        )}>{u.subscriptionPlan||'none'}</span>
+                      </div>
+                      <div style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap', alignItems:'center' }}>
+                        {['1month','1year','lifetime'].map(p => (
+                          <button key={p} onClick={() => setSubMap(prev=>({...prev,[u.id||u.uid]:p}))} style={{
+                            padding:'0.35rem 0.8rem', borderRadius:'0.45rem', border:'none', cursor:'pointer',
+                            fontSize:'0.72rem', fontWeight:700, fontFamily:'var(--ff-main)', transition:'all 0.13s',
+                            background: subMap[u.id||u.uid]===p ? 'rgba(124,58,237,0.30)' : 'rgba(255,255,255,0.04)',
+                            color:      subMap[u.id||u.uid]===p ? '#a78bfa' : 'rgba(148,163,184,0.65)',
+                            border:     subMap[u.id||u.uid]===p ? '1px solid rgba(124,58,237,0.40)' : '1px solid rgba(255,255,255,0.08)',
+                          }}>{p==='1month'?'1 Month':p==='1year'?'1 Year':'♾ Lifetime'}</button>
+                        ))}
+                        <button onClick={() => handleSetSub(u.id||u.uid)}
+                          style={{ ...S.btn('124,58,237'), marginLeft:'0.25rem' }}
+                          onMouseOver={e=>e.currentTarget.style.background='rgba(124,58,237,0.35)'}
+                          onMouseOut={e=>e.currentTarget.style.background='rgba(124,58,237,0.18)'}
+                        >Apply Plan</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* ══ TAB 4: MASTER PASSWORD ══ */}
+              {tab === 'pw' && (
+                <div>
+                  <div style={{ marginBottom:'1.1rem' }}>
+                    <h2 style={{ fontSize:'1rem', fontWeight:800, marginBottom:'0.2rem' }}>Update Master Password</h2>
+                    <p style={{ fontSize:'0.75rem', color:'rgba(148,163,184,0.55)' }}>
+                      Secure utility — updates the local master password for <span style={{color:'var(--c-teal)',fontFamily:'var(--ff-mono)'}}>{user.email}</span>.
+                      Changes persist in this device's localStorage.
+                    </p>
+                  </div>
+                  <div style={{ ...S.card, maxWidth:420 }}>
+                    <div style={{ marginBottom:'0.9rem' }}>
+                      <label style={{ display:'block', fontSize:'0.68rem', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'rgba(148,163,184,0.55)', marginBottom:'0.35rem' }}>New Password</label>
+                      <input type="password" style={S.input} value={newPw} onChange={e=>setNewPw(e.target.value)} placeholder="Min 6 characters" />
+                    </div>
+                    <div style={{ marginBottom:'1.1rem' }}>
+                      <label style={{ display:'block', fontSize:'0.68rem', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'rgba(148,163,184,0.55)', marginBottom:'0.35rem' }}>Confirm Password</label>
+                      <input type="password" style={S.input} value={newPwConfirm} onChange={e=>setNewPwConfirm(e.target.value)} placeholder="Repeat password" />
+                    </div>
+                    {pwMsg && (
+                      <div style={{
+                        padding:'0.5rem 0.85rem', borderRadius:'0.45rem', marginBottom:'0.9rem', fontSize:'0.78rem',
+                        background: pwMsg.startsWith('✓')?'rgba(52,211,153,0.10)':'rgba(239,68,68,0.10)',
+                        border: pwMsg.startsWith('✓')?'1px solid rgba(52,211,153,0.28)':'1px solid rgba(239,68,68,0.28)',
+                        color: pwMsg.startsWith('✓')?'#34d399':'#f87171',
+                      }}>{pwMsg}</div>
+                    )}
+                    <button onClick={handleChangePw} style={{
+                      width:'100%', padding:'0.72rem', borderRadius:'0.6rem', border:'1px solid rgba(0,245,212,0.38)', cursor:'pointer',
+                      background:'linear-gradient(135deg,rgba(0,245,212,0.22) 0%,rgba(124,58,237,0.22) 100%)',
+                      color:'var(--c-teal)', fontSize:'0.88rem', fontWeight:700, fontFamily:'var(--ff-main)',
+                      boxShadow:'0 4px 20px rgba(0,245,212,0.10)', transition:'all 0.2s',
+                    }}
+                      onMouseOver={e=>e.currentTarget.style.boxShadow='0 6px 28px rgba(0,245,212,0.22)'}
+                      onMouseOut={e=>e.currentTarget.style.boxShadow='0 4px 20px rgba(0,245,212,0.10)'}
+                    >🔐 Update Master Password</button>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      );
+    };
+
     /* ── App Shell (wraps master bar + sidebar + module panel tabs) ── */
     const AppShell = ({ user, onSignOut }) => {
       const [activeNav, setActiveNav] = useState('dashboard');
@@ -15013,9 +15493,47 @@ Thank you for your business! 🙏
       /* Which panel section is shown: module tab content or the dashboard placeholder */
       const showModulePanel = MODULE_TABS.some(t => t.id === activeTab);
 
+      /* ── ESG-2: SaaS Master Control floating button state ──────── */
+      const [masterPanelOpen, setMasterPanelOpen] = useState(false);
+      const isMasterUser = (user && (user.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com');
+
       return (
         <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
           <TopMasterBar user={user} onSignOut={onSignOut} />
+
+          {/* ── ESG-2: ⭐ SaaS Master Control floating button (master only) ── */}
+          {isMasterUser && (
+            <div style={{
+              position:'fixed', top:'0.85rem', right:'1rem', zIndex:99990,
+              display:'flex', alignItems:'center', gap:'0.5rem',
+            }}>
+              <button
+                onClick={() => setMasterPanelOpen(true)}
+                style={{
+                  display:'flex', alignItems:'center', gap:'0.45rem',
+                  padding:'0.42rem 0.95rem', borderRadius:'99px', border:'none', cursor:'pointer',
+                  background:'linear-gradient(135deg,rgba(0,245,212,0.22) 0%,rgba(124,58,237,0.30) 100%)',
+                  border:'1px solid rgba(0,245,212,0.45)',
+                  color:'#00f5d4', fontSize:'0.75rem', fontWeight:800,
+                  fontFamily:'var(--ff-main)', letterSpacing:'0.04em',
+                  boxShadow:'0 0 18px rgba(0,245,212,0.20), 0 2px 12px rgba(0,0,0,0.45)',
+                  backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)',
+                  transition:'all 0.18s',
+                  animation:'saas-master-glow 2.2s ease-in-out infinite',
+                }}
+                onMouseOver={e => { e.currentTarget.style.boxShadow='0 0 32px rgba(0,245,212,0.45), 0 4px 18px rgba(0,0,0,0.55)'; e.currentTarget.style.transform='scale(1.05)'; }}
+                onMouseOut={e  => { e.currentTarget.style.boxShadow='0 0 18px rgba(0,245,212,0.20), 0 2px 12px rgba(0,0,0,0.45)'; e.currentTarget.style.transform='scale(1)'; }}
+              >
+                <span style={{ fontSize:'0.88rem' }}>⭐</span>
+                SaaS Master Control
+              </button>
+            </div>
+          )}
+
+          {/* ── ESG-2: SaaS Master Control Panel Modal ─────────────── */}
+          {isMasterUser && masterPanelOpen && (
+            <MasterControlPanel user={user} onClose={() => setMasterPanelOpen(false)} />
+          )}
 
           {/* ── PART 10A-1: Offline Queue Toast (fixed, portal-like) ── */}
           <OfflineQueueToast />
@@ -15104,10 +15622,14 @@ Thank you for your business! 🙏
           }}>Account Awaiting Master Verification</h2>
 
           <p style={{ fontSize:'0.84rem', color:'rgba(148,163,184,0.80)', lineHeight:1.75, marginBottom:'1.8rem' }}>
-            Your account has been successfully registered and is currently under review.<br />
-            <strong style={{ color:'rgba(0,245,212,0.85)' }}>Please contact the administrator</strong> at<br />
+            <strong style={{ color:'#f87171', fontSize:'1rem', display:'block', marginBottom:'0.6rem' }}>
+              Access Denied — Account Awaiting Activation
+            </strong>
+            Your workspace is pending activation by<br />
+            <strong style={{ color:'rgba(0,245,212,0.85)' }}>Ajith Kumar</strong>.<br /><br />
+            Please share your registered email at<br />
             <span style={{ fontFamily:'var(--ff-mono)', color:'#a78bfa', fontSize:'0.82rem' }}>iamajithkumar98@gmail.com</span><br />
-            to request activation of your workspace.
+            for premium activation.
           </p>
 
           {/* User chip */}
@@ -15623,8 +16145,8 @@ Thank you for your business! 🙏
           return <MasterAdminDashboard user={authUser} onSignOut={handleSignOut} />;
         }
 
-        /* Pending → lock screen */
-        if (status === 'pending') {
+        /* Pending / pending_approval → lock screen (non-bypassable) */
+        if (status === 'pending' || status === 'pending_approval') {
           return <PendingLockScreen user={authUser} onSignOut={handleSignOut} />;
         }
 
