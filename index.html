@@ -14864,6 +14864,37 @@ Thank you for your business! 🙏
       const [activeNav, setActiveNav] = useState('dashboard');
       const [activeTab, setActiveTab] = useState('owner-dashboard'); // default open panel
 
+      /* ── Global connection state — available to all child panels ────
+         isOnline      : mirrors window.RoajiOnlineStatus verified state.
+                         Seeded from the live global at mount; falls back
+                         to navigator.onLine when the global is absent.
+         unsyncedCount : number of transactions held in the offline queue.
+                         Seeded at 0; refreshed via subscription + poll.  */
+      const [isOnline,      setIsOnline]      = useState(
+        window.RoajiOnlineStatus ? window.RoajiOnlineStatus.isOnline() : navigator.onLine
+      );
+      const [unsyncedCount, setUnsyncedCount] = useState(0);
+
+      /* Wire up connection subscription so AppShell stays in sync */
+      React.useEffect(() => {
+        if (!window.RoajiOnlineStatus) return;
+        if (typeof window.RoajiOnlineStatus.getQueue === 'function') {
+          setUnsyncedCount(window.RoajiOnlineStatus.getQueue().length);
+        }
+        const unsub = window.RoajiOnlineStatus.subscribe((nowOnline) => {
+          setIsOnline(nowOnline);
+          if (typeof window.RoajiOnlineStatus.getQueue === 'function') {
+            setUnsyncedCount(window.RoajiOnlineStatus.getQueue().length);
+          }
+        });
+        const poll = setInterval(() => {
+          if (typeof window.RoajiOnlineStatus.getQueue === 'function') {
+            setUnsyncedCount(window.RoajiOnlineStatus.getQueue().length);
+          }
+        }, 5000);
+        return () => { unsub(); clearInterval(poll); };
+      }, []);
+
       /* Sidebar nav items that map directly to a module panel tab */
       const NAV_TO_TAB = {
         'dashboard': null,           // shows dashboard placeholder
