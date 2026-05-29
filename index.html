@@ -1427,7 +1427,8 @@
     /* ── ESG-2: Hardcoded Master Credentials ─────────────────────── */
     const ROAJI_MASTER_EMAIL    = 'iamajithkumar98@gmail.com';
     const ROAJI_MASTER_PW_DEFAULT = 'RoajiMaster98@';
-    const ROAJI_LOCAL_USERS_KEY   = 'roaji_local_users';
+    const ROAJI_LOCAL_USERS_KEY    = 'roaji_local_users';
+    const ROAJI_LOCAL_TENANTS_KEY  = 'roaji_local_tenants';  /* spec-required alias */
     const ROAJI_MASTER_PW_KEY     = 'roaji_master_pw_override';
 
     /* ── ESG-2 LOCAL STORE: localStorage-backed user registry ─────── */
@@ -1439,9 +1440,13 @@
           return raw ? JSON.parse(raw) : [];
         } catch(_) { return []; }
       },
-      /* Persist the full registry */
+      /* Persist the full registry — writes to both keys for spec compliance */
       save(users) {
-        try { localStorage.setItem(ROAJI_LOCAL_USERS_KEY, JSON.stringify(users)); } catch(_) {}
+        try {
+          const json = JSON.stringify(users);
+          localStorage.setItem(ROAJI_LOCAL_USERS_KEY,   json);
+          localStorage.setItem(ROAJI_LOCAL_TENANTS_KEY, json);  /* roaji_local_tenants alias */
+        } catch(_) {}
       },
       /* Find by email (case-insensitive) */
       findByEmail(email) {
@@ -1644,22 +1649,24 @@
       if (typeof roajiV2SetActiveTenant === 'function') roajiV2SetActiveTenant(profile.uid, profile.primaryStoreId || profile.uid);
       return { firebaseUser: { uid: profile.uid, email: normalEmail, displayName: profile.fullName }, profile };
     }
-    }
 
-    /* ── Auth: Sign-out ───────────────────────────────────────────── */
-    /* PART 9B-2: Clears active tenant context on every sign-out so no
-       stale uid/storeId can bleed into the next session.             */
+    /* ── Auth: Sign-out (ESG-2: Local-First, never crashes without Firebase) ── */
     async function roajiV2SignOut() {
-      if (!roajiV2Ready) return;
       _roajiActiveTenantUid     = null;
       _roajiActiveTenantStoreId = null;
-      console.info('[Roaji 9B-2] Tenant context cleared on sign-out.');
-      await roajiV2Auth.signOut();
+      console.info('[Roaji ESG-2] Tenant context cleared on sign-out.');
+      /* Only attempt Firebase sign-out if Firebase Auth is available */
+      if (roajiV2Ready && roajiV2Auth && typeof roajiV2Auth.signOut === 'function') {
+        try { await roajiV2Auth.signOut(); } catch(e) { console.warn('[Roaji ESG-2] Firebase signOut skipped:', e.message); }
+      }
     }
 
     /* ── Auth: Observe session (call once at boot) ────────────────── */
     function roajiV2OnAuthStateChanged(callback) {
-      if (!roajiV2Ready) return () => {};
+      /* ESG-2: Firebase may not be configured — return a no-op unsubscriber */
+      if (!roajiV2Ready || !roajiV2Auth || typeof roajiV2Auth.onAuthStateChanged !== 'function') {
+        return () => {};
+      }
       return roajiV2Auth.onAuthStateChanged(callback);
     }
 
@@ -1710,7 +1717,18 @@
          _schemaVersion    ← 'v2'
     ══════════════════════════════════════════════════════════════════ */
     async function roajiV2AddBill(billData, storeIdOverride) {
-      if (!roajiV2Ready) throw new Error('[Roaji 13A-4] Firebase V2 not initialized.');
+      /* ESG-2: If Firebase is not configured, queue offline and return a local ID */
+      if (!roajiV2Ready || !roajiV2Firestore) {
+        const localId = 'local_bill_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,7);
+        const payload = { ...billData, _localId: localId, _localOnly: true, createdAt: new Date().toISOString() };
+        try {
+          const q = JSON.parse(localStorage.getItem('roaji_local_bills') || '[]');
+          q.push(payload);
+          localStorage.setItem('roaji_local_bills', JSON.stringify(q));
+        } catch(_) {}
+        console.info('[Roaji ESG-2] Bill saved locally (Firebase not configured):', localId);
+        return localId;
+      }
 
       /* ── Step 1: Resolve live uid from Firebase Auth (ground truth) ── */
       /* Always re-read currentUser at call time — never rely solely on a
@@ -1934,7 +1952,14 @@
        the callback, so no cross-outlet document can ever surface even
        if Firestore security rules are misconfigured.                  */
     function roajiV2OnBills(uid, callback, storeIdOverride) {
-      if (!roajiV2Ready) return () => {};
+      /* ESG-2: If Firebase is absent, serve from local bills store */
+      if (!roajiV2Ready || !roajiV2Firestore) {
+        try {
+          const localBills = JSON.parse(localStorage.getItem('roaji_local_bills') || '[]');
+          callback(localBills.filter(b => !b.ownerUid || b.ownerUid === uid));
+        } catch(_) { callback([]); }
+        return () => {};
+      }
       const storeId = storeIdOverride || _roajiActiveTenantStoreId || uid;
 
       /* 9B-2 Guard 1 */
@@ -1967,7 +1992,10 @@
     /* PART 9B-2: After the fetch, verifies the returned document belongs
        to the requesting uid before returning data to the caller.      */
     async function roajiV2GetUserProfile(uid) {
-      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
+      /* ESG-2: Try local registry first */
+      const localProfile = RoajiLocalUserStore.findByUid(uid);
+      if (localProfile) return localProfile;
+      if (!roajiV2Ready || !roajiV2Firestore) return null;
       /* 9B-2: Users doc is keyed by uid; storeId guard uses uid as storeId
          here because the users collection is per-user, not per-store.  */
       if (!uid) throw new Error('[Roaji 9B-2] roajiV2GetUserProfile: uid is required.');
@@ -1990,7 +2018,9 @@
     /* PART 9B-2: Verifies uid matches the active session before update.
        Strips any attempt to override uid or tenant fields in updates.  */
     async function roajiV2UpdateUserProfile(uid, updates) {
-      if (!roajiV2Ready) throw new Error('Firebase V2 not initialized.');
+      /* ESG-2: Always update local registry first */
+      RoajiLocalUserStore.update(uid, updates);
+      if (!roajiV2Ready || !roajiV2Firestore) return;
       if (!uid) throw new Error('[Roaji 9B-2] roajiV2UpdateUserProfile: uid is required.');
       /* 9B-2: Cross-check caller uid against active session */
       if (_roajiActiveTenantUid && _roajiActiveTenantUid !== uid) {
@@ -15619,17 +15649,20 @@ Thank you for your business! 🙏
             background:'linear-gradient(135deg,#00f5d4 0%,#7c3aed 100%)',
             WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
             backgroundClip:'text',
-          }}>Account Awaiting Master Verification</h2>
+          }}>Access Pending — Account Awaiting Activation</h2>
 
           <p style={{ fontSize:'0.84rem', color:'rgba(148,163,184,0.80)', lineHeight:1.75, marginBottom:'1.8rem' }}>
             <strong style={{ color:'#f87171', fontSize:'1rem', display:'block', marginBottom:'0.6rem' }}>
-              Access Denied — Account Awaiting Activation
+              🔒 Access Denied — Your workspace is locked.
             </strong>
-            Your workspace is pending activation by<br />
+            Your account is <strong style={{ color:'#f59e0b' }}>awaiting activation</strong> from{' '}
             <strong style={{ color:'rgba(0,245,212,0.85)' }}>Ajith Kumar</strong>.<br /><br />
-            Please share your registered email at<br />
-            <span style={{ fontFamily:'var(--ff-mono)', color:'#a78bfa', fontSize:'0.82rem' }}>iamajithkumar98@gmail.com</span><br />
-            for premium activation.
+            <span style={{ color:'rgba(148,163,184,0.70)', fontSize:'0.82rem' }}>
+              Please contact the owner to white-list your registered email.
+            </span><br />
+            <span style={{ fontFamily:'var(--ff-mono)', color:'#a78bfa', fontSize:'0.80rem' }}>
+              iamajithkumar98@gmail.com
+            </span>
           </p>
 
           {/* User chip */}
