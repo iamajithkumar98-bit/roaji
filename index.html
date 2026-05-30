@@ -13586,6 +13586,374 @@ Thank you for your business! 🙏
             </div>
           )}
 
+          {/* ════════════════════════════════════════════════════════════
+               RULE 3 — SAAS MASTER CONTROL PANEL (EMBEDDED INLINE)
+               Renders ONLY when currentUserEmail === "iamajithkumar98@gmail.com"
+               Moved out of root AppShell floating layer and secured here
+               inside Owner Settings / Control Center.
+          ════════════════════════════════════════════════════════════ */}
+          {(() => {
+            const _ccIsMaster = user && (user.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com';
+            if (!_ccIsMaster) return null;
+            return (
+              <EmbeddedMasterHub user={user} />
+            );
+          })()}
+
+        </div>
+      );
+    };
+
+    /* ════════════════════════════════════════════════════════════════════
+       EMBEDDED MASTER HUB — inline version of MasterControlPanel
+       Rendered inside ControlCenterPanel ONLY for iamajithkumar98@gmail.com
+       Provides the full SaaS Master Control experience within the
+       Owner Settings panel without a floating overlay or separate route.
+    ════════════════════════════════════════════════════════════════════ */
+    const EmbeddedMasterHub = ({ user }) => {
+      const { useState: uState, useEffect: uEffect } = React;
+      const [tab,          setTab]         = uState('clients');
+      const [localUsers,   setLocalUsers]  = uState([]);
+      const [storeInputs,  setStoreInputs] = uState({});
+      const [subMap,       setSubMap]      = uState({});
+      const [toast,        setToast]       = uState('');
+      const [newPw,        setNewPw]       = uState('');
+      const [newPwConfirm, setNewPwConfirm]= uState('');
+      const [pwMsg,        setPwMsg]       = uState('');
+      const [hubOpen,      setHubOpen]     = uState(false);
+
+      const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+
+      const loadUsers = async () => {
+        try {
+          const all = await window.RoajiV2Store.getAllUsers();
+          setLocalUsers(all);
+        } catch(e) {
+          setLocalUsers(typeof RoajiLocalUserStore !== 'undefined'
+            ? RoajiLocalUserStore.allStandard().map(u => ({ id: u.uid, ...u }))
+            : []);
+        }
+      };
+      uEffect(() => { if (hubOpen) loadUsers(); }, [hubOpen]);
+
+      const handleApprove = async (uid) => {
+        try { await window.RoajiV2Store.approveUser(uid); showToast('✓ Access granted.'); loadUsers(); }
+        catch(e) { showToast('✗ ' + e.message); }
+      };
+
+      const handleSaveStores = async (uid) => {
+        const raw = storeInputs[uid] || '';
+        const stores = raw.split(',').map(s => s.trim()).filter(Boolean);
+        if (!stores.length) { showToast('⚠ Enter at least one Store ID.'); return; }
+        try { await window.RoajiV2Store.setUserAllowedStores(uid, stores); showToast('✓ Store mapping saved.'); loadUsers(); }
+        catch(e) { showToast('✗ ' + e.message); }
+      };
+
+      const handleSetSub = async (uid) => {
+        const plan = subMap[uid];
+        if (!plan) { showToast('⚠ Select a plan first.'); return; }
+        let expiresAt = null;
+        const now = new Date();
+        if (plan === '1month') expiresAt = new Date(now.setMonth(now.getMonth()+1));
+        if (plan === '1year')  expiresAt = new Date(now.setFullYear(now.getFullYear()+1));
+        try { await window.RoajiV2Store.setSubscription(uid, plan, expiresAt); showToast('✓ Subscription updated.'); loadUsers(); }
+        catch(e) { showToast('✗ ' + e.message); }
+      };
+
+      const handleChangePw = () => {
+        if (newPw.length < 6)       { setPwMsg('Minimum 6 characters required.'); return; }
+        if (newPw !== newPwConfirm) { setPwMsg('Passwords do not match.'); return; }
+        if (typeof roajiSetMasterPw === 'function') roajiSetMasterPw(newPw);
+        else if (window.RoajiV2Store && window.RoajiV2Store.setMasterPw) window.RoajiV2Store.setMasterPw(newPw);
+        try {
+          const fbUser = window.roajiV2Auth && window.roajiV2Auth.currentUser;
+          if (fbUser && typeof fbUser.updatePassword === 'function') fbUser.updatePassword(newPw).catch(() => {});
+        } catch(_) {}
+        setPwMsg('✓ Master password updated successfully.');
+        setNewPw(''); setNewPwConfirm('');
+        setTimeout(() => setPwMsg(''), 3000);
+      };
+
+      const S = {
+        card:  { background:'rgba(255,255,255,0.030)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'0.75rem', padding:'1.1rem 1.25rem', marginBottom:'0.85rem' },
+        input: { width:'100%', padding:'0.48rem 0.8rem', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:'0.5rem', color:'#f1f5f9', fontSize:'0.8rem', fontFamily:'var(--ff-main)', outline:'none', boxSizing:'border-box' },
+        btn:   (rgb) => ({ padding:'0.42rem 1rem', borderRadius:'0.5rem', border:`1px solid rgba(${rgb},0.45)`, background:`rgba(${rgb},0.18)`, color:`rgb(${rgb})`, fontSize:'0.75rem', fontWeight:700, fontFamily:'var(--ff-main)', cursor:'pointer', whiteSpace:'nowrap' }),
+        badge: (rgb) => ({ padding:'2px 9px', borderRadius:'99px', fontSize:'0.67rem', fontWeight:700, background:`rgba(${rgb},0.14)`, border:`1px solid rgba(${rgb},0.30)`, color:`rgb(${rgb})` }),
+      };
+
+      const TABS = [
+        { id:'clients', label:'👥 Client Management' },
+        { id:'stores',  label:'🏪 Store Mapping'      },
+        { id:'subs',    label:'💎 Subscriptions'       },
+        { id:'pw',      label:'🔐 Master Password'     },
+      ];
+
+      /* Firestore-aware profile sync on login — fires once on mount */
+      uEffect(() => {
+        /* Re-anchor Firebase tenant context for master profile on panel mount */
+        if (typeof roajiV2SetActiveTenant === 'function') {
+          try {
+            const uid = (user && user.uid) || 'MASTER_UID_ROAJI';
+            roajiV2SetActiveTenant(uid, 'ROAJI_MAIN');
+          } catch(_) {}
+        }
+        /* Load master profile from Firestore if available */
+        if (window.roajiV2Firestore && window.roajiV2Auth && window.roajiV2Auth.currentUser) {
+          const uid = window.roajiV2Auth.currentUser.uid;
+          window.roajiV2Firestore.collection('roaji_v2_users').doc(uid).get()
+            .then(snap => {
+              if (snap.exists) {
+                const profile = snap.data();
+                /* Update local registry with fresh Firestore data */
+                if (typeof RoajiLocalUserStore !== 'undefined') {
+                  RoajiLocalUserStore.upsert({ ...profile, uid });
+                }
+                console.info('[Roaji EmbeddedMasterHub] Master profile synced from Firestore ✓', { uid, storeId: profile.primaryStoreId });
+              }
+            })
+            .catch(e => console.warn('[Roaji EmbeddedMasterHub] Firestore profile sync skipped:', e.message));
+        }
+      }, []);
+
+      return (
+        <div style={{
+          marginTop:'1rem',
+          border:'1.5px solid rgba(0,245,212,0.28)',
+          borderRadius:'1rem',
+          overflow:'hidden',
+          background:'rgba(4,2,16,0.55)',
+          backdropFilter:'blur(12px)',
+          WebkitBackdropFilter:'blur(12px)',
+        }}>
+          {/* ── Header toggle ── */}
+          <button
+            type="button"
+            onClick={() => setHubOpen(v => !v)}
+            style={{
+              width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
+              padding:'0.95rem 1.25rem',
+              background: hubOpen
+                ? 'linear-gradient(90deg,rgba(0,245,212,0.10) 0%,rgba(124,58,237,0.10) 100%)'
+                : 'transparent',
+              border:'none', cursor:'pointer',
+              borderBottom: hubOpen ? '1px solid rgba(0,245,212,0.14)' : 'none',
+            }}
+          >
+            <div style={{ display:'flex', alignItems:'center', gap:'0.7rem' }}>
+              <span style={{ fontSize:'1.1rem' }}>⭐</span>
+              <div style={{ textAlign:'left' }}>
+                <div style={{
+                  fontSize:'0.68rem', fontWeight:700, letterSpacing:'0.12em',
+                  color:'var(--c-teal)', textTransform:'uppercase', marginBottom:'0.1rem',
+                }}>Owner-Only — Exclusive Access</div>
+                <div style={{
+                  fontSize:'0.95rem', fontWeight:800,
+                  background:'linear-gradient(110deg,#00f5d4 0%,#7c3aed 100%)',
+                  WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
+                }}>SaaS Master Control Panel</div>
+              </div>
+            </div>
+            <span style={{
+              fontSize:'0.72rem', fontWeight:700, color:'var(--c-teal)',
+              display:'flex', alignItems:'center', gap:'0.3rem',
+              transition:'transform 0.2s',
+              transform: hubOpen ? 'rotate(180deg)' : 'none',
+            }}>▼</span>
+          </button>
+
+          {/* ── Body (collapsible) ── */}
+          {hubOpen && (
+            <div>
+              {/* Tab bar */}
+              <div style={{ display:'flex', gap:'0.3rem', padding:'0.65rem 1.25rem', borderBottom:'1px solid rgba(255,255,255,0.06)', background:'rgba(0,0,0,0.18)', flexWrap:'wrap' }}>
+                {TABS.map(t => (
+                  <button key={t.id} type="button" onClick={() => setTab(t.id)} style={{
+                    padding:'0.32rem 0.8rem', borderRadius:'0.4rem', border:'none', cursor:'pointer',
+                    fontSize:'0.72rem', fontWeight:700, fontFamily:'var(--ff-main)',
+                    background: tab === t.id ? 'rgba(0,245,212,0.18)' : 'rgba(255,255,255,0.04)',
+                    color:      tab === t.id ? 'var(--c-teal)' : 'rgba(148,163,184,0.65)',
+                    border:     tab === t.id ? '1px solid rgba(0,245,212,0.38)' : '1px solid transparent',
+                    transition:'all 0.15s',
+                  }}>{t.label}</button>
+                ))}
+              </div>
+
+              {/* Toast */}
+              {toast && (
+                <div style={{ margin:'0.65rem 1.25rem 0', padding:'0.45rem 0.85rem', borderRadius:'0.45rem', fontSize:'0.78rem', fontWeight:600,
+                  background: toast.startsWith('✓') ? 'rgba(52,211,153,0.12)' : 'rgba(239,68,68,0.12)',
+                  border: toast.startsWith('✓') ? '1px solid rgba(52,211,153,0.32)' : '1px solid rgba(239,68,68,0.32)',
+                  color: toast.startsWith('✓') ? '#34d399' : '#f87171',
+                }}>{toast}</div>
+              )}
+
+              <div style={{ padding:'1.25rem' }}>
+
+                {/* ══ TAB 1: CLIENT MANAGEMENT ══ */}
+                {tab === 'clients' && (
+                  <div>
+                    <div style={{ marginBottom:'1rem', display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:'0.5rem' }}>
+                      <div>
+                        <h3 style={{ fontSize:'0.95rem', fontWeight:800, marginBottom:'0.1rem' }}>Client Management Dashboard</h3>
+                        <p style={{ fontSize:'0.73rem', color:'rgba(148,163,184,0.55)' }}>{localUsers.length} client{localUsers.length !== 1 ? 's' : ''} registered — Local registry + Firestore sync</p>
+                      </div>
+                      <button type="button" onClick={loadUsers} style={S.btn('0,245,212')}
+                        onMouseOver={e => e.currentTarget.style.background='rgba(0,245,212,0.30)'}
+                        onMouseOut={e  => e.currentTarget.style.background='rgba(0,245,212,0.18)'}>↻ Refresh</button>
+                    </div>
+                    {localUsers.length === 0 ? (
+                      <div style={{ ...S.card, textAlign:'center', padding:'2.5rem', color:'rgba(148,163,184,0.45)', fontSize:'0.82rem' }}>
+                        No client accounts registered yet.
+                      </div>
+                    ) : localUsers.map(u => (
+                      <div key={u.id || u.uid} style={S.card}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'0.55rem', flexWrap:'wrap', marginBottom:'0.55rem' }}>
+                          <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{u.fullName || '(No name)'}</span>
+                          <span style={{ fontSize:'0.72rem', color:'rgba(148,163,184,0.5)', fontFamily:'var(--ff-mono)' }}>{u.email}</span>
+                          {u.businessName && <span style={{ fontSize:'0.70rem', color:'var(--c-dim)' }}>• {u.businessName}</span>}
+                          <span style={S.badge(
+                            u.status === 'active' ? '52,211,153' :
+                            (u.status === 'pending_approval' || u.status === 'pending') ? '245,158,11' : '148,163,184'
+                          )}>{u.status || 'unknown'}</span>
+                          <span style={S.badge(
+                            u.subscriptionPlan === 'lifetime' ? '52,211,153' :
+                            u.subscriptionPlan === '1year'    ? '96,165,250' :
+                            u.subscriptionPlan === '1month'   ? '167,139,250' : '100,116,139'
+                          )}>{u.subscriptionPlan || 'free'}</span>
+                        </div>
+                        <div style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap' }}>
+                          {(u.status === 'pending_approval' || u.status === 'pending') && (
+                            <button type="button" onClick={() => handleApprove(u.id || u.uid)} style={S.btn('0,245,212')}
+                              onMouseOver={e => e.currentTarget.style.background='rgba(0,245,212,0.30)'}
+                              onMouseOut={e  => e.currentTarget.style.background='rgba(0,245,212,0.18)'}>✓ Approve & Activate</button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* ══ TAB 2: STORE MAPPING ══ */}
+                {tab === 'stores' && (
+                  <div>
+                    <div style={{ marginBottom:'1rem' }}>
+                      <h3 style={{ fontSize:'0.95rem', fontWeight:800, marginBottom:'0.15rem' }}>Dynamic Store Mapping Config</h3>
+                      <p style={{ fontSize:'0.73rem', color:'rgba(148,163,184,0.55)' }}>Bind Store IDs to each user's profile. Comma-separate multiple IDs (e.g. ROAJI_MAIN, STORE_002).</p>
+                    </div>
+                    {localUsers.length === 0 ? (
+                      <div style={{ ...S.card, textAlign:'center', padding:'2.5rem', color:'rgba(148,163,184,0.45)', fontSize:'0.82rem' }}>No client accounts found.</div>
+                    ) : localUsers.map(u => (
+                      <div key={u.id || u.uid} style={S.card}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.65rem', flexWrap:'wrap' }}>
+                          <span style={{ fontSize:'0.83rem', fontWeight:700 }}>{u.fullName || u.email}</span>
+                          <span style={u.status === 'active' ? S.badge('52,211,153') : S.badge('245,158,11')}>{u.status}</span>
+                        </div>
+                        <div style={{ display:'flex', flexWrap:'wrap', gap:'0.3rem', marginBottom:'0.65rem' }}>
+                          {(u.allowedStores || []).map(s => (
+                            <span key={s} style={{ padding:'2px 9px', borderRadius:'99px', fontSize:'0.68rem', fontWeight:700, background:'rgba(0,245,212,0.10)', border:'1px solid rgba(0,245,212,0.25)', color:'var(--c-teal)', fontFamily:'var(--ff-mono)' }}>{s}</span>
+                          ))}
+                          {(!u.allowedStores || !u.allowedStores.length) && (
+                            <span style={{ fontSize:'0.7rem', color:'rgba(239,68,68,0.65)' }}>⚠ No stores assigned</span>
+                          )}
+                        </div>
+                        <div style={{ display:'flex', gap:'0.5rem', alignItems:'center', flexWrap:'wrap' }}>
+                          <input type="text" style={{ ...S.input, flex:1, minWidth:180 }}
+                            placeholder={(u.allowedStores || []).join(', ') || 'ROAJI_MAIN, STORE_002'}
+                            value={storeInputs[u.id || u.uid] !== undefined ? storeInputs[u.id || u.uid] : (u.allowedStores || []).join(', ')}
+                            onChange={e => setStoreInputs(p => ({ ...p, [u.id || u.uid]: e.target.value }))}
+                          />
+                          <button type="button" onClick={() => handleSaveStores(u.id || u.uid)} style={S.btn('0,245,212')}
+                            onMouseOver={e => e.currentTarget.style.background='rgba(0,245,212,0.30)'}
+                            onMouseOut={e  => e.currentTarget.style.background='rgba(0,245,212,0.18)'}>Map Store ID</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* ══ TAB 3: SUBSCRIPTIONS ══ */}
+                {tab === 'subs' && (
+                  <div>
+                    <div style={{ marginBottom:'1rem' }}>
+                      <h3 style={{ fontSize:'0.95rem', fontWeight:800, marginBottom:'0.15rem' }}>Subscription Tier Toggle</h3>
+                      <p style={{ fontSize:'0.73rem', color:'rgba(148,163,184,0.55)' }}>Assign subscription windows to clients. 3-day expiry alerts fire automatically.</p>
+                    </div>
+                    {localUsers.length === 0 ? (
+                      <div style={{ ...S.card, textAlign:'center', padding:'2rem', color:'rgba(148,163,184,0.45)', fontSize:'0.8rem' }}>No clients found.</div>
+                    ) : localUsers.map(u => (
+                      <div key={u.id || u.uid} style={S.card}>
+                        <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.65rem', flexWrap:'wrap' }}>
+                          <span style={{ fontSize:'0.85rem', fontWeight:700 }}>{u.fullName || u.email}</span>
+                          <span style={S.badge(
+                            u.subscriptionPlan === 'lifetime' ? '52,211,153' :
+                            u.subscriptionPlan === '1year'    ? '96,165,250' :
+                            u.subscriptionPlan === '1month'   ? '167,139,250' : '100,116,139'
+                          )}>{u.subscriptionPlan || 'none'}</span>
+                        </div>
+                        <div style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap', alignItems:'center' }}>
+                          {['1month','1year','lifetime'].map(p => (
+                            <button key={p} type="button" onClick={() => setSubMap(prev => ({ ...prev, [u.id || u.uid]: p }))} style={{
+                              padding:'0.32rem 0.75rem', borderRadius:'0.4rem', border:'none', cursor:'pointer',
+                              fontSize:'0.72rem', fontWeight:700, fontFamily:'var(--ff-main)', transition:'all 0.13s',
+                              background: subMap[u.id || u.uid] === p ? 'rgba(124,58,237,0.30)' : 'rgba(255,255,255,0.04)',
+                              color:      subMap[u.id || u.uid] === p ? '#a78bfa' : 'rgba(148,163,184,0.65)',
+                              border:     subMap[u.id || u.uid] === p ? '1px solid rgba(124,58,237,0.40)' : '1px solid rgba(255,255,255,0.08)',
+                            }}>
+                              {p === '1month' ? '1 Month' : p === '1year' ? '1 Year' : '♾ Lifetime'}
+                            </button>
+                          ))}
+                          <button type="button" onClick={() => handleSetSub(u.id || u.uid)} style={{ ...S.btn('124,58,237'), marginLeft:'0.2rem' }}
+                            onMouseOver={e => e.currentTarget.style.background='rgba(124,58,237,0.35)'}
+                            onMouseOut={e  => e.currentTarget.style.background='rgba(124,58,237,0.18)'}>Apply Plan</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* ══ TAB 4: MASTER PASSWORD ══ */}
+                {tab === 'pw' && (
+                  <div>
+                    <div style={{ marginBottom:'1rem' }}>
+                      <h3 style={{ fontSize:'0.95rem', fontWeight:800, marginBottom:'0.15rem' }}>Update Master Password</h3>
+                      <p style={{ fontSize:'0.73rem', color:'rgba(148,163,184,0.55)' }}>
+                        Secure utility — updates the local master password for{' '}
+                        <span style={{ color:'var(--c-teal)', fontFamily:'var(--ff-mono)' }}>{user.email}</span>.
+                      </p>
+                    </div>
+                    <div style={{ ...S.card, maxWidth:420 }}>
+                      <div style={{ marginBottom:'0.85rem' }}>
+                        <label style={{ display:'block', fontSize:'0.68rem', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'rgba(148,163,184,0.55)', marginBottom:'0.35rem' }}>New Password</label>
+                        <input type="password" style={S.input} value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="Min 6 characters" />
+                      </div>
+                      <div style={{ marginBottom:'1rem' }}>
+                        <label style={{ display:'block', fontSize:'0.68rem', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'rgba(148,163,184,0.55)', marginBottom:'0.35rem' }}>Confirm Password</label>
+                        <input type="password" style={S.input} value={newPwConfirm} onChange={e => setNewPwConfirm(e.target.value)} placeholder="Repeat password" />
+                      </div>
+                      {pwMsg && (
+                        <div style={{
+                          padding:'0.5rem 0.85rem', borderRadius:'0.45rem', marginBottom:'0.9rem', fontSize:'0.78rem',
+                          background: pwMsg.startsWith('✓') ? 'rgba(52,211,153,0.10)' : 'rgba(239,68,68,0.10)',
+                          border: pwMsg.startsWith('✓') ? '1px solid rgba(52,211,153,0.28)' : '1px solid rgba(239,68,68,0.28)',
+                          color: pwMsg.startsWith('✓') ? '#34d399' : '#f87171',
+                        }}>{pwMsg}</div>
+                      )}
+                      <button type="button" onClick={handleChangePw} style={{
+                        width:'100%', padding:'0.72rem', borderRadius:'0.6rem', border:'1px solid rgba(0,245,212,0.38)', cursor:'pointer',
+                        background:'linear-gradient(135deg,rgba(0,245,212,0.22) 0%,rgba(124,58,237,0.22) 100%)',
+                        color:'var(--c-teal)', fontSize:'0.88rem', fontWeight:700, fontFamily:'var(--ff-main)',
+                        boxShadow:'0 4px 20px rgba(0,245,212,0.10)', transition:'all 0.2s',
+                      }}
+                        onMouseOver={e => e.currentTarget.style.boxShadow='0 6px 28px rgba(0,245,212,0.22)'}
+                        onMouseOut={e  => e.currentTarget.style.boxShadow='0 4px 20px rgba(0,245,212,0.10)'}
+                      >🔐 Update Master Password</button>
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </div>
+          )}
         </div>
       );
     };
@@ -15458,7 +15826,9 @@ Thank you for your business! 🙏
     /* ── App Shell (wraps master bar + sidebar + module panel tabs) ── */
     const AppShell = ({ user, onSignOut }) => {
       const [activeNav, setActiveNav] = useState('dashboard');
-      const [activeTab, setActiveTab] = useState('owner-dashboard'); // default open panel
+      /* RULE 2: Master email lands directly on Gifts billing workspace tab */
+      const _isMasterOwner = (user && (user.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com');
+      const [activeTab, setActiveTab] = useState(_isMasterOwner ? 'gifts' : 'owner-dashboard');
 
       /* ── Global connection state — available to all child panels ────
          isOnline      : mirrors window.RoajiOnlineStatus verified state.
@@ -15523,47 +15893,12 @@ Thank you for your business! 🙏
       /* Which panel section is shown: module tab content or the dashboard placeholder */
       const showModulePanel = MODULE_TABS.some(t => t.id === activeTab);
 
-      /* ── ESG-2: SaaS Master Control floating button state ──────── */
-      const [masterPanelOpen, setMasterPanelOpen] = useState(false);
-      const isMasterUser = (user && (user.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com');
+      /* RULE 3: SaaS Master Control Panel is now embedded inside ControlCenterPanel.
+         The floating root-level button has been removed. No floating state needed here. */
 
       return (
         <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column' }}>
           <TopMasterBar user={user} onSignOut={onSignOut} />
-
-          {/* ── ESG-2: ⭐ SaaS Master Control floating button (master only) ── */}
-          {isMasterUser && (
-            <div style={{
-              position:'fixed', top:'0.85rem', right:'1rem', zIndex:99990,
-              display:'flex', alignItems:'center', gap:'0.5rem',
-            }}>
-              <button
-                onClick={() => setMasterPanelOpen(true)}
-                style={{
-                  display:'flex', alignItems:'center', gap:'0.45rem',
-                  padding:'0.42rem 0.95rem', borderRadius:'99px', border:'none', cursor:'pointer',
-                  background:'linear-gradient(135deg,rgba(0,245,212,0.22) 0%,rgba(124,58,237,0.30) 100%)',
-                  border:'1px solid rgba(0,245,212,0.45)',
-                  color:'#00f5d4', fontSize:'0.75rem', fontWeight:800,
-                  fontFamily:'var(--ff-main)', letterSpacing:'0.04em',
-                  boxShadow:'0 0 18px rgba(0,245,212,0.20), 0 2px 12px rgba(0,0,0,0.45)',
-                  backdropFilter:'blur(12px)', WebkitBackdropFilter:'blur(12px)',
-                  transition:'all 0.18s',
-                  animation:'saas-master-glow 2.2s ease-in-out infinite',
-                }}
-                onMouseOver={e => { e.currentTarget.style.boxShadow='0 0 32px rgba(0,245,212,0.45), 0 4px 18px rgba(0,0,0,0.55)'; e.currentTarget.style.transform='scale(1.05)'; }}
-                onMouseOut={e  => { e.currentTarget.style.boxShadow='0 0 18px rgba(0,245,212,0.20), 0 2px 12px rgba(0,0,0,0.45)'; e.currentTarget.style.transform='scale(1)'; }}
-              >
-                <span style={{ fontSize:'0.88rem' }}>⭐</span>
-                SaaS Master Control
-              </button>
-            </div>
-          )}
-
-          {/* ── ESG-2: SaaS Master Control Panel Modal ─────────────── */}
-          {isMasterUser && masterPanelOpen && (
-            <MasterControlPanel user={user} onClose={() => setMasterPanelOpen(false)} />
-          )}
 
           {/* ── PART 10A-1: Offline Queue Toast (fixed, portal-like) ── */}
           <OfflineQueueToast />
@@ -16153,29 +16488,75 @@ Thank you for your business! 🙏
 
     /* ════════════════════════════════════════════════════════════════════
        AUTH ROOT — ESG-1 top-level screen router
-       Routes: master → MasterAdminDashboard
+       Routes: master → AppShell (primary billing workspace, all modules unlocked)
                pending → PendingLockScreen
                active  → AppShell
                unauth  → LoginScreen / SignUpScreen
+
+       REFACTOR NOTE (Rules 1 & 2):
+         Master email "iamajithkumar98@gmail.com" now routes DIRECTLY to
+         AppShell — the primary billing workspace — instead of the legacy
+         MasterAdminDashboard full-screen view. The MasterAdminDashboard
+         component is retained for possible future use but is no longer
+         mounted at the root router level.
+
+         On successful login, the Firebase Firestore tenant context is
+         synchronously anchored via roajiV2SetActiveTenant so all subsequent
+         bill reads and writes are correctly scoped to the master profile's
+         storeId (ROAJI_MAIN) from the very first render.
     ════════════════════════════════════════════════════════════════════ */
     const AuthRoot = () => {
       const [screen,   setScreen]   = useState('login');   // 'login' | 'signup'
       const [authUser, setAuthUser] = useState(null);
 
+      /* ── RULE 1: Firebase Data Sync — anchor tenant context on login ── */
+      /* Called by both LoginScreen.onSuccess and SignUpScreen.onSuccess.
+         Ensures _roajiActiveTenantUid + _roajiActiveTenantStoreId are set
+         BEFORE the first Firestore read/write so the guard pipeline never
+         hits a "null storeId" violation on the master profile.             */
+      const handleAuthSuccess = (userProfile) => {
+        /* Re-anchor the Firebase tenant session immediately */
+        if (typeof roajiV2SetActiveTenant === 'function') {
+          const uid     = userProfile.uid || userProfile.firebaseUser?.uid || 'MASTER_UID_ROAJI';
+          const storeId = userProfile.primaryStoreId || (
+            (userProfile.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com'
+              ? 'ROAJI_MAIN'
+              : uid
+          );
+          try { roajiV2SetActiveTenant(uid, storeId); } catch(_) {}
+        }
+        /* If the profile came back as { firebaseUser, profile }, unwrap it */
+        const resolved = userProfile.profile || userProfile;
+        setAuthUser(resolved);
+      };
+
       if (authUser) {
         const handleSignOut = async () => {
+          /* Clear tenant context and Firebase session */
+          if (typeof roajiV2SetActiveTenant === 'function') {
+            try { roajiV2SetActiveTenant(null, null); } catch(_) {}
+          }
           if (window.RoajiV2Store && window.RoajiV2Store.ready()) {
             try { await window.RoajiV2Store.signOut(); } catch(_) {}
+          }
+          /* Also clear Firebase Auth directly if available */
+          if (window.roajiV2Auth && typeof window.roajiV2Auth.signOut === 'function') {
+            try { await window.roajiV2Auth.signOut(); } catch(_) {}
           }
           setAuthUser(null);
         };
 
-        const status = authUser.status || 'pending';
+        const isMasterEmail = (authUser.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com';
+        const status        = authUser.status || 'pending';
 
-        /* Master email → full admin dashboard */
-        if (status === 'master' ||
-            (authUser.email || '').toLowerCase().trim() === 'iamajithkumar98@gmail.com') {
-          return <MasterAdminDashboard user={authUser} onSignOut={handleSignOut} />;
+        /* ── RULE 2: Master email → AppShell (primary billing workspace) ── */
+        /* Master email bypasses ALL status checks and routes directly to
+           the full AppShell with all modules (Gifts, Frame, Xerox,
+           Stationery, Studio) active and unlocked for real transactions.
+           The SaaS Master Control Panel is now embedded inside the
+           Control Center tab (Owner Settings) — see Rule 3.              */
+        if (isMasterEmail || status === 'master') {
+          return <AppShell user={authUser} onSignOut={handleSignOut} />;
         }
 
         /* Pending / pending_approval → lock screen (non-bypassable) */
@@ -16183,13 +16564,13 @@ Thank you for your business! 🙏
           return <PendingLockScreen user={authUser} onSignOut={handleSignOut} />;
         }
 
-        /* Active → normal app */
+        /* Active standard user → normal app */
         return <AppShell user={authUser} onSignOut={handleSignOut} />;
       }
 
       return screen === 'login'
-        ? <LoginScreen  onSwitch={() => setScreen('signup')} onSuccess={u => setAuthUser(u)} />
-        : <SignUpScreen onSwitch={() => setScreen('login')}  onSuccess={u => setAuthUser(u)} />;
+        ? <LoginScreen  onSwitch={() => setScreen('signup')} onSuccess={handleAuthSuccess} />
+        : <SignUpScreen onSwitch={() => setScreen('login')}  onSuccess={handleAuthSuccess} />;
     };
 
     /* ════════════════════════════════════════════════════════════════════
