@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roaji Billing Software - Orders & Shipping</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FDFCF7; /* Warm White Default */
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(231, 229, 222, 0.6);
+            border-radius: 1.5rem;
+        }
+        .glow-focus:focus {
+            outline: none;
+            border-color: #D97706; /* Warm Amber */
+            box-shadow: 0 0 10px rgba(217, 119, 6, 0.15);
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-label-area, #printable-label-area * {
+                visibility: visible;
+            }
+            #printable-label-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden p-4 md:p-8 flex flex-col items-center justify-start">
+
+    <!-- BACKGROUND BLOB DECORATIONS -->
+    <div class="absolute top-[-10%] left-[-10%] w-[45vw] h-[45vw] rounded-full bg-amber-100/40 blur-[80px] pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-orange-100/30 blur-[90px] pointer-events-none"></div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
+
+    <!-- MAIN INTERFACE WRAPPER -->
+    <div class="w-full max-w-6xl z-10 space-y-6">
+
+        <!-- HEADER AREA -->
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-stone-200/50">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <a href="index.html" data-key="back_dashboard" class="text-xs font-bold text-amber-700 hover:text-amber-800 transition">← முகப்புப்பக்கத்திற்குச் செல்</a>
+                </div>
+                <h1 id="app-title" data-key="app_title" class="text-xl font-bold text-stone-850">ஆர்டர்கள் மற்றும் ஷிப்பிங் மேலாண்மை</h1>
+                <p class="text-xs text-stone-500">SaaS Dynamic Orders Pipeline & Logistics Cockpit</p>
+            </div>
+
+            <!-- GLOBAL LANGUAGE TOGGLE -->
+            <div class="glass-panel p-1 rounded-2xl flex items-center shadow-sm self-end sm:self-auto">
+                <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3.5 py-1.5 text-xs font-bold rounded-xl transition duration-300">தமிழ்</button>
+                <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3.5 py-1.5 text-xs font-bold rounded-xl transition duration-300">EN</button>
+            </div>
+        </header>
+
+        <!-- SEARCH & FILTERS -->
+        <div class="glass-panel p-6 rounded-3xl border border-stone-200/50 space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-stone-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; max-width: 100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </span>
+                    <input id="order-search" type="text" data-placeholder-key="search_placeholder" placeholder="தேடுக (ஆர்டர் ID, பெயர், கைபேசி)..." oninput="renderOrdersTable()" class="w-full pl-9 pr-4 py-2.5 bg-white border border-stone-200 rounded-xl text-stone-800 text-xs glow-focus">
+                </div>
+
+                <div>
+                    <select id="status-filter" onchange="renderOrdersTable()" class="w-full px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-stone-750 text-xs font-semibold focus:outline-none glow-focus cursor-pointer">
+                        <option value="all" data-key="filter_status">அனைத்து நிலைகளும் / All Status</option>
+                        <option value="New">New</option>
+                        <option value="In Production">In Production</option>
+                        <option value="Ready to Pack">Ready to Pack</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <label data-key="filter_date" class="text-xs font-bold text-stone-500 whitespace-nowrap">டெலிவரி தேதி:</label>
+                    <input type="date" id="date-filter" onchange="renderOrdersTable()" class="w-full px-3 py-2 bg-white border border-stone-200 rounded-xl text-stone-850 text-xs glow-focus">
+                </div>
+            </div>
+
+            <!-- Orders Table Container -->
+            <div class="overflow-x-auto pt-2">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b border-stone-200 text-stone-500 font-bold">
+                            <th class="py-3 px-2" data-key="th_order_id">ஆர்டர் ஐடி</th>
+                            <th class="py-3 px-2" data-key="th_customer">வாடிக்கையாளர்</th>
+                            <th class="py-3 px-2 text-center" data-key="th_delivery_date">டெலிவரி தேதி</th>
+                            <th class="py-3 px-2 text-right" data-key="th_advance">முன்பதிவுத் தொகை</th>
+                            <th class="py-3 px-2 text-right" data-key="th_balance">நிலுவை</th>
+                            <th class="py-3 px-2 text-center" data-key="th_status">நிலை</th>
+                            <th class="py-3 px-2 text-center" data-key="th_actions">செயல்பாடுகள்</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body" class="divide-y divide-stone-100">
+                        <!-- Loaded Dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL 1: COURIER & SHIPPING ENTRY ==================== -->
+    <div id="shipping-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-50 items-center justify-center p-4 hidden transition-all duration-300">
+        <div class="w-full max-w-sm bg-white border border-stone-200 p-6 rounded-2xl shadow-xl transform scale-95 transition-all">
+            <h3 id="modal-ship-title" data-key="modal_ship_title" class="text-base font-bold text-stone-800 mb-1">ஷிப்பிங் விவரங்கள்</h3>
+            <p id="modal-ship-desc" data-key="modal_ship_desc" class="text-xs text-stone-500 mb-4">கூரியர் மற்றும் டிராக்கிங் தகவல்களைப் புதுப்பிக்கவும்.</p>
+            
+            <form id="shipping-form" onsubmit="handleShippingSave(event)">
+                <input type="hidden" id="shipping-order-id">
+                <div class="space-y-4 mb-5">
+                    <div>
+                        <label data-key="lbl_courier" class="block text-[10px] font-bold text-stone-500 uppercase mb-1">கூரியர் நிறுவனம்</label>
+                        <select id="ship-courier" class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-stone-800 text-xs glow-focus cursor-pointer">
+                            <option value="DTDC Express">DTDC Express</option>
+                            <option value="Professional Courier">The Professional Couriers</option>
+                            <option value="Delhivery Logistics">Delhivery</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label data-key="lbl_tracking_id" class="block text-[10px] font-bold text-stone-500 uppercase mb-1">டிராக்கிங் எண் / AWB</label>
+                        <input type="text" id="ship-tracking-id" required placeholder="AWB90284102" class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-stone-850 text-xs glow-focus">
+                    </div>
+                    <div>
+                        <label data-key="lbl_shipping_cost" class="block text-[10px] font-bold text-stone-500 uppercase mb-1">ஷிப்பிங் கட்டணம்</label>
+                        <input type="number" id="ship-cost" value="60" class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-stone-850 text-xs glow-focus">
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" data-key="modal_btn_cancel" onclick="closeShippingModal()" class="flex-1 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium rounded-xl text-xs transition">ரத்துசெய்</button>
+                    <button type="submit" data-key="btn_save" class="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl text-xs transition shadow">சேமி</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL 2: SHIPPING LABEL PREVIEW ==================== -->
+    <div id="label-modal" class="fixed inset-0 bg-stone-900/50 backdrop-blur-md z-50 items-center justify-center p-4 hidden overflow-y-auto transition-all duration-300">
+        <div class="w-full max-w-sm bg-white border border-stone-200 p-6 rounded-3xl shadow-2xl transform scale-95 transition-all flex flex-col gap-4">
+            <h3 data-key="modal_label_title" class="text-sm font-bold text-stone-800 border-b border-stone-100 pb-2">ஷிப்பிங் லேபிள் முன்னோட்டம்</h3>
+            
+            <div id="printable-label-area" class="p-4 bg-white border border-stone-300 mx-auto" style="width: 100mm; max-width: 100%; font-family: monospace; color: #000; font-size: 11px;">
+                <!-- Filled Dynamically -->
+            </div>
+
+            <div class="flex gap-2 pt-2 border-t border-stone-100">
+                <button onclick="closeLabelModal()" data-key="btn_close" class="flex-1 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold rounded-xl text-xs transition">மூடு</button>
+                <button onclick="window.print()" data-key="btn_print" class="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition shadow flex items-center justify-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 16px; height: 16px; max-width: 100%;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                    <span>அச்சிடு</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VANILLA JS STATE & i18n SHARED DB ENGINE -->
+    <script>
+        const langData = {
+            ta: {
+                app_title: "ஆர்டர்கள் மற்றும் ஷிப்பிங் மேலாண்மை",
+                back_dashboard: "← முகப்புப்பக்கத்திற்குச் செல்",
+                search_placeholder: "தேடுக (ஆர்டர் ID, பெயர், கைபேசி)...",
+                filter_status: "அனைத்து நிலைகளும் / All Status",
+                filter_date: "டெலிவரி தேதி:",
+                th_order_id: "ஆர்டர் ஐடி",
+                th_customer: "வாடிக்கையாளர்",
+                th_delivery_date: "டெலிவரி தேதி",
+                th_advance: "முன்பதிவுத் தொகை",
+                th_balance: "நிலுவை",
+                th_status: "நிலை",
+                th_actions: "செயல்பாடுகள்",
+                btn_label: "லேபிள் / Label",
+                btn_ship: "ஷிப்பிங்",
+                modal_ship_title: "ஷிப்பிங் விவரங்கள்",
+                modal_ship_desc: "கூரியர் மற்றும் டிராக்கிங் தகவல்களைப் புதுப்பிக்கவும்.",
+                lbl_courier: "கூரியர் நிறுவனம்",
+                lbl_tracking_id: "டிராக்கிங் எண் / AWB",
+                lbl_shipping_cost: "ஷிப்பிங் கட்டணம்",
+                modal_btn_cancel: "ரத்துசெய்",
+                btn_save: "சேமி",
+                modal_label_title: "ஷிப்பிங் லேபிள் முன்னோட்டம்",
+                btn_print: "அச்சிடு",
+                btn_close: "மூடு",
+                toast_status_updated: "ஆர்டர் நிலை வெற்றிகரமாக மாற்றப்பட்டது!",
+                toast_shipping_saved: "டிராக்கிங் விபரங்கள் சேமிக்கப்பட்டு நிலை மாற்றப்பட்டது!"
+            },
+            en: {
+                app_title: "Orders & Shipping Management",
+                back_dashboard: "← Back to Dashboard",
+                search_placeholder: "Search (Order ID, Name, Mobile)...",
+                filter_status: "All Statuses",
+                filter_date: "Delivery Date:",
+                th_order_id: "Order ID",
+                th_customer: "Customer",
+                th_delivery_date: "Delivery Date",
+                th_advance: "Advance Paid",
+                th_balance: "Balance Due",
+                th_status: "Status",
+                th_actions: "Actions",
+                btn_label: "Label",
+                btn_ship: "Ship Order",
+                modal_ship_title: "Shipping Details",
+                modal_ship_desc: "Update courier and tracking information.",
+                lbl_courier: "Courier Partner",
+                lbl_tracking_id: "Tracking ID / AWB",
+                lbl_shipping_cost: "Shipping Cost",
+                modal_btn_cancel: "Cancel",
+                btn_save: "Save Details",
+                modal_label_title: "Shipping Label Preview",
+                btn_print: "Print Now",
+                btn_close: "Close",
+                toast_status_updated: "Order status modified successfully!",
+                toast_shipping_saved: "Shipping credentials verified and order status transitioned!"
+            }
+        };
+
+        let currentLang = 'ta';
+        let ordersDB = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Retrieve shared DB
+            ordersDB = JSON.parse(localStorage.getItem('roaji_orders')) || [];
+            
+            const savedGlobalLang = localStorage.getItem('roaji_language');
+            if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
+                currentLang = savedGlobalLang;
+            }
+            applyLanguage();
+            renderOrdersTable();
+        });
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('roaji_language', lang);
+            applyLanguage();
+            renderOrdersTable();
+        }
+
+        function applyLanguage() {
+            const btnTa = document.getElementById('lang-btn-ta');
+            const btnEn = document.getElementById('lang-btn-en');
+
+            if (currentLang === 'ta') {
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-xl transition bg-amber-600 text-white";
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-xl transition text-stone-600";
+            } else {
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-xl transition bg-amber-600 text-white";
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-xl transition text-stone-600";
+            }
+
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (langData[currentLang][key]) {
+                    element.innerText = langData[currentLang][key];
+                }
+            });
+
+            const searchBox = document.getElementById('order-search');
+            if (searchBox) {
+                searchBox.placeholder = langData[currentLang]['search_placeholder'];
+            }
+        }
+
+        function renderOrdersTable() {
+            const tableBody = document.getElementById('orders-table-body');
+            const searchVal = document.getElementById('order-search').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('status-filter').value;
+            const dateFilter = document.getElementById('date-filter').value;
+
+            tableBody.innerHTML = '';
+
+            const filtered = ordersDB.filter(o => {
+                const matchesSearch = o.customer.toLowerCase().includes(searchVal) || o.id.toLowerCase().includes(searchVal) || o.mobile.includes(searchVal);
+                const matchesStatus = statusFilter === 'all' || o.status === statusFilter;
+                const matchesDate = !dateFilter || o.date === dateFilter;
+                return matchesSearch && matchesStatus && matchesDate;
+            });
+
+            filtered.forEach(o => {
+                const badgeStyle = getOrderStatusBadgeClass(o.status);
+                
+                tableBody.innerHTML += `
+                    <tr class="border-b border-stone-100 hover:bg-stone-50/50 transition">
+                        <td class="py-4 px-2 font-bold text-stone-800">${o.id}</td>
+                        <td class="py-4 px-2">
+                            <p class="font-semibold text-stone-850">${o.customer}</p>
+                            <span class="text-[10px] text-stone-400 font-medium">${o.mobile}</span>
+                        </td>
+                        <td class="py-4 px-2 text-center font-mono font-bold text-stone-600">${o.date}</td>
+                        <td class="py-4 px-2 text-right font-bold text-stone-700">₹${o.advance.toFixed(2)}</td>
+                        <td class="py-4 px-2 text-right font-bold text-rose-700">₹${o.balance.toFixed(2)}</td>
+                        <td class="py-4 px-2 text-center">
+                            <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase ${badgeStyle}">${o.status}</span>
+                        </td>
+                        <td class="py-4 px-2 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <select onchange="updateOrderStatus('${o.id}', this.value)" class="px-2 py-1 bg-white border border-stone-200 rounded-lg text-stone-700 text-[10px] font-bold cursor-pointer">
+                                    <option value="New" ${o.status==='New'?'selected':''}>New</option>
+                                    <option value="In Production" ${o.status==='In Production'?'selected':''}>In Prod</option>
+                                    <option value="Ready to Pack" ${o.status==='Ready to Pack'?'selected':''}>Ready Pack</option>
+                                    <option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option>
+                                    <option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option>
+                                </select>
+                                <button onclick="printShippingLabel('${o.id}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-750 font-bold text-[10px] rounded-lg transition border border-amber-200/50">Label</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            applyLanguage();
+        }
+
+        function getOrderStatusBadgeClass(status) {
+            switch(status) {
+                case 'New': return 'bg-sky-100 text-sky-800 border border-sky-200';
+                case 'In Production': return 'bg-amber-100 text-amber-800 border border-amber-200';
+                case 'Ready to Pack': return 'bg-indigo-100 text-indigo-800 border border-indigo-200';
+                case 'Shipped': return 'bg-purple-100 text-purple-800 border border-purple-200';
+                case 'Delivered': return 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+                default: return 'bg-stone-100 text-stone-700';
+            }
+        }
+
+        function updateOrderStatus(id, newStatus) {
+            const order = ordersDB.find(o => o.id === id);
+            if (!order) return;
+
+            if (newStatus === 'Shipped' && !order.trackingId) {
+                openShippingModal(id);
+                renderOrdersTable();
+                return;
+            }
+
+            order.status = newStatus;
+            saveOrdersToLocalStorage();
+            renderOrdersTable();
+            showToast(langData[currentLang]['toast_status_updated'], 'success');
+        }
+
+        function openShippingModal(id) {
+            document.getElementById('shipping-order-id').value = id;
+            document.getElementById('ship-tracking-id').value = "AWB" + Math.floor(10000000 + Math.random() * 90000000);
+            
+            const modal = document.getElementById('shipping-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeShippingModal() {
+            const modal = document.getElementById('shipping-modal');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => { modal.classList.remove('flex'); modal.classList.add('hidden'); }, 200);
+        }
+
+        function handleShippingSave(event) {
+            event.preventDefault();
+            const id = document.getElementById('shipping-order-id').value;
+            const courier = document.getElementById('ship-courier').value;
+            const tracking = document.getElementById('ship-tracking-id').value.trim();
+            const cost = parseFloat(document.getElementById('ship-cost').value) || 0;
+
+            const order = ordersDB.find(o => o.id === id);
+            if (order) {
+                order.courier = courier;
+                order.trackingId = tracking;
+                order.cost = cost;
+                order.status = 'Shipped';
+            }
+
+            saveOrdersToLocalStorage();
+            closeShippingModal();
+            renderOrdersTable();
+            showToast(langData[currentLang]['toast_shipping_saved'], 'success');
+        }
+
+        function printShippingLabel(id) {
+            const order = ordersDB.find(o => o.id === id);
+            if (!order) return;
+
+            const container = document.getElementById('printable-label-area');
+            const barcodeMock = Math.floor(1000000000 + Math.random() * 9000000000);
+
+            container.innerHTML = `
+                <div style="border: 2px solid #000; padding: 12px; line-height: 1.4; background: #fff;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 8px;">
+                        <strong>SENDER / அனுப்புநர்:</strong>
+                        <strong style="text-align: right; color: #b45309; font-weight: bold;">ROAJI GIFT SHOP</strong>
+                    </div>
+                    <div style="font-size: 10px; margin-bottom: 8px;">
+                        32, Gandhi Road, Chennai, Tamil Nadu - 600001<br>
+                        GSTIN: 33AAACR2938A1Z5
+                    </div>
+                    
+                    <div style="border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 8px;">
+                        <strong>SHIP TO / பெறுநர்:</strong>
+                        <div style="font-size: 12px; font-weight: bold; margin-top: 4px;">${order.customer}</div>
+                        <div style="font-size: 11px;">
+                            ${order.address}<br>
+                            <strong>Mobile: ${order.mobile}</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div><strong>COURIER:</strong> ${order.courier || 'PENDING'}</div>
+                            <div><strong>AWB / TRACK:</strong> ${order.trackingId || 'N/A'}</div>
+                            <div><strong>ORDER ID:</strong> ${order.id}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="border: 1px solid #000; padding: 3px; font-size: 8px; font-weight: bold; background: #eee;">
+                                [ |||||||||||||||| ]<br>${barcodeMock}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            openLabelModal();
+        }
+
+        function openLabelModal() {
+            const modal = document.getElementById('label-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeLabelModal() {
+            const modal = document.getElementById('label-modal');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => { modal.classList.remove('flex'); modal.classList.add('hidden'); }, 200);
+        }
+
+        function saveOrdersToLocalStorage() {
+            localStorage.setItem('roaji_orders', JSON.stringify(ordersDB));
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgClass = 'bg-stone-900 text-white';
+            let iconSvg = '';
+
+            if (type === 'success') {
+                bgClass = 'bg-emerald-50 border border-emerald-200 text-emerald-800';
+                iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+
+            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
+            toast.innerHTML = `<div class="flex-shrink-0">${iconSvg}</div><div class="text-xs font-semibold leading-relaxed">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-x-12', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
