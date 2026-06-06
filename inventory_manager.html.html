@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roaji SaaS Suite - Enterprise Inventory Manager</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050505; /* Deep luxury streaming-app dark base */
+            color: #F5F5F4;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .premium-card {
+            background: rgba(18, 16, 15, 0.85); /* Premium Stone-900 Alpha */
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+        .glow-focus:focus {
+            outline: none;
+            border-color: #06B6D4; /* Cyan-500 Neon */
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+        }
+        .row-warning {
+            animation: rowWarningPulse 2s infinite;
+        }
+        @keyframes rowWarningPulse {
+            0% { background-color: rgba(239, 68, 68, 0.02); border-color: rgba(239, 68, 68, 0.2); }
+            50% { background-color: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.5); }
+            100% { background-color: rgba(239, 68, 68, 0.02); border-color: rgba(239, 68, 68, 0.2); }
+        }
+        /* Mock barcode lines rendering style */
+        .barcode-line {
+            display: inline-block;
+            height: 40px;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative p-4 md:p-6 flex flex-col items-center justify-start overflow-x-hidden">
+
+    <!-- Radial Glow Ambience -->
+    <div class="absolute top-[-25%] left-[-15%] w-[65vw] h-[65vw] rounded-full bg-cyan-500/5 blur-[130px] pointer-events-none"></div>
+    <div class="absolute bottom-[-25%] right-[-15%] w-[65vw] h-[65vw] rounded-full bg-amber-600/5 blur-[130px] pointer-events-none"></div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
+
+    <!-- MAIN CORE CONTAINER -->
+    <div class="w-full max-w-7xl z-10 space-y-4">
+
+        <!-- HEADER AREA -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-3 border-b border-stone-900">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <a href="index.html" data-key="back_dashboard" class="text-xs font-bold text-cyan-500 hover:text-cyan-400 transition">← பில்லிங் பக்கத்திற்குச் செல்</a>
+                </div>
+                <h1 id="app-title" data-key="app_title" class="text-lg font-bold tracking-tight text-white uppercase">எண்டர்பிரைஸ் சரக்கு இருப்பு மேலாண்மை</h1>
+                <p class="text-xs text-stone-500 font-semibold uppercase tracking-wider">Workspace Stock Directory & Barcode Sheet Generator</p>
+            </div>
+
+            <!-- Topbar actions -->
+            <div class="flex flex-wrap items-center gap-3 self-end md:self-auto">
+                <!-- Global Language Toggle -->
+                <div class="glass-panel p-1 rounded-2xl flex items-center shadow-sm bg-stone-900/60 border border-stone-850">
+                    <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200">EN</button>
+                    <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- PANEL SWITCHER TAB ROW -->
+        <div class="flex items-center gap-2 bg-stone-950/40 border border-stone-900 p-1.5 rounded-2xl overflow-x-auto">
+            <button onclick="switchTab('list')" id="tab-btn-list" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl transition duration-200 bg-cyan-600 text-white shadow-md" data-key="tab_list">Master Stock List</button>
+            <button onclick="switchTab('adjustment')" id="tab-btn-adjustment" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl transition duration-200 text-stone-400 hover:text-white" data-key="tab_adjust">Stock Adjust & Audit</button>
+            <button onclick="switchTab('barcode')" id="tab-btn-barcode" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl transition duration-200 text-stone-400 hover:text-white" data-key="tab_barcode">Barcode Sheet Generator</button>
+        </div>
+
+        <!-- ==================== TAB 1: PRODUCT MATRIX DIRECTORY ==================== -->
+        <div id="panel-list" class="tab-panel space-y-4">
+            <div class="premium-card p-6 rounded-3xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest" data-key="tab_list">Master Stock List</h3>
+                    <input id="stock-search" type="text" placeholder="Search product name, category..." oninput="renderProductsTable()" class="px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-200 text-xs glow-focus w-full max-w-xs">
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-850 text-stone-500 font-bold">
+                                <th class="py-3 px-2">ID</th>
+                                <th class="py-3 px-2" data-key="th_prod_name">தயாரிப்பு பெயர்</th>
+                                <th class="py-3 px-2">Barcode</th>
+                                <th class="py-3 px-2">Category</th>
+                                <th class="py-3 px-2 text-right">Cost Price</th>
+                                <th class="py-3 px-2 text-right">Selling Price</th>
+                                <th class="py-3 px-2 text-center">Batch No</th>
+                                <th class="py-3 px-2 text-center" data-key="th_prod_stock">சரக்கு இருப்பு</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body" class="divide-y divide-stone-900">
+                            <!-- Loaded Dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: STOCK ADJUSTMENT & LOG AUDIT ENGINE ==================== -->
+        <div id="panel-adjustment" class="tab-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left Form Control (Col 5) -->
+            <div class="lg:col-span-5 space-y-4">
+                <div class="premium-card p-6 rounded-3xl space-y-4">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2" data-key="tab_adjust">Stock Adjust & Audit</h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Select Product</label>
+                            <select id="adjust-product-picker" class="w-full px-3 py-2 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-300 text-xs font-semibold focus:outline-none glow-focus cursor-pointer">
+                                <!-- Loaded dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Action Type</label>
+                            <select id="adjust-action-type" class="w-full px-3 py-2 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-300 text-xs font-semibold focus:outline-none glow-focus cursor-pointer">
+                                <option value="IN">Stock IN (+)</option>
+                                <option value="OUT">Stock OUT (-)</option>
+                                <option value="RETURN">Return Stock (+)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Transaction Quantity</label>
+                            <input type="number" id="adjust-qty" value="10" class="w-full px-3 py-2 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-200 text-xs glow-focus font-bold">
+                        </div>
+                    </div>
+
+                    <button onclick="executeStockAdjustment()" class="w-full py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs transition shadow shadow-cyan-600/10">
+                        Execute Adjustment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Audit Logs Feed (Col 7) -->
+            <div class="lg:col-span-7 space-y-4">
+                <div class="premium-card p-6 rounded-3xl min-h-[350px] flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2 mb-4">Stock Ledger Audit Trail</h3>
+                        <div class="space-y-3 max-h-[280px] overflow-y-auto pr-1" id="audit-logs-container">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: CUSTOM BARCODE SHEET BUILDER ==================== -->
+        <div id="panel-barcode" class="tab-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left controls (Col 5) -->
+            <div class="lg:col-span-5 space-y-4">
+                <div class="premium-card p-6 rounded-3xl space-y-4">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2" data-key="tab_barcode">Barcode Sheet Generator</h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Select Product</label>
+                            <select id="barcode-product-picker" onchange="generateBarcodeSheet()" class="w-full px-3 py-2 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-300 text-xs font-semibold focus:outline-none glow-focus cursor-pointer">
+                                <!-- Loaded dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Printable Label Preview (Col 7) -->
+            <div class="lg:col-span-7 space-y-4">
+                <div class="premium-card p-6 rounded-3xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center border-b border-stone-850 pb-2 mb-4">
+                            <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest">Thermal Label Sheet (50mm x 25mm)</h3>
+                            <button onclick="window.print()" class="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-[10px] rounded-lg transition shadow">Print Sheets</button>
+                        </div>
+
+                        <!-- Target printable barcode container -->
+                        <div class="p-4 bg-stone-50 rounded-2xl flex items-center justify-center">
+                            <div id="printable-barcode-sheet" class="p-6 bg-white border border-stone-200 text-stone-950 rounded-xl flex flex-col items-center justify-center text-center space-y-2 shadow" style="width: 250px;">
+                                <!-- Barcode metadata loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- VANILLA JS STATE & INVENTORY ENGINES -->
+    <script>
+        const langData = {
+            ta: {
+                app_title: "எண்டர்பிரைஸ் சரக்கு இருப்பு மேலாண்மை",
+                back_dashboard: "← பில்லிங் பக்கத்திற்குச் செல்",
+                tab_list: "சரக்கு இருப்புப் பட்டியல்",
+                tab_adjust: "இருப்பு சரிசெய்தல் & தணிக்கை",
+                tab_barcode: "பார்கோடு லேபிள் அச்சிடல்",
+                th_prod_name: "தயாரிப்பு பெயர்",
+                th_prod_stock: "சரக்கு இருப்பு",
+                toast_adjust_success: "சரக்கு இருப்பு வெற்றிகரமாக புதுப்பிக்கப்பட்டது!",
+                toast_adjust_error: "விவரங்களைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்."
+            },
+            en: {
+                app_title: "Enterprise Inventory Control",
+                back_dashboard: "← Go to POS Billing Screen",
+                tab_list: "Master Stock Directory",
+                tab_adjust: "Stock Adjustment & Audits",
+                tab_barcode: "Barcode Label Builder",
+                th_prod_name: "Product Name",
+                th_prod_stock: "In Stock Qty",
+                toast_adjust_success: "Inventory adjustment executed and logged successfully!",
+                toast_adjust_error: "Adjustment parameters verification failed!"
+            }
+        };
+
+        let currentLang = 'en';
+
+        // STATIC CONFIGS
+        const minStockAlertThreshold = 5;
+
+        // SHARED DATABASE MEMORIES
+        let productsDB = [];
+        let stockLogsDB = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Retrieve shared database
+            productsDB = JSON.parse(localStorage.getItem('roaji_products')) || [];
+            stockLogsDB = JSON.parse(localStorage.getItem('roaji_logs')) || [];
+
+            const savedGlobalLang = localStorage.getItem('roaji_language');
+            if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
+                currentLang = savedGlobalLang;
+            }
+            applyLanguage();
+            populateProductPickers();
+            renderProductsTable();
+            renderAuditLogsFeed();
+            generateBarcodeSheet();
+        });
+
+        // LANGUAGE TOGGLE
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('roaji_language', lang);
+            applyLanguage();
+            renderProductsTable();
+        }
+
+        function applyLanguage() {
+            const btnTa = document.getElementById('lang-btn-ta');
+            const btnEn = document.getElementById('lang-btn-en');
+
+            if (currentLang === 'ta') {
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white shadow-sm";
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+            } else {
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white shadow-sm";
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+            }
+
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (langData[currentLang][key]) {
+                    element.innerText = langData[currentLang][key];
+                }
+            });
+        }
+
+        // PANEL SWITCHER
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.className = "tab-btn px-4 py-2 text-xs font-bold rounded-xl transition duration-200 text-stone-400 hover:text-white";
+            });
+
+            document.getElementById(`panel-${tabName}`).classList.remove('hidden');
+            
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            activeBtn.className = "tab-btn px-4 py-2 text-xs font-bold rounded-xl transition duration-200 bg-cyan-600 text-white shadow-md";
+        }
+
+        // ==================== MODULE A: PRODUCT DIRECTORY MATRIX ====================
+        function renderProductsTable() {
+            const tableBody = document.getElementById('inventory-table-body');
+            const searchVal = document.getElementById('stock-search').value.toLowerCase().trim();
+            tableBody.innerHTML = '';
+
+            const filtered = productsDB.filter(p => 
+                p.name[currentLang].toLowerCase().includes(searchVal) || p.barcode.includes(searchVal)
+            );
+
+            filtered.forEach(p => {
+                const isLowStock = p.stock <= minStockAlertThreshold;
+                const rowWarningClass = isLowStock ? 'row-warning' : '';
+                const badgeStyle = p.stock === 0 ? 'bg-rose-500/10 text-rose-400' : (isLowStock ? 'bg-amber-500/10 text-amber-400' : 'bg-emerald-500/10 text-emerald-400');
+
+                tableBody.innerHTML += `
+                    <tr class="border-b border-stone-900 hover:bg-stone-900/30 transition ${rowWarningClass}">
+                        <td class="py-3.5 px-2 font-mono font-bold text-stone-500">${p.id}</td>
+                        <td class="py-3.5 px-2 font-bold text-stone-200">${p.name[currentLang]}</td>
+                        <td class="py-3.5 px-2 font-mono text-stone-400">${p.barcode}</td>
+                        <td class="py-3.5 px-2 text-stone-500 font-semibold">${p.category || 'N/A'}</td>
+                        <td class="py-3.5 px-2 text-right font-bold text-stone-400">₹${p.cost || '40.00'}</td>
+                        <td class="py-3.5 px-2 text-right font-bold text-stone-200">₹${p.price.toFixed(2)}</td>
+                        <td class="py-3.5 px-2 text-center text-stone-500 font-mono">10/2026</td>
+                        <td class="py-3.5 px-2 text-center">
+                            <span class="px-2.5 py-0.5 text-[9px] font-bold rounded-full uppercase tracking-wider ${badgeStyle}">${p.stock} units</span>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ==================== MODULE B: ADJUSTMENTS & AUDIT TRIAL ENGINE ====================
+        function executeStockAdjustment() {
+            const prodId = document.getElementById('adjust-product-picker').value;
+            const actionType = document.getElementById('adjust-action-type').value;
+            const qty = parseInt(document.getElementById('adjust-qty').value) || 0;
+
+            if (!prodId || qty <= 0) {
+                showToast(langData[currentLang]['toast_adjust_error'], "error");
+                return;
+            }
+
+            const product = productsDB.find(p => p.id === prodId);
+            if (!product) return;
+
+            // Execute math
+            if (actionType === 'OUT') {
+                product.stock = Math.max(0, product.stock - qty);
+            } else {
+                product.stock += qty; // IN or RETURN
+            }
+
+            // Create log entry dynamically into central audit DB
+            const logEntry = {
+                timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+                user: "Ajith Kumar (Inventory Master)",
+                text: `Executed [Stock ${actionType}] adjustment for ${product.name[currentLang]}. Qty shifted: ${qty}.`
+            };
+            logsDB.unshift(logEntry);
+
+            // Save to localStorage Shared DB
+            localStorage.setItem('roaji_products', JSON.stringify(productsDB));
+            localStorage.setItem('roaji_logs', JSON.stringify(logsDB));
+
+            // Refresh UI Views
+            renderProductsTable();
+            renderAuditLogsFeed();
+
+            showToast(langData[currentLang]['toast_adjust_success'], "success");
+        }
+
+        function renderAuditLogsFeed() {
+            const container = document.getElementById('audit-logs-container');
+            container.innerHTML = '';
+
+            logsDB.forEach(log => {
+                container.innerHTML += `
+                    <div class="p-3 bg-stone-950/60 border border-stone-850 rounded-xl space-y-1.5 hover:border-cyan-500/25 transition">
+                        <div class="flex justify-between items-center text-[9px] font-bold text-stone-500 font-mono">
+                            <span>${log.user}</span>
+                            <span>${log.timestamp}</span>
+                        </div>
+                        <p class="text-[10px] text-stone-300 font-semibold leading-relaxed">${log.text}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // ==================== MODULE C: BARCODE GENERATOR ====================
+        function generateBarcodeSheet() {
+            const prodId = document.getElementById('barcode-product-picker').value || productsDB[0].id;
+            const container = document.getElementById('printable-barcode-sheet');
+            
+            const product = productsDB.find(p => p.id === prodId);
+            if (!product) return;
+
+            // Render simulated physical bar lines pattern via HTML/CSS
+            let barcodePatternHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const width = Math.random() > 0.4 ? 'w-1.5' : 'w-0.5';
+                const gap = Math.random() > 0.5 ? 'mr-1' : 'mr-0.5';
+                barcodePatternHTML += `<span class="barcode-line ${width} ${gap}"></span>`;
+            }
+
+            container.innerHTML = `
+                <div class="font-sans text-stone-950 p-2" style="font-family: monospace;">
+                    <div class="text-[10px] font-bold uppercase tracking-wider">${product.name[currentLang]}</div>
+                    <div class="flex justify-center items-center py-2">
+                        ${barcodePatternHTML}
+                    </div>
+                    <div class="text-[9px] font-bold tracking-widest mb-1">SKU: ${product.barcode}</div>
+                    <div class="text-sm font-extrabold text-orange-600">PRICE: ₹${product.price.toFixed(2)}</div>
+                </div>
+            `;
+        }
+
+        // CONTROLLERS DISPATCH POPULATES
+        function populateProductPickers() {
+            const pickerAdjust = document.getElementById('adjust-product-picker');
+            const pickerBarcode = document.getElementById('barcode-product-picker');
+
+            pickerAdjust.innerHTML = '';
+            pickerBarcode.innerHTML = '';
+
+            productsDB.forEach(p => {
+                const optHTML = `<option value="${p.id}">${p.name[currentLang]}</option>`;
+                pickerAdjust.innerHTML += optHTML;
+                pickerBarcode.innerHTML += optHTML;
+            });
+        }
+
+        // TOAST NOTIFICATIONS ENGINE
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgClass = 'bg-stone-900 text-white border-stone-850';
+            let iconSvg = '';
+
+            if (type === 'success') {
+                bgClass = 'bg-cyan-950/90 border border-cyan-500/30 text-cyan-300';
+                iconSvg = `<svg class="h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (type === 'error') {
+                bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
+                iconSvg = `<svg class="h-5 w-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+
+            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
+            toast.innerHTML = `<div class="flex-shrink-0">${iconSvg}</div><div class="text-xs font-semibold leading-relaxed">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-x-12', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
