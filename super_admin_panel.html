@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS Suite - Super Admin Control Panel</title>
+    <title>Roaji SaaS Suite - Master Control Command Room</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -226,41 +226,71 @@
             </div>
         </div>
 
-        <!-- ==================== VIEW 4: SAAS AUTOMATION MODULES (9 FEATURES) ==================== -->
+        <!-- ==================== VIEW 4: SAAS AUTOMATION MODULES & PAYMENT CONFIGS ==================== -->
         <div id="section-automation" class="view-panel p-4 lg:p-6 hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <!-- left column (Col 6) -->
             <div class="lg:col-span-6 space-y-6">
-                <!-- WhatsApp Webhook & Custom Bill footer -->
+                <!-- Enterprise Payment Gateway Configuration Terminal -->
                 <div class="premium-glass p-6 rounded-3xl space-y-4">
-                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">WhatsApp Webhook & Branding</h3>
-                    <div class="space-y-3 text-xs">
-                        <div>
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">WhatsApp Webhook (n8n bot)</label>
-                            <input id="auto-wa-webhook" type="text" value="https://n8n.roaji.in/webhook/v1/whatsapp" oninput="saveAutomationConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">💳 Enterprise Payment Gateway Configuration Terminal</h3>
+                    
+                    <div class="space-y-4 text-xs">
+                        <!-- SECTION A: CURRENT LIVE SYSTEM -->
+                        <div class="space-y-3">
+                            <h4 class="text-[10px] font-bold text-orange-500 uppercase tracking-widest block border-b border-stone-850 pb-1">Section A: Live UPI Payments (GPay/PhonePe/Paytm)</h4>
+                            <div>
+                                <label class="block text-[9px] font-bold text-stone-500 uppercase mb-1">Super Admin Gateway UPI ID</label>
+                                <input id="config-upi-id" type="text" value="roajisystems@upi" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-bold text-stone-500 uppercase mb-1">Custom QR Code API Source Link</label>
+                                <input id="config-qr-link" type="text" value="https://api.qrserver.com/v1/create-qr-code/" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Global Bill Footer Branding</label>
-                            <input id="auto-bill-footer" type="text" value="ROAJI Enterprise billing suite" oninput="saveAutomationConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+
+                        <!-- SECTION B: FUTURE SECURE API BINDINGS -->
+                        <div class="space-y-3 pt-2 border-t border-stone-850 relative">
+                            <span class="absolute top-2 right-0 bg-stone-800 text-stone-400 text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">🔒 Future Secure Expansion / எதிர்கால பாதுகாப்பு அப்டேட்</span>
+                            <h4 class="text-[10px] font-bold text-stone-500 uppercase tracking-widest block pb-1 pt-3">Section B: Secure API Gateway Integrations</h4>
+                            <div>
+                                <label class="block text-[9px] font-bold text-stone-500 uppercase mb-1">Future Payment Gateway API Core Selector</label>
+                                <select disabled class="w-full px-3 py-2 bg-stone-950/30 border border-stone-900 rounded-xl text-stone-500 text-xs cursor-not-allowed">
+                                    <option value="razorpay">Razorpay API</option>
+                                    <option value="phonepe">PhonePe PG API</option>
+                                    <option value="stripe">Stripe global</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[9px] font-bold text-stone-500 uppercase mb-1">Merchant API Key ID</label>
+                                    <input type="text" disabled placeholder="rzp_live_tok_90218" class="w-full px-3 py-2 bg-stone-950/30 border border-stone-900 rounded-xl text-stone-600 text-xs cursor-not-allowed">
+                                </div>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-stone-500 uppercase mb-1">Merchant API Secret Token</label>
+                                    <input type="password" disabled placeholder="••••••••••••••••" class="w-full px-3 py-2 bg-stone-950/30 border border-stone-900 rounded-xl text-stone-600 text-xs cursor-not-allowed">
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- MASTER SAVE CONTROLLER -->
+                        <button onclick="savePaymentGatewayConfig()" class="w-full py-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-orange-600/10 focus:outline-none focus:ring-1 focus:ring-orange-500/20">
+                            💾 Save Payment Gateway Credentials / செட்டிங்ஸை சேமி
+                        </button>
                     </div>
                 </div>
 
                 <!-- Global banner, maintenance & promo engine -->
                 <div class="premium-glass p-6 rounded-3xl space-y-4">
-                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">SaaS Status Alerts & Payment Gateways</h3>
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">SaaS Status Alerts & Custom Branding</h3>
                     <div class="space-y-3 text-xs">
                         <div>
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Global System Banner Alert</label>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Global System Banner Alert / Marquee publisher</label>
                             <input id="auto-banner" type="text" placeholder="Scheduled maintenance on 10th Apr..." oninput="saveAutomationConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">System Gateway UPI ID Destination</label>
-                            <input id="config-upi-id" type="text" value="roajisystems@upi" oninput="saveGlobalConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Custom QR Code API Source Link</label>
-                            <input id="config-qr-link" type="text" value="https://api.qrserver.com/v1/create-qr-code/" oninput="saveGlobalConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Global Bill Footer Branding (White-Label Footer)</label>
+                            <input id="auto-bill-footer" type="text" value="ROAJI Enterprise billing suite" oninput="saveAutomationConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
@@ -411,6 +441,8 @@
         ];
 
         let currentLang = 'en';
+        const SUPER_ADMIN_EMAIL = "iamajithkumar98@gmail.com";
+
         let shopsDB = [];
 
         // INITIAL SECURITY AUDIT GATE
@@ -455,6 +487,7 @@
             renderGlobalPricingEditor();
             loadAdminSecurityConfig();
             loadAutomationConfig();
+            loadGlobalConfig();
             updateStatisticsBadges();
         });
 
@@ -785,11 +818,17 @@
 
             localStorage.setItem('roaji_admin_upi_id', upiId);
             localStorage.setItem('roaji_admin_qr_link', qrLink);
+            
+            showToast(langData[currentLang]['toast_config_saved'], "success");
         }
 
         function loadGlobalConfig() {
             document.getElementById('config-upi-id').value = localStorage.getItem('roaji_admin_upi_id') || 'roajisystems@upi';
             document.getElementById('config-qr-link').value = localStorage.getItem('roaji_admin_qr_link') || 'https://api.qrserver.com/v1/create-qr-code/';
+        }
+
+        function savePaymentGatewayConfig() {
+            saveGlobalConfig();
         }
 
         function exportDatabaseToCSV() {
