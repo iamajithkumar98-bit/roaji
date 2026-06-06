@@ -208,7 +208,7 @@
                 </div>
             </div>
 
-            <!-- DYNAMIC UPI QR GATEWAY OVERLAY (Appears upon choosing Pro/Enterprise) -->
+            <!-- DYNAMIC UPI QR GATEWAY OVERLAY -->
             <div id="upi-qr-gateway" class="hidden flex-col md:flex-row gap-6 p-6 bg-stone-950/60 border border-stone-850 rounded-3xl items-center justify-between transition-all duration-300">
                 <div class="text-center md:text-left space-y-2 max-w-sm">
                     <span id="lbl-selected-plan" class="inline-block px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase text-orange-400 bg-orange-500/10 rounded-md">Selected: Pro Plan</span>
@@ -358,7 +358,7 @@
                 modal_btn_cancel: "ரத்துசெய்",
                 modal_btn_send: "அனுப்புக",
 
-                // Dynamic Toasts
+                // Toasts
                 toast_login_success: "வெற்றிகரமாக அங்கீகரிக்கப்பட்டது!",
                 toast_login_error: "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல்! மீண்டும் முயற்சிக்கவும்.",
                 toast_blocked_user: "பாதுகாப்பு அச்சுறுத்தல்! உங்களது கணக்கு முடக்கப்பட்டுள்ளது.",
@@ -417,7 +417,7 @@
             });
         }
 
-        // PASSWORD VISIBILITY TOGGLER
+        // PASSWORD FIELD VISIBILITY
         function togglePasswordVisibility(inputId) {
             const input = document.getElementById(inputId);
             if (input.type === 'password') {
@@ -442,7 +442,7 @@
             if (viewName === 'suspended') suspendedView.classList.remove('hidden');
         }
 
-        // ==================== STATE 1: RE-ALIGNED SECURE AUTH GATEWAY ROUTING ====================
+        // ==================== STATE 1: MOCK FIREBASE SECURE LOGIN ====================
         function handleLoginSubmit(event) {
             event.preventDefault();
             const email = document.getElementById('login-email').value.trim();
@@ -498,7 +498,7 @@
             }
         }
 
-        // ==================== STATE 2: ONBOARDING REGISTRATION ====================
+        // ==================== STATE 2: REGISTRATION LOGIC ====================
         function handleRegistrationSubmit(event) {
             event.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
@@ -608,7 +608,7 @@
             }, 800);
         }
 
-        // FORGOT PASSWORD MODALS
+        // MODALS UTILS
         function openForgotModal() {
             const modal = document.getElementById('forgot-modal');
             const emailValue = document.getElementById('login-email').value;
