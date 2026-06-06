@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS Suite - Secure Auth Gateway</title>
+    <title>Roaji SaaS Suite - Central Secure Auth Gateway</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -13,12 +13,13 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #050505; /* Deep Streaming-app Dark Black */
+            background-color: #050505; /* Obsidian Black Premium Base Theme */
             color: #F5F5F4;
             margin: 0;
+            overflow-x: hidden;
         }
-        .premium-card {
-            background: rgba(18, 16, 15, 0.85); /* Premium Stone-900 Alpha */
+        .premium-glass {
+            background: rgba(18, 16, 15, 0.75); /* Premium Stone-900 Alpha */
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
@@ -26,7 +27,7 @@
         }
         .glow-accent:focus {
             outline: none;
-            border-color: #F97316; /* Orange-500 Neon */
+            border-color: #F97316; /* Orange-500 Neon Accents */
             box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
         }
         .text-neon-gold {
@@ -37,14 +38,14 @@
 </head>
 <body class="min-h-screen relative overflow-x-hidden flex items-center justify-center p-4">
 
-    <!-- Background Radial Gradients -->
+    <!-- Background Radial Neon Ambiance Glows -->
     <div class="absolute top-[-20%] left-[-15%] w-[65vw] h-[65vw] rounded-full bg-amber-500/10 blur-[130px] pointer-events-none"></div>
     <div class="absolute bottom-[-20%] right-[-15%] w-[65vw] h-[65vw] rounded-full bg-orange-600/10 blur-[130px] pointer-events-none"></div>
 
     <!-- TOAST CONTAINER -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
 
-    <!-- MAIN CORE CONTAINER -->
+    <!-- MAIN INTERFACE CORE WRAPPER -->
     <div class="w-full max-w-4xl z-10 my-6">
 
         <!-- Global Language Switcher -->
@@ -55,8 +56,8 @@
             </div>
         </div>
 
-        <!-- ==================== STATE 1: SECURE MINIMALIST LOGIN VIEW ==================== -->
-        <div id="view-login" class="w-full max-w-md mx-auto premium-card rounded-3xl p-8 space-y-6 block">
+        <!-- ==================== VIEW A: MINIMALIST AUTHENTICATION FORM ==================== -->
+        <div id="view-login" class="w-full max-w-md mx-auto premium-glass rounded-3xl p-8 space-y-6 block transition-all duration-500 transform">
             <div class="text-center">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 mb-3 border border-orange-500/25" style="width: 56px; height: 56px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 32px; height: 32px; max-width: 100%;">
@@ -64,20 +65,21 @@
                     </svg>
                 </div>
                 <h1 class="text-2xl font-bold tracking-tight text-white">ROAJI</h1>
-                <p class="text-xs font-semibold text-orange-500 tracking-wider uppercase mt-1">Enterprise secure login</p>
+                <p class="text-xs font-semibold text-orange-500 tracking-wider uppercase mt-1">SaaS central entryway portal</p>
                 <p id="login-tagline" data-key="login_tagline" class="text-sm text-stone-400 mt-2">Enter credentials to unlock context</p>
             </div>
 
+            <!-- Login Inputs -->
             <form id="login-form" class="space-y-4" onsubmit="handleLoginSubmit(event)">
                 <div>
                     <label id="lbl-login-email" data-key="lbl_email" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Email Address</label>
-                    <input type="email" id="login-email" required placeholder="example@domain.com" class="w-full px-4 py-3 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-sm focus:outline-none glow-accent">
+                    <input type="email" id="login-email" required placeholder="example@domain.com" class="w-full px-4 py-3 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-sm focus:outline-none glow-focus">
                 </div>
 
                 <div>
                     <label id="lbl-login-pass" data-key="lbl_password" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Password</label>
                     <div class="relative">
-                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-sm focus:outline-none glow-accent">
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-sm focus:outline-none glow-focus">
                         <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-500 hover:text-stone-300">
                             <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; max-width: 100%;">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -104,8 +106,8 @@
             </div>
         </div>
 
-        <!-- ==================== STATE 2: AUTOMATED CUSTOMER REGISTRATION ==================== -->
-        <div id="view-register" class="w-full max-w-md mx-auto premium-card rounded-3xl p-8 space-y-6 hidden">
+        <!-- ==================== VIEW B: CLIENT REGISTRATION & 30-DAY FREE TRIAL ==================== -->
+        <div id="view-register" class="w-full max-w-md mx-auto premium-glass rounded-3xl p-8 space-y-6 hidden transition-all duration-500 transform">
             <div class="text-center">
                 <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 mb-3 border border-orange-500/25" style="width: 56px; height: 56px;">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 32px; height: 32px; max-width: 100%;">
@@ -119,29 +121,30 @@
             <form id="register-form" class="space-y-4" onsubmit="handleRegistrationSubmit(event)">
                 <div>
                     <label id="lbl-reg-name" data-key="lbl_name" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Full Name</label>
-                    <input type="text" id="reg-name" required placeholder="Ajith Kumar" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-accent">
+                    <input type="text" id="reg-name" required placeholder="Ajith Kumar" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
                 </div>
                 <div>
                     <label id="lbl-reg-email" data-key="lbl_email" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Email Address</label>
-                    <input type="email" id="reg-email" required placeholder="example@domain.com" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-accent">
+                    <input type="email" id="reg-email" required placeholder="example@domain.com" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
                 </div>
                 <div>
                     <label id="lbl-reg-pass" data-key="lbl_password" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Password</label>
-                    <input type="password" id="reg-password" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-accent">
+                    <input type="password" id="reg-password" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
                 </div>
                 <div>
                     <label id="lbl-reg-shop" data-key="lbl_shop_name" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Shop Name</label>
-                    <input type="text" id="reg-shop" required placeholder="Roaji Gifts Studio" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-accent">
+                    <input type="text" id="reg-shop" required placeholder="Roaji Gifts Studio" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
                 </div>
                 <div>
                     <label id="lbl-reg-type" data-key="lbl_shop_type" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Shop Type</label>
-                    <select id="reg-type" required class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-200 text-xs focus:outline-none glow-accent cursor-pointer">
-                        <option value="Gift Shop">Gift Shop</option>
-                        <option value="Frame Shop">Frame Shop</option>
-                        <option value="Textile Shop">Textile Shop</option>
-                        <option value="Bakery">Bakery</option>
-                        <option value="Supermarket">Supermarket</option>
-                        <option value="Services">Services</option>
+                    <select id="reg-type" required class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-200 text-xs focus:outline-none glow-focus cursor-pointer appearance-none">
+                        <option value="Gift Shop">Gift Shop / பரிசு கடை</option>
+                        <option value="Frame Shop">Frame Shop / பிரேம் கடை</option>
+                        <option value="Textile Shop">Textile Shop / ஜவுளிக் கடை</option>
+                        <option value="Xerox">Xerox / ஜெராக்ஸ்</option>
+                        <option value="Bakery">Bakery / பேக்கரி</option>
+                        <option value="Supermarket">Supermarket / சூப்பர் மார்க்கெட்</option>
+                        <option value="Services">Services / சேவை மையம்</option>
                     </select>
                 </div>
 
@@ -155,9 +158,8 @@
             </div>
         </div>
 
-        <!-- ==================== STATE 3: SUBSCRIPTION & UPI QR GATEWAY ==================== -->
-        <div id="view-subscription" class="space-y-6 hidden">
-            
+        <!-- ==================== VIEW C: SUBSCRIPTION PLANS & UPI QR GATEWAY ==================== -->
+        <div id="view-subscription" class="space-y-6 hidden transition-all duration-500 transform">
             <div class="text-center max-w-xl mx-auto space-y-2">
                 <h2 id="lbl-sub-title" data-key="lbl_sub_title" class="text-xl font-bold text-white">Choose Your Workspace Scale</h2>
                 <p id="lbl-sub-desc" data-key="lbl_sub_desc" class="text-xs text-stone-400 leading-relaxed">Your 30-Day Free Trial is initiated. Upgrade to paid packages below to unlock automated WhatsApp triggers & secure AI advisors.</p>
@@ -166,7 +168,7 @@
             <!-- Pricing Tiers Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Basic Card -->
-                <div class="premium-card p-6 rounded-3xl border border-stone-850 flex flex-col justify-between hover:border-stone-700 transition duration-300">
+                <div class="premium-glass p-6 rounded-3xl border border-stone-850 flex flex-col justify-between hover:border-stone-700 transition duration-300">
                     <div>
                         <h4 class="text-sm font-bold text-stone-300">Basic Edition</h4>
                         <div class="flex items-baseline mt-2">
@@ -179,7 +181,7 @@
                 </div>
 
                 <!-- Pro Card -->
-                <div class="premium-card p-6 rounded-3xl border border-orange-500/40 relative flex flex-col justify-between hover:border-orange-500 transition duration-300">
+                <div class="premium-glass p-6 rounded-3xl border border-orange-500/40 relative flex flex-col justify-between hover:border-orange-500 transition duration-300">
                     <span class="absolute top-[-10px] right-4 bg-orange-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Popular</span>
                     <div>
                         <h4 class="text-sm font-bold text-white">Pro Suite</h4>
@@ -193,7 +195,7 @@
                 </div>
 
                 <!-- Lifetime Card -->
-                <div class="premium-card p-6 rounded-3xl border border-stone-850 flex flex-col justify-between hover:border-stone-700 transition duration-300">
+                <div class="premium-glass p-6 rounded-3xl border border-stone-850 flex flex-col justify-between hover:border-stone-700 transition duration-300">
                     <div>
                         <h4 class="text-sm font-bold text-stone-300">Enterprise Scale</h4>
                         <div class="flex items-baseline mt-2">
@@ -226,7 +228,6 @@
                 <div class="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-stone-200 shadow-lg">
                     <!-- Static simulated payment QR representation -->
                     <div class="w-36 h-36 bg-stone-100 border border-stone-300 flex items-center justify-center relative overflow-hidden" id="upi-qr-image-container">
-                        <!-- MOCK QR EMBED -->
                         <div class="text-stone-900 text-center text-xs font-bold leading-none p-4">
                             MOCK QR CODE<br>
                             <span class="text-[9px] font-normal text-stone-500 mt-2 block" id="qr-price-lbl">₹1,499.00</span>
@@ -244,8 +245,8 @@
             </div>
         </div>
 
-        <!-- ==================== VIEW 4: SECURITY SUSPENDED ACCOUNT BLOCK ==================== -->
-        <div id="view-suspended" class="w-full max-w-md mx-auto premium-card rounded-3xl p-8 space-y-6 hidden text-center">
+        <!-- ==================== VIEW D: ACCESS SUSPENDED SCREEN ==================== -->
+        <div id="view-suspended" class="w-full max-w-md mx-auto premium-glass rounded-3xl p-8 space-y-6 hidden text-center transition-all duration-500 transform">
             <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/25 mb-2" style="width: 56px; height: 56px;">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:32px; height:32px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             </div>
@@ -256,103 +257,26 @@
 
     </div>
 
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgot-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-md z-50 items-center justify-center p-4 hidden transition-all duration-300">
+        <div class="w-full max-w-sm premium-glass p-6 rounded-2xl shadow-xl transform scale-95 transition-all">
+            <h3 id="modal-title" data-key="modal_title" class="text-base font-bold text-white mb-1">மின்னஞ்சல் வழி மீட்பு</h3>
+            <p id="modal-desc" data-key="modal_desc" class="text-xs text-stone-400 mb-4">உங்கள் மின்னஞ்சலை உள்ளிட்டால் அதற்கான கடவுச்சொல் மீட்பு இணைப்பு அனுப்பப்படும்.</p>
+            <form id="forgot-form" onsubmit="handleForgotPassword(event)">
+                <input type="email" id="forgot-email" required placeholder="example@domain.com" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-800 rounded-xl text-stone-100 text-sm mb-4 glow-focus">
+                <div class="flex gap-2">
+                    <button type="button" id="modal-btn-cancel-modal" data-key="modal_btn_cancel" onclick="closeForgotModal()" class="flex-1 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium rounded-xl text-xs transition">ரத்துசெய்</button>
+                    <button type="submit" id="modal-btn-send" data-key="modal_btn_send" class="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-xl text-xs transition shadow">அனுப்புக</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- VANILLA JS STATE CONTROLLER & SUBSCRIPTION COMPUTATIONS -->
     <script>
-        // MULTI-LANGUAGE BILINGUAL DICTIONARY
-        const langData = {
-            en: {
-                login_tagline: "Enter credentials to unlock context",
-                lbl_email: "Email Address",
-                lbl_password: "Password",
-                lbl_remember: "Remember Me",
-                btn_forgot_link: "Forgot Password?",
-                btn_submit: "Sign In",
-                lnk_create_account: "Don't have an account? Create one",
-                
-                // Registration
-                lbl_register_title: "Create SaaS Profile",
-                lbl_register_desc: "Register your store context and begin 30-Day Free Trial",
-                lbl_name: "Full Name",
-                lbl_shop_name: "Shop Name",
-                lbl_shop_type: "Shop Type",
-                btn_register_submit: "Activate Trial & Register",
-                lnk_back_login: "Already registered? Log In",
-                
-                // Subscriptions & QR gateway
-                lbl_sub_title: "Choose Your Workspace Scale",
-                lbl_sub_desc: "Your 30-Day Free Trial is initiated. Upgrade to paid packages below to unlock automated WhatsApp triggers & secure AI advisors.",
-                lbl_gateway_title: "Automated UPI Payment Gate",
-                lbl_gateway_desc: "Scan the dynamic UPI QR code on the right side using any UPI App (GPay, PhonePe, Paytm) and complete your payment securely.",
-                lbl_utr_input: "Enter 12-Digit UPI Ref / UTR No",
-                btn_utr_submit: "Verify Reference",
-                btn_skip_sub: "Skip & Launch Workspace (Active Trial)",
-                
-                // Blocked
-                lbl_suspended_title: "Access Suspension Alert",
-                lbl_suspended_desc: "Your subscription access or credentials have been marked inactive. Please contact Super Admin.",
-                
-                // Modals
-                modal_title: "Recover Password",
-                modal_desc: "Enter your registered email below, and we'll send you a password reset link.",
-                modal_btn_cancel: "Cancel",
-                modal_btn_send: "Send Link",
-
-                // Toasts
-                toast_login_success: "Successfully authenticated!",
-                toast_login_error: "Invalid email or password! Please try again.",
-                toast_utr_checking: "Reference sent. Awaiting administrator manual context activation...",
-                toast_trial_initiated: "Workspace initialized. 30-Day Free Trial activated!",
-                toast_recovery_sent: "Recovery verification link sent!"
-            },
-            ta: {
-                login_tagline: "உள்நுழைய உங்கள் விபரங்களை உள்ளிடவும்",
-                lbl_email: "மின்னஞ்சல் முகவரி",
-                lbl_password: "கடவுச்சொல்",
-                lbl_remember: "என்னை நினைவில் கொள்",
-                btn_forgot_link: "கடவுச்சொல் மறந்ததா?",
-                btn_submit: "உள்நுழைக",
-                lnk_create_account: "புதிய கணக்கை உருவாக்க வேண்டுமா? இங்கே கிளிக் செய்யவும்",
-                
-                // Registration
-                lbl_register_title: "புதிய கணக்கு உருவாக்குதல்",
-                lbl_register_desc: "வணிக விவரங்களை உள்ளிட்டு 30 நாள் இலவச சோதனையைத் தொடங்கவும்",
-                lbl_name: "முழுப் பெயர்",
-                lbl_shop_name: "கடையின் பெயர்",
-                lbl_shop_type: "வணிக வகை",
-                btn_register_submit: "சோதனையைத் தொடங்கு & பதிவு செய்",
-                lnk_back_login: "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழையவும்",
-                
-                // Subscriptions & QR gateway
-                lbl_sub_title: "உங்களுக்கான கட்டணத் திட்டம் தேர்வு செய்க",
-                lbl_sub_desc: "உங்கள் 30 நாள் இலவச சோதனை துவங்கப்பட்டுள்ளது. வாட்ஸ்அப் ஆட்டோமேஷன் மற்றும் ஏஐ ஆலோசகரை அணுக கட்டணத் திட்டங்களை மேம்படுத்தவும்.",
-                lbl_gateway_title: "தானியங்கி யுபிஐ கட்டண முறை",
-                lbl_gateway_desc: "வலதுபுறம் உள்ள யுபிஐ கியூஆர் கோடை உங்கள் மொபைல் செயலிகள் மூலம் ஸ்கேன் செய்து பாதுகாப்பாகக் கட்டணத்தை செலுத்தவும்.",
-                lbl_utr_input: "12-இலக்க யுபிஐ குறிப்பு எண் (UTR) உள்ளிடவும்",
-                btn_utr_submit: "சரிபார்",
-                btn_skip_sub: "இப்போதைக்குத் தவிர் (இலவச சோதனைக் காலம்)",
-                
-                // Blocked
-                lbl_suspended_title: "கணக்கு முடக்கப்பட்டுள்ளது",
-                lbl_suspended_desc: "பாதுகாப்பு அச்சுறுத்தல் காரணமாக உங்களது கணக்கு தற்காலிகமாக முடக்கப்பட்டுள்ளது. முதன்மை நிர்வாகியைத் தொடர்பு கொள்ளவும்.",
-                
-                // Modals
-                modal_title: "மின்னஞ்சல் வழி மீட்பு",
-                modal_desc: "உங்கள் மின்னஞ்சலை உள்ளிட்டால் அதற்கான கடவுச்சொல் மீட்பு இணைப்பு அனுப்பப்படும்.",
-                modal_btn_cancel: "ரத்துசெய்",
-                modal_btn_send: "அனுப்புக",
-
-                // Toasts
-                toast_login_success: "வெற்றிகரமாக அங்கீகரிக்கப்பட்டது!",
-                toast_login_error: "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல்! மீண்டும் முயற்சிக்கவும்.",
-                toast_utr_checking: "கட்டண குறிப்பு அனுப்பப்பட்டது. நிர்வாகியின் அனுமதிக்கு பின் கணக்கு முழுமையாகத் திறக்கப்படும்...",
-                toast_trial_initiated: "இலவச 30-நாள் சோதனைக் காலம் வெற்றிகரமாகத் தொடங்கப்பட்டது!",
-                toast_recovery_sent: "மீட்பு மின்னஞ்சல் அனுப்பப்பட்டது!"
-            }
-        };
-
         let currentLang = 'en';
 
-        // ON RUNTIME LOADER
+        // ON RUNTIME START
         window.addEventListener('DOMContentLoaded', () => {
             const savedGlobalLang = localStorage.getItem('roaji_language');
             if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
@@ -443,19 +367,18 @@
                 // Route Super Admin directly
                 setTimeout(() => {
                     console.log("Routing to hidden /super-admin portal...");
-                    window.location.href = "admin.html";
+                    window.location.href = "super_admin_panel.html";
                 }, 800);
             } else if (email === "owner@roaji.com" && password === "owner123") {
                 showToast(langData[currentLang]['toast_login_success'], "success");
                 
-                // OWNER with multiple shops -> transitions context to selection resolver
+                // Multi-Shop Owner Routing -> Redirects exactly to shop_resolver.html
                 setTimeout(() => {
-                    localStorage.setItem('roaji_active_shop_id', 'shop_gift');
-                    window.location.href = "index.html"; 
+                    window.location.href = "shop_resolver.html";
                 }, 800);
             } else if (email === "blocked@roaji.com" && password === "blocked123") {
-                // Suspended claims evaluation
-                showToast(langData[currentLang]['toast_blocked_user'], "error");
+                // Blocked User Routing -> Swapped to inline suspended view panel
+                showToast(langData[currentLang]['toast_blocked_user'] || "Suspended!", "error");
                 switchView('suspended');
             } else {
                 showToast(langData[currentLang]['toast_login_error'], "error");
@@ -471,7 +394,7 @@
             const shopName = document.getElementById('reg-shop').value.trim();
             const shopType = document.getElementById('reg-type').value;
 
-            // Simulate Firestore profile registration
+            // Mock profile registration mapping role: OWNER
             const mockRegisteredOwnerClaims = {
                 uid: "usr_owner_" + Date.now(),
                 name: name,
@@ -582,13 +505,13 @@
 
             if (type === 'success') {
                 bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
-                iconSvg = `<svg class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width: 100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             } else if (type === 'error') {
                 bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
-                iconSvg = `<svg class="h-5 w-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width: 100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             } else if (type === 'info') {
                 bgClass = 'bg-amber-950/90 border border-amber-500/30 text-amber-300';
-                iconSvg = `<svg class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width: 100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             }
 
             toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
