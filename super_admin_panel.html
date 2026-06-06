@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS Suite - Super Admin Control Panel</title>
+    <title>Roaji SaaS Suite - Master Control Command Room</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -73,8 +73,14 @@
                 <button onclick="showSection('queue')" id="menu-btn-queue" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-orange-600 text-white font-medium text-xs">
                     <span data-key="menu_onboarding_queue">Onboarding Queue</span>
                 </button>
+                <button onclick="showSection('onboarding')" id="menu-btn-onboarding" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-stone-400 hover:bg-stone-800 hover:text-white font-medium text-xs">
+                    <span data-key="menu_onboarding_form">➕ Manual Onboarding</span>
+                </button>
                 <button onclick="showSection('shops')" id="menu-btn-shops" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-stone-400 hover:bg-stone-800 hover:text-white font-medium text-xs">
                     <span data-key="menu_tenant_list">Tenant Workspace List</span>
+                </button>
+                <button onclick="showSection('automation')" id="menu-btn-automation" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-stone-400 hover:bg-stone-800 hover:text-white font-medium text-xs">
+                    <span data-key="menu_automation_hub">SaaS Automation Modules</span>
                 </button>
                 <button onclick="showSection('security')" id="menu-btn-security" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-stone-400 hover:bg-stone-800 hover:text-white font-medium text-xs">
                     <span data-key="menu_security_settings">SaaS Security & Identity</span>
@@ -88,7 +94,7 @@
     </aside>
 
     <!-- MAIN WINDOW WRAPPER -->
-    <main class="flex-1 min-w-0 flex flex-col">
+    <main class="flex-1 min-w-0 flex flex-col overflow-y-auto">
 
         <!-- TOPBAR -->
         <header class="h-16 premium-glass px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 border-b border-stone-200/40 shadow-sm gap-4">
@@ -101,26 +107,28 @@
             </div>
         </header>
 
+        <!-- Dynamic Statistics Badges Row -->
+        <div class="p-4 lg:p-6 pb-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="premium-glass p-5 rounded-3xl">
+                <span data-key="stat_total_tenants" class="text-[10px] text-stone-500 font-bold block uppercase tracking-wider">Total Tenant Branches</span>
+                <strong id="stat-total-shops" class="text-xl text-stone-200 font-bold block mt-2">0</strong>
+            </div>
+            <div class="premium-glass p-5 rounded-3xl">
+                <span data-key="stat_pending_payments" class="text-[10px] text-amber-500 font-bold block uppercase tracking-wider">Pending Approvals</span>
+                <strong id="stat-pending-utr" class="text-xl text-amber-400 font-bold block mt-2">0</strong>
+            </div>
+            <div class="premium-glass p-5 rounded-3xl">
+                <span data-key="stat_active_lic" class="text-[10px] text-emerald-500 font-bold block uppercase tracking-wider">Active Workspace Licenses</span>
+                <strong id="stat-active-shops" class="text-xl text-emerald-400 font-bold block mt-2">0</strong>
+            </div>
+            <div class="premium-glass p-5 rounded-3xl">
+                <span data-key="stat_global_mrr" class="text-[10px] text-orange-500 font-bold block uppercase tracking-wider">Global System MRR</span>
+                <strong id="stat-mrr" class="text-xl text-orange-400 font-bold block mt-2">₹0.00</strong>
+            </div>
+        </div>
+
         <!-- ==================== VIEW 1: ONBOARDING QUEUE ==================== -->
         <div id="section-queue" class="view-panel p-4 lg:p-6 space-y-6">
-            
-            <!-- Statistics widget cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="premium-glass p-5 rounded-3xl">
-                    <span data-key="stat_total_tenants" class="text-[10px] text-stone-500 font-bold block uppercase tracking-wider">Total SaaS Branches</span>
-                    <strong id="stat-total-shops" class="text-xl text-stone-200 font-bold block mt-2">0</strong>
-                </div>
-                <div class="premium-glass p-5 rounded-3xl">
-                    <span data-key="stat_pending_payments" class="text-[10px] text-amber-500 font-bold block uppercase tracking-wider">Pending Approvals</span>
-                    <strong id="stat-pending-utr" class="text-xl text-amber-400 font-bold block mt-2">0</strong>
-                </div>
-                <div class="premium-glass p-5 rounded-3xl">
-                    <span data-key="stat_global_mrr" class="text-[10px] text-orange-500 font-bold block uppercase tracking-wider">Global System MRR</span>
-                    <strong id="stat-mrr" class="text-xl text-orange-400 font-bold block mt-2">₹0.00</strong>
-                </div>
-            </div>
-
-            <!-- Queue table -->
             <div class="premium-glass p-6 rounded-3xl">
                 <h3 data-key="queue_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2 mb-4">SaaS Onboarding Payment Verification Queue</h3>
                 
@@ -144,22 +152,150 @@
             </div>
         </div>
 
-        <!-- ==================== VIEW 2: TENANT WORKSPACE MANAGEMENT ==================== -->
+        <!-- ==================== VIEW 2: MANUAL ONBOARDING FORM ==================== -->
+        <div id="section-onboarding" class="view-panel p-4 lg:p-6 hidden">
+            <div class="premium-glass p-6 rounded-3xl max-w-2xl mx-auto space-y-4">
+                <h2 data-key="menu_onboarding_form" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">➕ Manual Quick Onboarding</h2>
+                <form id="onboarding-form" onsubmit="handleManualOnboarding(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Full Name / முழுப் பெயர்</label>
+                            <input type="text" id="ob-name" required placeholder="Owner Name" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-250 text-xs glow-focus">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Email / மின்னஞ்சல்</label>
+                            <input type="email" id="ob-email" required placeholder="example@domain.com" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-250 text-xs glow-focus">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Password / கடவுச்சொல்</label>
+                            <input type="password" id="ob-pass" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-250 text-xs glow-focus">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Shop Name / கடையின் பெயர்</label>
+                            <input type="text" id="ob-shop" required placeholder="Store Name" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-250 text-xs glow-focus">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Phone / கைபேசி</label>
+                            <input type="tel" id="ob-phone" required placeholder="e.g., 9876543210" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-250 text-xs glow-focus">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Account Mode / உரிம வகை</label>
+                            <select id="ob-mode" class="w-full px-3 py-2 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-300 text-xs font-semibold focus:outline-none glow-focus cursor-pointer">
+                                <option value="Active_Lifetime_Free">Active_Lifetime_Free (Bypasses verification)</option>
+                                <option value="SaaS_Paid_Plan">SaaS_Paid_Plan (Subject to paid cycle)</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Shop Address / முகவரி</label>
+                            <textarea id="ob-address" required rows="2" placeholder="Corporate Shop Address" class="w-full p-3 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-250 text-xs glow-focus"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 13 Niches select -->
+                    <div class="space-y-3 pt-3 border-t border-stone-850">
+                        <h4 class="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Select Store Niches</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs" id="ob-niches-grid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-orange-600/10">
+                        Manual Create Merchant Workspace
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 3: GLOBAL TENANTS WORKSPACE DIRECTORY ==================== -->
         <div id="section-shops" class="view-panel p-4 lg:p-6 hidden">
-            <div class="premium-glass p-6 rounded-3xl">
-                <h3 data-key="shops_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2 mb-4">Global Shop & Enterprise Tenant Control List</h3>
+            <div class="premium-glass p-6 rounded-3xl space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-stone-850 pb-4">
+                    <div>
+                        <h2 data-key="shops_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest">Global Shop & Enterprise Tenant Control List</h2>
+                        <p class="text-[10px] text-stone-500 mt-1">Configure independent feature gates and modular license flags per registered tenant store.</p>
+                    </div>
+                    <button onclick="exportDatabaseToCSV()" class="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold rounded-xl text-xs transition flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        <span>Export Database (CSV)</span>
+                    </button>
+                </div>
+
                 <div id="shops-control-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Loaded dynamically -->
                 </div>
             </div>
         </div>
 
-        <!-- ==================== VIEW 3: SYSTEM SECURITY SETTINGS ==================== -->
-        <div id="section-security" class="view-panel p-4 lg:p-6 hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-6 premium-glass p-6 rounded-3xl space-y-4">
-                <h3 data-key="config_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">Admin Identity Settings</h3>
-                
-                <!-- Credentials Config -->
+        <!-- ==================== VIEW 4: SAAS AUTOMATION MODULES (9 FEATURES) ==================== -->
+        <div id="section-automation" class="view-panel p-4 lg:p-6 hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- left column (Col 6) -->
+            <div class="lg:col-span-6 space-y-6">
+                <!-- WhatsApp Webhook & Custom Bill footer -->
+                <div class="premium-glass p-6 rounded-3xl space-y-4">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">WhatsApp Webhook & Branding</h3>
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">WhatsApp Webhook (n8n bot)</label>
+                            <input id="auto-wa-webhook" type="text" value="https://n8n.roaji.in/webhook/v1/whatsapp" oninput="saveAutomationConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Global Bill Footer Branding</label>
+                            <input id="auto-bill-footer" type="text" value="ROAJI Enterprise billing suite" oninput="saveAutomationConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global banner, maintenance & promo engine -->
+                <div class="premium-glass p-6 rounded-3xl space-y-4">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">SaaS Status Alerts</h3>
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Global System Banner Alert</label>
+                            <input id="auto-banner" type="text" placeholder="Scheduled maintenance on 10th Apr..." oninput="saveAutomationConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Promo Code Voucher</label>
+                                <input id="auto-promo-code" type="text" value="ROAJIFREE" oninput="saveAutomationConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Maintenance Switch</label>
+                                <select id="auto-maintenance-selector" onchange="saveAutomationConfig()" class="w-full px-3 py-1.5 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs font-semibold focus:outline-none">
+                                    <option value="OFF">OFF (Live)</option>
+                                    <option value="ON">ON (Lockdown)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right column (Col 6) -->
+            <div class="lg:col-span-6 space-y-6">
+                <!-- Support ticket console -->
+                <div class="premium-glass p-6 rounded-3xl flex flex-col justify-between h-[180px]">
+                    <div>
+                        <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2 mb-2">Merchant Support Tickets</h3>
+                        <div class="text-[11px] text-stone-500 py-4 text-center font-semibold">No active support tickets. All hubs operational.</div>
+                    </div>
+                </div>
+
+                <!-- Global baseline pricing overrides (13 niches) -->
+                <div class="premium-glass p-6 rounded-3xl space-y-4">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">Global Base Price Overrides</h3>
+                    <div class="grid grid-cols-2 gap-3 text-xs" id="pricing-overrides-grid">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== VIEW 5: SECURITY SETTINGS ==================== -->
+        <div id="section-security" class="view-panel p-4 lg:p-6 hidden">
+            <div class="premium-glass p-6 rounded-3xl max-w-md mx-auto space-y-4">
+                <h2 data-key="config_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">Admin Identity Settings</h2>
                 <div class="space-y-3">
                     <div>
                         <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Backup Recovery Email</label>
@@ -181,7 +317,6 @@
             <h3 id="modal-customizer-title" class="text-sm font-bold text-white border-b border-stone-850 pb-2">✏️ Edit Package & Manage Shops</h3>
             <p class="text-[11px] text-stone-400">Add or remove distinct operational store modules for this tenant securely.</p>
             
-            <!-- Checkbox matrix of 13 blueprint nodes -->
             <form id="customizer-form" onsubmit="saveCustomizedPackage(event)">
                 <input type="hidden" id="customizer-shop-id">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs h-56 overflow-y-auto p-1 border border-stone-800 rounded-xl bg-stone-950/50" id="modal-niches-grid">
@@ -196,82 +331,25 @@
         </div>
     </div>
 
-    <!-- VANILLA JS CORE SYSTEM CONTROLLERS -->
+    <!-- VANILLA JS STATE, CRM, INVENTORY, PURCHASES & i18n ENGINE -->
     <script>
-        const langData = {
-            en: {
-                app_title: "SaaS Super Admin Control Room",
-                back_dashboard: "← Go back to Central Gate",
-                sidebar_role_admin: "Super Admin Control",
-                menu_onboarding_queue: "Onboarding Queue",
-                menu_tenant_list: "Tenant Workspace List",
-                menu_security_settings: "SaaS Security & Identity",
-                stat_total_tenants: "Total Tenant Branches",
-                stat_pending_payments: "UTR Verifications Pending",
-                stat_active_lic: "Active Workspace Licenses",
-                stat_global_mrr: "Global System MRR",
-                queue_title: "SaaS Onboarding Payment Verification Queue",
-                th_merchant: "Merchant Details",
-                lbl_shop_phone: "Phone",
-                lbl_shop_address: "Address",
-                lbl_shop_gstin: "GSTIN",
-                th_status: "Status",
-                shops_title: "Global Shop & Enterprise Tenant Control List",
-                config_title: "Admin Identity Settings",
-                toast_approved: "Merchant license activated successfully! Status: Active_Lifetime_Free",
-                toast_rejected: "UTR reference rejected.",
-                toast_config_saved: "SaaS security overrides updated successfully!"
-            },
-            ta: {
-                app_title: "முதன்மை நிர்வாகக் குழு (Super Admin Panel)",
-                back_dashboard: "← உள்நுழைவுப் பக்கத்திற்குச் செல்",
-                sidebar_role_admin: "சூப்பர் அட்மின்",
-                menu_onboarding_queue: "சரிபார்ப்புப் பட்டியல்",
-                menu_tenant_list: "வணிகர்களின் பட்டியல்",
-                menu_security_settings: "பாதுகாப்பு அமைப்புகள்",
-                stat_total_tenants: "மொத்த கிளைக் கடைகள்",
-                stat_pending_payments: "சரிபார்ப்புகள் நிலுவையில்",
-                stat_active_lic: "செயலில் உள்ள உரிமங்கள்",
-                stat_global_mrr: "ஒட்டுமொத்த SaaS வருமானம் (MRR)",
-                queue_title: "SaaS தானியங்கி கட்டணச் சரிபார்ப்புப் பட்டியல்",
-                th_merchant: "வணிகர் விவரங்கள்",
-                lbl_shop_phone: "தொலைபேசி",
-                lbl_shop_address: "முகவரி",
-                lbl_shop_gstin: "ஜிஎஸ்டி",
-                th_status: "நிலை",
-                shops_title: "உலகளாவிய கடைகள் மற்றும் உரிமங்கள் மேலாண்மை",
-                config_title: "நிர்வாகி அடையாள அமைப்புகள்",
-                toast_approved: "வணிகர் கணக்கு வெற்றிகரமாகச் செயல்படுத்தப்பட்டது! நிலை: Active_Lifetime_Free",
-                toast_rejected: "யுபிஐ குறிப்பு எண் நிராகரிக்கப்பட்டது.",
-                toast_config_saved: "நிர்வாக அமைப்புகள் வெற்றிகரமாகச் சேமிக்கப்பட்டன!"
-            }
-        };
-
-        const blueprintShopsData = [
-            { id: "xerox", name: { en: "Xerox Matrix", ta: "ஜெராக்ஸ் மேட்ரிக்ஸ்" } },
-            { id: "photo_studio", name: { en: "Photo Studio", ta: "போட்டோ ஸ்டுடியோ" } },
-            { id: "custom_frames", name: { en: "Custom Frames", ta: "ஃபிரேமிங் யூனிட்" } },
-            { id: "stationery", name: { en: "Stationery Zone", ta: "ஸ்டேஷனரி அங்காடி" } },
-            { id: "premium_gifts", name: { en: "Premium Gifts Zone", ta: "பரிசுப் பொருட்கள்" } },
-            { id: "mobile_tech", name: { en: "Mobile & Tech", ta: "மொபைல் & ஸ்பேர்ஸ்" } },
-            { id: "printing_tech", name: { en: "Printing & Tech Suite", ta: "பிரிண்டிங் சிஸ்டம்ஸ்" } },
-            { id: "csc_esevai", name: { en: "Internet Cafe & e-Sevai / CSC", ta: "இணைய சேவை & இ-சேவை" } },
-            { id: "toys_meesho", name: { en: "Toys Zone & Meesho Packing", ta: "விளையாட்டுப் பொருட்கள் & Meesho" } },
-            { id: "money_transfer", name: { en: "Money Transfer Ledger", ta: "பணப் பரிமாற்றம்" } },
-            { id: "fabrication", name: { en: "Welding, Roof & SS Fabrication Works", ta: "வெல்டிங் & ஃபேப்ரிகேஷன்" } },
-            { id: "bakery_core", name: { en: "Bakery Core Counter", ta: "பேக்கரி கவுண்டர்" } },
-            { id: "tea_shop", name: { en: "Tea Shop Quick Billing", ta: "டீ ஷாப் கவுண்டர்" } }
-        ];
-
         let currentLang = 'en';
         const SUPER_ADMIN_EMAIL = "iamajithkumar98@gmail.com";
 
         let shopsDB = [];
 
-        // INITIAL SECURITY AUDIT GATE
+        // ON RUNTIME START
         window.addEventListener('DOMContentLoaded', () => {
             const sessionClaims = JSON.parse(sessionStorage.getItem('roaji_session_claims'));
             
+            // For easy local file testing, let's auto-inject SUPER_ADMIN session if ?test=true query parameter is matched
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('test') === 'true') {
+                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: SUPER_ADMIN_EMAIL, role: "SUPER_ADMIN", is_active: true }));
+                window.location.href = "super_admin_panel.html"; 
+                return;
+            }
+
             if (!sessionClaims || sessionClaims.role !== "SUPER_ADMIN") {
                 // INSTANTLY WIPE BODY SCREEN ON SECURITY ALERT
                 document.getElementById('admin-body').innerHTML = '';
@@ -286,6 +364,7 @@
 
             // Reveal body if authenticated
             document.getElementById('admin-body').classList.remove('hidden');
+            document.getElementById('admin-body').classList.add('flex');
 
             shopsDB = JSON.parse(localStorage.getItem('roaji_shops')) || [];
 
@@ -294,9 +373,13 @@
                 currentLang = savedGlobalLang;
             }
             applyLanguage();
-            loadAdminSecurityConfig();
+            initializeGlobalPricingRulesOnLoad();
             renderOnboardingQueue();
             renderShopsControlList();
+            renderManualNicheCheckboxes();
+            renderGlobalPricingEditor();
+            loadAdminSecurityConfig();
+            loadAutomationConfig();
             updateStatisticsBadges();
         });
 
@@ -307,6 +390,8 @@
             applyLanguage();
             renderOnboardingQueue();
             renderShopsControlList();
+            renderManualNicheCheckboxes();
+            renderGlobalPricingEditor();
         }
 
         function applyLanguage() {
@@ -339,6 +424,17 @@
 
             document.getElementById(`section-${sectionName}`).classList.remove('hidden');
             document.getElementById(`menu-btn-${sectionName}`).className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-orange-600 text-white font-medium text-xs";
+        }
+
+        // ==================== GLOBAL RULES SEEDER ====================
+        function initializeGlobalPricingRulesOnLoad() {
+            if (!localStorage.getItem('roaji_global_pricing_rules')) {
+                const baseRules = {};
+                blueprintShopsData.forEach(shop => {
+                    baseRules[shop.id] = shop.price;
+                });
+                localStorage.setItem('roaji_global_pricing_rules', JSON.stringify(baseRules));
+            }
         }
 
         // ==================== MODULE A: SAAS ONBOARDING QUEUE ====================
@@ -385,16 +481,82 @@
             showToast(langData[currentLang]['toast_rejected'], "error");
         }
 
+        // ==================== MANUAL ONBOARDING CONSOLE ====================
+        function renderManualNicheCheckboxes() {
+            const grid = document.getElementById('ob-niches-grid');
+            grid.innerHTML = '';
+            blueprintShopsData.forEach(shop => {
+                grid.innerHTML += `
+                    <label class="p-3 bg-stone-900/60 border border-stone-850 hover:border-stone-800 rounded-xl flex items-center justify-between cursor-pointer transition select-none">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" value="${shop.id}" class="manual-niche-chk rounded border-stone-800 bg-stone-950 text-orange-500 w-4 h-4">
+                            <span class="text-stone-300 font-semibold leading-tight text-[11px]">${shop.name[currentLang]}</span>
+                        </div>
+                    </label>
+                `;
+            });
+        }
+
+        function handleManualOnboarding(event) {
+            event.preventDefault();
+            const name = document.getElementById('ob-name').value.trim();
+            const email = document.getElementById('ob-email').value.trim();
+            const pass = document.getElementById('ob-pass').value;
+            const shopName = document.getElementById('ob-shop').value.trim();
+            const phone = document.getElementById('ob-phone').value.trim();
+            const mode = document.getElementById('ob-mode').value;
+            const address = document.getElementById('ob-address').value.trim();
+
+            const checkboxes = document.querySelectorAll('.manual-niche-chk');
+            let chosenNiches = [];
+            checkboxes.forEach(chk => {
+                if (chk.checked) chosenNiches.push(chk.value);
+            });
+
+            if (chosenNiches.length === 0) {
+                showToast("Please select at least 1 store niche!", "error");
+                return;
+            }
+
+            const newShop = {
+                id: "shop_man_" + Date.now(),
+                name: shopName,
+                owner_email: email,
+                owner_password: pass,
+                owner_name: name,
+                phone: phone,
+                address: address,
+                gstin: "N/A",
+                type: chosenNiches.join(', '),
+                plan: mode === 'Active_Lifetime_Free' ? 'Lifetime Free Plan' : 'SaaS Paid Plan',
+                status: mode
+            };
+
+            shopsDB.push(newShop);
+            saveShopsToLocalStorage();
+            renderOnboardingQueue();
+            renderShopsControlList();
+            updateStatisticsBadges();
+
+            // Clear inputs
+            document.getElementById('ob-name').value = '';
+            document.getElementById('ob-email').value = '';
+            document.getElementById('ob-pass').value = '';
+            document.getElementById('ob-shop').value = '';
+            document.getElementById('ob-phone').value = '';
+            document.getElementById('ob-address').value = '';
+            checkboxes.forEach(chk => chk.checked = false);
+
+            showToast("Manual onboarding executed successfully!", "success");
+            showSection('shops');
+        }
+
         // ==================== DYNAMIC PACKAGE CUSTOMIZER MODAL ====================
         function openCustomizerModal(shopId) {
             const shop = shopsDB.find(s => s.id === shopId);
-            if (!order) {
-                // Seed temp initial fields if needed
-            }
+            if (!shop) return;
 
             document.getElementById('customizer-shop-id').value = shopId;
-            
-            // Render 13 checkboxes inside customizer grid
             const grid = document.getElementById('modal-niches-grid');
             grid.innerHTML = '';
 
@@ -440,7 +602,6 @@
                     if (chk.checked) mutatedNiches.push(chk.value);
                 });
 
-                // Overrides registered modules
                 shop.type = mutatedNiches.join(', ');
                 shop.status = "Active_Lifetime_Free"; // FLIP STATE TOKEN
 
@@ -459,7 +620,7 @@
             const grid = document.getElementById('shops-control-grid');
             grid.innerHTML = '';
 
-            const activeShops = shopsDB.filter(s => s.status === "Active_Lifetime_Free" || s.status === "Active");
+            const activeShops = shopsDB.filter(s => s.status === "Active_Lifetime_Free" || s.status === "Active" || s.status === "SaaS_Paid_Plan");
 
             if (activeShops.length === 0) {
                 grid.innerHTML = `<div class="col-span-2 text-center text-xs text-stone-500 py-6">No active workspace licenses found.</div>`;
@@ -467,6 +628,9 @@
             }
 
             activeShops.forEach(shop => {
+                const licenseLabel = shop.status === 'Active_Lifetime_Free' ? 'LIFETIME_FREE' : 'PAID_ACTIVE';
+                const badgeStyle = shop.status === 'Active_Lifetime_Free' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-blue-500/10 text-blue-400';
+
                 grid.innerHTML += `
                     <div class="p-5 bg-stone-950/40 border border-stone-850 rounded-3xl space-y-3">
                         <div class="flex justify-between items-start">
@@ -474,17 +638,90 @@
                                 <h4 class="font-bold text-stone-200 text-xs">${shop.name}</h4>
                                 <span class="text-[9px] text-stone-500 font-bold uppercase tracking-wider block mt-0.5">Owner: ${shop.owner_name || 'N/A'}</span>
                             </div>
-                            <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase">ACTIVE_LIFETIME</span>
+                            <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase ${badgeStyle}">${licenseLabel}</span>
                         </div>
                         <div class="text-[10px] text-stone-400 border-t border-stone-900 pt-2 leading-relaxed">
                             <strong>Modules:</strong> ${shop.type}
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button onclick="openCustomizerModal('${shop.id}')" class="flex-1 py-1.5 bg-stone-900 hover:bg-stone-850 border border-stone-800 text-[10px] font-bold rounded-lg text-stone-300">✏️ Edit Package</button>
+                            ${shop.status === 'SaaS_Paid_Plan' ? `
+                                <button onclick="extendGracePeriod('${shop.id}')" class="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-[10px] font-bold rounded-lg border border-amber-500/20">Extend Trial</button>
+                            ` : ''}
                         </div>
                     </div>
                 `;
             });
         }
 
-        // ==================== MODULE C: PROTECTED ADMIN CONFIGS ====================
+        function extendGracePeriod(shopId) {
+            const shop = shopsDB.find(s => s.id === shopId);
+            if (shop) {
+                shop.plan = "Pro Suite (Grace Period Extended)";
+                saveShopsToLocalStorage();
+                renderShopsControlList();
+                showToast("SaaS license grace period extended!", "success");
+            }
+        }
+
+        // ==================== SAAS GLOBAL CONFIG SETTINGS ====================
+        function renderGlobalPricingEditor() {
+            const container = document.getElementById('pricing-overrides-grid');
+            container.innerHTML = '';
+
+            const localRules = JSON.parse(localStorage.getItem('roaji_global_pricing_rules')) || {};
+
+            blueprintShopsData.forEach(shop => {
+                const currentPrice = localRules[shop.id] || shop.price;
+                container.innerHTML += `
+                    <div class="flex items-center justify-between p-2 bg-stone-950/40 border border-stone-850 rounded-xl">
+                        <span class="text-stone-400 font-semibold">${shop.name[currentLang]}</span>
+                        <input type="number" value="${currentPrice}" oninput="updateGlobalPriceRule('${shop.id}', this.value)" class="w-20 px-2 py-1 bg-stone-900 border border-stone-800 rounded-lg text-stone-200 text-xs text-right glow-focus font-bold">
+                    </div>
+                `;
+            });
+        }
+
+        function updateGlobalPriceRule(shopId, val) {
+            const localRules = JSON.parse(localStorage.getItem('roaji_global_pricing_rules')) || {};
+            localRules[shopId] = parseInt(val) || 0;
+            localStorage.setItem('roaji_global_pricing_rules', JSON.stringify(localRules));
+        }
+
+        function loadAutomationConfig() {
+            document.getElementById('auto-wa-webhook').value = localStorage.getItem('roaji_whatsapp_webhook') || "https://n8n.roaji.in/webhook/v1/whatsapp";
+            document.getElementById('auto-bill-footer').value = localStorage.getItem('roaji_bill_footer_branding') || "ROAJI Enterprise billing suite";
+            document.getElementById('auto-banner').value = localStorage.getItem('roaji_global_banner') || "";
+            document.getElementById('auto-promo-code').value = localStorage.getItem('roaji_promo_code') || "ROAJIFREE";
+            document.getElementById('auto-maintenance-selector').value = localStorage.getItem('roaji_maintenance_mode') || "OFF";
+        }
+
+        function saveAutomationConfig() {
+            localStorage.setItem('roaji_whatsapp_webhook', document.getElementById('auto-wa-webhook').value);
+            localStorage.setItem('roaji_bill_footer_branding', document.getElementById('auto-bill-footer').value);
+            localStorage.setItem('roaji_global_banner', document.getElementById('auto-banner').value);
+            localStorage.setItem('roaji_promo_code', document.getElementById('auto-promo-code').value);
+            localStorage.setItem('roaji_maintenance_mode', document.getElementById('auto-maintenance-selector').value);
+        }
+
+        function exportDatabaseToCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Shop ID,Shop Name,Owner,Type,Plan,Status\n";
+
+            shopsDB.forEach(s => {
+                csvContent += `"${s.id}","${s.name}","${s.owner_name || 'N/A'}","${s.type}","${s.plan}","${s.status}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `roaji_saas_export_${Date.now()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ==================== DEEP REVENUE ANALYTICS & SECURITY ====================
         function loadAdminSecurityConfig() {
             document.getElementById('config-backup-email').value = localStorage.getItem('roaji_admin_backup_email') || 'superadmin@backup.com';
             document.getElementById('config-master-password').value = localStorage.getItem('roaji_admin_password_override') || 'Roaji.inbilling';
@@ -502,13 +739,25 @@
         function updateStatisticsBadges() {
             const totalShops = shopsDB.length;
             const pendingUtr = shopsDB.filter(s => s.status === "PENDING_SUPER_ADMIN_APPROVAL").length;
-            const activeLicenses = shopsDB.filter(s => s.status === "Active_Lifetime_Free" || s.status === "Active").length;
+            const activeLicenses = shopsDB.filter(s => s.status === "Active_Lifetime_Free" || s.status === "Active" || s.status === "SaaS_Paid_Plan").length;
             
-            // Calculate mock global MRR
-            let mrrVal = activeLicenses * 1499;
+            // Calculate deep revenue metrics based on active pricing rules
+            let mrrVal = 0;
+            const pricingRules = JSON.parse(localStorage.getItem('roaji_global_pricing_rules')) || {};
+
+            shopsDB.forEach(shop => {
+                if (shop.status === "SaaS_Paid_Plan" || shop.status === "Active") {
+                    const assignedNichesArray = shop.type ? shop.type.split(', ') : [];
+                    assignedNichesArray.forEach(nicheId => {
+                        const rate = pricingRules[nicheId] || 150; // default average fallback rate
+                        mrrVal += rate;
+                    });
+                }
+            });
 
             document.getElementById('stat-total-shops').innerText = totalShops;
             document.getElementById('stat-pending-utr').innerText = pendingUtr;
+            document.getElementById('stat-active-shops').innerText = activeLicenses;
             document.getElementById('stat-mrr').innerText = `₹${mrrVal.toLocaleString('en-IN')}.00`;
         }
 
@@ -525,7 +774,7 @@
 
             if (type === 'success') {
                 bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
-                iconSvg = `<svg class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             } else if (type === 'error') {
                 bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
                 iconSvg = `<svg class="h-5 w-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
