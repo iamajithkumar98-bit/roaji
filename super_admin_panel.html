@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS Suite - Master Control Command Room</title>
+    <title>Roaji SaaS Suite - Super Admin Control Panel</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -248,11 +248,19 @@
 
                 <!-- Global banner, maintenance & promo engine -->
                 <div class="premium-glass p-6 rounded-3xl space-y-4">
-                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">SaaS Status Alerts</h3>
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">SaaS Status Alerts & Payment Gateways</h3>
                     <div class="space-y-3 text-xs">
                         <div>
                             <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Global System Banner Alert</label>
                             <input id="auto-banner" type="text" placeholder="Scheduled maintenance on 10th Apr..." oninput="saveAutomationConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">System Gateway UPI ID Destination</label>
+                            <input id="config-upi-id" type="text" value="roajisystems@upi" oninput="saveGlobalConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Custom QR Code API Source Link</label>
+                            <input id="config-qr-link" type="text" value="https://api.qrserver.com/v1/create-qr-code/" oninput="saveGlobalConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
@@ -333,12 +341,79 @@
 
     <!-- VANILLA JS STATE, CRM, INVENTORY, PURCHASES & i18n ENGINE -->
     <script>
-        let currentLang = 'en';
-        const SUPER_ADMIN_EMAIL = "iamajithkumar98@gmail.com";
+        const langData = {
+            en: {
+                app_title: "SaaS Super Admin Control Room",
+                back_dashboard: "← Go back to Central Gate",
+                sidebar_role_admin: "Super Admin Control",
+                menu_onboarding_queue: "Onboarding Queue",
+                menu_tenant_list: "Tenant Workspace List",
+                menu_security_settings: "SaaS Security & Identity",
+                menu_onboarding_form: "➕ Manual Onboarding",
+                menu_automation_hub: "SaaS Automation Modules",
+                stat_total_tenants: "Total Tenant Branches",
+                stat_pending_payments: "UTR Verifications Pending",
+                stat_active_lic: "Active Workspace Licenses",
+                stat_global_mrr: "Global System MRR",
+                queue_title: "SaaS Onboarding Payment Verification Queue",
+                th_merchant: "Merchant Details",
+                lbl_shop_phone: "Phone",
+                lbl_shop_address: "Address",
+                lbl_shop_gstin: "GSTIN",
+                th_status: "Status",
+                shops_title: "Global Shop & Enterprise Tenant Control List",
+                config_title: "Admin Identity Settings",
+                toast_approved: "Merchant license activated successfully! Status: Active_Lifetime_Free",
+                toast_rejected: "UTR reference rejected.",
+                toast_config_saved: "SaaS security overrides updated successfully!"
+            },
+            ta: {
+                app_title: "முதன்மை நிர்வாகக் குழு (Super Admin Panel)",
+                back_dashboard: "← உள்நுழைவுப் பக்கத்திற்குச் செல்",
+                sidebar_role_admin: "சூப்பர் அட்மின்",
+                menu_onboarding_queue: "சரிபார்ப்புப் பட்டியல்",
+                menu_onboarding_form: "➕ கைமுறை நுழைவு",
+                menu_tenant_list: "வணிகர்களின் பட்டியல்",
+                menu_automation_hub: "SaaS தானியங்கி தொகுப்புகள்",
+                menu_security_settings: "பாதுகாப்பு அமைப்புகள்",
+                stat_total_tenants: "மொத்த கிளைக் கடைகள்",
+                stat_pending_payments: "சரிபார்ப்புகள் நிலுவையில்",
+                stat_active_lic: "செயலில் உள்ள உரிமங்கள்",
+                stat_global_mrr: "ஒட்டுமொத்த SaaS வருமானம் (MRR)",
+                queue_title: "SaaS தானியங்கி கட்டணச் சரிபார்ப்புப் பட்டியல்",
+                th_merchant: "வணிகர் விவரங்கள்",
+                lbl_shop_phone: "தொலைபேசி",
+                lbl_shop_address: "முகவரி",
+                lbl_shop_gstin: "ஜிஎஸ்டி",
+                th_status: "நிலை",
+                shops_title: "உலகளாவிய கடைகள் மற்றும் உரிமங்கள் மேலாண்மை",
+                config_title: "நிர்வாகி அடையாள அமைப்புகள்",
+                toast_approved: "வணிகர் கணக்கு வெற்றிகரமாகச் செயல்படுத்தப்பட்டது! நிலை: Active_Lifetime_Free",
+                toast_rejected: "யுபிஐ குறிப்பு எண் நிராகரிக்கப்பட்டது.",
+                toast_config_saved: "நிர்வாக அமைப்புகள் வெற்றிகரமாகச் சேமிக்கப்பட்டன!"
+            }
+        };
 
+        const blueprintShopsData = [
+            { id: "xerox", name: { en: "Xerox Matrix", ta: "ஜெராக்ஸ் மேட்ரிக்ஸ்" }, price: 150 },
+            { id: "photo_studio", name: { en: "Photo Studio", ta: "போட்டோ ஸ்டுடியோ" }, price: 200 },
+            { id: "custom_frames", name: { en: "Custom Frames", ta: "ஃபிரேமிங் யூனிட்" }, price: 200 },
+            { id: "stationery", name: { en: "Stationery Zone", ta: "ஸ்டேஷனரி அங்காடி" }, price: 100 },
+            { id: "premium_gifts", name: { en: "Premium Gifts Zone", ta: "பரிசுப் பொருட்கள்" }, price: 150 },
+            { id: "mobile_tech", name: { en: "Mobile & Tech", ta: "மொபைல் & ஸ்பேர்ஸ்" }, price: 150 },
+            { id: "printing_tech", name: { en: "Printing & Tech Suite", ta: "பிரிண்டிங் சிஸ்டம்ஸ்" }, price: 200 },
+            { id: "csc_esevai", name: { en: "Internet Cafe & e-Sevai / CSC", ta: "இணைய சேவை & இ-சேவை" }, price: 250 },
+            { id: "toys_meesho", name: { en: "Toys Zone & Meesho Packing", ta: "விளையாட்டுப் பொருட்கள் & Meesho" }, price: 150 },
+            { id: "money_transfer", name: { en: "Money Transfer Ledger", ta: "பணப் பரிமாற்றம்" }, price: 300 },
+            { id: "fabrication", name: { en: "Welding, Roof & SS Fabrication Works", ta: "வெல்டிங் & ஃபேப்ரிகேஷன்" }, price: 400 },
+            { id: "bakery_core", name: { en: "Bakery Core Counter", ta: "பேக்கரி கவுண்டர்" }, price: 300 },
+            { id: "tea_shop", name: { en: "Tea Shop Quick Billing", ta: "டீ ஷாப் கவுண்டர்" }, price: 100 }
+        ];
+
+        let currentLang = 'en';
         let shopsDB = [];
 
-        // ON RUNTIME START
+        // INITIAL SECURITY AUDIT GATE
         window.addEventListener('DOMContentLoaded', () => {
             const sessionClaims = JSON.parse(sessionStorage.getItem('roaji_session_claims'));
             
@@ -675,7 +750,7 @@
                 const currentPrice = localRules[shop.id] || shop.price;
                 container.innerHTML += `
                     <div class="flex items-center justify-between p-2 bg-stone-950/40 border border-stone-850 rounded-xl">
-                        <span class="text-stone-400 font-semibold">${shop.name[currentLang]}</span>
+                        <span class="text-stone-400 font-semibold text-[11px]">${shop.name[currentLang]}</span>
                         <input type="number" value="${currentPrice}" oninput="updateGlobalPriceRule('${shop.id}', this.value)" class="w-20 px-2 py-1 bg-stone-900 border border-stone-800 rounded-lg text-stone-200 text-xs text-right glow-focus font-bold">
                     </div>
                 `;
@@ -702,6 +777,19 @@
             localStorage.setItem('roaji_global_banner', document.getElementById('auto-banner').value);
             localStorage.setItem('roaji_promo_code', document.getElementById('auto-promo-code').value);
             localStorage.setItem('roaji_maintenance_mode', document.getElementById('auto-maintenance-selector').value);
+        }
+
+        function saveGlobalConfig() {
+            const upiId = document.getElementById('config-upi-id').value;
+            const qrLink = document.getElementById('config-qr-link').value;
+
+            localStorage.setItem('roaji_admin_upi_id', upiId);
+            localStorage.setItem('roaji_admin_qr_link', qrLink);
+        }
+
+        function loadGlobalConfig() {
+            document.getElementById('config-upi-id').value = localStorage.getItem('roaji_admin_upi_id') || 'roajisystems@upi';
+            document.getElementById('config-qr-link').value = localStorage.getItem('roaji_admin_qr_link') || 'https://api.qrserver.com/v1/create-qr-code/';
         }
 
         function exportDatabaseToCSV() {
