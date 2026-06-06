@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS - Select Workspace</title>
+    <title>Roaji SaaS - Workspace Resolver</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -13,7 +13,7 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #050505; /* Deep streaming-app dark base */
+            background-color: #050505; /* Obsidian Black Premium Base Theme */
             color: #F5F5F4;
             margin: 0;
             overflow-x: hidden;
@@ -25,144 +25,188 @@
             border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
-        .carousel-perspective {
-            perspective: 1200px;
-            transform-style: preserve-3d;
+        .glow-focus:focus {
+            outline: none;
+            border-color: #F97316; /* Orange-500 Neon Accents */
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
         }
-        .carousel-card {
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s, filter 0.6s;
-            transform-style: preserve-3d;
-            backface-visibility: hidden;
-        }
-        .active-glow {
-            border-color: #F59E0B; /* Amber-500 */
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.25);
-        }
-        .active-glow-pro {
-            border-color: #EA580C; /* Orange-600 */
-            box-shadow: 0 0 30px rgba(234, 88, 12, 0.25);
+        .text-neon-gold {
+            color: #F59E0B;
+            text-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between p-4 md:p-8 relative">
+<body id="resolver-body" class="min-h-screen relative overflow-x-hidden p-4 md:p-8 flex flex-col justify-between">
 
-    <!-- Ambient backdrop neon glow -->
-    <div class="absolute top-[20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-[20%] right-[20%] w-[50vw] h-[50vw] rounded-full bg-orange-600/5 blur-[120px] pointer-events-none"></div>
+    <!-- Background Radial Neon Ambiance Glows -->
+    <div class="absolute top-[-20%] left-[-15%] w-[65vw] h-[65vw] rounded-full bg-amber-500/10 blur-[130px] pointer-events-none"></div>
+    <div class="absolute bottom-[-20%] right-[-15%] w-[65vw] h-[65vw] rounded-full bg-orange-600/10 blur-[130px] pointer-events-none"></div>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
+    <!-- TOAST CONTAINER -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
 
-    <!-- HEADER AREA -->
-    <header class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-stone-900 z-10">
-        <div class="space-y-1">
-            <h1 id="app-title" data-key="app_title" class="text-xl font-bold tracking-tight text-white">உங்களது வணிகத் தளம்</h1>
-            <p class="text-xs text-stone-500 font-semibold uppercase tracking-wider">Multi-Shop Portal Resolver</p>
+    <!-- MAIN INTERFACE CORE WRAPPER -->
+    <div class="w-full max-w-6xl mx-auto z-10 space-y-6">
+
+        <!-- GLOBAL SYSTEM BROADCASTER MARQUEE BANNER -->
+        <div id="marquee-container" class="w-full py-2.5 px-4 bg-orange-600/10 border border-orange-500/20 rounded-2xl overflow-hidden hidden">
+            <marquee id="marquee-ticker" behavior="scroll" direction="left" class="text-xs font-bold text-orange-400 tracking-wider uppercase"></marquee>
         </div>
 
-        <!-- Language toggle -->
-        <div class="glass-panel p-1 rounded-2xl flex items-center shadow-sm self-end sm:self-auto bg-stone-900/60 border border-stone-850">
-            <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200">EN</button>
-            <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
-        </div>
-    </header>
+        <!-- HEADER AREA -->
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-stone-900">
+            <div class="space-y-1">
+                <h1 id="app-title" data-key="app_title" class="text-xl font-bold tracking-tight text-white uppercase">வணிகத் தேர்வுக் கன்சோல்</h1>
+                <p id="app-subtitle" class="text-xs text-stone-500 font-semibold uppercase tracking-wider">Multi-Shop Portal Resolver & Paywall Gate</p>
+            </div>
 
-    <!-- ==================== MAIN 3D CAROUSEL COMPONENT ==================== -->
-    <main class="w-full flex-1 flex flex-col items-center justify-center py-12 z-10">
-        
-        <!-- Error Banner Container (Shows if no linked shops found) -->
-        <div id="error-banner" class="max-w-md w-full p-4 bg-rose-950/20 border border-rose-500/30 rounded-2xl text-rose-300 text-xs font-semibold leading-relaxed hidden flex-col items-center text-center gap-2 mb-8">
-            <span class="p-1.5 bg-rose-500/10 rounded-lg text-rose-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-            </span>
-            <span id="lbl-error-text" data-key="lbl_error_text">உங்களது கணக்கில் எந்தவொரு வணிகமும் இணைக்கப்படவில்லை.</span>
-        </div>
+            <!-- Global Language Toggle -->
+            <div class="glass-panel p-1 rounded-2xl flex items-center shadow-sm bg-stone-900/60 border border-stone-850">
+                <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 bg-orange-600 text-white shadow">EN</button>
+                <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
+            </div>
+        </header>
 
-        <div id="carousel-viewport" class="w-full max-w-lg h-72 relative flex items-center justify-center carousel-perspective">
-            <!-- 3D CAROUSEL WORKSPACE WRAPPER (Dynamically populated) -->
-            <div id="carousel-stage" class="w-full h-full relative flex items-center justify-center transform-gpu"></div>
-
-            <!-- Left Navigation Arrow -->
-            <button onclick="rotateCarousel('prev')" class="absolute left-[-20px] md:left-[-60px] p-3 bg-stone-900/60 hover:bg-stone-850 border border-stone-800 rounded-full hover:border-amber-500 transition-all duration-300 text-stone-300 hover:text-white z-40 focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:20px; height:20px; max-width:100%;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
-
-            <!-- Right Navigation Arrow -->
-            <button onclick="rotateCarousel('next')" class="absolute right-[-20px] md:right-[-60px] p-3 bg-stone-900/60 hover:bg-stone-850 border border-stone-800 rounded-full hover:border-amber-500 transition-all duration-300 text-stone-300 hover:text-white z-40 focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:20px; height:20px; max-width:100%;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-            </button>
+        <!-- 13 SHOP MODULES DYNAMIC SELECTION GRID -->
+        <div class="space-y-4">
+            <h2 id="lbl-select-shop" data-key="lbl_select_shop" class="text-sm font-bold text-stone-400 uppercase tracking-widest">Select Workspace to Launch</h2>
+            
+            <div id="shops-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Loaded Dynamically -->
+            </div>
         </div>
 
-        <!-- Launch Button of active centered card -->
-        <div class="mt-12 text-center">
-            <button onclick="launchFocusedStore()" id="btn-launch" data-key="btn_launch" class="px-8 py-3.5 bg-amber-600 hover:bg-amber-700 text-stone-950 font-bold rounded-2xl text-xs transition duration-300 shadow-lg shadow-amber-600/10 active:scale-[0.98]">
-                கடையைத் தொடங்கு / Launch Workspace
-            </button>
-        </div>
+    </div>
 
-    </main>
+    <!-- ==================== PREMIUM EXPIRED PAYWALL MODAL ==================== -->
+    <div id="paywall-modal" class="fixed inset-0 bg-stone-950/90 backdrop-blur-md z-50 items-center justify-center p-4 hidden transition-all duration-300">
+        <div class="w-full max-w-lg premium-glass p-6 rounded-3xl shadow-xl transform scale-95 transition-all space-y-4 text-center border-orange-500/20">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/25 mb-2" style="width: 48px; height: 48px;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:24px; height:24px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            </div>
+            <h3 id="paywall-title" data-key="paywall_title" class="text-base font-bold text-white">SaaS Subscription Expired</h3>
+            <p id="paywall-desc" data-key="paywall_desc" class="text-xs text-stone-400 leading-relaxed">Your active subscription cycle has expired. Upgrade your workspace scale below using our automated UPI payment gateway to restore access immediately.</p>
+            
+            <!-- Dynamic UPI QR container -->
+            <div class="p-4 bg-stone-950/60 border border-stone-850 rounded-2xl flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div class="text-left space-y-2">
+                    <span class="inline-block px-2 py-0.5 text-[8px] font-bold tracking-wider uppercase text-orange-400 bg-orange-500/10 rounded-md">Pro Package Renewal</span>
+                    <h4 class="text-[10px] font-bold text-white uppercase">Automated UPI payment</h4>
+                    <p id="paywall-qr-info" data-key="paywall_qr_info" class="text-[10px] text-stone-500">Scan the QR code on GPay/PhonePe to renew your workspace instantly.</p>
+                </div>
+                <div class="p-2 bg-white rounded-xl">
+                    <!-- Dynamic UPI QR generator -->
+                    <img id="paywall-qr-img" src="" alt="UPI QR Code" style="width:100px; height:100px;">
+                </div>
+            </div>
+
+            <!-- UTR Input Form -->
+            <form id="paywall-utr-form" onsubmit="handlePaywallUtrSubmit(event)" class="space-y-3 text-left">
+                <div>
+                    <label id="paywall-utr-label" data-key="paywall_utr_label" class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Enter UTR / Transaction ID (பணப் பரிவர்த்தனை எண்)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="paywall-utr-input" required maxlength="12" placeholder="e.g. 389021840194" class="flex-1 px-4 py-2 bg-stone-900 border border-stone-850 rounded-xl text-stone-150 text-xs glow-focus">
+                        <button type="submit" id="paywall-btn-submit" data-key="paywall_btn_submit" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition">Submit Payment</button>
+                    </div>
+                </div>
+            </form>
+
+            <button onclick="logoutFromResolver()" data-key="back_dashboard" class="w-full py-2 bg-stone-850 hover:bg-stone-800 text-stone-300 rounded-xl text-xs font-semibold transition">Back to Login</button>
+        </div>
+    </div>
+
+    <!-- ==================== SYSTEM MAINTENANCE MODE INTERCEPTOR ==================== -->
+    <div id="maintenance-view" class="fixed inset-0 bg-stone-950 z-50 items-center justify-center p-4 hidden transition-all duration-300">
+        <div class="w-full max-w-md text-center space-y-4">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/25 mb-2" style="width: 56px; height: 56px;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:32px; height:32px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </div>
+            <h2 id="lbl-maintenance-title" class="text-xl font-bold text-white">System Maintenance Active</h2>
+            <p id="lbl-maintenance-desc" class="text-xs text-stone-400 leading-relaxed">Software under optimization by ROAJI admin suite. Normal access will be restored shortly.</p>
+        </div>
+    </div>
 
     <!-- FOOTER AREA -->
-    <footer class="w-full max-w-6xl mx-auto border-t border-stone-900 pt-4 text-center text-[10px] text-stone-600 font-semibold z-10">
-        <p>ROAJI Multi-Tenant Workspace Gateway. Fully hardware-accelerated 3D transforms rendering.</p>
+    <footer class="w-full max-w-6xl mx-auto border-t border-stone-900 pt-4 text-center text-[10px] text-stone-600 font-semibold">
+        <p>ROAJI Multi-Tenant Workspace Gateway & Paywall Resolver.</p>
     </footer>
 
-    <!-- VANILLA JS STATE & 3D GEOMETRIC TRANSFORM CALCULATORS -->
+    <!-- VANILLA JS STATE & GATEWAY ENGINE -->
     <script>
-        // BILINGUAL LANGUAGE TRANSLATOR DICTIONARY
         const langData = {
             en: {
-                app_title: "Select Active Workspace",
-                lbl_error_text: "No active store tenants found linked to this profile.",
-                btn_launch: "Launch Store Dashboard",
-                toast_switched: "Workspace successfully resolved! Initializing context...",
-                back_dashboard: "← Back to Sign In"
+                app_title: "Workspace Portal Resolver",
+                lbl_select_shop: "Select Workspace to Launch",
+                paywall_title: "SaaS Subscription Expired",
+                paywall_desc: "Your active subscription cycle has expired. Upgrade your workspace scale below using our automated UPI payment gateway to restore access immediately.",
+                paywall_qr_info: "Scan the QR code on GPay/PhonePe to renew your workspace instantly.",
+                paywall_utr_label: "Enter UTR / Transaction ID (பணப் பரிவர்த்தனை எண்)",
+                paywall_btn_submit: "Submit Payment",
+                back_dashboard: "Back to Login / பின்செல்ல",
+                lbl_locked_card: "Locked Niche",
+                toast_switched: "Workspace context loaded! Redirecting...",
+                toast_utr_submitted: "Payment proof uploaded! Awaiting Admin verification approval."
             },
             ta: {
-                app_title: "வணிகத்தைத் தேர்ந்தெடுக்கவும்",
-                lbl_error_text: "உங்களது கணக்கில் எந்தவொரு வணிகமும் இணைக்கப்படவில்லை.",
-                btn_launch: "கடையைத் தொடங்கு (Launch Store)",
+                app_title: "வணிகத் தேர்வுக் கன்சோல்",
+                lbl_select_shop: "துவங்க வேண்டிய வணிகத்தைத் தேர்ந்தெடுக்கவும்",
+                paywall_title: "SaaS உரிமக் காலம் முடிவடைந்தது",
+                paywall_desc: "உங்களது வணிகச் சந்தாக் காலம் முடிவடைந்துவிட்டது. எங்களது தானியங்கி யுபிஐ கியூஆர் மூலமாகப் பணம் செலுத்தி உடனடி அணுகலை மீட்டெடுக்கவும்.",
+                paywall_qr_info: "GPay/PhonePe மூலம் கட்டணம் செலுத்தி கடையை உடனடியாகத் திறக்கவும்.",
+                paywall_utr_label: "12-இலக்க யுபிஐ குறிப்பு எண் (UTR) உள்ளிடவும்",
+                paywall_btn_submit: "பணத்தை செலுத்து",
+                back_dashboard: "Back to Login / பின்செல்ல",
+                lbl_locked_card: "லாக் செய்யப்பட்டுள்ளது",
                 toast_switched: "வணிகத் தளம் வெற்றிகரமாகத் தேர்ந்தெடுக்கப்பட்டது! துவங்குகிறது...",
-                back_dashboard: "← உள்நுழைவுப் பக்கம்"
+                toast_utr_submitted: "பரிவர்த்தனை விபரங்கள் பதியப்பட்டன! அட்மின் சரிபார்ப்பிற்குப் பின் களம் திறக்கப்படும்."
             }
         };
 
-        let currentLang = 'en';
-
-        // Mocked User Claims & Store Relations (STEP A)
-        let userProfileClaims = {
-            uid: "usr_owner_902184",
-            email: "owner@roaji.com",
-            shop_ids: ["shop_gift", "shop_textile", "shop_bakery"] // Mock multiple stores bound
-        };
-
-        // Simulated central stores collection inside LocalStorage
-        const mockShopsDB = [
-            { id: "shop_gift", name: "ROAJI Gifts Studio (Chennai)", type: "Gift Shop", tier: "Basic" },
-            { id: "shop_textile", name: "ROAJI Textiles (Madurai)", type: "Textile Shop", tier: "Pro Suite" },
-            { id: "shop_bakery", name: "ROAJI Bakery (Coimbatore)", type: "Bakery", tier: "Enterprise" }
+        const blueprintShopsData = [
+            { id: "xerox", name: { en: "Xerox Matrix", ta: "ஜெராக்ஸ் மேட்ரிக்ஸ்" }, price: 150, route: "pos_billing_engine.html" },
+            { id: "photo_studio", name: { en: "Photo Studio", ta: "போட்டோ ஸ்டுடியோ" }, price: 200, route: "pos_billing_engine.html" },
+            { id: "custom_frames", name: { en: "Custom Frames", ta: "பிரேம் யூனிட்" }, price: 200, route: "pos_billing_engine.html" },
+            { id: "stationery", name: { en: "Stationery Zone", ta: "ஸ்டேஷனரி அங்காடி" }, price: 100, route: "pos_billing_engine.html" },
+            { id: "premium_gifts", name: { en: "Premium Gifts Zone", ta: "பரிசுப் பொருட்கள்" }, price: 150, route: "pos_billing_engine.html" },
+            { id: "mobile_tech", name: { en: "Mobile & Tech", ta: "மொபைல் & ஸ்பேர்ஸ்" }, price: 150, route: "pos_billing_engine.html" },
+            { id: "printing_tech", name: { en: "Printing & Tech Suite", ta: "பிரிண்டிங் சிஸ்டம்ஸ்" }, price: 200, route: "pos_billing_engine.html" },
+            { id: "csc_esevai", name: { en: "Internet Cafe & e-Sevai / CSC", ta: "இணைய சேவை & இ-சேவை" }, price: 250, route: "pos_billing_engine.html" },
+            { id: "toys_meesho", name: { en: "Toys Zone & Meesho Packing", ta: "விளையாட்டுப் பொருட்கள் & Meesho" }, price: 150, route: "pos_billing_engine.html" },
+            { id: "money_transfer", name: { en: "Money Transfer Ledger", ta: "பணப் பரிமாற்றம்" }, price: 300, route: "pos_billing_engine.html" },
+            { id: "fabrication", name: { en: "Welding, Roof & SS Fabrication Works", ta: "வெல்டிங் & ஃபேப்ரிகேஷன்" }, price: 400, route: "fabrication_billing_engine.html" },
+            { id: "bakery_core", name: { en: "Bakery Core Counter", ta: "பேக்கரி கவுண்டர்" }, price: 300, route: "pos_billing_engine.html" },
+            { id: "tea_shop", name: { en: "Tea Shop Quick Billing", ta: "டீ ஷாப் கவுண்டர்" }, price: 100, route: "pos_billing_engine.html" }
         ];
 
-        let activeCarouselIndex = 0;
-        let shopsInCarousel = [];
+        let currentLang = 'en';
+        let activeMerchantShop = null;
 
         // ON RUNTIME START
         window.addEventListener('DOMContentLoaded', () => {
+            // STEP A: Security Identity Validation
+            const sessionClaims = JSON.parse(sessionStorage.getItem('roaji_session_claims'));
+            if (!sessionClaims || sessionClaims.role !== "OWNER") {
+                window.location.href = "https://iamajithkumar98-bit.github.io/roaji/index.html";
+                return;
+            }
+
+            // Retrieve active onboarding merchant shop configuration
+            const registeredSaaSShops = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+            activeMerchantShop = registeredSaaSShops.find(s => s.owner_email === sessionClaims.email);
+
             const savedGlobalLang = localStorage.getItem('roaji_language');
             if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
                 currentLang = savedGlobalLang;
-            } else {
-                currentLang = 'en';
-                localStorage.setItem('roaji_language', 'en');
             }
             applyLanguage();
 
-            // STEP A: Security Identity Validation
-            evaluateProfileResolution();
+            // Check Maintenance interceptor
+            evaluateSystemMaintenance();
+
+            // Check Paywall expiration
+            evaluateSaaSPaywallGate();
+
+            renderShopsGrid();
         });
 
         // LANGUAGE TOGGLE
@@ -170,7 +214,7 @@
             currentLang = lang;
             localStorage.setItem('roaji_language', lang);
             applyLanguage();
-            renderCarouselCards(); // refresh tags
+            renderShopsGrid();
         }
 
         function applyLanguage() {
@@ -178,10 +222,10 @@
             const btnEn = document.getElementById('lang-btn-en');
 
             if (currentLang === 'ta') {
-                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white shadow-sm";
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
                 btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
             } else {
-                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white shadow-sm";
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
                 btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
             }
 
@@ -194,157 +238,148 @@
             });
         }
 
-        // IDENTITY IDENTITY VALIDATOR
-        function evaluateProfileResolution() {
-            const errorBanner = document.getElementById('error-banner');
-            const viewport = document.getElementById('carousel-viewport');
-            const launchBtn = document.getElementById('btn-launch');
+        // ==================== SYSTEM INTERCEPTORS ====================
+        function evaluateSystemMaintenance() {
+            const state = localStorage.getItem('roaji_maintenance_mode') || 'OFF';
+            if (state === 'ON') {
+                document.getElementById('maintenance-view').classList.remove('hidden');
+                document.getElementById('maintenance-view').classList.add('flex');
+            }
+        }
 
-            if (!userProfileClaims.shop_ids || userProfileClaims.shop_ids.length === 0) {
-                // Wipe screen elements
-                viewport.classList.add('hidden');
-                launchBtn.classList.add('hidden');
-                errorBanner.classList.remove('hidden');
-                errorBanner.classList.add('flex');
+        function evaluateSaaSPaywallGate() {
+            if (!activeMerchantShop) return;
+
+            // Bypasses lock completely for Active_Lifetime_Free
+            if (activeMerchantShop.status === "Active_Lifetime_Free") {
                 return;
             }
 
-            // Fill active carousel array elements
-            userProfileClaims.shop_ids.forEach(shopId => {
-                const shopData = mockShopsDB.find(s => s.id === shopId);
-                if (shopData) shopsInCarousel.push(shopData);
-            });
+            // Hard check for expiring SaaS plans
+            if (activeMerchantShop.status === "SaaS_Paid_Plan" && activeMerchantShop.is_expired) {
+                // Initialize Payment variables
+                const masterUpiId = localStorage.getItem('roaji_admin_upi_id') || 'roajisystems@upi';
+                const baseQrApi = localStorage.getItem('roaji_admin_qr_link') || 'https://api.qrserver.com/v1/create-qr-code/';
+                
+                const qrImage = document.getElementById('paywall-qr-img');
+                const priceTotalPayload = 1499; // Mock Pro Suite package weight
 
-            renderCarouselCards();
+                qrImage.src = `${baseQrApi}?size=150x150&data=upi://pay?pa=${masterUpiId}%26am=${priceTotalPayload}%26cu=INR`;
+
+                // Display blocking overlay modal
+                const modal = document.getElementById('paywall-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
         }
 
-        // ==================== STEP B: 3D CURVED CAROUSEL ENGINE ====================
-        function renderCarouselCards() {
-            const stage = document.getElementById('carousel-stage');
-            stage.innerHTML = '';
+        // ==================== RENDER INTEGRATED SHops GRID ====================
+        function renderShopsGrid() {
+            const grid = document.getElementById('shops-grid');
+            grid.innerHTML = '';
 
-            shopsInCarousel.forEach((shop, index) => {
-                const isPro = shop.tier === 'Pro Suite';
-                const isEnt = shop.tier === 'Enterprise';
-                
-                let tierBadgeStyle = 'bg-stone-800 text-stone-400';
-                if (isPro) tierBadgeStyle = 'bg-orange-600/10 text-orange-400 border border-orange-500/20';
-                if (isEnt) tierBadgeStyle = 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+            const authorizedModulesString = activeMerchantShop ? activeMerchantShop.type : '';
+            const authorizedModulesArray = authorizedModulesString.split(', ');
 
-                // Core card structure
-                stage.innerHTML += `
-                    <div id="card-${index}" onclick="setCarouselActive(${index})" class="carousel-card absolute w-72 h-44 premium-card rounded-3xl p-6 flex flex-col justify-between border cursor-pointer transform-gpu select-none">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="px-2 py-0.5 text-[8px] font-bold rounded-md uppercase tracking-wider ${tierBadgeStyle}">${shop.tier}</span>
-                                <span class="text-stone-600 font-bold text-[9px] font-mono">ID: ${shop.id}</span>
+            blueprintShopsData.forEach(shop => {
+                // Check if shop niche exists inside verified merchant claims
+                const isUnlocked = authorizedModulesArray.includes(shop.id) || authorizedModulesArray.includes(shop.name.en);
+
+                if (isUnlocked) {
+                    // UNLOCKED CLICKABLE CORE CARD
+                    grid.innerHTML += `
+                        <div onclick="launchStoreDashboard('${shop.id}', '${shop.route}')" class="p-5 bg-stone-950/40 border border-stone-850 hover:border-orange-500 rounded-3xl cursor-pointer transition-all duration-300 flex flex-col justify-between h-40 group shadow-md hover:shadow-orange-500/10">
+                            <div>
+                                <span class="inline-block px-2.5 py-0.5 text-[8px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded uppercase tracking-wider">Active</span>
+                                <h3 class="font-bold text-stone-200 text-xs mt-3 leading-snug group-hover:text-white">${shop.name[currentLang]}</h3>
                             </div>
-                            <h4 class="font-bold text-stone-200 text-xs mt-1 leading-snug card-title-node">${shop.name}</h4>
+                            <div class="flex items-center justify-between border-t border-stone-900 pt-3">
+                                <span class="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Launch POS</span>
+                                <span class="text-stone-600 group-hover:text-orange-500 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                                </span>
+                            </div>
                         </div>
-
-                        <div class="flex items-center justify-between border-t border-stone-850 pt-3">
-                            <span class="text-[10px] text-stone-500 font-bold uppercase tracking-wider">${shop.type}</span>
-                            <span class="text-stone-500 group-hover:text-amber-500 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:16px; height:16px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </span>
+                    `;
+                } else {
+                    // LOCKED GREYSCALE CARD
+                    const lockedText = langData[currentLang]['lbl_locked_card'];
+                    grid.innerHTML += `
+                        <div class="p-5 bg-stone-950/20 border border-stone-900 rounded-3xl h-40 flex flex-col justify-between filter grayscale opacity-45 cursor-not-allowed select-none">
+                            <div>
+                                <span class="inline-block px-2.5 py-0.5 text-[8px] font-bold bg-stone-800 text-stone-400 border border-stone-850 rounded uppercase tracking-wider">${lockedText}</span>
+                                <h3 class="font-bold text-stone-500 text-xs mt-3 leading-snug">${shop.name[currentLang]}</h3>
+                            </div>
+                            <div class="flex items-center justify-between border-t border-stone-900/60 pt-3 text-stone-600">
+                                <span class="text-[9px] font-bold uppercase tracking-wider">Locked</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             });
 
-            // Recalculate 3D space vectors
-            updateCarousel3DSpace();
+            // Append dynamic marquee if present
+            evaluateScrollingMarqueeAlert();
         }
 
-        // MOCK CAROUSEL MATH COEFFICIENTS
-        function updateCarousel3DSpace() {
-            const total = shopsInCarousel.length;
-            if (total === 0) return;
+        function evaluateScrollingMarqueeAlert() {
+            const bannerString = localStorage.getItem('roaji_global_banner') || '';
+            const marqueeBlock = document.getElementById('marquee-container');
+            const marqueeTicker = document.getElementById('marquee-ticker');
 
-            for (let i = 0; i < total; i++) {
-                const card = document.getElementById(`card-${i}`);
-                if (!card) continue;
-
-                // Circular loop offset logic
-                let offset = i - activeCarouselIndex;
-                
-                // Keep values bound within curved carousel boundary
-                if (offset < -1) offset += total;
-                if (offset > total - 2) offset -= total;
-
-                // Apply dynamic 3D hardware-accelerated transforms
-                if (offset === 0) {
-                    // CENTER ACTIVE FOCUS CARD
-                    const isPro = shopsInCarousel[i].tier === 'Pro Suite';
-                    const glowClass = isPro ? 'active-glow-pro' : 'active-glow';
-                    
-                    card.className = `carousel-card absolute w-72 h-44 premium-card rounded-3xl p-6 flex flex-col justify-between border cursor-pointer transform-gpu select-none ${glowClass}`;
-                    card.style.transform = "translate3d(0, 0, 150px) scale(1.05)";
-                    card.style.opacity = "1";
-                    card.style.zIndex = "30";
-                    card.style.filter = "none";
-                    card.style.pointerEvents = "auto";
-                } else if (offset === 1 || offset === -1) {
-                    // SIDES scale-down & dimmed opacity
-                    const angle = offset * 35; // degrees skew
-                    const transX = offset * 115; // horizontal spacing percentage
-
-                    card.className = "carousel-card absolute w-72 h-44 premium-card rounded-3xl p-6 flex flex-col justify-between border cursor-pointer transform-gpu select-none border-stone-800";
-                    card.style.transform = `translate3d(${transX}px, 0, 0) rotateY(${-angle}deg) scale(0.82)`;
-                    card.style.opacity = "0.35";
-                    card.style.zIndex = "10";
-                    card.style.filter = "blur(1.5px)";
-                    card.style.pointerEvents = "none";
-                } else {
-                    // HIDE elements pushed further behind the viewing spectrum
-                    card.style.transform = "translate3d(0, 0, -200px) scale(0.6)";
-                    card.style.opacity = "0";
-                    card.style.zIndex = "0";
-                    card.style.filter = "blur(4px)";
-                    card.style.pointerEvents = "none";
-                }
-            }
-        }
-
-        // NAVIGATION ROTATORS
-        function rotateCarousel(direction) {
-            const total = shopsInCarousel.length;
-            if (total === 0) return;
-
-            if (direction === 'next') {
-                activeCarouselIndex = (activeCarouselIndex + 1) % total;
+            if (bannerString.trim() !== '') {
+                marqueeTicker.innerText = bannerString;
+                marqueeBlock.classList.remove('hidden');
             } else {
-                activeCarouselIndex = (activeCarouselIndex - 1 + total) % total;
+                marqueeBlock.classList.add('hidden');
             }
-
-            updateCarousel3DSpace();
         }
 
-        function setCarouselActive(index) {
-            activeCarouselIndex = index;
-            updateCarousel3DSpace();
-        }
-
-        // ==================== STEP C: CONTEXT LOCK & REDIRECTION ENGINE ====================
-        function launchFocusedStore() {
-            const activeShop = shopsInCarousel[activeCarouselIndex];
-            if (!activeShop) return;
-
-            initializeStoreContext(activeShop.id);
-        }
-
-        function initializeStoreContext(shopId) {
-            // Write selected workspace context into localStorage
+        // ==================== REDIRECTION CONTROLLERS ====================
+        function launchStoreDashboard(shopId, routeFile) {
             localStorage.setItem('roaji_active_shop_id', shopId);
-
             showToast(langData[currentLang]['toast_switched'], "success");
 
-            // Programmatic redirect directly to dashboard / main pos billing workspace
             setTimeout(() => {
-                window.location.href = "index.html";
+                window.location.href = `https://iamajithkumar98-bit.github.io/roaji/${routeFile}?id=${shopId}`;
             }, 800);
+        }
+
+        function handlePaywallUtrSubmit(event) {
+            event.preventDefault();
+            const utr = document.getElementById('paywall-utr-input').value.trim();
+
+            if (utr.length < 12) {
+                showToast("UTR reference must be exactly 12 digits long!", "error");
+                return;
+            }
+
+            // Update registration status to PENDING_SUPER_ADMIN_APPROVAL
+            if (activeMerchantShop) {
+                activeMerchantShop.status = "PENDING_SUPER_ADMIN_APPROVAL";
+                activeMerchantShop.address += ` | Paywall UTR: ${utr}`;
+                
+                // Commit to storage
+                const registeredSaaSShops = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+                const idx = registeredSaaSShops.findIndex(s => s.owner_email === activeMerchantShop.owner_email);
+                if (idx !== -1) {
+                    registeredSaaSShops[idx] = activeMerchantShop;
+                    localStorage.setItem('roaji_shops', JSON.stringify(registeredSaaSShops));
+                }
+            }
+
+            showToast(langData[currentLang]['toast_utr_submitted'], "info");
+
+            setTimeout(() => {
+                window.location.href = "https://iamajithkumar98-bit.github.io/roaji/index.html"; // Redirect to lock entryway waiting for Super Admin verify
+            }, 1200);
+        }
+
+        function logoutFromResolver() {
+            sessionStorage.removeItem('roaji_session_claims');
+            localStorage.removeItem('roaji_active_shop_id');
+            window.location.href = "https://iamajithkumar98-bit.github.io/roaji/index.html";
         }
 
         // TOAST NOTIFICATIONS ENGINE
@@ -356,7 +391,13 @@
 
             if (type === 'success') {
                 bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
-                iconSvg = `<svg class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (type === 'error') {
+                bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
+                iconSvg = `<svg class="h-5 w-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (type === 'info') {
+                bgClass = 'bg-amber-950/90 border border-amber-500/30 text-amber-300';
+                iconSvg = `<svg class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             }
 
             toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
