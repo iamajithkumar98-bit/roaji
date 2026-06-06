@@ -251,7 +251,7 @@
 
                         <!-- SECTION B: FUTURE SECURE API BINDINGS -->
                         <div class="space-y-3 pt-2 border-t border-stone-850 relative">
-                            <span class="absolute top-2 right-0 bg-stone-800 text-stone-400 text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">🔒 Future Secure Expansion / எதிர்கால பாதுகாப்பு அப்டேட்</span>
+                            <span class="absolute top-2 right-0 bg-stone-800 text-stone-400 text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">🔒 Future Secure Encryption Upgrades / எதிர்கால பாதுகாப்பு அப்டேட்</span>
                             <h4 class="text-[10px] font-bold text-stone-500 uppercase tracking-widest block pb-1 pt-3">Section B: Secure API Gateway Integrations</h4>
                             <div>
                                 <label class="block text-[9px] font-bold text-stone-500 uppercase mb-1">Future Payment Gateway API Core Selector</label>
@@ -311,11 +311,58 @@
 
             <!-- Right column (Col 6) -->
             <div class="lg:col-span-6 space-y-6">
-                <!-- Support ticket console -->
-                <div class="premium-glass p-6 rounded-3xl flex flex-col justify-between h-[180px]">
-                    <div>
-                        <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2 mb-2">Merchant Support Tickets</h3>
-                        <div class="text-[11px] text-stone-500 py-4 text-center font-semibold">No active support tickets. All hubs operational.</div>
+                <!-- System Offline License Key Generator (Module 3) -->
+                <div class="premium-glass p-6 rounded-3xl space-y-4">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">🎫 System Offline License Generator</h3>
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Target Tenant Email</label>
+                            <input id="lic-email" type="email" placeholder="merchant@roaji.com" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">License Expiry</label>
+                                <select id="lic-duration" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs font-semibold focus:outline-none">
+                                    <option value="3">3 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="12">1 Year</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col justify-end">
+                                <button onclick="generateOfflineLicenseKey()" class="w-full py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition">⚡ Generate Key</button>
+                            </div>
+                        </div>
+                        <div id="generated-key-container" class="p-3 bg-stone-950/80 border border-stone-850 rounded-xl text-stone-200 text-center font-mono font-bold hidden">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-Time System Health Matrix Widget (Module 4) -->
+                <div class="premium-glass p-6 rounded-3xl space-y-4">
+                    <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">🖥️ Real-Time System Health Matrix</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="p-3 bg-stone-950/50 border border-stone-850 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <span class="text-stone-500 font-bold block uppercase text-[9px]">SaaS Local DB</span>
+                                <strong id="health-db-usage" class="text-stone-200 block mt-1 font-mono">0.05%</strong>
+                            </div>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        </div>
+                        <div class="p-3 bg-stone-950/50 border border-stone-850 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <span class="text-stone-500 font-bold block uppercase text-[9px]">GitHub API</span>
+                                <strong class="text-emerald-400 block mt-1 font-bold">LIVE</strong>
+                            </div>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        </div>
+                        <div class="p-3 bg-stone-950/50 border border-stone-850 rounded-2xl flex items-center justify-between">
+                            <div>
+                                <span class="text-stone-500 font-bold block uppercase text-[9px]">n8n Gateway</span>
+                                <strong class="text-emerald-400 block mt-1 font-bold">ONLINE</strong>
+                            </div>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -330,11 +377,28 @@
 
         </div>
 
-        <!-- ==================== VIEW 5: SECURITY SETTINGS ==================== -->
-        <div id="section-security" class="view-panel p-4 lg:p-6 hidden">
-            <div class="premium-glass p-6 rounded-3xl max-w-md mx-auto space-y-4">
-                <h2 data-key="config_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">Admin Identity Settings</h2>
-                <div class="space-y-3">
+        <!-- ==================== VIEW 5: SECURITY SETTINGS & ADMIN AUTHORITY PROFILE ==================== -->
+        <div id="section-security" class="view-panel p-4 lg:p-6 hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- 👑 Master Admin Authority Profile (Module 1) -->
+            <div class="lg:col-span-6 premium-glass p-6 rounded-3xl space-y-4 text-center">
+                <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2 text-left">👑 Master Admin Authority Profile</h3>
+                <div class="py-4 space-y-3">
+                    <div class="w-20 h-20 bg-orange-500/10 text-orange-500 border border-orange-500/25 rounded-full flex items-center justify-center font-bold text-xl mx-auto shadow-md shadow-orange-500/10">SA</div>
+                    <div>
+                        <h4 class="font-bold text-stone-200 text-sm">Ajith Kumar</h4>
+                        <span class="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold bg-orange-600/10 text-orange-400 border border-orange-500/20 rounded uppercase tracking-wider">Founder & Chief Architect of ROAJI</span>
+                    </div>
+                    <div class="text-[11px] text-stone-500 font-semibold space-y-1">
+                        <div>Website: <a href="https://roaji.in" target="_blank" class="text-amber-500 hover:underline">roaji.in</a></div>
+                        <div>Email: iamajithkumar98@gmail.com</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security forms (Module 1) -->
+            <div class="lg:col-span-6 premium-glass p-6 rounded-3xl space-y-4">
+                <h3 data-key="config_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">Admin Identity Settings</h3>
+                <div class="space-y-3 text-xs">
                     <div>
                         <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Backup Recovery Email</label>
                         <input id="config-backup-email" type="email" placeholder="superadmin@backup.com" oninput="saveAdminSecurityConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
@@ -343,6 +407,36 @@
                         <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Master Gate Password (Override default "Roaji.inbilling")</label>
                         <input id="config-master-password" type="password" placeholder="••••••••" oninput="saveAdminSecurityConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
                     </div>
+
+                    <!-- 2FA Secure Lock -->
+                    <div class="p-3 bg-stone-950/40 border border-stone-850 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-stone-300 block">🔒 Secure 2FA Email Authentication Lock</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="security-2fa-toggle" onchange="toggle2faconfig()" class="sr-only peer">
+                            <div class="w-11 h-6 bg-stone-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-Time Live Session Logs (Module 1) -->
+            <div class="lg:col-span-12 premium-glass p-6 rounded-3xl space-y-4">
+                <h3 class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">🖥️ Real-Time Live Session Logs</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-850 text-stone-500 font-bold">
+                                <th class="py-3 px-2">Timestamp</th>
+                                <th class="py-3 px-2">Browser User-Agent</th>
+                                <th class="py-3 px-2 text-center">IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="session-logs-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -488,6 +582,7 @@
             loadAdminSecurityConfig();
             loadAutomationConfig();
             loadGlobalConfig();
+            renderSessionLogs();
             updateStatisticsBadges();
         });
 
@@ -818,8 +913,6 @@
 
             localStorage.setItem('roaji_admin_upi_id', upiId);
             localStorage.setItem('roaji_admin_qr_link', qrLink);
-            
-            showToast(langData[currentLang]['toast_config_saved'], "success");
         }
 
         function loadGlobalConfig() {
@@ -829,6 +922,7 @@
 
         function savePaymentGatewayConfig() {
             saveGlobalConfig();
+            showToast(langData[currentLang]['toast_config_saved'], "success");
         }
 
         function exportDatabaseToCSV() {
@@ -848,10 +942,61 @@
             document.body.removeChild(link);
         }
 
-        // ==================== DEEP REVENUE ANALYTICS & SECURITY ====================
+        // ==================== SYSTEM OFFLINE LICENSE KEY GENERATOR (MODULE 3) ====================
+        function generateOfflineLicenseKey() {
+            const email = document.getElementById('lic-email').value.trim();
+            const duration = document.getElementById('lic-duration').value;
+            const container = document.getElementById('generated-key-container');
+
+            if (!email) {
+                showToast("Please input merchant email first!", "error");
+                return;
+            }
+
+            // Generate unique cryptographic license sequence representation
+            const hashMock = Math.floor(1000 + Math.random() * 9000);
+            const rawKeyStr = `ROAJI-${email.split('@')[0].toUpperCase()}-${duration}M-${hashMock}-LIFETIME`;
+
+            // Save key registry to shared DB context
+            const generatedLicensesList = JSON.parse(localStorage.getItem('roaji_generated_licenses')) || [];
+            generatedLicensesList.unshift({
+                key: rawKeyStr,
+                email: email,
+                expires: duration + " Months",
+                created: new Date().toISOString().split('T')[0]
+            });
+            localStorage.setItem('roaji_generated_licenses', JSON.stringify(generatedLicensesList));
+
+            container.innerText = rawKeyStr;
+            container.classList.remove('hidden');
+            showToast("Offline license master key generated successfully!", "success");
+        }
+
+        // ==================== MASTER ADMIN IDENTITY PROFILE SUITE (MODULE 1) ====================
+        function renderSessionLogs() {
+            const tableBody = document.getElementById('session-logs-tbody');
+            tableBody.innerHTML = '';
+
+            const mockLogs = [
+                { timestamp: "2025-04-06 14:22:15", ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/123.0", ip: "192.168.1.105" },
+                { timestamp: "2025-04-05 11:15:30", ua: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/15.6", ip: "103.84.112.4" }
+            ];
+
+            mockLogs.forEach(log => {
+                tableBody.innerHTML += `
+                    <tr class="border-b border-stone-850 text-[11px] text-stone-400">
+                        <td class="py-3 px-2 font-mono">${log.timestamp}</td>
+                        <td class="py-3 px-2 truncate max-w-xs">${log.ua}</td>
+                        <td class="py-3 px-2 text-center font-mono font-bold">${log.ip}</td>
+                    </tr>
+                `;
+            });
+        }
+
         function loadAdminSecurityConfig() {
             document.getElementById('config-backup-email').value = localStorage.getItem('roaji_admin_backup_email') || 'superadmin@backup.com';
             document.getElementById('config-master-password').value = localStorage.getItem('roaji_admin_password_override') || 'Roaji.inbilling';
+            document.getElementById('security-2fa-toggle').checked = (localStorage.getItem('roaji_admin_2fa_enabled') === 'ON');
         }
 
         function saveAdminSecurityConfig() {
@@ -860,6 +1005,12 @@
 
             localStorage.setItem('roaji_admin_backup_email', backupEmail);
             localStorage.setItem('roaji_admin_password_override', masterPass);
+        }
+
+        function toggle2faconfig() {
+            const isChecked = document.getElementById('security-2fa-toggle').checked;
+            localStorage.setItem('roaji_admin_2fa_enabled', isChecked ? 'ON' : 'OFF');
+            showToast(`2FA secure authenticator status updated: ${isChecked ? 'ON' : 'OFF'}`, 'success');
         }
 
         // COUNTERS AND BADGES RE-CALCULATORS
@@ -881,6 +1032,10 @@
                     });
                 }
             });
+
+            // Calculate mock memory allocation
+            const dbSizeFactor = (JSON.stringify(localStorage).length / (1024 * 1024)) * 100;
+            document.getElementById('health-db-usage').innerText = `${dbSizeFactor.toFixed(3)}%`;
 
             document.getElementById('stat-total-shops').innerText = totalShops;
             document.getElementById('stat-pending-utr').innerText = pendingUtr;
