@@ -108,6 +108,13 @@
 
         <!-- ==================== VIEW B: CLIENT REGISTRATION & ESTIMATE GRID ==================== -->
         <div id="view-register" class="w-full max-w-2xl mx-auto premium-glass rounded-3xl p-8 space-y-6 hidden transition-all duration-500 transform">
+            
+            <!-- BACK NAVIGATION BUTTON -->
+            <div class="flex justify-between items-center pb-2 border-b border-stone-850">
+                <button onclick="switchView('login')" data-key="btn_back_login" class="text-xs font-bold text-amber-500 hover:text-amber-400 transition">← Back to Login / பின்செல்ல</button>
+                <span class="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Merchant Onboarding</span>
+            </div>
+
             <div class="text-center">
                 <h2 id="lbl-register-title" data-key="lbl_register_title" class="text-xl font-bold text-white">Activate Enterprise Workspace</h2>
                 <p id="lbl-register-desc" data-key="lbl_register_desc" class="text-xs text-stone-400 mt-1">Select your dynamic blueprint niches below to initialize setup context.</p>
@@ -132,6 +139,20 @@
                         <label id="lbl-reg-shop" data-key="lbl_shop_name" class="block text-xs font-semibold text-stone-400 mb-1.5">Shop Name</label>
                         <input type="text" id="reg-shop" required placeholder="Roaji Gifts Studio" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
                     </div>
+
+                    <!-- NEW PRINT COMPONENTS -->
+                    <div>
+                        <label id="lbl-reg-phone" data-key="lbl_shop_phone" class="block text-xs font-semibold text-stone-400 mb-1.5">Shop Phone Number</label>
+                        <input type="tel" id="reg-phone" required placeholder="e.g., 9876543210" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
+                    </div>
+                    <div>
+                        <label id="lbl-reg-gstin" data-key="lbl_shop_gstin" class="block text-xs font-semibold text-stone-400 mb-1.5">Shop GST Number / Tin</label>
+                        <input type="text" id="reg-gstin" placeholder="e.g., 33AAAAA0000A1Z1" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label id="lbl-reg-address" data-key="lbl_shop_address" class="block text-xs font-semibold text-stone-400 mb-1.5">Full Shop Address</label>
+                        <textarea id="reg-address" required rows="2" placeholder="e.g., 123, Main Road, Uthangarai, Krishnagiri DT" class="w-full p-3 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus"></textarea>
+                    </div>
                 </div>
 
                 <!-- 13 BLUEPRINT STORES SELECTION GRID -->
@@ -142,7 +163,6 @@
                         <span id="setup-estimate-badge" class="px-2.5 py-1 text-[10px] font-bold bg-orange-600/10 text-orange-400 border border-orange-500/20 rounded-md tracking-wider">Setup Estimate Value: ₹0/mo</span>
                     </div>
 
-                    <!-- Checkout items -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs" id="blueprint-checkbox-grid">
                         <!-- Loaded dynamically via JS -->
                     </div>
@@ -152,10 +172,6 @@
                     Activate Trial & Register
                 </button>
             </form>
-
-            <div class="text-center pt-2">
-                <button onclick="switchView('login')" id="lnk-back-login" data-key="lnk_back_login" class="text-xs text-stone-400 hover:text-white transition underline">Already registered? Log In</button>
-            </div>
         </div>
 
         <!-- ==================== VIEW C: SECURE ACCESS LOCKED OVERLAY ==================== -->
@@ -213,10 +229,14 @@
                 lbl_register_desc: "Select your dynamic blueprint niches below to initialize setup context.",
                 lbl_name: "Full Name",
                 lbl_shop_name: "Shop Name",
+                lbl_shop_phone: "Shop Phone Number",
+                lbl_shop_address: "Full Shop Address",
+                lbl_shop_gstin: "Shop GST Number / Tin (Optional)",
                 btn_register_submit: "Activate Trial & Register",
                 lnk_back_login: "Already registered? Log In",
                 lbl_blueprint_grid: "Niche-specific Module Configuration",
                 lbl_estimate_math_txt: "Setup Estimate Value: ₹",
+                btn_back_login: "← Back to Login / பின்செல்ல",
                 
                 // Blocked & Awaiting verification locks
                 lbl_locked_title: "Awaiting Core Activation",
@@ -251,10 +271,14 @@
                 lbl_register_desc: "கீழே உள்ள உங்களது கிளைக் கடைகளைத் தேர்ந்தெடுத்து சோதனைக் காலத்தைத் தொடங்கவும்.",
                 lbl_name: "முழுப் பெயர்",
                 lbl_shop_name: "கடையின் பெயர்",
+                lbl_shop_phone: "கடையின் தொலைபேசி எண்",
+                lbl_shop_address: "கடையின் முழு முகவரி",
+                lbl_shop_gstin: "கடையின் ஜிஎஸ்டி எண் (தேவையின்றி தவிர்க்கலாம்)",
                 btn_register_submit: "பதிவு செய்",
                 lnk_back_login: "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழையவும்",
                 lbl_blueprint_grid: "வணிகத் தொகுப்புகளின் கட்டமைப்பு",
                 lbl_estimate_math_txt: "எஸ்டிமேட் மதிப்பு: ₹",
+                btn_back_login: "← Back to Login / பின்செல்ல",
                 
                 // Blocked & Awaiting verification locks
                 lbl_locked_title: "சரிபார்ப்பு நிலுவையில் உள்ளது",
@@ -344,6 +368,19 @@
                     element.innerText = langData[currentLang][key];
                 }
             });
+
+            // Update placeholders dynamically
+            const searchBox = document.getElementById('login-email');
+            if (searchBox) searchBox.placeholder = "example@domain.com";
+
+            const phoneInput = document.getElementById('reg-phone');
+            if (phoneInput) phoneInput.placeholder = "e.g., 9876543210";
+
+            const addressInput = document.getElementById('reg-address');
+            if (addressInput) addressInput.placeholder = currentLang === 'ta' ? "எ.கா., 123, மெயின் ரோடு, உத்தங்கரை, கிருஷ்ணகிரி மாவட்டம்" : "e.g., 123, Main Road, Uthangarai, Krishnagiri DT";
+
+            const gstinInput = document.getElementById('reg-gstin');
+            if (gstinInput) gstinInput.placeholder = "e.g., 33AAAAA0000A1Z1";
         }
 
         // PASSWORD TOGGLER
@@ -381,7 +418,7 @@
                     <label class="p-3 bg-stone-900/60 border border-stone-850 hover:border-stone-700 rounded-xl flex items-center justify-between cursor-pointer transition select-none">
                         <div class="flex items-center gap-2">
                             <input type="checkbox" value="${shop.id}" data-price="${shop.price}" onchange="updateLiveEstimatePrice()" class="blueprint-chk rounded border-stone-800 bg-stone-950 text-orange-500 w-4 h-4">
-                            <span class="text-stone-300 font-semibold leading-tight">${shop.name[currentLang]}</span>
+                            <span class="text-stone-300 font-semibold leading-tight text-[11px]">${shop.name[currentLang]}</span>
                         </div>
                         <span class="text-[10px] text-amber-500 font-bold font-mono">₹${shop.price}</span>
                     </label>
@@ -415,7 +452,7 @@
             // Retrieve overrides if any
             const adminPass = localStorage.getItem('roaji_admin_password_override') || "Roaji.inbilling";
 
-            // RULE 1: Bulletproof Principle Master Admin Direct Route Switch (CRITICAL FIX)
+            // RULE 1: Bulletproof Principle Master Admin Direct Route Switch (CRITICAL FIX - HARDCODED ABSOLUTE PATH)
             if (email === "iamajithkumar98@gmail.com" && password === adminPass) {
                 if (rememberMe) {
                     localStorage.setItem('remembered_roaji_email', email);
@@ -435,7 +472,7 @@
                 return;
             } 
 
-            // RULE 2: Multi-Shop Owner Authentication Target Route (CRITICAL FIX)
+            // RULE 2: Multi-Shop Owner Authentication Target Route (CRITICAL FIX - HARDCODED ABSOLUTE PATH)
             if (email === "owner@roaji.com" && password === "owner123") {
                 if (rememberMe) {
                     localStorage.setItem('remembered_roaji_email', email);
@@ -497,6 +534,9 @@
             const email = document.getElementById('reg-email').value.trim();
             const password = document.getElementById('reg-password').value;
             const shopName = document.getElementById('reg-shop').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const address = document.getElementById('reg-address').value.trim();
+            const gstin = document.getElementById('reg-gstin').value.trim() || 'N/A';
 
             // Collect chosen selected dynamic blueprint stores
             const checkboxes = document.querySelectorAll('.blueprint-chk');
@@ -518,6 +558,9 @@
                 owner_email: email,
                 owner_password: password,
                 owner_name: name,
+                phone: phone,
+                address: address,
+                gstin: gstin,
                 type: chosenShopIds.join(', '),
                 plan: "Pro Suite (30-Day Free Trial)",
                 status: "PENDING_SUPER_ADMIN_APPROVAL" // STRICT ACTION STATUS
