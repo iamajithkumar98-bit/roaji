@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS Suite - Secure Auth Gateway</title>
+    <title>Roaji SaaS Suite - Secure Gateway Portal</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -106,46 +106,46 @@
             </div>
         </div>
 
-        <!-- ==================== VIEW B: CLIENT REGISTRATION & 30-DAY FREE TRIAL ==================== -->
-        <div id="view-register" class="w-full max-w-md mx-auto premium-glass rounded-3xl p-8 space-y-6 hidden transition-all duration-500 transform">
+        <!-- ==================== VIEW B: CLIENT REGISTRATION & ESTIMATE GRID ==================== -->
+        <div id="view-register" class="w-full max-w-2xl mx-auto premium-glass rounded-3xl p-8 space-y-6 hidden transition-all duration-500 transform">
             <div class="text-center">
-                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 mb-3 border border-orange-500/25" style="width: 56px; height: 56px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 32px; height: 32px; max-width: 100%;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                    </svg>
-                </div>
-                <h2 id="lbl-register-title" data-key="lbl_register_title" class="text-xl font-bold text-white">Create SaaS Profile</h2>
-                <p id="lbl-register-desc" data-key="lbl_register_desc" class="text-xs text-stone-400 mt-1">Register your store context and begin 30-Day Free Trial</p>
+                <h2 id="lbl-register-title" data-key="lbl_register_title" class="text-xl font-bold text-white">Activate Enterprise Workspace</h2>
+                <p id="lbl-register-desc" data-key="lbl_register_desc" class="text-xs text-stone-400 mt-1">Select your dynamic blueprint niches below to initialize setup context.</p>
             </div>
 
             <form id="register-form" class="space-y-4" onsubmit="handleRegistrationSubmit(event)">
-                <div>
-                    <label id="lbl-reg-name" data-key="lbl_name" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Full Name</label>
-                    <input type="text" id="reg-name" required placeholder="Ajith Kumar" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
+                <!-- Merchant metadata -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label id="lbl-reg-name" data-key="lbl_name" class="block text-xs font-semibold text-stone-400 mb-1.5">Full Name</label>
+                        <input type="text" id="reg-name" required placeholder="Ajith Kumar" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
+                    </div>
+                    <div>
+                        <label id="lbl-reg-email" data-key="lbl_email" class="block text-xs font-semibold text-stone-400 mb-1.5">Email Address</label>
+                        <input type="email" id="reg-email" required placeholder="example@domain.com" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
+                    </div>
+                    <div>
+                        <label id="lbl-reg-pass" data-key="lbl_password" class="block text-xs font-semibold text-stone-400 mb-1.5">Password</label>
+                        <input type="password" id="reg-password" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
+                    </div>
+                    <div>
+                        <label id="lbl-reg-shop" data-key="lbl_shop_name" class="block text-xs font-semibold text-stone-400 mb-1.5">Shop Name</label>
+                        <input type="text" id="reg-shop" required placeholder="Roaji Gifts Studio" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
+                    </div>
                 </div>
-                <div>
-                    <label id="lbl-reg-email" data-key="lbl_email" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Email Address</label>
-                    <input type="email" id="reg-email" required placeholder="example@domain.com" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
-                </div>
-                <div>
-                    <label id="lbl-reg-pass" data-key="lbl_password" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Password</label>
-                    <input type="password" id="reg-password" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
-                </div>
-                <div>
-                    <label id="lbl-reg-shop" data-key="lbl_shop_name" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Shop Name</label>
-                    <input type="text" id="reg-shop" required placeholder="Roaji Gifts Studio" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-focus">
-                </div>
-                <div>
-                    <label id="lbl-reg-type" data-key="lbl_shop_type" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Shop Type</label>
-                    <select id="reg-type" required class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-200 text-xs focus:outline-none glow-focus cursor-pointer appearance-none">
-                        <option value="Gift Shop">Gift Shop / பரிசு கடை</option>
-                        <option value="Frame Shop">Frame Shop / பிரேம் கடை</option>
-                        <option value="Textile Shop">Textile Shop / ஜவுளிக் கடை</option>
-                        <option value="Xerox">Xerox / ஜெராக்ஸ்</option>
-                        <option value="Bakery">Bakery / பேக்கரி</option>
-                        <option value="Supermarket">Supermarket / சூப்பர் மார்க்கெட்</option>
-                        <option value="Services">Services / சேவை மையம்</option>
-                    </select>
+
+                <!-- 13 BLUEPRINT STORES SELECTION GRID -->
+                <div class="space-y-3 pt-3 border-t border-stone-850">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <h4 id="lbl-blueprint-grid" data-key="lbl_blueprint_grid" class="text-xs font-bold text-stone-400 uppercase tracking-widest">Niche-specific Module Configuration</h4>
+                        <!-- LIVE MATH ESTIMATE NEON BADGE -->
+                        <span id="setup-estimate-badge" class="px-2.5 py-1 text-[10px] font-bold bg-orange-600/10 text-orange-400 border border-orange-500/20 rounded-md tracking-wider">Setup Estimate Value: ₹0/mo</span>
+                    </div>
+
+                    <!-- Checkout items -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs" id="blueprint-checkbox-grid">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
                 </div>
 
                 <button type="submit" id="btn-register-submit" data-key="btn_register_submit" class="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-orange-600/10">
@@ -158,91 +158,14 @@
             </div>
         </div>
 
-        <!-- ==================== VIEW C: SUBSCRIPTION PLANS & UPI QR GATEWAY ==================== -->
-        <div id="view-subscription" class="space-y-6 hidden transition-all duration-500 transform">
-            <div class="text-center max-w-xl mx-auto space-y-2">
-                <h2 id="lbl-sub-title" data-key="lbl_sub_title" class="text-xl font-bold text-white">Choose Your Workspace Scale</h2>
-                <p id="lbl-sub-desc" data-key="lbl_sub_desc" class="text-xs text-stone-400 leading-relaxed">Your 30-Day Free Trial is initiated. Upgrade to paid packages below to unlock automated WhatsApp triggers & secure AI advisors.</p>
+        <!-- ==================== VIEW C: SECURE ACCESS LOCKED OVERLAY ==================== -->
+        <div id="view-locked" class="w-full max-w-md mx-auto premium-glass rounded-3xl p-8 space-y-6 hidden text-center transition-all duration-500 transform">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/25 mb-2" style="width: 56px; height: 56px;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:32px; height:32px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
             </div>
-
-            <!-- Pricing Tiers Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Basic Card -->
-                <div class="premium-glass p-6 rounded-3xl border border-stone-850 flex flex-col justify-between hover:border-stone-700 transition duration-300">
-                    <div>
-                        <h4 class="text-sm font-bold text-stone-300">Basic Edition</h4>
-                        <div class="flex items-baseline mt-2">
-                            <span class="text-2xl font-bold text-white">₹0</span>
-                            <span class="text-[10px] text-stone-500 ml-1">/ Month</span>
-                        </div>
-                        <p class="text-[10px] text-stone-400 mt-3 leading-relaxed border-t border-stone-850 pt-3">Core point-of-sale invoice creation, local database structures, and billing summaries.</p>
-                    </div>
-                    <button onclick="selectPackage('Basic', 0)" class="w-full py-2.5 bg-stone-800 hover:bg-stone-700 text-white text-xs font-semibold rounded-xl mt-6 transition">Active Trial Plan</button>
-                </div>
-
-                <!-- Pro Card -->
-                <div class="premium-glass p-6 rounded-3xl border border-orange-500/40 relative flex flex-col justify-between hover:border-orange-500 transition duration-300">
-                    <span class="absolute top-[-10px] right-4 bg-orange-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Popular</span>
-                    <div>
-                        <h4 class="text-sm font-bold text-white">Pro Suite</h4>
-                        <div class="flex items-baseline mt-2">
-                            <span class="text-2xl font-bold text-neon-gold">₹1,499</span>
-                            <span class="text-[10px] text-stone-500 ml-1">/ Month</span>
-                        </div>
-                        <p class="text-[10px] text-stone-300 mt-3 leading-relaxed border-t border-stone-800 pt-3 font-semibold">Includes WhatsApp AI Auto-Responder trigger systems, dynamic CRM outstanding trackers, and automated SMS.</p>
-                    </div>
-                    <button onclick="selectPackage('Pro', 1499)" class="w-full py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-xl mt-6 transition shadow-md shadow-orange-600/10">Upgrade Pro</button>
-                </div>
-
-                <!-- Lifetime Card -->
-                <div class="premium-glass p-6 rounded-3xl border border-stone-850 flex flex-col justify-between hover:border-stone-700 transition duration-300">
-                    <div>
-                        <h4 class="text-sm font-bold text-stone-300">Enterprise Scale</h4>
-                        <div class="flex items-baseline mt-2">
-                            <span class="text-2xl font-bold text-white">₹9,999</span>
-                            <span class="text-[10px] text-stone-500 ml-1">/ Lifetime</span>
-                        </div>
-                        <p class="text-[10px] text-stone-400 mt-3 leading-relaxed border-t border-stone-850 pt-3">Unlocks AI Voice Billing modules, bilingual voice command tools, and full Multi-Shop global switcher dashboard.</p>
-                    </div>
-                    <button onclick="selectPackage('Enterprise', 9999)" class="w-full py-2.5 bg-stone-800 hover:bg-stone-700 text-white text-xs font-semibold rounded-xl mt-6 transition">Active Lifetime</button>
-                </div>
-            </div>
-
-            <!-- DYNAMIC UPI QR GATEWAY OVERLAY -->
-            <div id="upi-qr-gateway" class="hidden flex-col md:flex-row gap-6 p-6 bg-stone-950/60 border border-stone-850 rounded-3xl items-center justify-between transition-all duration-300">
-                <div class="text-center md:text-left space-y-2 max-w-sm">
-                    <span id="lbl-selected-plan" class="inline-block px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase text-orange-400 bg-orange-500/10 rounded-md">Selected: Pro Plan</span>
-                    <h3 id="lbl-gateway-title" data-key="lbl_gateway_title" class="text-sm font-bold text-white">Automated UPI Payment Gate</h3>
-                    <p id="lbl-gateway-desc" data-key="lbl_gateway_desc" class="text-[11px] text-stone-500 leading-relaxed">Scan the dynamic UPI QR code on the right side using any UPI App (GPay, PhonePe, Paytm) and complete your payment securely.</p>
-                    
-                    <!-- UTR Form -->
-                    <form id="utr-form" onsubmit="handleUtrSubmission(event)" class="pt-2 space-y-2">
-                        <label id="lbl-utr-input" data-key="lbl_utr_input" class="block text-[10px] font-bold text-stone-400 uppercase">Enter 12-Digit UPI Ref / UTR No</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="utr-input" required maxlength="12" placeholder="389021840194" class="flex-1 px-3 py-1.5 bg-stone-900 border border-stone-800 rounded-xl text-stone-100 text-xs glow-focus">
-                            <button type="submit" id="btn-utr-submit" data-key="btn_utr_submit" class="px-4 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition">Verify</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <div class="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-stone-200 shadow-lg">
-                    <!-- Static simulated payment QR representation -->
-                    <div class="w-36 h-36 bg-stone-100 border border-stone-300 flex items-center justify-center relative overflow-hidden" id="upi-qr-image-container">
-                        <div class="text-stone-900 text-center text-xs font-bold leading-none p-4">
-                            MOCK QR CODE<br>
-                            <span class="text-[9px] font-normal text-stone-500 mt-2 block" id="qr-price-lbl">₹1,499.00</span>
-                        </div>
-                    </div>
-                    <span class="text-[10px] text-stone-600 font-bold mt-2" id="qr-upi-id">SuperAdmin@upi</span>
-                </div>
-            </div>
-
-            <!-- Bottom redirect exit -->
-            <div class="text-center pt-2">
-                <button onclick="initializeMerchantWorkspace()" id="btn-skip-sub" data-key="btn_skip_sub" class="px-6 py-2.5 bg-stone-900 hover:bg-stone-850 border border-stone-850 text-stone-300 text-xs font-semibold rounded-xl transition">
-                    Skip & Launch Workspace (Active Trial Mode)
-                </button>
-            </div>
+            <h2 id="lbl-locked-title" data-key="lbl_locked_title" class="text-lg font-bold text-white">Awaiting Core Activation</h2>
+            <p id="lbl-locked-desc" data-key="lbl_locked_desc" class="text-xs text-stone-400 leading-relaxed">Your workspace is currently locked. The administrator will grant 100% Free Premium Full Access from the Super Admin Panel shortly.</p>
+            <button onclick="switchView('login')" data-key="lnk_back_login" class="px-6 py-2 bg-stone-850 hover:bg-stone-800 text-stone-300 rounded-xl text-xs font-semibold transition">Back to Login</button>
         </div>
 
         <!-- ==================== VIEW D: ACCESS SUSPENDED SCREEN ==================== -->
@@ -250,9 +173,9 @@
             <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/25 mb-2" style="width: 56px; height: 56px;">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:32px; height:32px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             </div>
-            <h2 id="lbl-suspended-title" data-key="lbl_suspended_title" class="text-lg font-bold text-white">கணக்கு முடக்கப்பட்டுள்ளது</h2>
-            <p id="lbl-suspended-desc" data-key="lbl_suspended_desc" class="text-xs text-stone-400 leading-relaxed">பாதுகாப்பு அச்சுறுத்தல் காரணமாக உங்களது கணக்கு தற்காலிகமாக முடக்கப்பட்டுள்ளது. முதன்மை நிர்வாகியைத் தொடர்பு கொள்ளவும்.</p>
-            <button onclick="switchView('login')" data-key="lnk_back_login" class="px-6 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 rounded-xl text-xs font-semibold transition">உள்நுழைவுப் பக்கம்</button>
+            <h2 id="lbl-suspended-title" data-key="lbl_suspended_title" class="text-lg font-bold text-white">Access Suspended</h2>
+            <p id="lbl-suspended-desc" data-key="lbl_suspended_desc" class="text-xs text-stone-400 leading-relaxed">Your subscription access or credentials have been marked inactive. Please contact Super Admin.</p>
+            <button onclick="switchView('login')" data-key="lnk_back_login" class="px-6 py-2 bg-stone-850 hover:bg-stone-800 text-stone-300 rounded-xl text-xs font-semibold transition">Back to Login</button>
         </div>
 
     </div>
@@ -260,13 +183,13 @@
     <!-- FORGOT PASSWORD MODAL -->
     <div id="forgot-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-md z-50 items-center justify-center p-4 hidden transition-all duration-300">
         <div class="w-full max-w-sm premium-glass p-6 rounded-2xl shadow-xl transform scale-95 transition-all">
-            <h3 id="modal-title" data-key="modal_title" class="text-base font-bold text-white mb-1">மின்னஞ்சல் வழி மீட்பு</h3>
-            <p id="modal-desc" data-key="modal_desc" class="text-xs text-stone-400 mb-4">உங்கள் மின்னஞ்சலை உள்ளிட்டால் அதற்கான கடவுச்சொல் மீட்பு இணைப்பு அனுப்பப்படும்.</p>
+            <h3 id="modal-title" data-key="modal_title" class="text-base font-bold text-white mb-1">Recover Password</h3>
+            <p id="modal-desc" data-key="modal_desc" class="text-xs text-stone-400 mb-4">Enter your registered email below, and we'll send you a password reset link.</p>
             <form id="forgot-form" onsubmit="handleForgotPassword(event)">
                 <input type="email" id="forgot-email" required placeholder="example@domain.com" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-800 rounded-xl text-stone-100 text-sm mb-4 glow-focus">
                 <div class="flex gap-2">
-                    <button type="button" id="modal-btn-cancel-modal" data-key="modal_btn_cancel" onclick="closeForgotModal()" class="flex-1 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium rounded-xl text-xs transition">ரத்துசெய்</button>
-                    <button type="submit" id="modal-btn-send" data-key="modal_btn_send" class="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-xl text-xs transition shadow">அனுப்புக</button>
+                    <button type="button" id="modal-btn-cancel-modal" data-key="modal_btn_cancel" onclick="closeForgotModal()" class="flex-1 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium rounded-xl text-xs transition">Cancel</button>
+                    <button type="submit" id="modal-btn-send" data-key="modal_btn_send" class="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-xl text-xs transition shadow">Send Link</button>
                 </div>
             </form>
         </div>
@@ -274,7 +197,7 @@
 
     <!-- VANILLA JS STATE CONTROLLER & SUBSCRIPTION COMPUTATIONS -->
     <script>
-        // BILINGUAL DUAL-LANGUAGE DICTIONARY MAP
+        // DUAL-LANGUAGE MATRIX TRANSLATIONS DICTIONARY
         const langData = {
             en: {
                 login_tagline: "Enter credentials to unlock context",
@@ -286,25 +209,19 @@
                 lnk_create_account: "Don't have an account? Create one",
                 
                 // Onboarding Registration
-                lbl_register_title: "Create SaaS Profile",
-                lbl_register_desc: "Register your store context and begin 30-Day Free Trial",
+                lbl_register_title: "Activate Enterprise Workspace",
+                lbl_register_desc: "Select your dynamic blueprint niches below to initialize setup context.",
                 lbl_name: "Full Name",
                 lbl_shop_name: "Shop Name",
-                lbl_shop_type: "Shop Type",
                 btn_register_submit: "Activate Trial & Register",
                 lnk_back_login: "Already registered? Log In",
+                lbl_blueprint_grid: "Niche-specific Module Configuration",
+                lbl_estimate_math_txt: "Setup Estimate Value: ₹",
                 
-                // Subscription & QR Gate
-                lbl_sub_title: "Choose Your Workspace Scale",
-                lbl_sub_desc: "Your 30-Day Free Trial is initiated. Upgrade to paid packages below to unlock automated WhatsApp triggers & secure AI advisors.",
-                lbl_gateway_title: "Automated UPI Payment Gate",
-                lbl_gateway_desc: "Scan the dynamic UPI QR code on the right side using any UPI App (GPay, PhonePe, Paytm) and complete your payment securely.",
-                lbl_utr_input: "Enter 12-Digit UPI Ref / UTR No",
-                btn_utr_submit: "Verify Reference",
-                btn_skip_sub: "Skip & Launch Workspace (Active Trial)",
-                
-                // Access Suspended / Blocked
-                lbl_suspended_title: "Access Suspension Alert",
+                // Blocked & Awaiting verification locks
+                lbl_locked_title: "Awaiting Core Activation",
+                lbl_locked_desc: "Your workspace is currently locked. The administrator will grant 100% Free Premium Full Access from the Super Admin Panel shortly.",
+                lbl_suspended_title: "Access Suspended",
                 lbl_suspended_desc: "Your subscription access or credentials have been marked inactive. Please contact Super Admin.",
                 
                 // Modal
@@ -317,8 +234,7 @@
                 toast_login_success: "Successfully authenticated!",
                 toast_login_error: "Invalid email or password! Please try again.",
                 toast_blocked_user: "Security alert! Your access account has been suspended.",
-                toast_utr_checking: "Reference sent. Awaiting administrator manual context activation...",
-                toast_trial_initiated: "Workspace initialized. 30-Day Free Trial activated!",
+                toast_trial_initiated: "Profile registered. Awaiting Super Admin licensing verification...",
                 toast_recovery_sent: "Recovery verification link sent!"
             },
             ta: {
@@ -331,24 +247,18 @@
                 lnk_create_account: "புதிய கணக்கை உருவாக்க வேண்டுமா? இங்கே கிளிக் செய்யவும்",
                 
                 // Onboarding Registration
-                lbl_register_title: "புதிய கணக்கு உருவாக்குதல்",
-                lbl_register_desc: "வணிக விவரங்களை உள்ளிட்டு 30 நாள் இலவச சோதனையைத் தொடங்கவும்",
+                lbl_register_title: "வணிகப் பதிவேடு மேலாண்மை",
+                lbl_register_desc: "கீழே உள்ள உங்களது கிளைக் கடைகளைத் தேர்ந்தெடுத்து சோதனைக் காலத்தைத் தொடங்கவும்.",
                 lbl_name: "முழுப் பெயர்",
                 lbl_shop_name: "கடையின் பெயர்",
-                lbl_shop_type: "வணிக வகை",
-                btn_register_submit: "சோதனையைத் தொடங்கு & பதிவு செய்",
+                btn_register_submit: "பதிவு செய்",
                 lnk_back_login: "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழையவும்",
+                lbl_blueprint_grid: "வணிகத் தொகுப்புகளின் கட்டமைப்பு",
+                lbl_estimate_math_txt: "எஸ்டிமேட் மதிப்பு: ₹",
                 
-                // Subscription & QR Gate
-                lbl_sub_title: "உங்களுக்கான கட்டணத் திட்டம் தேர்வு செய்க",
-                lbl_sub_desc: "உங்கள் 30 நாள் இலவச சோதனை துவங்கப்பட்டுள்ளது. வாட்ஸ்அப் ஆட்டோமேஷன் மற்றும் ஏஐ ஆலோசகரை அணுக கட்டணத் திட்டங்களை மேம்படுத்தவும்.",
-                lbl_gateway_title: "தானியங்கி யுபிஐ கட்டண முறை",
-                lbl_gateway_desc: "வலதுபுறம் உள்ள யுபிஐ கியூஆர் கோடை உங்கள் மொபைல் செயலிகள் மூலம் ஸ்கேன் செய்து பாதுகாப்பாகக் கட்டணத்தை செலுத்தவும்.",
-                lbl_utr_input: "12-இலக்க யுபிஐ குறிப்பு எண் (UTR) உள்ளிடவும்",
-                btn_utr_submit: "சரிபார்",
-                btn_skip_sub: "இப்போதைக்குத் தவிர் (இலவச சோதனைக் காலம்)",
-                
-                // Access Suspended / Blocked
+                // Blocked & Awaiting verification locks
+                lbl_locked_title: "சரிபார்ப்பு நிலுவையில் உள்ளது",
+                lbl_locked_desc: "உங்களது கணக்கு இன்னும் செயல்படுத்தப்படவில்லை. முதன்மை அட்மின் சரிபார்த்து சில நிமிடங்களில் உங்களது கணக்கை முழுமையாகச் செயல்படுத்துவார்.",
                 lbl_suspended_title: "கணக்கு முடக்கப்பட்டுள்ளது",
                 lbl_suspended_desc: "பாதுகாப்பு அச்சுறுத்தல் காரணமாக உங்களது கணக்கு தற்காலிகமாக முடக்கப்பட்டுள்ளது. முதன்மை நிர்வாகியைத் தொடர்பு கொள்ளவும்.",
                 
@@ -358,19 +268,35 @@
                 modal_btn_cancel: "ரத்துசெய்",
                 modal_btn_send: "அனுப்புக",
 
-                // Toasts
+                // Dynamic Toasts
                 toast_login_success: "வெற்றிகரமாக அங்கீகரிக்கப்பட்டது!",
                 toast_login_error: "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல்! மீண்டும் முயற்சிக்கவும்.",
                 toast_blocked_user: "பாதுகாப்பு அச்சுறுத்தல்! உங்களது கணக்கு முடக்கப்பட்டுள்ளது.",
-                toast_utr_checking: "கட்டண குறிப்பு அனுப்பப்பட்டது. நிர்வாகியின் அனுமதிக்கு பின் கணக்கு முழுமையாகத் திறக்கப்படும்...",
-                toast_trial_initiated: "இலவச 30-நாள் சோதனைக் காலம் வெற்றிகரமாகத் தொடங்கப்பட்டது!",
+                toast_trial_initiated: "வணிக விபரங்கள் பதியப்பட்டன. முதன்மை அட்மின் ஒப்புதலுக்காக காத்திருக்கவும்...",
                 toast_recovery_sent: "மீட்பு மின்னஞ்சல் அனுப்பப்பட்டது!"
             }
         };
 
+        // 13 BLUEPRINT MODULES STATIC VALUES
+        const blueprintShopsData = [
+            { id: "xerox", name: { en: "Xerox Matrix", ta: "ஜெராக்ஸ் மேட்ரிக்ஸ்" }, price: 150 },
+            { id: "photo_studio", name: { en: "Photo Studio", ta: "போட்டோ ஸ்டுடியோ" }, price: 200 },
+            { id: "custom_frames", name: { en: "Custom Frames", ta: "ஃபிரேமிங் யூனிட்" }, price: 200 },
+            { id: "stationery", name: { en: "Stationery Zone", ta: "ஸ்டேஷனரி அங்காடி" }, price: 100 },
+            { id: "premium_gifts", name: { en: "Premium Gifts Zone", ta: "பரிசுப் பொருட்கள்" }, price: 150 },
+            { id: "mobile_tech", name: { en: "Mobile & Tech", ta: "மொபைல் & ஸ்பேர்ஸ்" }, price: 150 },
+            { id: "printing_tech", name: { en: "Printing & Tech Suite", ta: "பிரிண்டிங் சிஸ்டம்ஸ்" }, price: 200 },
+            { id: "csc_esevai", name: { en: "Internet Cafe & e-Sevai / CSC", ta: "இணைய சேவை & இ-சேவை" }, price: 250 },
+            { id: "toys_meesho", name: { en: "Toys Zone & Meesho Packing", ta: "விளையாட்டுப் பொருட்கள் & Meesho" }, price: 150 },
+            { id: "money_transfer", name: { en: "Money Transfer Ledger", ta: "பணப் பரிமாற்றம்" }, price: 300 },
+            { id: "fabrication", name: { en: "Welding, Roof & SS Fabrication Works", ta: "வெல்டிங் & ஃபேப்ரிகேஷன்" }, price: 400 },
+            { id: "bakery_core", name: { en: "Bakery Core Counter [New Module]", ta: "பேக்கரி கவுண்டர் [புதியது]" }, price: 300 },
+            { id: "tea_shop", name: { en: "Tea Shop Quick Billing [New Module]", ta: "டீ ஷாப் கவுண்டர் [புதியது]" }, price: 100 }
+        ];
+
         let currentLang = 'en';
 
-        // ON RUNTIME LOADER
+        // ON RUNTIME START
         window.addEventListener('DOMContentLoaded', () => {
             const savedGlobalLang = localStorage.getItem('roaji_language');
             if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
@@ -380,6 +306,7 @@
                 localStorage.setItem('roaji_language', 'en');
             }
             applyLanguage();
+            renderBlueprintCheckboxes();
 
             // Populate remembered email
             const rememberedEmail = localStorage.getItem('remembered_roaji_email');
@@ -389,11 +316,13 @@
             }
         });
 
-        // LANGUAGE TOGGLES
+        // LANGUAGE TRANSLATOR UTILITY
         function changeLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('roaji_language', lang);
             applyLanguage();
+            renderBlueprintCheckboxes(); // re-render localized labels
+            updateLiveEstimatePrice();   // re-render currency badge language
         }
 
         function applyLanguage() {
@@ -417,7 +346,7 @@
             });
         }
 
-        // PASSWORD FIELD VISIBILITY
+        // PASSWORD TOGGLER
         function togglePasswordVisibility(inputId) {
             const input = document.getElementById(inputId);
             if (input.type === 'password') {
@@ -431,26 +360,63 @@
         function switchView(viewName) {
             const loginView = document.getElementById('view-login');
             const registerView = document.getElementById('view-register');
-            const subscriptionView = document.getElementById('view-subscription');
+            const lockedView = document.getElementById('view-locked');
             const suspendedView = document.getElementById('view-suspended');
 
-            [loginView, registerView, subscriptionView, suspendedView].forEach(v => v.classList.add('hidden'));
+            [loginView, registerView, lockedView, suspendedView].forEach(v => v.classList.add('hidden'));
 
             if (viewName === 'login') loginView.classList.remove('hidden');
             if (viewName === 'register') registerView.classList.remove('hidden');
-            if (viewName === 'subscription') subscriptionView.classList.remove('hidden');
+            if (viewName === 'locked') lockedView.classList.remove('hidden');
             if (viewName === 'suspended') suspendedView.classList.remove('hidden');
         }
 
-        // ==================== STATE 1: RE-ALIGNED SECURE AUTH GATEWAY ROUTING ====================
+        // RENDER CHECKBOX ONBOARDING MATRIX
+        function renderBlueprintCheckboxes() {
+            const grid = document.getElementById('blueprint-checkbox-grid');
+            grid.innerHTML = '';
+
+            blueprintShopsData.forEach(shop => {
+                grid.innerHTML += `
+                    <label class="p-3 bg-stone-900/60 border border-stone-850 hover:border-stone-700 rounded-xl flex items-center justify-between cursor-pointer transition select-none">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" value="${shop.id}" data-price="${shop.price}" onchange="updateLiveEstimatePrice()" class="blueprint-chk rounded border-stone-800 bg-stone-950 text-orange-500 w-4 h-4">
+                            <span class="text-stone-300 font-semibold leading-tight">${shop.name[currentLang]}</span>
+                        </div>
+                        <span class="text-[10px] text-amber-500 font-bold font-mono">₹${shop.price}</span>
+                    </label>
+                `;
+            });
+        }
+
+        // LIVE MATH ESTIMATE CALCULATOR ENGINE
+        function updateLiveEstimatePrice() {
+            const checkboxes = document.querySelectorAll('.blueprint-chk');
+            let totalSum = 0;
+
+            checkboxes.forEach(chk => {
+                if (chk.checked) {
+                    totalSum += parseInt(chk.getAttribute('data-price')) || 0;
+                }
+            });
+
+            const badge = document.getElementById('setup-estimate-badge');
+            const prefix = langData[currentLang]['lbl_estimate_math_txt'];
+            badge.innerText = `${prefix}${totalSum}/mo`;
+        }
+
+        // ==================== CRITICAL AUTH ROUTING CONTROLLER ====================
         function handleLoginSubmit(event) {
             event.preventDefault();
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
             const rememberMe = document.getElementById('remember-me').checked;
 
-            // 1. Super Admin Authentication Route (CRITICAL FIX - HARDCODED ABSOLUTE PATH)
-            if (email === "iamajithkumar98@gmail.com" && password === "Roaji.inbilling") {
+            // Retrieve overrides if any
+            const adminPass = localStorage.getItem('roaji_admin_password_override') || "Roaji.inbilling";
+
+            // RULE 1: Bulletproof Principle Master Admin Direct Route Switch (CRITICAL FIX)
+            if (email === "iamajithkumar98@gmail.com" && password === adminPass) {
                 if (rememberMe) {
                     localStorage.setItem('remembered_roaji_email', email);
                 } else {
@@ -462,13 +428,15 @@
                 // Initialize secure admin session claim
                 sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "SUPER_ADMIN", is_active: true }));
 
-                // Hard programmatic window redirection exactly to absolute URL
+                // Hard programmatic window redirection EXACTLY to absolute URL:
                 setTimeout(() => {
                     window.location.href = "https://iamajithkumar98-bit.github.io/roaji/super_admin_panel.html";
                 }, 800);
+                return;
             } 
-            // 2. Multi-Shop Merchant Authentication Route (CRITICAL FIX - HARDCODED ABSOLUTE PATH)
-            else if (email === "owner@roaji.com" && password === "owner123") {
+
+            // RULE 2: Multi-Shop Owner Authentication Target Route (CRITICAL FIX)
+            if (email === "owner@roaji.com" && password === "owner123") {
                 if (rememberMe) {
                     localStorage.setItem('remembered_roaji_email', email);
                 } else {
@@ -477,138 +445,106 @@
 
                 showToast(langData[currentLang]['toast_login_success'], "success");
 
-                // Cache simulation state profile context
+                // Cache the simulation state profile context
                 sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "OWNER", is_active: true }));
 
-                // Hard window redirection exactly to absolute URL
+                // Hard window redirection EXACTLY to absolute URL:
                 setTimeout(() => {
                     window.location.href = "https://iamajithkumar98-bit.github.io/roaji/shop_resolver.html";
                 }, 800);
+                return;
             } 
-            // 3. Suspended User Identity Route
-            else if (email === "blocked@roaji.com" && password === "blocked123") {
+
+            // RULE 3: Suspended Account Identity Route (CRITICAL FIX)
+            if (email === "blocked@roaji.com" && password === "blocked123") {
                 showToast(langData[currentLang]['toast_blocked_user'], "error");
                 
                 // Seamlessly switch inline SPA layout state to blocked panel
                 setTimeout(() => {
                     switchView('suspended');
                 }, 400);
+                return;
+            }
+
+            // IMPENETRABLE ADMIN GATE INTERCEPTION LAYER FOR RECENTLY ONBOARDED USERS (CRITICAL FIX)
+            const registeredSaaSShops = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+            
+            // Search if there is a pending onboarding merchant matched
+            const matchedPendingShop = registeredSaaSShops.find(s => s.owner_email === email && s.owner_password === password);
+
+            if (matchedPendingShop) {
+                if (matchedPendingShop.status === "PENDING_SUPER_ADMIN_APPROVAL") {
+                    // HARD ACCESS LOCK: Block completely and show locked overlay modal screen
+                    showToast("Workspace locked! Pending Super Admin activation.", "error");
+                    switchView('locked');
+                } else if (matchedPendingShop.status === "Active_Lifetime_Free") {
+                    // ACCESS GRANTED BYPASS: Bypass completely and route instantly straight into shop_resolver.html
+                    showToast(langData[currentLang]['toast_login_success'], "success");
+                    sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "OWNER", is_active: true }));
+                    setTimeout(() => {
+                        window.location.href = "https://iamajithkumar98-bit.github.io/roaji/shop_resolver.html";
+                    }, 800);
+                }
             } else {
                 showToast(langData[currentLang]['toast_login_error'], "error");
             }
         }
 
-        // ==================== STATE 2: ONBOARDING REGISTRATION ====================
+        // ==================== FORM SUBMISSION PIPELINE ====================
         function handleRegistrationSubmit(event) {
             event.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
             const email = document.getElementById('reg-email').value.trim();
             const password = document.getElementById('reg-password').value;
             const shopName = document.getElementById('reg-shop').value.trim();
-            const shopType = document.getElementById('reg-type').value;
 
-            // Mock profile owner registration
-            const mockOwnerClaims = {
-                uid: "usr_owner_" + Date.now(),
-                name: name,
-                email: email,
-                role: "OWNER",
-                shop_name: shopName,
-                shop_type: shopType,
-                trial_period: "Active",
-                trial_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-            };
+            // Collect chosen selected dynamic blueprint stores
+            const checkboxes = document.querySelectorAll('.blueprint-chk');
+            let chosenShopIds = [];
 
-            // Cache credentials
-            localStorage.setItem('roaji_session_owner', JSON.stringify(mockOwnerClaims));
-            sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "OWNER", is_active: true }));
+            checkboxes.forEach(chk => {
+                if (chk.checked) chosenShopIds.push(chk.value);
+            });
 
-            // Update multi-tenant global lists
-            const mockShopsList = JSON.parse(localStorage.getItem('roaji_shops')) || [];
-            mockShopsList.push({
+            if (chosenShopIds.length === 0) {
+                showToast("Please choose at least 1 blueprint store module!", "error");
+                return;
+            }
+
+            // Save inside localStorage under roaji_shops with PENDING_SUPER_ADMIN_APPROVAL status token
+            const mockRegisteredShop = {
                 id: "shop_new_" + Date.now(),
                 name: shopName,
-                type: shopType,
-                plan: "Basic (Trial)",
-                status: "Active"
+                owner_email: email,
+                owner_password: password,
+                owner_name: name,
+                type: chosenShopIds.join(', '),
+                plan: "Pro Suite (30-Day Free Trial)",
+                status: "PENDING_SUPER_ADMIN_APPROVAL" // STRICT ACTION STATUS
+            };
+
+            const registeredSaaSShops = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+            registeredSaaSShops.push(mockRegisteredShop);
+            localStorage.setItem('roaji_shops', JSON.stringify(registeredSaaSShops));
+
+            // Log action to Super Admin audit logs panel (Dynamic Integration)
+            const auditLogsList = JSON.parse(localStorage.getItem('roaji_logs')) || [];
+            auditLogsList.unshift({
+                timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+                user: "SaaS Onboarding Engine",
+                text: `Merchant ${name} requested onboarding activation for: ${shopName} (Pending UTR).`
             });
-            localStorage.setItem('roaji_shops', JSON.stringify(mockShopsList));
+            localStorage.setItem('roaji_logs', JSON.stringify(auditLogsList));
 
             showToast(langData[currentLang]['toast_trial_initiated'], "success");
 
-            // Open inline subscription choices panel immediately
+            // Lock screen wait for verification
             setTimeout(() => {
-                switchView('subscription');
+                switchView('locked');
             }, 1000);
         }
 
-        // ==================== STATE 3: UPI QR PAYMENT CONSOLE ====================
-        function selectPackage(planName, price) {
-            const gatewayBlock = document.getElementById('upi-qr-gateway');
-            const planBadge = document.getElementById('lbl-selected-plan');
-            const qrPriceLabel = document.getElementById('qr-price-lbl');
-            const upiIdLabel = document.getElementById('qr-upi-id');
-
-            if (price === 0) {
-                initializeMerchantWorkspace();
-                return;
-            }
-
-            // Bind values dynamically
-            planBadge.innerText = `Selected: ${planName} Plan`;
-            qrPriceLabel.innerText = `₹${price.toLocaleString('en-IN')}.00`;
-            
-            // Sync with central Admin UPI setting if modified in super_admin_panel.html
-            upiIdLabel.innerText = localStorage.getItem('roaji_saas_upi_id') || "roajisystems@upi";
-
-            // Reveal payment gate block
-            gatewayBlock.classList.remove('hidden');
-            gatewayBlock.classList.add('flex');
-            gatewayBlock.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function handleUtrSubmission(event) {
-            event.preventDefault();
-            const utr = document.getElementById('utr-input').value.trim();
-
-            if (utr.length < 12) {
-                showToast("UTR reference number must be exactly 12 digits!", "error");
-                return;
-            }
-
-            showToast(langData[currentLang]['toast_utr_checking'], "info");
-
-            // Mock verification queue push (Module A of super_admin_panel)
-            const mockOnboardingOrders = JSON.parse(localStorage.getItem('roaji_orders')) || [];
-            mockOnboardingOrders.unshift({
-                id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
-                customer: "New Registrant",
-                mobile: "N/A",
-                address: "UTR: " + utr,
-                date: new Date().toISOString().split('T')[0],
-                total: 1499,
-                advance: 1499,
-                balance: 0,
-                status: "Pending" // mapped as PENDING_VERIFICATION in super_admin_panel
-            });
-            localStorage.setItem('roaji_orders', JSON.stringify(mockOnboardingOrders));
-
-            // Freeze screen waiting for Admin verification approval
-            document.getElementById('utr-form').innerHTML = `
-                <div class="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-xl text-xs font-semibold leading-relaxed">
-                    ⚙️ Verification Pending: UTR Reference Code: ${utr} has been sent. Your dashboard will launch automatically upon Super Admin approval.
-                </div>
-            `;
-        }
-
-        function initializeMerchantWorkspace() {
-            showToast("Workspace initialized!", "success");
-            setTimeout(() => {
-                window.location.href = "https://iamajithkumar98-bit.github.io/roaji/index.html"; // Redirect cleanly to relative base dashboard index page
-            }, 800);
-        }
-
-        // MODALS UTILS
+        // FORGOT PASSWORD
         function openForgotModal() {
             const modal = document.getElementById('forgot-modal');
             const emailValue = document.getElementById('login-email').value;
@@ -649,7 +585,7 @@
                 iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width:100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             } else if (type === 'error') {
                 bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
-                iconSvg = `<svg class="h-5 w-5 text-rose-650" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width:100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width:100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             } else if (type === 'info') {
                 bgClass = 'bg-amber-950/90 border border-amber-500/30 text-amber-300';
                 iconSvg = `<svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width:100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
