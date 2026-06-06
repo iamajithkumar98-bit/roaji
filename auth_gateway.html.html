@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roaji SaaS Suite - Secure Auth Gateway</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050505; /* Deep Streaming-app Dark Black */
+            color: #F5F5F4;
+            margin: 0;
+        }
+        .premium-card {
+            background: rgba(18, 16, 15, 0.85); /* Premium Stone-900 Alpha */
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+        .glow-accent:focus {
+            outline: none;
+            border-color: #F97316; /* Orange-500 Neon */
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
+        }
+        .text-neon-gold {
+            color: #F59E0B;
+            text-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden flex items-center justify-center p-4">
+
+    <!-- Background Radial Gradients -->
+    <div class="absolute top-[-20%] left-[-15%] w-[65vw] h-[65vw] rounded-full bg-amber-500/10 blur-[130px] pointer-events-none"></div>
+    <div class="absolute bottom-[-20%] right-[-15%] w-[65vw] h-[65vw] rounded-full bg-orange-600/10 blur-[130px] pointer-events-none"></div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
+
+    <!-- MAIN CORE CONTAINER -->
+    <div class="w-full max-w-4xl z-10 my-6">
+
+        <!-- Global Language Switcher -->
+        <div class="flex justify-end mb-6">
+            <div class="bg-stone-950/60 border border-stone-800 p-0.5 rounded-xl flex items-center shadow-inner">
+                <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 bg-orange-600 text-white shadow">EN</button>
+                <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
+            </div>
+        </div>
+
+        <!-- ==================== STATE 1: SECURE MINIMALIST LOGIN VIEW ==================== -->
+        <div id="view-login" class="w-full max-w-md mx-auto premium-card rounded-3xl p-8 space-y-6 block">
+            <div class="text-center">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 mb-3 border border-orange-500/25" style="width: 56px; height: 56px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 32px; height: 32px; max-width: 100%;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight text-white">ROAJI</h1>
+                <p class="text-xs font-semibold text-orange-500 tracking-wider uppercase mt-1">Enterprise secure login</p>
+                <p id="login-tagline" data-key="login_tagline" class="text-sm text-stone-400 mt-2">Enter credentials to unlock context</p>
+            </div>
+
+            <form id="login-form" class="space-y-4" onsubmit="handleLoginSubmit(event)">
+                <div>
+                    <label id="lbl-login-email" data-key="lbl_email" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Email Address</label>
+                    <input type="email" id="login-email" required placeholder="example@domain.com" class="w-full px-4 py-3 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-sm focus:outline-none glow-accent">
+                </div>
+
+                <div>
+                    <label id="lbl-login-pass" data-key="lbl_password" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Password</label>
+                    <div class="relative">
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-sm focus:outline-none glow-accent">
+                        <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-500 hover:text-stone-300">
+                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; max-width: 100%;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs font-medium pt-1">
+                    <label class="flex items-center space-x-2 text-stone-400 cursor-pointer">
+                        <input type="checkbox" id="remember-me" class="rounded border-stone-800 bg-stone-950 text-orange-500 focus:ring-orange-500/20 w-4 h-4">
+                        <span id="lbl-remember" data-key="lbl_remember">Remember Me</span>
+                    </label>
+                    <button type="button" id="btn-forgot-link" data-key="btn_forgot_link" onclick="openForgotModal()" class="text-orange-500 hover:text-orange-400 transition">Forgot Password?</button>
+                </div>
+
+                <button type="submit" id="btn-login-submit" data-key="btn_submit" class="w-full py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition duration-300 shadow-lg shadow-orange-600/10 active:scale-[0.98]">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="text-center pt-2">
+                <button onclick="switchView('register')" id="lnk-create-account" data-key="lnk_create_account" class="text-xs text-stone-400 hover:text-white transition underline">Don't have an account? Create one</button>
+            </div>
+        </div>
+
+        <!-- ==================== STATE 2: AUTOMATED CUSTOMER REGISTRATION ==================== -->
+        <div id="view-register" class="w-full max-w-md mx-auto premium-card rounded-3xl p-8 space-y-6 hidden">
+            <div class="text-center">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-orange-500/10 text-orange-500 mb-3 border border-orange-500/25" style="width: 56px; height: 56px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 32px; height: 32px; max-width: 100%;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                </div>
+                <h2 id="lbl-register-title" data-key="lbl_register_title" class="text-xl font-bold text-white">Create SaaS Profile</h2>
+                <p id="lbl-register-desc" data-key="lbl_register_desc" class="text-xs text-stone-400 mt-1">Register your store context and begin 30-Day Free Trial</p>
+            </div>
+
+            <form id="register-form" class="space-y-4" onsubmit="handleRegistrationSubmit(event)">
+                <div>
+                    <label id="lbl-reg-name" data-key="lbl_name" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Full Name</label>
+                    <input type="text" id="reg-name" required placeholder="Ajith Kumar" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-accent">
+                </div>
+                <div>
+                    <label id="lbl-reg-email" data-key="lbl_email" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Email Address</label>
+                    <input type="email" id="reg-email" required placeholder="example@domain.com" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-accent">
+                </div>
+                <div>
+                    <label id="lbl-reg-pass" data-key="lbl_password" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Password</label>
+                    <input type="password" id="reg-password" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-accent">
+                </div>
+                <div>
+                    <label id="lbl-reg-shop" data-key="lbl_shop_name" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Shop Name</label>
+                    <input type="text" id="reg-shop" required placeholder="Roaji Gifts Studio" class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-xs focus:outline-none glow-accent">
+                </div>
+                <div>
+                    <label id="lbl-reg-type" data-key="lbl_shop_type" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Shop Type</label>
+                    <select id="reg-type" required class="w-full px-4 py-2.5 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-200 text-xs focus:outline-none glow-accent cursor-pointer">
+                        <option value="Gift Shop">Gift Shop</option>
+                        <option value="Frame Shop">Frame Shop</option>
+                        <option value="Textile Shop">Textile Shop</option>
+                        <option value="Bakery">Bakery</option>
+                        <option value="Supermarket">Supermarket</option>
+                        <option value="Services">Services</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="btn-register-submit" data-key="btn_register_submit" class="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-orange-600/10">
+                    Activate Trial & Register
+                </button>
+            </form>
+
+            <div class="text-center pt-2">
+                <button onclick="switchView('login')" id="lnk-back-login" data-key="lnk_back_login" class="text-xs text-stone-400 hover:text-white transition underline">Already registered? Log In</button>
+            </div>
+        </div>
+
+        <!-- ==================== STATE 3: SUBSCRIPTION & UPI QR GATEWAY ==================== -->
+        <div id="view-subscription" class="space-y-6 hidden">
+            
+            <div class="text-center max-w-xl mx-auto space-y-2">
+                <h2 id="lbl-sub-title" data-key="lbl_sub_title" class="text-xl font-bold text-white">Choose Your Workspace Scale</h2>
+                <p id="lbl-sub-desc" data-key="lbl_sub_desc" class="text-xs text-stone-400 leading-relaxed">Your 30-Day Free Trial is initiated. Upgrade to paid packages below to unlock automated WhatsApp triggers & secure AI advisors.</p>
+            </div>
+
+            <!-- Pricing Tiers Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Basic Card -->
+                <div class="premium-card p-6 rounded-3xl border border-stone-850 flex flex-col justify-between hover:border-stone-700 transition duration-300">
+                    <div>
+                        <h4 class="text-sm font-bold text-stone-300">Basic Edition</h4>
+                        <div class="flex items-baseline mt-2">
+                            <span class="text-2xl font-bold text-white">₹0</span>
+                            <span class="text-[10px] text-stone-500 ml-1">/ Month</span>
+                        </div>
+                        <p class="text-[10px] text-stone-400 mt-3 leading-relaxed border-t border-stone-850 pt-3">Core point-of-sale invoice creation, local database structures, and billing summaries.</p>
+                    </div>
+                    <button onclick="selectPackage('Basic', 0)" class="w-full py-2.5 bg-stone-800 hover:bg-stone-700 text-white text-xs font-semibold rounded-xl mt-6 transition">Active Trial Plan</button>
+                </div>
+
+                <!-- Pro Card -->
+                <div class="premium-card p-6 rounded-3xl border border-orange-500/40 relative flex flex-col justify-between hover:border-orange-500 transition duration-300">
+                    <span class="absolute top-[-10px] right-4 bg-orange-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Popular</span>
+                    <div>
+                        <h4 class="text-sm font-bold text-white">Pro Suite</h4>
+                        <div class="flex items-baseline mt-2">
+                            <span class="text-2xl font-bold text-neon-gold">₹1,499</span>
+                            <span class="text-[10px] text-stone-500 ml-1">/ Month</span>
+                        </div>
+                        <p class="text-[10px] text-stone-300 mt-3 leading-relaxed border-t border-stone-800 pt-3 font-semibold">Includes WhatsApp AI Auto-Responder trigger systems, dynamic CRM outstanding trackers, and automated SMS.</p>
+                    </div>
+                    <button onclick="selectPackage('Pro', 1499)" class="w-full py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-xl mt-6 transition shadow-md shadow-orange-600/10">Upgrade Pro</button>
+                </div>
+
+                <!-- Lifetime Card -->
+                <div class="premium-card p-6 rounded-3xl border border-stone-850 flex flex-col justify-between hover:border-stone-700 transition duration-300">
+                    <div>
+                        <h4 class="text-sm font-bold text-stone-300">Enterprise Scale</h4>
+                        <div class="flex items-baseline mt-2">
+                            <span class="text-2xl font-bold text-white">₹9,999</span>
+                            <span class="text-[10px] text-stone-500 ml-1">/ Lifetime</span>
+                        </div>
+                        <p class="text-[10px] text-stone-400 mt-3 leading-relaxed border-t border-stone-850 pt-3">Unlocks AI Voice Billing modules, bilingual voice command tools, and full Multi-Shop global switcher dashboard.</p>
+                    </div>
+                    <button onclick="selectPackage('Enterprise', 9999)" class="w-full py-2.5 bg-stone-800 hover:bg-stone-700 text-white text-xs font-semibold rounded-xl mt-6 transition">Active Lifetime</button>
+                </div>
+            </div>
+
+            <!-- DYNAMIC UPI QR GATEWAY OVERLAY (Appears upon choosing Pro/Enterprise) -->
+            <div id="upi-qr-gateway" class="hidden flex-col md:flex-row gap-6 p-6 bg-stone-950/60 border border-stone-850 rounded-3xl items-center justify-between transition-all duration-300">
+                <div class="text-center md:text-left space-y-2 max-w-sm">
+                    <span id="lbl-selected-plan" class="inline-block px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase text-orange-400 bg-orange-500/10 rounded-md">Selected: Pro Plan</span>
+                    <h3 id="lbl-gateway-title" data-key="lbl_gateway_title" class="text-sm font-bold text-white">Automated UPI Payment Gate</h3>
+                    <p id="lbl-gateway-desc" data-key="lbl_gateway_desc" class="text-[11px] text-stone-500 leading-relaxed">Scan the dynamic UPI QR code on the right side using any UPI App (GPay, PhonePe, Paytm) and complete your payment securely.</p>
+                    
+                    <!-- UTR Form -->
+                    <form id="utr-form" onsubmit="handleUtrSubmission(event)" class="pt-2 space-y-2">
+                        <label id="lbl-utr-input" data-key="lbl_utr_input" class="block text-[10px] font-bold text-stone-400 uppercase">Enter 12-Digit UPI Ref / UTR No</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="utr-input" required maxlength="12" placeholder="389021840194" class="flex-1 px-3 py-1.5 bg-stone-900 border border-stone-800 rounded-xl text-stone-100 text-xs glow-focus">
+                            <button type="submit" id="btn-utr-submit" data-key="btn_utr_submit" class="px-4 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition">Verify</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="flex flex-col items-center justify-center p-4 bg-white rounded-2xl border border-stone-200 shadow-lg">
+                    <!-- Static simulated payment QR representation -->
+                    <div class="w-36 h-36 bg-stone-100 border border-stone-300 flex items-center justify-center relative overflow-hidden" id="upi-qr-image-container">
+                        <!-- MOCK QR EMBED -->
+                        <div class="text-stone-900 text-center text-xs font-bold leading-none p-4">
+                            MOCK QR CODE<br>
+                            <span class="text-[9px] font-normal text-stone-500 mt-2 block" id="qr-price-lbl">₹1,499.00</span>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-stone-600 font-bold mt-2" id="qr-upi-id">SuperAdmin@upi</span>
+                </div>
+            </div>
+
+            <!-- Bottom redirect exit -->
+            <div class="text-center pt-2">
+                <button onclick="initializeMerchantWorkspace()" id="btn-skip-sub" data-key="btn_skip_sub" class="px-6 py-2.5 bg-stone-900 hover:bg-stone-850 border border-stone-850 text-stone-300 text-xs font-semibold rounded-xl transition">
+                    Skip & Launch Workspace (Active Trial Mode)
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 4: SECURITY SUSPENDED ACCOUNT BLOCK ==================== -->
+        <div id="view-suspended" class="w-full max-w-md mx-auto premium-card rounded-3xl p-8 space-y-6 hidden text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/25 mb-2" style="width: 56px; height: 56px;">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:32px; height:32px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            </div>
+            <h2 id="lbl-suspended-title" data-key="lbl_suspended_title" class="text-lg font-bold text-white">கணக்கு முடக்கப்பட்டுள்ளது</h2>
+            <p id="lbl-suspended-desc" data-key="lbl_suspended_desc" class="text-xs text-stone-400 leading-relaxed">பாதுகாப்பு அச்சுறுத்தல் காரணமாக உங்களது கணக்கு தற்காலிகமாக முடக்கப்பட்டுள்ளது. முதன்மை நிர்வாகியைத் தொடர்பு கொள்ளவும்.</p>
+            <button onclick="switchView('login')" data-key="lnk_back_login" class="px-6 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 rounded-xl text-xs font-semibold transition">உள்நுழைவுப் பக்கம்</button>
+        </div>
+
+    </div>
+
+    <!-- VANILLA JS STATE CONTROLLER & SUBSCRIPTION COMPUTATIONS -->
+    <script>
+        // MULTI-LANGUAGE BILINGUAL DICTIONARY
+        const langData = {
+            en: {
+                login_tagline: "Enter credentials to unlock context",
+                lbl_email: "Email Address",
+                lbl_password: "Password",
+                lbl_remember: "Remember Me",
+                btn_forgot_link: "Forgot Password?",
+                btn_submit: "Sign In",
+                lnk_create_account: "Don't have an account? Create one",
+                
+                // Registration
+                lbl_register_title: "Create SaaS Profile",
+                lbl_register_desc: "Register your store context and begin 30-Day Free Trial",
+                lbl_name: "Full Name",
+                lbl_shop_name: "Shop Name",
+                lbl_shop_type: "Shop Type",
+                btn_register_submit: "Activate Trial & Register",
+                lnk_back_login: "Already registered? Log In",
+                
+                // Subscriptions & QR gateway
+                lbl_sub_title: "Choose Your Workspace Scale",
+                lbl_sub_desc: "Your 30-Day Free Trial is initiated. Upgrade to paid packages below to unlock automated WhatsApp triggers & secure AI advisors.",
+                lbl_gateway_title: "Automated UPI Payment Gate",
+                lbl_gateway_desc: "Scan the dynamic UPI QR code on the right side using any UPI App (GPay, PhonePe, Paytm) and complete your payment securely.",
+                lbl_utr_input: "Enter 12-Digit UPI Ref / UTR No",
+                btn_utr_submit: "Verify Reference",
+                btn_skip_sub: "Skip & Launch Workspace (Active Trial)",
+                
+                // Blocked
+                lbl_suspended_title: "Access Suspension Alert",
+                lbl_suspended_desc: "Your subscription access or credentials have been marked inactive. Please contact Super Admin.",
+                
+                // Modals
+                modal_title: "Recover Password",
+                modal_desc: "Enter your registered email below, and we'll send you a password reset link.",
+                modal_btn_cancel: "Cancel",
+                modal_btn_send: "Send Link",
+
+                // Toasts
+                toast_login_success: "Successfully authenticated!",
+                toast_login_error: "Invalid email or password! Please try again.",
+                toast_utr_checking: "Reference sent. Awaiting administrator manual context activation...",
+                toast_trial_initiated: "Workspace initialized. 30-Day Free Trial activated!",
+                toast_recovery_sent: "Recovery verification link sent!"
+            },
+            ta: {
+                login_tagline: "உள்நுழைய உங்கள் விபரங்களை உள்ளிடவும்",
+                lbl_email: "மின்னஞ்சல் முகவரி",
+                lbl_password: "கடவுச்சொல்",
+                lbl_remember: "என்னை நினைவில் கொள்",
+                btn_forgot_link: "கடவுச்சொல் மறந்ததா?",
+                btn_submit: "உள்நுழைக",
+                lnk_create_account: "புதிய கணக்கை உருவாக்க வேண்டுமா? இங்கே கிளிக் செய்யவும்",
+                
+                // Registration
+                lbl_register_title: "புதிய கணக்கு உருவாக்குதல்",
+                lbl_register_desc: "வணிக விவரங்களை உள்ளிட்டு 30 நாள் இலவச சோதனையைத் தொடங்கவும்",
+                lbl_name: "முழுப் பெயர்",
+                lbl_shop_name: "கடையின் பெயர்",
+                lbl_shop_type: "வணிக வகை",
+                btn_register_submit: "சோதனையைத் தொடங்கு & பதிவு செய்",
+                lnk_back_login: "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழையவும்",
+                
+                // Subscriptions & QR gateway
+                lbl_sub_title: "உங்களுக்கான கட்டணத் திட்டம் தேர்வு செய்க",
+                lbl_sub_desc: "உங்கள் 30 நாள் இலவச சோதனை துவங்கப்பட்டுள்ளது. வாட்ஸ்அப் ஆட்டோமேஷன் மற்றும் ஏஐ ஆலோசகரை அணுக கட்டணத் திட்டங்களை மேம்படுத்தவும்.",
+                lbl_gateway_title: "தானியங்கி யுபிஐ கட்டண முறை",
+                lbl_gateway_desc: "வலதுபுறம் உள்ள யுபிஐ கியூஆர் கோடை உங்கள் மொபைல் செயலிகள் மூலம் ஸ்கேன் செய்து பாதுகாப்பாகக் கட்டணத்தை செலுத்தவும்.",
+                lbl_utr_input: "12-இலக்க யுபிஐ குறிப்பு எண் (UTR) உள்ளிடவும்",
+                btn_utr_submit: "சரிபார்",
+                btn_skip_sub: "இப்போதைக்குத் தவிர் (இலவச சோதனைக் காலம்)",
+                
+                // Blocked
+                lbl_suspended_title: "கணக்கு முடக்கப்பட்டுள்ளது",
+                lbl_suspended_desc: "பாதுகாப்பு அச்சுறுத்தல் காரணமாக உங்களது கணக்கு தற்காலிகமாக முடக்கப்பட்டுள்ளது. முதன்மை நிர்வாகியைத் தொடர்பு கொள்ளவும்.",
+                
+                // Modals
+                modal_title: "மின்னஞ்சல் வழி மீட்பு",
+                modal_desc: "உங்கள் மின்னஞ்சலை உள்ளிட்டால் அதற்கான கடவுச்சொல் மீட்பு இணைப்பு அனுப்பப்படும்.",
+                modal_btn_cancel: "ரத்துசெய்",
+                modal_btn_send: "அனுப்புக",
+
+                // Toasts
+                toast_login_success: "வெற்றிகரமாக அங்கீகரிக்கப்பட்டது!",
+                toast_login_error: "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல்! மீண்டும் முயற்சிக்கவும்.",
+                toast_utr_checking: "கட்டண குறிப்பு அனுப்பப்பட்டது. நிர்வாகியின் அனுமதிக்கு பின் கணக்கு முழுமையாகத் திறக்கப்படும்...",
+                toast_trial_initiated: "இலவச 30-நாள் சோதனைக் காலம் வெற்றிகரமாகத் தொடங்கப்பட்டது!",
+                toast_recovery_sent: "மீட்பு மின்னஞ்சல் அனுப்பப்பட்டது!"
+            }
+        };
+
+        let currentLang = 'en';
+
+        // ON RUNTIME LOADER
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedGlobalLang = localStorage.getItem('roaji_language');
+            if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
+                currentLang = savedGlobalLang;
+            } else {
+                currentLang = 'en';
+                localStorage.setItem('roaji_language', 'en');
+            }
+            applyLanguage();
+
+            // Populate remembered email
+            const rememberedEmail = localStorage.getItem('remembered_roaji_email');
+            if (rememberedEmail) {
+                document.getElementById('login-email').value = rememberedEmail;
+                document.getElementById('remember-me').checked = true;
+            }
+        });
+
+        // DUAL LANGUAGE TOGGLE SWITCHER
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('roaji_language', lang);
+            applyLanguage();
+        }
+
+        function applyLanguage() {
+            const btnTa = document.getElementById('lang-btn-ta');
+            const btnEn = document.getElementById('lang-btn-en');
+
+            if (currentLang === 'ta') {
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+            } else {
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+            }
+
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (langData[currentLang][key]) {
+                    element.innerText = langData[currentLang][key];
+                }
+            });
+        }
+
+        // PASSWORD FIELD VISIBILITY
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+
+        // SPA VIEW NAVIGATOR
+        function switchView(viewName) {
+            const loginView = document.getElementById('view-login');
+            const registerView = document.getElementById('view-register');
+            const subscriptionView = document.getElementById('view-subscription');
+            const suspendedView = document.getElementById('view-suspended');
+
+            [loginView, registerView, subscriptionView, suspendedView].forEach(v => v.classList.add('hidden'));
+
+            if (viewName === 'login') loginView.classList.remove('hidden');
+            if (viewName === 'register') registerView.classList.remove('hidden');
+            if (viewName === 'subscription') subscriptionView.classList.remove('hidden');
+            if (viewName === 'suspended') suspendedView.classList.remove('hidden');
+        }
+
+        // ==================== STATE 1: MOCK FIREBASE SECURE LOGIN ====================
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
+
+            if (email === "iamajithkumar98@gmail.com" && password === "Roaji.inbilling") {
+                if (rememberMe) {
+                    localStorage.setItem('remembered_roaji_email', email);
+                } else {
+                    localStorage.removeItem('remembered_roaji_email');
+                }
+
+                showToast(langData[currentLang]['toast_login_success'], "success");
+
+                // Route Super Admin directly
+                setTimeout(() => {
+                    console.log("Routing to hidden /super-admin portal...");
+                    window.location.href = "admin.html";
+                }, 800);
+            } else if (email === "owner@roaji.com" && password === "owner123") {
+                showToast(langData[currentLang]['toast_login_success'], "success");
+                
+                // OWNER with multiple shops -> transitions context to selection resolver
+                setTimeout(() => {
+                    localStorage.setItem('roaji_active_shop_id', 'shop_gift');
+                    window.location.href = "index.html"; 
+                }, 800);
+            } else if (email === "blocked@roaji.com" && password === "blocked123") {
+                // Suspended claims evaluation
+                showToast(langData[currentLang]['toast_blocked_user'], "error");
+                switchView('suspended');
+            } else {
+                showToast(langData[currentLang]['toast_login_error'], "error");
+            }
+        }
+
+        // ==================== STATE 2: REGISTRATION LOGIC ====================
+        function handleRegistrationSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const shopName = document.getElementById('reg-shop').value.trim();
+            const shopType = document.getElementById('reg-type').value;
+
+            // Simulate Firestore profile registration
+            const mockRegisteredOwnerClaims = {
+                uid: "usr_owner_" + Date.now(),
+                name: name,
+                email: email,
+                role: "OWNER",
+                shop_name: shopName,
+                shop_type: shopType,
+                trial_period: "Active",
+                trial_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+            };
+
+            // Store simulated active session contexts
+            localStorage.setItem('roaji_session_owner', JSON.stringify(mockRegisteredOwnerClaims));
+            
+            showToast(langData[currentLang]['toast_trial_initiated'], "success");
+
+            // Progress directly to pricing and UPI gateway stage
+            setTimeout(() => {
+                switchView('subscription');
+            }, 1000);
+        }
+
+        // ==================== STATE 3: UPI QR GATEWAY ENGINE ====================
+        function selectPackage(planName, price) {
+            const gatewayBlock = document.getElementById('upi-qr-gateway');
+            const planBadge = document.getElementById('lbl-selected-plan');
+            const qrPriceLabel = document.getElementById('qr-price-lbl');
+            const upiIdLabel = document.getElementById('qr-upi-id');
+
+            if (price === 0) {
+                // Free package bypasses payment gate
+                initializeMerchantWorkspace();
+                return;
+            }
+
+            // Configure dynamic payment QR details
+            planBadge.innerText = `Selected: ${planName} Plan`;
+            qrPriceLabel.innerText = `₹${price.toLocaleString('en-IN')}.00`;
+            upiIdLabel.innerText = "roajisystems@upi"; // Super Admin UPI Configuration
+
+            // Show QR gate block
+            gatewayBlock.classList.remove('hidden');
+            gatewayBlock.classList.add('flex');
+            gatewayBlock.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function handleUtrSubmission(event) {
+            event.preventDefault();
+            const utr = document.getElementById('utr-input').value.trim();
+
+            if (utr.length < 12) {
+                showToast("UTR number must be exactly 12 digits long!", "error");
+                return;
+            }
+
+            showToast(langData[currentLang]['toast_utr_checking'], "info");
+
+            // Simulated lock until admin approval
+            document.getElementById('utr-form').innerHTML = `
+                <div class="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-xl text-xs font-semibold leading-relaxed">
+                    ⚙️ Verification Pending: UTR: ${utr} has been sent. Your workspace will launch once Super Admin verifies the settlement.
+                </div>
+            `;
+        }
+
+        function initializeMerchantWorkspace() {
+            showToast("Initializing workspace contexts...", "success");
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 800);
+        }
+
+        // MODALS UTILS
+        function openForgotModal() {
+            const modal = document.getElementById('forgot-modal');
+            const emailValue = document.getElementById('login-email').value;
+            if (emailValue) {
+                document.getElementById('forgot-email').value = emailValue;
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeForgotModal() {
+            const modal = document.getElementById('forgot-modal');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => { modal.classList.remove('flex'); modal.classList.add('hidden'); }, 200);
+        }
+
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            const email = document.getElementById('forgot-email').value;
+            closeForgotModal();
+            showToast(`${langData[currentLang]['toast_recovery_sent']} (${email})`, 'success');
+        }
+
+        // TOAST NOTIFICATIONS ENGINE
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgClass = 'bg-stone-900 text-white border-stone-850';
+            let iconSvg = '';
+
+            if (type === 'success') {
+                bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
+                iconSvg = `<svg class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (type === 'error') {
+                bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
+                iconSvg = `<svg class="h-5 w-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (type === 'info') {
+                bgClass = 'bg-amber-950/90 border border-amber-500/30 text-amber-300';
+                iconSvg = `<svg class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+
+            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
+            toast.innerHTML = `<div class="flex-shrink-0">${iconSvg}</div><div class="text-xs font-semibold leading-relaxed">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-x-12', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
