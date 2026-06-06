@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roaji SaaS - Select Workspace</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050505; /* Deep streaming-app dark base */
+            color: #F5F5F4;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .premium-glass {
+            background: rgba(18, 16, 15, 0.75); /* Premium Stone-900 Alpha */
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+        .carousel-perspective {
+            perspective: 1200px;
+            transform-style: preserve-3d;
+        }
+        .carousel-card {
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s, filter 0.6s;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+        .active-glow {
+            border-color: #F59E0B; /* Amber-500 */
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.25);
+        }
+        .active-glow-pro {
+            border-color: #EA580C; /* Orange-600 */
+            box-shadow: 0 0 30px rgba(234, 88, 12, 0.25);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8 relative">
+
+    <!-- Ambient backdrop neon glow -->
+    <div class="absolute top-[20%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-[20%] right-[20%] w-[50vw] h-[50vw] rounded-full bg-orange-600/5 blur-[120px] pointer-events-none"></div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
+
+    <!-- HEADER AREA -->
+    <header class="w-full max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-stone-900 z-10">
+        <div class="space-y-1">
+            <h1 id="app-title" data-key="app_title" class="text-xl font-bold tracking-tight text-white">உங்களது வணிகத் தளம்</h1>
+            <p class="text-xs text-stone-500 font-semibold uppercase tracking-wider">Multi-Shop Portal Resolver</p>
+        </div>
+
+        <!-- Language toggle -->
+        <div class="glass-panel p-1 rounded-2xl flex items-center shadow-sm self-end sm:self-auto bg-stone-900/60 border border-stone-850">
+            <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200">EN</button>
+            <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
+        </div>
+    </header>
+
+    <!-- ==================== MAIN 3D CAROUSEL COMPONENT ==================== -->
+    <main class="w-full flex-1 flex flex-col items-center justify-center py-12 z-10">
+        
+        <!-- Error Banner Container (Shows if no linked shops found) -->
+        <div id="error-banner" class="max-w-md w-full p-4 bg-rose-950/20 border border-rose-500/30 rounded-2xl text-rose-300 text-xs font-semibold leading-relaxed hidden flex-col items-center text-center gap-2 mb-8">
+            <span class="p-1.5 bg-rose-500/10 rounded-lg text-rose-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            </span>
+            <span id="lbl-error-text" data-key="lbl_error_text">உங்களது கணக்கில் எந்தவொரு வணிகமும் இணைக்கப்படவில்லை.</span>
+        </div>
+
+        <div id="carousel-viewport" class="w-full max-w-lg h-72 relative flex items-center justify-center carousel-perspective">
+            <!-- 3D CAROUSEL WORKSPACE WRAPPER (Dynamically populated) -->
+            <div id="carousel-stage" class="w-full h-full relative flex items-center justify-center transform-gpu"></div>
+
+            <!-- Left Navigation Arrow -->
+            <button onclick="rotateCarousel('prev')" class="absolute left-[-20px] md:left-[-60px] p-3 bg-stone-900/60 hover:bg-stone-850 border border-stone-800 rounded-full hover:border-amber-500 transition-all duration-300 text-stone-300 hover:text-white z-40 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:20px; height:20px; max-width:100%;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            <!-- Right Navigation Arrow -->
+            <button onclick="rotateCarousel('next')" class="absolute right-[-20px] md:right-[-60px] p-3 bg-stone-900/60 hover:bg-stone-850 border border-stone-800 rounded-full hover:border-amber-500 transition-all duration-300 text-stone-300 hover:text-white z-40 focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:20px; height:20px; max-width:100%;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Launch Button of active centered card -->
+        <div class="mt-12 text-center">
+            <button onclick="launchFocusedStore()" id="btn-launch" data-key="btn_launch" class="px-8 py-3.5 bg-amber-600 hover:bg-amber-700 text-stone-950 font-bold rounded-2xl text-xs transition duration-300 shadow-lg shadow-amber-600/10 active:scale-[0.98]">
+                கடையைத் தொடங்கு / Launch Workspace
+            </button>
+        </div>
+
+    </main>
+
+    <!-- FOOTER AREA -->
+    <footer class="w-full max-w-6xl mx-auto border-t border-stone-900 pt-4 text-center text-[10px] text-stone-600 font-semibold z-10">
+        <p>ROAJI Multi-Tenant Workspace Gateway. Fully hardware-accelerated 3D transforms rendering.</p>
+    </footer>
+
+    <!-- VANILLA JS STATE & 3D GEOMETRIC TRANSFORM CALCULATORS -->
+    <script>
+        // BILINGUAL LANGUAGE TRANSLATOR DICTIONARY
+        const langData = {
+            en: {
+                app_title: "Select Active Workspace",
+                lbl_error_text: "No active store tenants found linked to this profile.",
+                btn_launch: "Launch Store Dashboard",
+                toast_switched: "Workspace successfully resolved! Initializing context...",
+                back_dashboard: "← Back to Sign In"
+            },
+            ta: {
+                app_title: "வணிகத்தைத் தேர்ந்தெடுக்கவும்",
+                lbl_error_text: "உங்களது கணக்கில் எந்தவொரு வணிகமும் இணைக்கப்படவில்லை.",
+                btn_launch: "கடையைத் தொடங்கு (Launch Store)",
+                toast_switched: "வணிகத் தளம் வெற்றிகரமாகத் தேர்ந்தெடுக்கப்பட்டது! துவங்குகிறது...",
+                back_dashboard: "← உள்நுழைவுப் பக்கம்"
+            }
+        };
+
+        let currentLang = 'en';
+
+        // Mocked User Claims & Store Relations (STEP A)
+        let userProfileClaims = {
+            uid: "usr_owner_902184",
+            email: "owner@roaji.com",
+            shop_ids: ["shop_gift", "shop_textile", "shop_bakery"] // Mock multiple stores bound
+        };
+
+        // Simulated central stores collection inside LocalStorage
+        const mockShopsDB = [
+            { id: "shop_gift", name: "ROAJI Gifts Studio (Chennai)", type: "Gift Shop", tier: "Basic" },
+            { id: "shop_textile", name: "ROAJI Textiles (Madurai)", type: "Textile Shop", tier: "Pro Suite" },
+            { id: "shop_bakery", name: "ROAJI Bakery (Coimbatore)", type: "Bakery", tier: "Enterprise" }
+        ];
+
+        let activeCarouselIndex = 0;
+        let shopsInCarousel = [];
+
+        // ON RUNTIME START
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedGlobalLang = localStorage.getItem('roaji_language');
+            if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
+                currentLang = savedGlobalLang;
+            } else {
+                currentLang = 'en';
+                localStorage.setItem('roaji_language', 'en');
+            }
+            applyLanguage();
+
+            // STEP A: Security Identity Validation
+            evaluateProfileResolution();
+        });
+
+        // LANGUAGE TOGGLE
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('roaji_language', lang);
+            applyLanguage();
+            renderCarouselCards(); // refresh tags
+        }
+
+        function applyLanguage() {
+            const btnTa = document.getElementById('lang-btn-ta');
+            const btnEn = document.getElementById('lang-btn-en');
+
+            if (currentLang === 'ta') {
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white shadow-sm";
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+            } else {
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white shadow-sm";
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+            }
+
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (langData[currentLang][key]) {
+                    element.innerText = langData[currentLang][key];
+                }
+            });
+        }
+
+        // IDENTITY IDENTITY VALIDATOR
+        function evaluateProfileResolution() {
+            const errorBanner = document.getElementById('error-banner');
+            const viewport = document.getElementById('carousel-viewport');
+            const launchBtn = document.getElementById('btn-launch');
+
+            if (!userProfileClaims.shop_ids || userProfileClaims.shop_ids.length === 0) {
+                // Wipe screen elements
+                viewport.classList.add('hidden');
+                launchBtn.classList.add('hidden');
+                errorBanner.classList.remove('hidden');
+                errorBanner.classList.add('flex');
+                return;
+            }
+
+            // Fill active carousel array elements
+            userProfileClaims.shop_ids.forEach(shopId => {
+                const shopData = mockShopsDB.find(s => s.id === shopId);
+                if (shopData) shopsInCarousel.push(shopData);
+            });
+
+            renderCarouselCards();
+        }
+
+        // ==================== STEP B: 3D CURVED CAROUSEL ENGINE ====================
+        function renderCarouselCards() {
+            const stage = document.getElementById('carousel-stage');
+            stage.innerHTML = '';
+
+            shopsInCarousel.forEach((shop, index) => {
+                const isPro = shop.tier === 'Pro Suite';
+                const isEnt = shop.tier === 'Enterprise';
+                
+                let tierBadgeStyle = 'bg-stone-800 text-stone-400';
+                if (isPro) tierBadgeStyle = 'bg-orange-600/10 text-orange-400 border border-orange-500/20';
+                if (isEnt) tierBadgeStyle = 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+
+                // Core card structure
+                stage.innerHTML += `
+                    <div id="card-${index}" onclick="setCarouselActive(${index})" class="carousel-card absolute w-72 h-44 premium-card rounded-3xl p-6 flex flex-col justify-between border cursor-pointer transform-gpu select-none">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="px-2 py-0.5 text-[8px] font-bold rounded-md uppercase tracking-wider ${tierBadgeStyle}">${shop.tier}</span>
+                                <span class="text-stone-600 font-bold text-[9px] font-mono">ID: ${shop.id}</span>
+                            </div>
+                            <h4 class="font-bold text-stone-200 text-xs mt-1 leading-snug card-title-node">${shop.name}</h4>
+                        </div>
+
+                        <div class="flex items-center justify-between border-t border-stone-850 pt-3">
+                            <span class="text-[10px] text-stone-500 font-bold uppercase tracking-wider">${shop.type}</span>
+                            <span class="text-stone-500 group-hover:text-amber-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:16px; height:16px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Recalculate 3D space vectors
+            updateCarousel3DSpace();
+        }
+
+        // MOCK CAROUSEL MATH COEFFICIENTS
+        function updateCarousel3DSpace() {
+            const total = shopsInCarousel.length;
+            if (total === 0) return;
+
+            for (let i = 0; i < total; i++) {
+                const card = document.getElementById(`card-${i}`);
+                if (!card) continue;
+
+                // Circular loop offset logic
+                let offset = i - activeCarouselIndex;
+                
+                // Keep values bound within curved carousel boundary
+                if (offset < -1) offset += total;
+                if (offset > total - 2) offset -= total;
+
+                // Apply dynamic 3D hardware-accelerated transforms
+                if (offset === 0) {
+                    // CENTER ACTIVE FOCUS CARD
+                    const isPro = shopsInCarousel[i].tier === 'Pro Suite';
+                    const glowClass = isPro ? 'active-glow-pro' : 'active-glow';
+                    
+                    card.className = `carousel-card absolute w-72 h-44 premium-card rounded-3xl p-6 flex flex-col justify-between border cursor-pointer transform-gpu select-none ${glowClass}`;
+                    card.style.transform = "translate3d(0, 0, 150px) scale(1.05)";
+                    card.style.opacity = "1";
+                    card.style.zIndex = "30";
+                    card.style.filter = "none";
+                    card.style.pointerEvents = "auto";
+                } else if (offset === 1 || offset === -1) {
+                    // SIDES scale-down & dimmed opacity
+                    const angle = offset * 35; // degrees skew
+                    const transX = offset * 115; // horizontal spacing percentage
+
+                    card.className = "carousel-card absolute w-72 h-44 premium-card rounded-3xl p-6 flex flex-col justify-between border cursor-pointer transform-gpu select-none border-stone-800";
+                    card.style.transform = `translate3d(${transX}px, 0, 0) rotateY(${-angle}deg) scale(0.82)`;
+                    card.style.opacity = "0.35";
+                    card.style.zIndex = "10";
+                    card.style.filter = "blur(1.5px)";
+                    card.style.pointerEvents = "none";
+                } else {
+                    // HIDE elements pushed further behind the viewing spectrum
+                    card.style.transform = "translate3d(0, 0, -200px) scale(0.6)";
+                    card.style.opacity = "0";
+                    card.style.zIndex = "0";
+                    card.style.filter = "blur(4px)";
+                    card.style.pointerEvents = "none";
+                }
+            }
+        }
+
+        // NAVIGATION ROTATORS
+        function rotateCarousel(direction) {
+            const total = shopsInCarousel.length;
+            if (total === 0) return;
+
+            if (direction === 'next') {
+                activeCarouselIndex = (activeCarouselIndex + 1) % total;
+            } else {
+                activeCarouselIndex = (activeCarouselIndex - 1 + total) % total;
+            }
+
+            updateCarousel3DSpace();
+        }
+
+        function setCarouselActive(index) {
+            activeCarouselIndex = index;
+            updateCarousel3DSpace();
+        }
+
+        // ==================== STEP C: CONTEXT LOCK & REDIRECTION ENGINE ====================
+        function launchFocusedStore() {
+            const activeShop = shopsInCarousel[activeCarouselIndex];
+            if (!activeShop) return;
+
+            initializeStoreContext(activeShop.id);
+        }
+
+        function initializeStoreContext(shopId) {
+            // Write selected workspace context into localStorage
+            localStorage.setItem('roaji_active_shop_id', shopId);
+
+            showToast(langData[currentLang]['toast_switched'], "success");
+
+            // Programmatic redirect directly to dashboard / main pos billing workspace
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 800);
+        }
+
+        // TOAST NOTIFICATIONS ENGINE
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgClass = 'bg-stone-900 text-white border-stone-850';
+            let iconSvg = '';
+
+            if (type === 'success') {
+                bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
+                iconSvg = `<svg class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+
+            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
+            toast.innerHTML = `<div class="flex-shrink-0">${iconSvg}</div><div class="text-xs font-semibold leading-relaxed">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-x-12', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
