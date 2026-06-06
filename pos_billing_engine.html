@@ -25,7 +25,7 @@
             border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
-        .glow-accent:focus {
+        .glow-focus:focus {
             outline: none;
             border-color: #F97316; /* Orange-500 Neon */
             box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
@@ -56,10 +56,10 @@
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-3 border-b border-stone-900">
             <div class="space-y-1">
                 <div class="flex items-center gap-2">
-                    <a href="index.html" data-key="back_dashboard" class="text-xs font-bold text-amber-700 hover:text-amber-800 transition">← பில்லிங் பக்கத்திற்குச் செல்</a>
+                    <a href="https://iamajithkumar98-bit.github.io/roaji/shop_resolver.html" data-key="back_dashboard" class="text-xs font-bold text-amber-700 hover:text-amber-800 transition">← வணிகத் தேர்விற்குச் செல்</a>
                 </div>
-                <h1 id="app-title" data-key="app_title" class="text-lg font-bold tracking-tight text-white uppercase">அதிநவீன பில்லிங் முனையம்</h1>
-                <p class="text-xs text-stone-500 font-semibold uppercase tracking-wider">High-frequency Multi-Billing Engine</p>
+                <h1 id="app-title" class="text-lg font-bold tracking-tight text-white uppercase">அதிநவீன பில்லிங் முனையம்</h1>
+                <p id="active-shop-header-title" class="text-xs text-stone-500 font-semibold uppercase tracking-wider">High-frequency Multi-Billing Engine</p>
             </div>
 
             <!-- Topbar options -->
@@ -207,13 +207,26 @@
         </div>
     </div>
 
+    <!-- ==================== LIVE BILL PREVIEW / PRINT TEMPLATE POPUP ==================== -->
+    <div id="invoice-modal" class="fixed inset-0 bg-stone-950/90 backdrop-blur-md z-50 items-center justify-center p-4 hidden overflow-y-auto">
+        <div class="w-full max-w-sm bg-white border border-stone-200 p-6 rounded-3xl shadow-2xl transform scale-95 transition-all flex flex-col gap-4">
+            <div id="printable-invoice-area" class="p-5 bg-stone-50 border border-stone-300 mx-auto" style="width: 100mm; max-width: 100%; font-family: monospace; color: #000; font-size: 11px;">
+                <!-- Dynamically filled with merchant profile, GSTIN, and custom admin bill footer -->
+            </div>
+            <div class="flex gap-2 pt-2 border-t border-stone-100">
+                <button onclick="closeInvoiceModal()" class="flex-1 py-2 bg-stone-100 text-stone-700 font-bold rounded-xl text-xs">Close</button>
+                <button onclick="window.print()" class="flex-1 py-2 bg-amber-600 text-stone-950 font-bold rounded-xl text-xs">Print Now</button>
+            </div>
+        </div>
+    </div>
+
     <!-- VANILLA JS COMPONENT & TRANSACTION EXECUTOR ENGINE -->
     <script>
         // BILINGUAL LANGUAGE TRANSLATOR DICTIONARY
         const langData = {
             ta: {
                 app_title: "அதிநவீன பில்லிங் முனையம் (POS)",
-                back_dashboard: "← முகப்புப்பக்கத்திற்குச் செல்",
+                back_dashboard: "← வணிகத் தேர்விற்குச் செல்",
                 th_item: "பொருள்",
                 th_price: "விலை",
                 th_qty: "அளவு",
@@ -229,7 +242,7 @@
             },
             en: {
                 app_title: "High-Frequency POS Terminal",
-                back_dashboard: "← Go to Dashboard",
+                back_dashboard: "← Go back to Shop Resolver",
                 th_item: "Item",
                 th_price: "Price",
                 th_qty: "Qty",
@@ -248,12 +261,13 @@
         let currentLang = 'en';
         let currentNiche = 'gift';
 
-        // STATIC HARDCODED PRODUCTS DATABASE MOCKUP
+        // SHARED SYSTEM DATABASE DATAS
         let productsDB = [];
-        
+        let activeShopObj = null;
+
         // MULTI-BILLING TABS ARRAY STORAGE
         let billingTabs = [
-            { id: "tab_1", name: "Tab 1 / பில் 1", cart: [], selectedCustomer: null, is_held: false }
+            { id: "tab_1", name: "Tab 1", cart: [], is_held: false }
         ];
         let activeTabId = "tab_1";
 
@@ -262,9 +276,22 @@
 
         // ON RUNTIME START
         window.addEventListener('DOMContentLoaded', () => {
+            // STEP 3: Secure Maintenance Mode Interceptor (CRITICAL SECURITY ACTION)
+            evaluateSystemMaintenance();
+
             // Retrieve shared DB components
             productsDB = JSON.parse(localStorage.getItem('roaji_products')) || [];
             
+            // STEP 1: Dynamic Active Shop Context Parsing
+            const activeShopId = localStorage.getItem('roaji_active_shop_id') || 'shop_gift';
+            const registeredSaaSShops = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+            activeShopObj = registeredSaaSShops.find(s => s.id === activeShopId);
+
+            // Set active shop context on page layouts
+            if (activeShopObj) {
+                document.getElementById('active-shop-header-title').innerText = `Workspace Context: ${activeShopObj.name} | Active Plan: ${activeShopObj.plan}`;
+            }
+
             const savedGlobalLang = localStorage.getItem('roaji_language');
             if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
                 currentLang = savedGlobalLang;
@@ -275,6 +302,17 @@
             renderBillingTabsBar();
             renderActiveTabCart();
         });
+
+        // SECURE MAINTENANCE MODE INTERCEPTOR
+        function evaluateSystemMaintenance() {
+            const state = localStorage.getItem('roaji_maintenance_mode') || 'OFF';
+            if (state === 'ON') {
+                showToast("System Maintenance Mode Active. Software under optimization.", "error");
+                setTimeout(() => {
+                    window.location.href = "https://iamajithkumar98-bit.github.io/roaji/shop_resolver.html";
+                }, 1000);
+            }
+        }
 
         // LANGUAGE TOGGLE
         function changeLanguage(lang) {
@@ -314,7 +352,7 @@
             const activeTabsElements = document.querySelectorAll('.dynamic-tab-btn');
             activeTabsElements.forEach(el => el.remove());
 
-            billingTabs.forEach(tab => {
+            billingTabs.forEach((tab, index) => {
                 const activeStyle = tab.id === activeTabId 
                     ? 'bg-orange-600 text-white shadow-md' 
                     : 'bg-stone-900 border border-stone-850 text-stone-300';
@@ -323,7 +361,7 @@
                 const btn = document.createElement('button');
                 btn.className = `dynamic-tab-btn px-4 py-1.5 text-xs font-bold rounded-xl transition flex items-center gap-2 ${activeStyle}`;
                 btn.innerHTML = `
-                    <span onclick="switchActiveTab('${tab.id}')">${tab.name}</span>
+                    <span onclick="switchActiveTab('${tab.id}')">Tab ${index + 1}</span>
                     <span onclick="event.stopPropagation(); closeBillingTab('${tab.id}')" class="text-stone-500 hover:text-rose-500 text-[10px] ml-1.5">✖</span>
                 `;
                 
@@ -333,13 +371,10 @@
 
         function createNewBillingTab() {
             const newId = "tab_" + Date.now();
-            const tabCount = billingTabs.length + 1;
             
             billingTabs.push({
                 id: newId,
-                name: `Tab ${tabCount} / பில் ${tabCount}`,
                 cart: [],
-                selectedCustomer: null,
                 is_held: false
             });
 
@@ -481,7 +516,7 @@
                 container.innerHTML += `
                     <div class="p-3.5 bg-stone-950 border border-stone-850 rounded-2xl flex justify-between items-center group hover:border-amber-500 transition">
                         <div>
-                            <h4 class="text-xs font-bold text-stone-200">${tx.tabName}</h4>
+                            <h4 class="text-xs font-bold text-stone-200">Tab State ${idx + 1}</h4>
                             <span class="text-[9px] text-stone-500 font-bold block mt-1">${tx.timestamp} (${tx.cart.length} items)</span>
                         </div>
                         <button onclick="resumeHeldTransaction('${tx.id}')" class="px-2 py-1 bg-amber-600 hover:bg-amber-700 text-stone-950 font-bold text-[9px] rounded-lg tracking-wider uppercase transition">Resume</button>
@@ -545,47 +580,103 @@
             document.getElementById('split-balance').innerText = `₹${remainingBalance.toFixed(2)}`;
         }
 
-        // ==================== FEATURE C: OUTPUT DISPATCH ENGINE ====================
-        function dispatchBillingOutput(mode) {
+        // ==================== FEATURE C & D: OUTPUT DISPATCH & WHITE LABEL BRANDING ====================
+        function saveAndPrintInvoice() {
             const activeTab = billingTabs.find(t => t.id === activeTabId);
             if (!activeTab || activeTab.cart.length === 0) {
-                showToast("Cart is empty! Cannot dispatch billing transaction.", "error");
+                showToast("Cart is empty! Cannot generate invoice.", "error");
                 return;
             }
 
-            if (mode === 'print') {
-                showToast("Broadcasting raw ESC/POS thermal command stream...", "success");
-            } else if (mode === 'pdf') {
-                showToast("Generating secure client PDF invoice blob...", "success");
-            } else if (mode === 'whatsapp') {
-                showToast("AI Bot triggered: Sending PDF link via automated WhatsApp gateway...", "success");
-            }
+            // Fetch central custom branding footer from Super Admin (STEP 2)
+            const whiteLabelFooter = localStorage.getItem('roaji_bill_footer_branding') || "ROAJI Enterprise Billing SaaS";
 
-            // Log dynamic transaction out to database
-            const mockSales = JSON.parse(localStorage.getItem('roaji_sales')) || [];
-            mockSales.unshift({
-                invoiceNo: "ROAJI-" + Math.floor(100000 + Math.random() * 900000),
-                date: new Date().toISOString().split('T')[0],
-                customer: "POS walk-in client",
-                cost: calculatedTotals.subtotal * 0.6, // simulated base cost margin
-                total: calculatedTotals.grandTotal,
-                tax: calculatedTotals.tax,
-                profit: calculatedTotals.grandTotal - (calculatedTotals.subtotal * 0.6)
-            });
-            localStorage.setItem('roaji_sales', JSON.stringify(mockSales));
+            // Fetch dynamic merchant profile details
+            const storeName = activeShopObj ? activeShopObj.name : "ROAJI STORE";
+            const storePhone = activeShopObj ? (activeShopObj.phone || '9876543210') : '9876543210';
+            const storeAddress = activeShopObj ? (activeShopObj.address || 'Chennai, TN') : 'Chennai, TN';
+            const storeGstin = activeShopObj ? (activeShopObj.gstin || 'N/A') : 'N/A';
 
-            // Subtract quantities from mock shared inventory DB
+            let itemsRows = '';
             activeTab.cart.forEach(item => {
-                const dbProduct = productsDB.find(p => p.id === item.product.id);
-                if (dbProduct) {
-                    dbProduct.stock = Math.max(0, dbProduct.stock - item.qty);
-                }
+                itemsRows += `
+                    <div class="flex justify-between py-1 border-b border-stone-200/50">
+                        <span>${item.product.name[currentLang]} (x${item.qty})</span>
+                        <span>₹${(item.product.price * item.qty).toFixed(2)}</span>
+                    </div>
+                `;
             });
-            localStorage.setItem('roaji_products', JSON.stringify(productsDB));
 
-            // Clear current tab cart and switch view context
-            activeTab.cart = [];
-            renderActiveTabCart();
+            // Populate thermal modal print view with dynamic profile & white label footer
+            document.getElementById('printable-invoice-area').innerHTML = `
+                <div class="text-stone-900 leading-relaxed font-mono">
+                    <div class="text-center pb-2 mb-2 border-b border-stone-900">
+                        <h4 class="font-bold text-sm uppercase">${storeName}</h4>
+                        <p class="text-[10px] text-stone-500">${storeAddress}</p>
+                        <p class="text-[10px] text-stone-500 font-bold">Phone: ${storePhone} | GSTIN: ${storeGstin}</p>
+                    </div>
+
+                    <div class="space-y-1 mb-2 text-[10px] text-stone-600 border-b border-stone-900 pb-2">
+                        <div>Invoice No: <strong>ROAJI-${Math.floor(100000 + Math.random() * 900000)}</strong></div>
+                        <div>Date: <strong>${new Date().toLocaleDateString()}</strong></div>
+                        <div>Payment: <strong>Split Pay (Cash/UPI)</strong></div>
+                    </div>
+
+                    <div class="text-[10px] space-y-1 py-1">
+                        ${itemsRows}
+                    </div>
+
+                    <div class="text-right border-t border-stone-900 pt-2 text-[10px] font-bold space-y-1">
+                        <div>Subtotal: ₹${calculatedTotals.subtotal.toFixed(2)}</div>
+                        <div>Tax Sum: ₹${calculatedTotals.tax.toFixed(2)}</div>
+                        <div class="text-sm border-t border-stone-300 pt-1 mt-1 text-orange-600">Grand Total: ₹${calculatedTotals.grandTotal.toFixed(2)}</div>
+                    </div>
+
+                    <div class="text-center pt-4 text-[9px] text-stone-500 border-t border-stone-300 mt-4 uppercase font-bold tracking-wider">
+                        ${whiteLabelFooter}
+                    </div>
+                </div>
+            `;
+
+            // Open popup
+            openInvoiceModal();
+        }
+
+        function openInvoiceModal() {
+            const modal = document.getElementById('invoice-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeInvoiceModal() {
+            const modal = document.getElementById('invoice-modal');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                
+                // Clear active cart & redirect safely upon complete transaction
+                const activeTab = billingTabs.find(t => t.id === activeTabId);
+                if (activeTab) {
+                    activeTab.cart = [];
+                    renderActiveTabCart();
+                }
+            }, 200);
+        }
+
+        function dispatchBillingOutput(mode) {
+            if (mode === 'print') {
+                saveAndPrintInvoice();
+            } else if (mode === 'pdf') {
+                showToast("Generating dynamic PDF file download...", "success");
+            } else if (mode === 'whatsapp') {
+                showToast("Triggering n8n AI WhatsApp webhook trigger dispatch...", "success");
+            }
         }
 
         // ==================== DYNAMIC GRAPH LIST CONTROLLERS ====================
@@ -707,7 +798,6 @@
         }
 
         function toggleSidebar(open) {
-            // Simulated toggle action
             showToast("Sidebar toggled", "info");
         }
 
@@ -728,7 +818,7 @@
 
             if (type === 'success') {
                 bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
-                iconSvg = `<svg class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             } else if (type === 'error') {
                 bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
                 iconSvg = `<svg class="h-5 w-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
