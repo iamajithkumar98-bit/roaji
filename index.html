@@ -442,14 +442,14 @@
             if (viewName === 'suspended') suspendedView.classList.remove('hidden');
         }
 
-        // ==================== STATE 1: MOCK FIREBASE SECURE LOGIN ====================
+        // ==================== STATE 1: RE-ALIGNED SECURE AUTH GATEWAY ROUTING ====================
         function handleLoginSubmit(event) {
             event.preventDefault();
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
             const rememberMe = document.getElementById('remember-me').checked;
 
-            // 1. Super Admin Authentication Route (CRITICAL FIX)
+            // 1. Super Admin Authentication Route (CRITICAL FIX - HARDCODED ABSOLUTE PATH)
             if (email === "iamajithkumar98@gmail.com" && password === "Roaji.inbilling") {
                 if (rememberMe) {
                     localStorage.setItem('remembered_roaji_email', email);
@@ -462,12 +462,12 @@
                 // Initialize secure admin session claim
                 sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "SUPER_ADMIN", is_active: true }));
 
-                // Force hard programmatic window redirection exactly to: "super_admin_panel.html"
+                // Hard programmatic window redirection exactly to absolute URL
                 setTimeout(() => {
-                    window.location.href = "super_admin_panel.html";
+                    window.location.href = "https://iamajithkumar98-bit.github.io/roaji/super_admin_panel.html";
                 }, 800);
             } 
-            // 2. Multi-Shop Merchant Authentication Route (CRITICAL FIX)
+            // 2. Multi-Shop Merchant Authentication Route (CRITICAL FIX - HARDCODED ABSOLUTE PATH)
             else if (email === "owner@roaji.com" && password === "owner123") {
                 if (rememberMe) {
                     localStorage.setItem('remembered_roaji_email', email);
@@ -480,12 +480,12 @@
                 // Cache simulation state profile context
                 sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "OWNER", is_active: true }));
 
-                // Force hard window redirection exactly to: "shop_resolver.html"
+                // Hard window redirection exactly to absolute URL
                 setTimeout(() => {
-                    window.location.href = "shop_resolver.html";
+                    window.location.href = "https://iamajithkumar98-bit.github.io/roaji/shop_resolver.html";
                 }, 800);
             } 
-            // 3. Suspended User Identity Route (CRITICAL FIX)
+            // 3. Suspended User Identity Route
             else if (email === "blocked@roaji.com" && password === "blocked123") {
                 showToast(langData[currentLang]['toast_blocked_user'], "error");
                 
@@ -498,7 +498,7 @@
             }
         }
 
-        // ==================== STATE 2: REGISTRATION LOGIC ====================
+        // ==================== STATE 2: ONBOARDING REGISTRATION ====================
         function handleRegistrationSubmit(event) {
             event.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
@@ -604,7 +604,7 @@
         function initializeMerchantWorkspace() {
             showToast("Workspace initialized!", "success");
             setTimeout(() => {
-                window.location.href = "index.html"; // Default Same-page context dashboard view
+                window.location.href = "https://iamajithkumar98-bit.github.io/roaji/index.html"; // Redirect cleanly to relative base dashboard index page
             }, 800);
         }
 
