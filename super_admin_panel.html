@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS Suite - Super Admin Panel</title>
+    <title>Roaji SaaS Suite - Super Admin Control Panel</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -13,21 +13,22 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #050505; /* Deep luxury streaming-app dark base */
+            background-color: #050505; /* Obsidian Black Premium Base Theme */
             color: #F5F5F4;
             margin: 0;
+            overflow-x: hidden;
         }
-        .premium-card {
-            background: rgba(18, 16, 15, 0.85); /* Stone-900 Alpha */
+        .premium-glass {
+            background: rgba(18, 16, 15, 0.75); /* Premium Stone-900 Alpha */
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
-        .glow-input:focus {
+        .glow-focus:focus {
             outline: none;
-            border-color: #D97706; /* Warm Amber */
-            box-shadow: 0 0 15px rgba(217, 119, 6, 0.25);
+            border-color: #F97316; /* Orange-500 Neon Accents */
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
         }
         .text-neon-gold {
             color: #F59E0B;
@@ -35,205 +36,242 @@
         }
     </style>
 </head>
-<body id="admin-body" class="min-h-screen relative overflow-x-hidden p-4 md:p-8 flex flex-col items-center justify-start hidden">
+<body id="admin-body" class="min-h-screen relative overflow-x-hidden flex hidden transition-all duration-300">
 
-    <!-- Background Glowing Ambiance -->
+    <!-- Background Radial Neon Ambiance Glows -->
     <div class="absolute top-[-20%] left-[-15%] w-[65vw] h-[65vw] rounded-full bg-amber-500/10 blur-[130px] pointer-events-none"></div>
-    <div class="absolute bottom-[-20%] right-[-15%] w-[65vw] h-[65vw] rounded-full bg-emerald-600/10 blur-[130px] pointer-events-none"></div>
+    <div class="absolute bottom-[-20%] right-[-15%] w-[65vw] h-[65vw] rounded-full bg-orange-600/10 blur-[130px] pointer-events-none"></div>
 
     <!-- TOAST CONTAINER -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
 
-    <!-- MAIN DASHBOARD CONTENT CONTAINER -->
-    <div class="w-full max-w-6xl z-10 space-y-6">
-
-        <!-- HEADER AREA -->
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-stone-800">
-            <div class="space-y-1">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-64 bg-stone-900 text-stone-200 fixed lg:sticky top-0 h-screen z-30 flex flex-col justify-between border-r border-stone-800 transition-transform duration-300">
+        <div>
+            <!-- Brand Title Area -->
+            <div class="p-6 border-b border-stone-800 flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                    <h1 id="app-title" data-key="app_title" class="text-xl font-bold tracking-tight text-white">முதன்மை நிர்வாகக் குழு (Super Admin)</h1>
+                    <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center text-stone-950 font-bold text-lg shadow-md shadow-orange-500/20" style="width: 36px; height: 36px;">R</div>
+                    <div>
+                        <h2 class="font-bold text-sm tracking-tight text-white leading-tight">ROAJI</h2>
+                        <span class="text-[10px] text-orange-500 uppercase tracking-widest font-semibold">SaaS Control</span>
+                    </div>
                 </div>
-                <p class="text-xs text-stone-500 font-semibold uppercase tracking-wider">Identity: iamajithkumar98@gmail.com</p>
             </div>
 
-            <!-- GLOBAL LANGUAGE TOGGLE -->
-            <div class="glass-panel p-1 rounded-2xl flex items-center shadow-sm self-end sm:self-auto bg-stone-950/60 border border-stone-800">
-                <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200">EN</button>
-                <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
+            <!-- Admin Info Indicator -->
+            <div class="p-4 mx-4 my-4 bg-stone-800/50 rounded-xl border border-stone-800/80 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/30 flex items-center justify-center font-bold" style="width: 40px; height: 40px;">SA</div>
+                <div>
+                    <p class="text-xs font-bold text-white leading-tight">Ajith Kumar</p>
+                    <span data-key="sidebar_role_admin" class="text-[9px] text-stone-400 font-medium">சூப்பர் அட்மின் (Super Admin)</span>
+                </div>
+            </div>
+
+            <!-- Main Menu Links -->
+            <nav class="px-3 space-y-1">
+                <button onclick="showSection('queue')" id="menu-btn-queue" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-orange-600 text-white font-medium text-xs">
+                    <span data-key="menu_onboarding_queue">Onboarding Queue</span>
+                </button>
+                <button onclick="showSection('shops')" id="menu-btn-shops" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-stone-400 hover:bg-stone-800 hover:text-white font-medium text-xs">
+                    <span data-key="menu_tenant_list">Tenant Workspace List</span>
+                </button>
+                <button onclick="showSection('security')" id="menu-btn-security" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-stone-400 hover:bg-stone-800 hover:text-white font-medium text-xs">
+                    <span data-key="menu_security_settings">SaaS Security & Identity</span>
+                </button>
+                <a href="https://iamajithkumar98-bit.github.io/roaji/index.html" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-stone-400 hover:bg-stone-800/40 hover:text-white font-medium text-xs">
+                    <span data-key="back_dashboard">Go to Central Gate</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-stone-800 text-center text-xs text-stone-500">ROAJI SuperAdmin v5.0</div>
+    </aside>
+
+    <!-- MAIN WINDOW WRAPPER -->
+    <main class="flex-1 min-w-0 flex flex-col">
+
+        <!-- TOPBAR -->
+        <header class="h-16 premium-glass px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 border-b border-stone-200/40 shadow-sm gap-4">
+            <h1 id="topbar-title" data-key="app_title" class="text-sm font-bold text-white uppercase">முதன்மை நிர்வாகக் குழு (Super Admin Panel)</h1>
+
+            <!-- Global Language Toggle -->
+            <div class="premium-glass p-0.5 rounded-xl flex items-center shadow-inner border border-stone-800/40 bg-stone-900/60">
+                <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-2.5 py-1 text-[10px] font-bold rounded-lg transition duration-200">EN</button>
+                <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-2.5 py-1 text-[10px] font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
             </div>
         </header>
 
-        <!-- STATISTICS BADGES ROW -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="premium-card p-5 rounded-3xl">
-                <span data-key="stat_total_tenants" class="text-[10px] text-stone-500 font-bold block uppercase tracking-wider">Total SaaS Branches</span>
-                <strong id="stat-total-shops" class="text-xl text-stone-200 font-bold block mt-2">0</strong>
-            </div>
-            <div class="premium-card p-5 rounded-3xl">
-                <span data-key="stat_pending_payments" class="text-[10px] text-amber-500 font-bold block uppercase tracking-wider">Pending UTR Verifications</span>
-                <strong id="stat-pending-utr" class="text-xl text-amber-400 font-bold block mt-2">0</strong>
-            </div>
-            <div class="premium-card p-5 rounded-3xl">
-                <span data-key="stat_active_lic" class="text-[10px] text-emerald-500 font-bold block uppercase tracking-wider">Active Workspace Licenses</span>
-                <strong id="stat-active-shops" class="text-xl text-emerald-400 font-bold block mt-2">0</strong>
-            </div>
-            <div class="premium-card p-5 rounded-3xl">
-                <span data-key="stat_global_mrr" class="text-[10px] text-orange-500 font-bold block uppercase tracking-wider">Global System MRR</span>
-                <strong id="stat-mrr" class="text-xl text-orange-400 font-bold block mt-2">₹0.00</strong>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- ==================== VIEW 1: ONBOARDING QUEUE ==================== -->
+        <div id="section-queue" class="view-panel p-4 lg:p-6 space-y-6">
             
-            <!-- MODULE A: SaaS ONBOARDING UTR VERIFICATION QUEUE (Col 8) -->
-            <div class="lg:col-span-8 space-y-6">
-                <div class="premium-card p-6 rounded-3xl">
-                    <div class="border-b border-stone-800 pb-3 mb-4">
-                        <h2 data-key="queue_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest">SaaS Onboarding Payment Verification Queue</h2>
-                        <p data-key="queue_desc" class="text-[10px] text-stone-500 mt-1">Audit incoming UTR settlement codes against configuration parameters.</p>
-                    </div>
-
-                    <!-- UTR Verification Queue Table -->
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead>
-                                <tr class="border-b border-stone-800 text-stone-500 font-bold">
-                                    <th class="py-3 px-2" data-key="th_merchant">Merchant</th>
-                                    <th class="py-3 px-2" data-key="th_tier">Selected Tier</th>
-                                    <th class="py-3 px-2 text-center">UTR Reference</th>
-                                    <th class="py-3 px-2 text-center" data-key="th_status">Status</th>
-                                    <th class="py-3 px-2 text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="utr-table-body" class="divide-y divide-stone-850">
-                                <!-- Populated Dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
+            <!-- Statistics widget cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="premium-glass p-5 rounded-3xl">
+                    <span data-key="stat_total_tenants" class="text-[10px] text-stone-500 font-bold block uppercase tracking-wider">Total SaaS Branches</span>
+                    <strong id="stat-total-shops" class="text-xl text-stone-200 font-bold block mt-2">0</strong>
                 </div>
-
-                <!-- MODULE B: GLOBAL SHOP & ENTERPRISE TENANT CONTROL LIST -->
-                <div class="premium-card p-6 rounded-3xl">
-                    <div class="border-b border-stone-800 pb-3 mb-4">
-                        <h2 data-key="shops_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest">Global Shop & Enterprise Tenant Control List</h2>
-                        <p data-key="shops_desc" class="text-[10px] text-stone-500 mt-1">Configure independent feature gates and modular license flags per registered tenant store.</p>
-                    </div>
-
-                    <div id="shops-control-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Loaded dynamically -->
-                    </div>
+                <div class="premium-glass p-5 rounded-3xl">
+                    <span data-key="stat_pending_payments" class="text-[10px] text-amber-500 font-bold block uppercase tracking-wider">Pending Approvals</span>
+                    <strong id="stat-pending-utr" class="text-xl text-amber-400 font-bold block mt-2">0</strong>
+                </div>
+                <div class="premium-glass p-5 rounded-3xl">
+                    <span data-key="stat_global_mrr" class="text-[10px] text-orange-500 font-bold block uppercase tracking-wider">Global System MRR</span>
+                    <strong id="stat-mrr" class="text-xl text-orange-400 font-bold block mt-2">₹0.00</strong>
                 </div>
             </div>
 
-            <!-- MODULE C: GLOBAL SaaS CONFIGURATION SETTINGS (Col 4) -->
-            <div class="lg:col-span-4 space-y-6">
-                <div class="premium-card p-6 rounded-3xl space-y-4">
-                    <div class="border-b border-stone-800 pb-3">
-                        <h3 data-key="config_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest">SaaS Settings Configuration</h3>
-                    </div>
-
-                    <!-- Config inputs -->
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Super Admin Destination UPI ID</label>
-                            <input id="config-upi-id" type="text" value="roajisystems@upi" oninput="saveGlobalConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-input">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Pro Suite Price (₹ / Month)</label>
-                            <input id="config-price-pro" type="number" value="1499" oninput="saveGlobalConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-input">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Enterprise Lifetime Price (₹)</label>
-                            <input id="config-price-ent" type="number" value="9999" oninput="saveGlobalConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-input">
-                        </div>
-                    </div>
-
-                    <div class="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl">
-                        <p class="text-[10px] text-stone-400 leading-relaxed">Updating configurations dynamically modifies the automated payment QR generators across the entire client onboarding flow in real time.</p>
-                    </div>
+            <!-- Queue table -->
+            <div class="premium-glass p-6 rounded-3xl">
+                <h3 data-key="queue_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2 mb-4">SaaS Onboarding Payment Verification Queue</h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="border-b border-stone-850 text-stone-500 font-bold">
+                                <th class="py-3 px-2" data-key="th_merchant">Merchant</th>
+                                <th class="py-3 px-2" data-key="lbl_shop_phone">Phone</th>
+                                <th class="py-3 px-2" data-key="lbl_shop_address">Address</th>
+                                <th class="py-3 px-2" data-key="lbl_shop_gstin">GSTIN</th>
+                                <th class="py-3 px-2 text-center" data-key="th_status">Status</th>
+                                <th class="py-3 px-2 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="utr-table-body" class="divide-y divide-stone-850">
+                            <!-- Loaded Dynamically -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
         </div>
 
+        <!-- ==================== VIEW 2: TENANT WORKSPACE MANAGEMENT ==================== -->
+        <div id="section-shops" class="view-panel p-4 lg:p-6 hidden">
+            <div class="premium-glass p-6 rounded-3xl">
+                <h3 data-key="shops_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2 mb-4">Global Shop & Enterprise Tenant Control List</h3>
+                <div id="shops-control-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 3: SYSTEM SECURITY SETTINGS ==================== -->
+        <div id="section-security" class="view-panel p-4 lg:p-6 hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-6 premium-glass p-6 rounded-3xl space-y-4">
+                <h3 data-key="config_title" class="text-xs font-bold text-stone-400 uppercase tracking-widest border-b border-stone-850 pb-2">Admin Identity Settings</h3>
+                
+                <!-- Credentials Config -->
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Backup Recovery Email</label>
+                        <input id="config-backup-email" type="email" placeholder="superadmin@backup.com" oninput="saveAdminSecurityConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Master Gate Password (Override default "Roaji.inbilling")</label>
+                        <input id="config-master-password" type="password" placeholder="••••••••" oninput="saveAdminSecurityConfig()" class="w-full px-3 py-2 bg-stone-950/60 border border-stone-850 rounded-xl text-stone-300 text-xs glow-focus">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== DYNAMIC PACKAGE CUSTOMIZER MODAL (13 NICHES) ==================== -->
+    <div id="customizer-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-md z-50 items-center justify-center p-4 hidden transition-all duration-300">
+        <div class="w-full max-w-lg premium-glass p-6 rounded-3xl shadow-xl transform scale-95 transition-all space-y-4">
+            <h3 id="modal-customizer-title" class="text-sm font-bold text-white border-b border-stone-850 pb-2">✏️ Edit Package & Manage Shops</h3>
+            <p class="text-[11px] text-stone-400">Add or remove distinct operational store modules for this tenant securely.</p>
+            
+            <!-- Checkbox matrix of 13 blueprint nodes -->
+            <form id="customizer-form" onsubmit="saveCustomizedPackage(event)">
+                <input type="hidden" id="customizer-shop-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs h-56 overflow-y-auto p-1 border border-stone-800 rounded-xl bg-stone-950/50" id="modal-niches-grid">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div class="flex gap-2 pt-4">
+                    <button type="button" onclick="closeCustomizerModal()" class="flex-1 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium rounded-xl text-xs transition">Cancel</button>
+                    <button type="submit" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-stone-950 font-bold rounded-xl text-xs transition shadow">Save & Grant Lifetime Access</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- VANILLA JS STATE & AUTH SECURITY SYSTEM -->
+    <!-- VANILLA JS CORE SYSTEM CONTROLLERS -->
     <script>
-        // BILINGUAL LANGUAGE TRANSLATOR DICTIONARY
         const langData = {
             en: {
-                app_title: "SaaS Super Admin Control Panel",
-                back_dashboard: "← Return to Main Dashboard View",
+                app_title: "SaaS Super Admin Control Room",
+                back_dashboard: "← Go back to Central Gate",
+                sidebar_role_admin: "Super Admin Control",
+                menu_onboarding_queue: "Onboarding Queue",
+                menu_tenant_list: "Tenant Workspace List",
+                menu_security_settings: "SaaS Security & Identity",
                 stat_total_tenants: "Total Tenant Branches",
                 stat_pending_payments: "UTR Verifications Pending",
-                stat_active_lic: "Active System Licenses",
+                stat_active_lic: "Active Workspace Licenses",
                 stat_global_mrr: "Global System MRR",
                 queue_title: "SaaS Onboarding Payment Verification Queue",
-                queue_desc: "Audit incoming UTR settlement codes against configuration parameters.",
                 th_merchant: "Merchant Details",
-                th_tier: "Selected Tier",
+                lbl_shop_phone: "Phone",
+                lbl_shop_address: "Address",
+                lbl_shop_gstin: "GSTIN",
                 th_status: "Status",
                 shops_title: "Global Shop & Enterprise Tenant Control List",
-                shops_desc: "Configure independent feature gates and modular license flags per registered tenant store.",
-                config_title: "SaaS Settings Configuration",
-                toast_approved: "Merchant license activated successfully!",
+                config_title: "Admin Identity Settings",
+                toast_approved: "Merchant license activated successfully! Status: Active_Lifetime_Free",
                 toast_rejected: "UTR reference rejected.",
-                toast_config_saved: "Global configurations modified!"
+                toast_config_saved: "SaaS security overrides updated successfully!"
             },
             ta: {
-                app_title: "முதன்மை நிர்வாகக் குழு (Super Admin)",
-                back_dashboard: "← முகப்புப்பக்கத்திற்குச் செல்",
+                app_title: "முதன்மை நிர்வாகக் குழு (Super Admin Panel)",
+                back_dashboard: "← உள்நுழைவுப் பக்கத்திற்குச் செல்",
+                sidebar_role_admin: "சூப்பர் அட்மின்",
+                menu_onboarding_queue: "சரிபார்ப்புப் பட்டியல்",
+                menu_tenant_list: "வணிகர்களின் பட்டியல்",
+                menu_security_settings: "பாதுகாப்பு அமைப்புகள்",
                 stat_total_tenants: "மொத்த கிளைக் கடைகள்",
-                stat_pending_payments: "நிலுவையில் உள்ள யுபிஐ சரிபார்ப்புகள்",
+                stat_pending_payments: "சரிபார்ப்புகள் நிலுவையில்",
                 stat_active_lic: "செயலில் உள்ள உரிமங்கள்",
                 stat_global_mrr: "ஒட்டுமொத்த SaaS வருமானம் (MRR)",
                 queue_title: "SaaS தானியங்கி கட்டணச் சரிபார்ப்புப் பட்டியல்",
-                queue_desc: "வாடிக்கையாளர்கள் செலுத்திய UTR எண்களைச் சரிபார்த்து அனுமதியை வழங்கவும்.",
                 th_merchant: "வணிகர் விவரங்கள்",
-                th_tier: "தேர்வு செய்யப்பட்ட திட்டம்",
+                lbl_shop_phone: "தொலைபேசி",
+                lbl_shop_address: "முகவரி",
+                lbl_shop_gstin: "ஜிஎஸ்டி",
                 th_status: "நிலை",
                 shops_title: "உலகளாவிய கடைகள் மற்றும் உரிமங்கள் மேலாண்மை",
-                shops_desc: "இணைக்கப்பட்டுள்ள கிளைகளின் மாஸ்டர் அம்சங்களையும் தொகுப்பு அனுமதிகளையும் இங்கிருந்து கட்டுப்படுத்தவும்.",
-                config_title: "உலகளாவிய SaaS கட்டமைப்பு அமைப்புகள்",
-                toast_approved: "வணிகர் கணக்கு வெற்றிகரமாகச் செயல்படுத்தப்பட்டது!",
+                config_title: "நிர்வாகி அடையாள அமைப்புகள்",
+                toast_approved: "வணிகர் கணக்கு வெற்றிகரமாகச் செயல்படுத்தப்பட்டது! நிலை: Active_Lifetime_Free",
                 toast_rejected: "யுபிஐ குறிப்பு எண் நிராகரிக்கப்பட்டது.",
-                toast_config_saved: "SaaS கட்டமைப்பு விவரங்கள் புதுப்பிக்கப்பட்டன!"
+                toast_config_saved: "நிர்வாக அமைப்புகள் வெற்றிகரமாகச் சேமிக்கப்பட்டன!"
             }
         };
 
-        let currentLang = 'en';
+        const blueprintShopsData = [
+            { id: "xerox", name: { en: "Xerox Matrix", ta: "ஜெராக்ஸ் மேட்ரிக்ஸ்" } },
+            { id: "photo_studio", name: { en: "Photo Studio", ta: "போட்டோ ஸ்டுடியோ" } },
+            { id: "custom_frames", name: { en: "Custom Frames", ta: "ஃபிரேமிங் யூனிட்" } },
+            { id: "stationery", name: { en: "Stationery Zone", ta: "ஸ்டேஷனரி அங்காடி" } },
+            { id: "premium_gifts", name: { en: "Premium Gifts Zone", ta: "பரிசுப் பொருட்கள்" } },
+            { id: "mobile_tech", name: { en: "Mobile & Tech", ta: "மொபைல் & ஸ்பேர்ஸ்" } },
+            { id: "printing_tech", name: { en: "Printing & Tech Suite", ta: "பிரிண்டிங் சிஸ்டம்ஸ்" } },
+            { id: "csc_esevai", name: { en: "Internet Cafe & e-Sevai / CSC", ta: "இணைய சேவை & இ-சேவை" } },
+            { id: "toys_meesho", name: { en: "Toys Zone & Meesho Packing", ta: "விளையாட்டுப் பொருட்கள் & Meesho" } },
+            { id: "money_transfer", name: { en: "Money Transfer Ledger", ta: "பணப் பரிமாற்றம்" } },
+            { id: "fabrication", name: { en: "Welding, Roof & SS Fabrication Works", ta: "வெல்டிங் & ஃபேப்ரிகேஷன்" } },
+            { id: "bakery_core", name: { en: "Bakery Core Counter", ta: "பேக்கரி கவுண்டர்" } },
+            { id: "tea_shop", name: { en: "Tea Shop Quick Billing", ta: "டீ ஷாப் கவுண்டர்" } }
+        ];
 
-        // STATIC HARDCODED IDENTITY ACCESS RULE
+        let currentLang = 'en';
         const SUPER_ADMIN_EMAIL = "iamajithkumar98@gmail.com";
 
-        // MOCK ONBOARDING TRANSACTIONS DATA
-        let pendingPayments = [
-            { id: "tx_101", merchant: "அ அஜித் குமார் (Ajith)", shop: "ROAJI Frame Shop", type: "Frame Shop", tier: "Pro Suite", utr: "389021840194", status: "PENDING_VERIFICATION", price: 1499 },
-            { id: "tx_102", merchant: "ரோஹித் குமார் (Rohit)", shop: "ROAJI Bakery", type: "Bakery", tier: "Enterprise", utr: "392019401924", status: "PENDING_VERIFICATION", price: 9999 }
-        ];
+        let shopsDB = [];
 
-        // MOCK GLOBAL TENANT STORES SCHEMA
-        let registeredShops = [
-            { id: "shop_gift", name: "ROAJI Gifts Studio (Chennai)", type: "Gift Shop", owner: "Ajith Kumar", license: "Active", flags: { pos: true, inventory: true, whatsapp: true, logistics: false, glow: true } },
-            { id: "shop_textile", name: "ROAJI Textiles (Madurai)", type: "Textiles", owner: "Rohit Kumar", license: "Active", flags: { pos: true, inventory: true, whatsapp: false, logistics: false, glow: false } },
-            { id: "shop_bakery", name: "ROAJI Bakery (Coimbatore)", type: "Bakery", owner: "Kavitha Selvam", license: "Expired", flags: { pos: true, inventory: false, whatsapp: false, logistics: false, glow: false } }
-        ];
-
-        // INITIAL IDENTITY ACCESS AUDIT GATE
+        // INITIAL SECURITY AUDIT GATE
         window.addEventListener('DOMContentLoaded', () => {
-            // Check session sessionStorage claims
             const sessionClaims = JSON.parse(sessionStorage.getItem('roaji_session_claims'));
             
-            // For easy local file testing, let's auto-inject SUPER_ADMIN session if ?test=true query parameter is matched
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('test') === 'true') {
-                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: SUPER_ADMIN_EMAIL, role: "SUPER_ADMIN" }));
-                window.location.href = "super_admin_panel.html"; // Reload cleanly
-                return;
-            }
-
             if (!sessionClaims || sessionClaims.role !== "SUPER_ADMIN") {
                 // INSTANTLY WIPE BODY SCREEN ON SECURITY ALERT
                 document.getElementById('admin-body').innerHTML = '';
@@ -241,26 +279,28 @@
                 document.getElementById('admin-body').innerText = "SECURITY ALERT: Access Denied! Redirecting to Auth Gateway...";
                 
                 setTimeout(() => {
-                    window.location.href = "auth_gateway.html";
+                    window.location.href = "https://iamajithkumar98-bit.github.io/roaji/index.html";
                 }, 1500);
                 return;
             }
 
-            // If verified, display UI body cleanly
+            // Reveal body if authenticated
             document.getElementById('admin-body').classList.remove('hidden');
+
+            shopsDB = JSON.parse(localStorage.getItem('roaji_shops')) || [];
 
             const savedGlobalLang = localStorage.getItem('roaji_language');
             if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
                 currentLang = savedGlobalLang;
             }
             applyLanguage();
-            loadGlobalConfig();
+            loadAdminSecurityConfig();
             renderOnboardingQueue();
             renderShopsControlList();
             updateStatisticsBadges();
         });
 
-        // LANGUAGE TOGGLE
+        // LANGUAGE TOGGLES
         function changeLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('roaji_language', lang);
@@ -274,11 +314,11 @@
             const btnEn = document.getElementById('lang-btn-en');
 
             if (currentLang === 'ta') {
-                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
-                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+                btnTa.className = "px-2.5 py-1 text-[10px] font-bold rounded-lg bg-orange-600 text-white shadow-sm";
+                btnEn.className = "px-2.5 py-1 text-[10px] font-bold rounded-lg text-stone-400";
             } else {
-                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
-                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+                btnEn.className = "px-2.5 py-1 text-[10px] font-bold rounded-lg bg-orange-600 text-white shadow-sm";
+                btnTa.className = "px-2.5 py-1 text-[10px] font-bold rounded-lg text-stone-400";
             }
 
             const elements = document.querySelectorAll('[data-key]');
@@ -290,32 +330,46 @@
             });
         }
 
-        // ==================== MODULE A: UTR VERIFICATION LOGIC ====================
+        // SIDEBAR NAVIGATION VIEW ROUTER
+        function showSection(sectionName) {
+            document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-stone-400 hover:bg-stone-800 hover:text-white font-medium text-xs";
+            });
+
+            document.getElementById(`section-${sectionName}`).classList.remove('hidden');
+            document.getElementById(`menu-btn-${sectionName}`).className = "menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-orange-600 text-white font-medium text-xs";
+        }
+
+        // ==================== MODULE A: SAAS ONBOARDING QUEUE ====================
         function renderOnboardingQueue() {
             const tableBody = document.getElementById('utr-table-body');
             tableBody.innerHTML = '';
 
-            if (pendingPayments.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-stone-500 font-semibold">Queue is empty! No pending payments.</td></tr>`;
+            const pending = shopsDB.filter(s => s.status === "PENDING_SUPER_ADMIN_APPROVAL");
+
+            if (pending.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-stone-500 font-semibold">Queue is empty. No pending registrations.</td></tr>`;
                 return;
             }
 
-            pendingPayments.forEach(p => {
+            pending.forEach(s => {
                 tableBody.innerHTML += `
                     <tr class="border-b border-stone-850 hover:bg-stone-900/40">
                         <td class="py-4 px-2">
-                            <p class="font-bold text-stone-200">${p.merchant}</p>
-                            <span class="text-[10px] text-stone-500 font-semibold uppercase tracking-wider">${p.shop} (${p.type})</span>
+                            <p class="font-bold text-stone-200">${s.owner_name}</p>
+                            <span class="text-[10px] text-stone-500 font-semibold uppercase tracking-wider">${s.name}</span>
                         </td>
-                        <td class="py-4 px-2 text-stone-300 font-semibold">${p.tier}</td>
-                        <td class="py-4 px-2 text-center font-mono font-bold text-stone-400">${p.utr}</td>
+                        <td class="py-4 px-2 font-mono text-stone-400">${s.phone || 'N/A'}</td>
+                        <td class="py-4 px-2 text-stone-400 text-xs">${s.address || 'N/A'}</td>
+                        <td class="py-4 px-2 font-mono text-stone-400">${s.gstin || 'N/A'}</td>
                         <td class="py-4 px-2 text-center">
-                            <span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wider animate-pulse">${p.status}</span>
+                            <span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wider animate-pulse">${s.status}</span>
                         </td>
                         <td class="py-4 px-2 text-center">
                             <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="approveMerchantTenant('${p.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] rounded-lg transition">Approve</button>
-                                <button onclick="rejectMerchantTenant('${p.id}')" class="px-2.5 py-1 bg-rose-950 hover:bg-rose-900 text-rose-300 font-bold text-[10px] rounded-lg transition border border-rose-500/20">Reject</button>
+                                <button onclick="openCustomizerModal('${s.id}')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-stone-950 font-bold text-[10px] rounded-lg transition">✏️ Edit Package</button>
+                                <button onclick="rejectMerchantTenant('${s.id}')" class="px-2.5 py-1 bg-rose-950 hover:bg-rose-900 text-rose-300 font-bold text-[10px] rounded-lg transition border border-rose-500/20">Reject</button>
                             </div>
                         </td>
                     </tr>
@@ -323,134 +377,143 @@
             });
         }
 
-        // APPROVAL FLOW
-        function approveMerchantTenant(txId) {
-            const tx = pendingPayments.find(p => p.id === txId);
-            if (!tx) return;
-
-            // Generate active Shop structure in Master list
-            const newActiveShop = {
-                id: "shop_" + Date.now(),
-                name: tx.shop,
-                type: tx.type,
-                owner: tx.merchant,
-                license: "Active",
-                flags: { pos: true, inventory: true, whatsapp: true, logistics: false, glow: false }
-            };
-
-            // Push to shops state
-            registeredShops.push(newActiveShop);
-            
-            // Pop out of UTR pending queue
-            pendingPayments = pendingPayments.filter(p => p.id !== txId);
-
-            renderOnboardingQueue();
-            renderShopsControlList();
-            updateStatisticsBadges();
-
-            showToast(langData[currentLang]['toast_approved'], "success");
-        }
-
-        function rejectMerchantTenant(txId) {
-            pendingPayments = pendingPayments.filter(p => p.id !== txId);
+        function rejectMerchantTenant(id) {
+            shopsDB = shopsDB.filter(s => s.id !== id);
+            saveShopsToLocalStorage();
             renderOnboardingQueue();
             updateStatisticsBadges();
             showToast(langData[currentLang]['toast_rejected'], "error");
         }
 
-        // ==================== MODULE B: TENANT DIRECTORY & FLAGS CONFIGURATOR ====================
+        // ==================== DYNAMIC PACKAGE CUSTOMIZER MODAL ====================
+        function openCustomizerModal(shopId) {
+            const shop = shopsDB.find(s => s.id === shopId);
+            if (!order) {
+                // Seed temp initial fields if needed
+            }
+
+            document.getElementById('customizer-shop-id').value = shopId;
+            
+            // Render 13 checkboxes inside customizer grid
+            const grid = document.getElementById('modal-niches-grid');
+            grid.innerHTML = '';
+
+            const registeredTypesArray = shop.type ? shop.type.split(', ') : [];
+
+            blueprintShopsData.forEach(node => {
+                const isChecked = registeredTypesArray.includes(node.id) || registeredTypesArray.includes(node.name.en);
+                grid.innerHTML += `
+                    <label class="p-3 bg-stone-900/60 border border-stone-850 hover:border-stone-800 rounded-xl flex items-center justify-between cursor-pointer transition select-none">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" value="${node.id}" ${isChecked ? 'checked' : ''} class="customizer-niche-chk rounded border-stone-800 bg-stone-950 text-orange-500 w-4 h-4">
+                            <span class="text-stone-300 font-semibold leading-tight text-[11px]">${node.name[currentLang]}</span>
+                        </div>
+                    </label>
+                `;
+            });
+
+            const modal = document.getElementById('customizer-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeCustomizerModal() {
+            const modal = document.getElementById('customizer-modal');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => { modal.classList.remove('flex'); modal.classList.add('hidden'); }, 200);
+        }
+
+        function saveCustomizedPackage(event) {
+            event.preventDefault();
+            const shopId = document.getElementById('customizer-shop-id').value;
+            const shop = shopsDB.find(s => s.id === shopId);
+
+            if (shop) {
+                const checkboxes = document.querySelectorAll('.customizer-niche-chk');
+                let mutatedNiches = [];
+                checkboxes.forEach(chk => {
+                    if (chk.checked) mutatedNiches.push(chk.value);
+                });
+
+                // Overrides registered modules
+                shop.type = mutatedNiches.join(', ');
+                shop.status = "Active_Lifetime_Free"; // FLIP STATE TOKEN
+
+                saveShopsToLocalStorage();
+                closeCustomizerModal();
+                renderOnboardingQueue();
+                renderShopsControlList();
+                updateStatisticsBadges();
+
+                showToast(langData[currentLang]['toast_approved'], "success");
+            }
+        }
+
+        // ==================== MODULE B: SHops control directory ====================
         function renderShopsControlList() {
             const grid = document.getElementById('shops-control-grid');
             grid.innerHTML = '';
 
-            registeredShops.forEach(shop => {
-                const licenseStyle = shop.license === "Active" 
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-                    : "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+            const activeShops = shopsDB.filter(s => s.status === "Active_Lifetime_Free" || s.status === "Active");
 
+            if (activeShops.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center text-xs text-stone-500 py-6">No active workspace licenses found.</div>`;
+                return;
+            }
+
+            activeShops.forEach(shop => {
                 grid.innerHTML += `
-                    <div class="p-5 bg-stone-950/40 border border-stone-850 rounded-3xl space-y-4">
+                    <div class="p-5 bg-stone-950/40 border border-stone-850 rounded-3xl space-y-3">
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-bold text-stone-200 text-xs">${shop.name}</h4>
-                                <span class="text-[9px] text-stone-500 font-bold uppercase tracking-wider block mt-0.5">Owner: ${shop.owner}</span>
+                                <span class="text-[9px] text-stone-500 font-bold uppercase tracking-wider block mt-0.5">Owner: ${shop.owner_name || 'N/A'}</span>
                             </div>
-                            <span class="px-2 py-0.5 text-[9px] font-bold rounded uppercase ${licenseStyle}">${shop.license}</span>
+                            <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase">ACTIVE_LIFETIME</span>
                         </div>
-
-                        <!-- Configurator checkboxes -->
-                        <div class="space-y-2 pt-2 border-t border-stone-900 text-[10px] text-stone-400">
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <span>[ Billing POS Engine ]</span>
-                                <input type="checkbox" onchange="toggleFeatureFlag('${shop.id}', 'pos')" ${shop.flags.pos ? 'checked' : ''} class="rounded border-stone-800 bg-stone-950 text-orange-500 w-4 h-4">
-                            </label>
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <span>[ Inventory Manager ]</span>
-                                <input type="checkbox" onchange="toggleFeatureFlag('${shop.id}', 'inventory')" ${shop.flags.inventory ? 'checked' : ''} class="rounded border-stone-800 bg-stone-950 text-orange-500 w-4 h-4">
-                            </label>
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <span>[ WhatsApp AI Auto-Responder Bot ]</span>
-                                <input type="checkbox" onchange="toggleFeatureFlag('${shop.id}', 'whatsapp')" ${shop.flags.whatsapp ? 'checked' : ''} class="rounded border-stone-800 bg-stone-950 text-orange-500 w-4 h-4">
-                            </label>
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <span>[ Multi-Branch Logistics ]</span>
-                                <input type="checkbox" onchange="toggleFeatureFlag('${shop.id}', 'logistics')" ${shop.flags.logistics ? 'checked' : ''} class="rounded border-stone-800 bg-stone-950 text-orange-500 w-4 h-4">
-                            </label>
-                            <label class="flex items-center justify-between cursor-pointer">
-                                <span class="text-neon-gold">[ Custom Glow UI Effects ]</span>
-                                <input type="checkbox" onchange="toggleFeatureFlag('${shop.id}', 'glow')" ${shop.flags.glow ? 'checked' : ''} class="rounded border-stone-800 bg-stone-950 text-orange-500 w-4 h-4">
-                            </label>
+                        <div class="text-[10px] text-stone-400 border-t border-stone-900 pt-2 leading-relaxed">
+                            <strong>Modules:</strong> ${shop.type}
                         </div>
                     </div>
                 `;
             });
         }
 
-        function toggleFeatureFlag(shopId, flagKey) {
-            const shop = registeredShops.find(s => s.id === shopId);
-            if (shop) {
-                shop.flags[flagKey] = !shop.flags[flagKey];
-                showToast(`Flag updated for: ${shop.name}`, "success");
-            }
+        // ==================== MODULE C: PROTECTED ADMIN CONFIGS ====================
+        function loadAdminSecurityConfig() {
+            document.getElementById('config-backup-email').value = localStorage.getItem('roaji_admin_backup_email') || 'superadmin@backup.com';
+            document.getElementById('config-master-password').value = localStorage.getItem('roaji_admin_password_override') || 'Roaji.inbilling';
         }
 
-        // ==================== MODULE C: SaaS GLOBAL CONFIG ====================
-        function loadGlobalConfig() {
-            const upiId = localStorage.getItem('roaji_saas_upi_id') || 'roajisystems@upi';
-            const pricePro = localStorage.getItem('roaji_saas_price_pro') || '1499';
-            const priceEnt = localStorage.getItem('roaji_saas_price_ent') || '9999';
+        function saveAdminSecurityConfig() {
+            const backupEmail = document.getElementById('config-backup-email').value;
+            const masterPass = document.getElementById('config-master-password').value;
 
-            document.getElementById('config-upi-id').value = upiId;
-            document.getElementById('config-price-pro').value = pricePro;
-            document.getElementById('config-price-ent').value = priceEnt;
+            localStorage.setItem('roaji_admin_backup_email', backupEmail);
+            localStorage.setItem('roaji_admin_password_override', masterPass);
         }
 
-        function saveGlobalConfig() {
-            const upiId = document.getElementById('config-upi-id').value;
-            const pricePro = document.getElementById('config-price-pro').value;
-            const priceEnt = document.getElementById('config-price-ent').value;
-
-            localStorage.setItem('roaji_saas_upi_id', upiId);
-            localStorage.setItem('roaji_saas_price_pro', pricePro);
-            localStorage.setItem('roaji_saas_price_ent', priceEnt);
-        }
-
-        // ANALYTICS STATS RE-CALCULATOR
+        // COUNTERS AND BADGES RE-CALCULATORS
         function updateStatisticsBadges() {
-            const totalShops = registeredShops.length;
-            const pendingUtr = pendingPayments.length;
-            const activeLicenses = registeredShops.filter(s => s.license === "Active").length;
+            const totalShops = shopsDB.length;
+            const pendingUtr = shopsDB.filter(s => s.status === "PENDING_SUPER_ADMIN_APPROVAL").length;
+            const activeLicenses = shopsDB.filter(s => s.status === "Active_Lifetime_Free" || s.status === "Active").length;
             
-            // Calculate simulated global MRR
-            let mrr = 0;
-            registeredShops.forEach(s => {
-                if (s.license === "Active") mrr += 1499; // Mock Pro price
-            });
+            // Calculate mock global MRR
+            let mrrVal = activeLicenses * 1499;
 
             document.getElementById('stat-total-shops').innerText = totalShops;
             document.getElementById('stat-pending-utr').innerText = pendingUtr;
-            document.getElementById('stat-active-shops').innerText = activeLicenses;
-            document.getElementById('stat-mrr').innerText = `₹${mrr.toLocaleString('en-IN')}.00`;
+            document.getElementById('stat-mrr').innerText = `₹${mrrVal.toLocaleString('en-IN')}.00`;
+        }
+
+        function saveShopsToLocalStorage() {
+            localStorage.setItem('roaji_shops', JSON.stringify(shopsDB));
         }
 
         // TOAST NOTIFICATIONS ENGINE
