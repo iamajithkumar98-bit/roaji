@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS Suite - Central Secure Auth Gateway</title>
+    <title>Roaji SaaS Suite - Secure Auth Gateway</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -25,7 +25,7 @@
             border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
-        .glow-accent:focus {
+        .glow-focus:focus {
             outline: none;
             border-color: #F97316; /* Orange-500 Neon Accents */
             box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
@@ -80,7 +80,7 @@
                     <label id="lbl-login-pass" data-key="lbl_password" class="block text-xs font-semibold text-stone-400 mb-1.5 uppercase tracking-wider">Password</label>
                     <div class="relative">
                         <input type="password" id="login-password" required placeholder="••••••••" class="w-full px-4 py-3 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 placeholder-stone-600 text-sm focus:outline-none glow-focus">
-                        <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-500 hover:text-stone-300">
+                        <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-400 hover:text-stone-300">
                             <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; max-width: 100%;">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
@@ -274,9 +274,103 @@
 
     <!-- VANILLA JS STATE CONTROLLER & SUBSCRIPTION COMPUTATIONS -->
     <script>
+        // BILINGUAL DUAL-LANGUAGE DICTIONARY MAP
+        const langData = {
+            en: {
+                login_tagline: "Enter credentials to unlock context",
+                lbl_email: "Email Address",
+                lbl_password: "Password",
+                lbl_remember: "Remember Me",
+                btn_forgot_link: "Forgot Password?",
+                btn_submit: "Sign In",
+                lnk_create_account: "Don't have an account? Create one",
+                
+                // Onboarding Registration
+                lbl_register_title: "Create SaaS Profile",
+                lbl_register_desc: "Register your store context and begin 30-Day Free Trial",
+                lbl_name: "Full Name",
+                lbl_shop_name: "Shop Name",
+                lbl_shop_type: "Shop Type",
+                btn_register_submit: "Activate Trial & Register",
+                lnk_back_login: "Already registered? Log In",
+                
+                // Subscription & QR Gate
+                lbl_sub_title: "Choose Your Workspace Scale",
+                lbl_sub_desc: "Your 30-Day Free Trial is initiated. Upgrade to paid packages below to unlock automated WhatsApp triggers & secure AI advisors.",
+                lbl_gateway_title: "Automated UPI Payment Gate",
+                lbl_gateway_desc: "Scan the dynamic UPI QR code on the right side using any UPI App (GPay, PhonePe, Paytm) and complete your payment securely.",
+                lbl_utr_input: "Enter 12-Digit UPI Ref / UTR No",
+                btn_utr_submit: "Verify Reference",
+                btn_skip_sub: "Skip & Launch Workspace (Active Trial)",
+                
+                // Access Suspended / Blocked
+                lbl_suspended_title: "Access Suspension Alert",
+                lbl_suspended_desc: "Your subscription access or credentials have been marked inactive. Please contact Super Admin.",
+                
+                // Modal
+                modal_title: "Recover Password",
+                modal_desc: "Enter your registered email below, and we'll send you a password reset link.",
+                modal_btn_cancel: "Cancel",
+                modal_btn_send: "Send Link",
+
+                // Dynamic Toasts
+                toast_login_success: "Successfully authenticated!",
+                toast_login_error: "Invalid email or password! Please try again.",
+                toast_blocked_user: "Security alert! Your access account has been suspended.",
+                toast_utr_checking: "Reference sent. Awaiting administrator manual context activation...",
+                toast_trial_initiated: "Workspace initialized. 30-Day Free Trial activated!",
+                toast_recovery_sent: "Recovery verification link sent!"
+            },
+            ta: {
+                login_tagline: "உள்நுழைய உங்கள் விபரங்களை உள்ளிடவும்",
+                lbl_email: "மின்னஞ்சல் முகவரி",
+                lbl_password: "கடவுச்சொல்",
+                lbl_remember: "என்னை நினைவில் கொள்",
+                btn_forgot_link: "கடவுச்சொல் மறந்ததா?",
+                btn_submit: "உள்நுழைக",
+                lnk_create_account: "புதிய கணக்கை உருவாக்க வேண்டுமா? இங்கே கிளிக் செய்யவும்",
+                
+                // Onboarding Registration
+                lbl_register_title: "புதிய கணக்கு உருவாக்குதல்",
+                lbl_register_desc: "வணிக விவரங்களை உள்ளிட்டு 30 நாள் இலவச சோதனையைத் தொடங்கவும்",
+                lbl_name: "முழுப் பெயர்",
+                lbl_shop_name: "கடையின் பெயர்",
+                lbl_shop_type: "வணிக வகை",
+                btn_register_submit: "சோதனையைத் தொடங்கு & பதிவு செய்",
+                lnk_back_login: "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழையவும்",
+                
+                // Subscription & QR Gate
+                lbl_sub_title: "உங்களுக்கான கட்டணத் திட்டம் தேர்வு செய்க",
+                lbl_sub_desc: "உங்கள் 30 நாள் இலவச சோதனை துவங்கப்பட்டுள்ளது. வாட்ஸ்அப் ஆட்டோமேஷன் மற்றும் ஏஐ ஆலோசகரை அணுக கட்டணத் திட்டங்களை மேம்படுத்தவும்.",
+                lbl_gateway_title: "தானியங்கி யுபிஐ கட்டண முறை",
+                lbl_gateway_desc: "வலதுபுறம் உள்ள யுபிஐ கியூஆர் கோடை உங்கள் மொபைல் செயலிகள் மூலம் ஸ்கேன் செய்து பாதுகாப்பாகக் கட்டணத்தை செலுத்தவும்.",
+                lbl_utr_input: "12-இலக்க யுபிஐ குறிப்பு எண் (UTR) உள்ளிடவும்",
+                btn_utr_submit: "சரிபார்",
+                btn_skip_sub: "இப்போதைக்குத் தவிர் (இலவச சோதனைக் காலம்)",
+                
+                // Access Suspended / Blocked
+                lbl_suspended_title: "கணக்கு முடக்கப்பட்டுள்ளது",
+                lbl_suspended_desc: "பாதுகாப்பு அச்சுறுத்தல் காரணமாக உங்களது கணக்கு தற்காலிகமாக முடக்கப்பட்டுள்ளது. முதன்மை நிர்வாகியைத் தொடர்பு கொள்ளவும்.",
+                
+                // Modal
+                modal_title: "மின்னஞ்சல் வழி மீட்பு",
+                modal_desc: "உங்கள் மின்னஞ்சலை உள்ளிட்டால் அதற்கான கடவுச்சொல் மீட்பு இணைப்பு அனுப்பப்படும்.",
+                modal_btn_cancel: "ரத்துசெய்",
+                modal_btn_send: "அனுப்புக",
+
+                // Dynamic Toasts
+                toast_login_success: "வெற்றிகரமாக அங்கீகரிக்கப்பட்டது!",
+                toast_login_error: "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல்! மீண்டும் முயற்சிக்கவும்.",
+                toast_blocked_user: "பாதுகாப்பு அச்சுறுத்தல்! உங்களது கணக்கு முடக்கப்பட்டுள்ளது.",
+                toast_utr_checking: "கட்டண குறிப்பு அனுப்பப்பட்டது. நிர்வாகியின் அனுமதிக்கு பின் கணக்கு முழுமையாகத் திறக்கப்படும்...",
+                toast_trial_initiated: "இலவச 30-நாள் சோதனைக் காலம் வெற்றிகரமாகத் தொடங்கப்பட்டது!",
+                toast_recovery_sent: "மீட்பு மின்னஞ்சல் அனுப்பப்பட்டது!"
+            }
+        };
+
         let currentLang = 'en';
 
-        // ON RUNTIME START
+        // ON RUNTIME LOADER
         window.addEventListener('DOMContentLoaded', () => {
             const savedGlobalLang = localStorage.getItem('roaji_language');
             if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
@@ -295,7 +389,7 @@
             }
         });
 
-        // DUAL LANGUAGE TOGGLE SWITCHER
+        // LANGUAGE TOGGLES
         function changeLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('roaji_language', lang);
@@ -323,7 +417,7 @@
             });
         }
 
-        // PASSWORD FIELD VISIBILITY
+        // PASSWORD VISIBILITY TOGGLER
         function togglePasswordVisibility(inputId) {
             const input = document.getElementById(inputId);
             if (input.type === 'password') {
@@ -348,13 +442,14 @@
             if (viewName === 'suspended') suspendedView.classList.remove('hidden');
         }
 
-        // ==================== STATE 1: MOCK FIREBASE SECURE LOGIN ====================
+        // ==================== STATE 1: RE-ALIGNED SECURE AUTH GATEWAY ROUTING ====================
         function handleLoginSubmit(event) {
             event.preventDefault();
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
             const rememberMe = document.getElementById('remember-me').checked;
 
+            // 1. Super Admin Authentication Route (CRITICAL FIX)
             if (email === "iamajithkumar98@gmail.com" && password === "Roaji.inbilling") {
                 if (rememberMe) {
                     localStorage.setItem('remembered_roaji_email', email);
@@ -364,28 +459,46 @@
 
                 showToast(langData[currentLang]['toast_login_success'], "success");
 
-                // Route Super Admin directly
+                // Initialize secure admin session claim
+                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "SUPER_ADMIN", is_active: true }));
+
+                // Force hard programmatic window redirection exactly to: "super_admin_panel.html"
                 setTimeout(() => {
-                    console.log("Routing to hidden /super-admin portal...");
                     window.location.href = "super_admin_panel.html";
                 }, 800);
-            } else if (email === "owner@roaji.com" && password === "owner123") {
+            } 
+            // 2. Multi-Shop Merchant Authentication Route (CRITICAL FIX)
+            else if (email === "owner@roaji.com" && password === "owner123") {
+                if (rememberMe) {
+                    localStorage.setItem('remembered_roaji_email', email);
+                } else {
+                    localStorage.removeItem('remembered_roaji_email');
+                }
+
                 showToast(langData[currentLang]['toast_login_success'], "success");
-                
-                // Multi-Shop Owner Routing -> Redirects exactly to shop_resolver.html
+
+                // Cache simulation state profile context
+                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "OWNER", is_active: true }));
+
+                // Force hard window redirection exactly to: "shop_resolver.html"
                 setTimeout(() => {
                     window.location.href = "shop_resolver.html";
                 }, 800);
-            } else if (email === "blocked@roaji.com" && password === "blocked123") {
-                // Blocked User Routing -> Swapped to inline suspended view panel
-                showToast(langData[currentLang]['toast_blocked_user'] || "Suspended!", "error");
-                switchView('suspended');
+            } 
+            // 3. Suspended User Identity Route (CRITICAL FIX)
+            else if (email === "blocked@roaji.com" && password === "blocked123") {
+                showToast(langData[currentLang]['toast_blocked_user'], "error");
+                
+                // Seamlessly switch inline SPA layout state to blocked panel
+                setTimeout(() => {
+                    switchView('suspended');
+                }, 400);
             } else {
                 showToast(langData[currentLang]['toast_login_error'], "error");
             }
         }
 
-        // ==================== STATE 2: REGISTRATION LOGIC ====================
+        // ==================== STATE 2: ONBOARDING REGISTRATION ====================
         function handleRegistrationSubmit(event) {
             event.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
@@ -394,8 +507,8 @@
             const shopName = document.getElementById('reg-shop').value.trim();
             const shopType = document.getElementById('reg-type').value;
 
-            // Mock profile registration mapping role: OWNER
-            const mockRegisteredOwnerClaims = {
+            // Mock profile owner registration
+            const mockOwnerClaims = {
                 uid: "usr_owner_" + Date.now(),
                 name: name,
                 email: email,
@@ -406,18 +519,30 @@
                 trial_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
             };
 
-            // Store simulated active session contexts
-            localStorage.setItem('roaji_session_owner', JSON.stringify(mockRegisteredOwnerClaims));
-            
+            // Cache credentials
+            localStorage.setItem('roaji_session_owner', JSON.stringify(mockOwnerClaims));
+            sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "OWNER", is_active: true }));
+
+            // Update multi-tenant global lists
+            const mockShopsList = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+            mockShopsList.push({
+                id: "shop_new_" + Date.now(),
+                name: shopName,
+                type: shopType,
+                plan: "Basic (Trial)",
+                status: "Active"
+            });
+            localStorage.setItem('roaji_shops', JSON.stringify(mockShopsList));
+
             showToast(langData[currentLang]['toast_trial_initiated'], "success");
 
-            // Progress directly to pricing and UPI gateway stage
+            // Open inline subscription choices panel immediately
             setTimeout(() => {
                 switchView('subscription');
             }, 1000);
         }
 
-        // ==================== STATE 3: UPI QR GATEWAY ENGINE ====================
+        // ==================== STATE 3: UPI QR PAYMENT CONSOLE ====================
         function selectPackage(planName, price) {
             const gatewayBlock = document.getElementById('upi-qr-gateway');
             const planBadge = document.getElementById('lbl-selected-plan');
@@ -425,17 +550,18 @@
             const upiIdLabel = document.getElementById('qr-upi-id');
 
             if (price === 0) {
-                // Free package bypasses payment gate
                 initializeMerchantWorkspace();
                 return;
             }
 
-            // Configure dynamic payment QR details
+            // Bind values dynamically
             planBadge.innerText = `Selected: ${planName} Plan`;
             qrPriceLabel.innerText = `₹${price.toLocaleString('en-IN')}.00`;
-            upiIdLabel.innerText = "roajisystems@upi"; // Super Admin UPI Configuration
+            
+            // Sync with central Admin UPI setting if modified in super_admin_panel.html
+            upiIdLabel.innerText = localStorage.getItem('roaji_saas_upi_id') || "roajisystems@upi";
 
-            // Show QR gate block
+            // Reveal payment gate block
             gatewayBlock.classList.remove('hidden');
             gatewayBlock.classList.add('flex');
             gatewayBlock.scrollIntoView({ behavior: 'smooth' });
@@ -446,28 +572,43 @@
             const utr = document.getElementById('utr-input').value.trim();
 
             if (utr.length < 12) {
-                showToast("UTR number must be exactly 12 digits long!", "error");
+                showToast("UTR reference number must be exactly 12 digits!", "error");
                 return;
             }
 
             showToast(langData[currentLang]['toast_utr_checking'], "info");
 
-            // Simulated lock until admin approval
+            // Mock verification queue push (Module A of super_admin_panel)
+            const mockOnboardingOrders = JSON.parse(localStorage.getItem('roaji_orders')) || [];
+            mockOnboardingOrders.unshift({
+                id: "ORD-" + Math.floor(1000 + Math.random() * 9000),
+                customer: "New Registrant",
+                mobile: "N/A",
+                address: "UTR: " + utr,
+                date: new Date().toISOString().split('T')[0],
+                total: 1499,
+                advance: 1499,
+                balance: 0,
+                status: "Pending" // mapped as PENDING_VERIFICATION in super_admin_panel
+            });
+            localStorage.setItem('roaji_orders', JSON.stringify(mockOnboardingOrders));
+
+            // Freeze screen waiting for Admin verification approval
             document.getElementById('utr-form').innerHTML = `
                 <div class="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-xl text-xs font-semibold leading-relaxed">
-                    ⚙️ Verification Pending: UTR: ${utr} has been sent. Your workspace will launch once Super Admin verifies the settlement.
+                    ⚙️ Verification Pending: UTR Reference Code: ${utr} has been sent. Your dashboard will launch automatically upon Super Admin approval.
                 </div>
             `;
         }
 
         function initializeMerchantWorkspace() {
-            showToast("Initializing workspace contexts...", "success");
+            showToast("Workspace initialized!", "success");
             setTimeout(() => {
-                window.location.href = "index.html";
+                window.location.href = "index.html"; // Default Same-page context dashboard view
             }, 800);
         }
 
-        // MODALS UTILS
+        // FORGOT PASSWORD MODALS
         function openForgotModal() {
             const modal = document.getElementById('forgot-modal');
             const emailValue = document.getElementById('login-email').value;
@@ -505,13 +646,13 @@
 
             if (type === 'success') {
                 bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
-                iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width: 100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width:100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             } else if (type === 'error') {
                 bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
-                iconSvg = `<svg class="h-5 w-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width: 100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-rose-650" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width:100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             } else if (type === 'info') {
                 bgClass = 'bg-amber-950/90 border border-amber-500/30 text-amber-300';
-                iconSvg = `<svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width: 100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                iconSvg = `<svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; max-width:100%;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
             }
 
             toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
