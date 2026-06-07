@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROAJI - Enterprise Gateway & Onboarding Platform</title>
+    <title>ROAJI - Enterprise Gateway</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,7 +12,7 @@
                 extend: {
                     colors: {
                         brandDark: '#050505',
-                        brandGlass: 'rgba(15, 15, 15, 0.85)',
+                        brandGlass: 'rgba(12, 12, 12, 0.85)',
                         amberAccent: '#f59e0b',
                         emeraldAccent: '#10b981',
                     }
@@ -21,13 +21,13 @@
         }
     </script>
     <style>
-        /* Premium custom glassmorphism card */
-        .glass-panel {
+        /* Centered Lock Capsule Glassmorphism Styling matching Screenshot 456.png */
+        .glass-capsule {
             background: rgba(12, 12, 12, 0.85);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
         }
         /* Custom luxury input fields border and focus interactions */
         .glass-input {
@@ -46,12 +46,12 @@
 </head>
 <body class="bg-brandDark text-neutral-100 min-h-full font-sans antialiased flex flex-col justify-between selection:bg-amber-500/20 selection:text-amber-300 relative overflow-hidden">
 
-    <!-- Ambient Subtle Amber Background Radial Glow -->
+    <!-- Subtle Amber Background Radial Glow -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
 
     <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
-    <div id="maintenance-overlay" class="fixed inset-0 bg-black/98 backdrop-blur-3xl z-[9999] hidden flex-col items-center justify-center p-6 text-center">
-        <div class="glass-panel p-8 rounded-3xl border-red-500/30 max-w-md w-full">
+    <div id="maintenance-overlay" class="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[9999] hidden flex-col items-center justify-center p-6 text-center">
+        <div class="glass-capsule p-8 rounded-3xl border-red-500/30 max-w-md w-full">
             <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 animate-pulse">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
@@ -65,92 +65,42 @@
         </div>
     </div>
 
-    <!-- Authentic Master Branding Layout (Match Screenshot 491.png Apex) -->
-    <header class="relative z-10 border-b border-neutral-900 bg-neutral-950/60 sticky top-0 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            
-            <!-- Left Brand Logo & Core Identity -->
-            <div class="flex items-center space-x-3.5">
-                <div class="w-10 h-10 bg-amberAccent/10 border border-amberAccent/30 rounded-xl flex items-center justify-center">
-                    <span class="text-amberAccent font-black text-xl tracking-wider">R</span>
-                </div>
-                <div>
-                    <h1 class="text-sm font-extrabold text-neutral-100 tracking-wider uppercase font-sans">
-                        ROAJI GATEWAY <span class="text-neutral-500 font-normal mx-1">//</span> <span class="text-neutral-400 font-semibold text-xs tracking-widest">ONBOARDING PLATFORM</span>
-                    </h1>
-                </div>
-            </div>
-
-            <!-- Right Status Beacon & Translation Row -->
-            <div class="flex items-center space-x-5">
-                <!-- Status Beacon -->
-                <div class="hidden sm:flex items-center space-x-2 bg-neutral-900/60 px-3.5 py-1.5 rounded-full border border-neutral-800">
-                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emeraldAccent animate-pulse"></span>
-                    <span id="active-database-status" class="text-[10px] text-neutral-400 font-mono uppercase tracking-wider font-semibold">Security Vault Armed</span>
-                </div>
-
-                <!-- Language Toggle switcher row -->
-                <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex">
-                    <button id="lang-toggle-en" onclick="mutateLanguageContext('en')" class="px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">
-                        EN
-                    </button>
-                    <button id="lang-toggle-ta" onclick="mutateLanguageContext('ta')" class="px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono">
-                        தமிழ்
-                    </button>
-                </div>
-            </div>
+    <!-- Top Header Navigation (Localization Trigger Only) -->
+    <header class="relative z-10 w-full max-w-7xl mx-auto px-6 py-5 flex justify-end">
+        <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex">
+            <button id="lang-toggle-en" onclick="mutateLanguageContext('en')" class="px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">
+                EN
+            </button>
+            <button id="lang-toggle-ta" onclick="mutateLanguageContext('ta')" class="px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono">
+                தமிழ்
+            </button>
         </div>
     </header>
-
-    <!-- Collapsible Developer Sandbox Diagnostic Panel (Hidden inside footer standard triggers) -->
-    <div id="configs-drawer-panel" class="hidden border-b border-amber-500/20 bg-neutral-950 px-4 py-5 transition-all relative z-20">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-            
-            <!-- Maintenance mode switch simulation -->
-            <div class="glass-panel p-3.5 rounded-2xl border-neutral-800 flex flex-col justify-between">
-                <div>
-                    <h3 class="text-[10px] text-amberAccent font-mono uppercase mb-2">Simulate Maintenance Lockout</h3>
-                    <p class="text-neutral-500 text-[10px] leading-tight mb-3">Toggles `roaji_maintenance_mode` in localStorage. Lockout blocks all authentications instantly.</p>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="overrideMaintenance('ON')" class="text-xs font-mono font-semibold py-1.5 bg-red-950/20 border border-red-800/40 text-red-400 hover:bg-red-900 hover:text-white rounded transition-all">ON (Lock)</button>
-                    <button onclick="overrideMaintenance('OFF')" class="text-xs font-mono font-semibold py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:border-emeraldAccent hover:text-emeraldAccent hover:border-transparent rounded transition-all">OFF (Active)</button>
-                </div>
-            </div>
-
-            <!-- Diagnostics DB state reader -->
-            <div class="glass-panel p-3.5 rounded-2xl border-neutral-800">
-                <h3 class="text-[10px] text-amberAccent font-mono uppercase mb-2">Registered Accounts Diagnostic Ledger</h3>
-                <div id="sandbox-diag-accounts" class="text-[9px] font-mono text-neutral-400 bg-black/60 p-2.5 rounded border border-neutral-900 h-24 overflow-y-auto leading-relaxed">
-                    Loading diagnostic stack...
-                </div>
-            </div>
-
-            <!-- Dynamic setup database initial seeder helper -->
-            <div class="glass-panel p-3.5 rounded-2xl border-neutral-800 flex flex-col justify-between">
-                <div>
-                    <h3 class="text-[10px] text-amberAccent font-mono uppercase mb-2">Initialize / Reset Local Seed</h3>
-                    <p class="text-neutral-500 text-[10px] leading-tight">Clears all account data and registers the default demo verified merchant: `demo@roaji.com` / `password123`.</p>
-                </div>
-                <button onclick="forceCleanResetSeed()" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold text-xs py-2 rounded-lg transition-all mt-3 uppercase tracking-wider">
-                    Reset Local Registry
-                </button>
-            </div>
-
-        </div>
-    </div>
 
     <!-- Main Centered Obsidian Lock-Capsule Onboarding & Security Module -->
     <main class="relative z-10 flex-1 flex items-center justify-center px-4 py-8">
         
         <div class="w-full max-w-md">
             
-            <!-- Centered Dual-Tab Control Capsule Matrix -->
-            <div class="glass-panel rounded-3xl p-8 relative overflow-hidden">
+            <!-- Centered Capsule Container (Screenshot 456.png Style) -->
+            <div class="glass-capsule rounded-3xl p-8 relative overflow-hidden">
                 <!-- Top delicate ambient neon line -->
                 <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amberAccent to-transparent"></div>
 
-                <!-- Tabs header switcher with active amber accent underline states -->
+                <!-- Apex Security Lock Brand Emblem Header -->
+                <div class="flex flex-col items-center text-center mb-8">
+                    <!-- Amber Vector Lock Emblem with glow -->
+                    <div class="w-14 h-14 bg-amberAccent/5 border border-amberAccent/20 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(245,158,11,0.12)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-amberAccent filter drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">
+                            <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <h1 id="app-brand-title" class="text-2xl font-black text-white tracking-widest">ROAJI</h1>
+                    <p id="sec-login-subtitle" class="text-[10px] text-amberAccent font-bold tracking-[0.2em] mt-1.5 uppercase">ENTERPRISE SECURE LOGIN</p>
+                    <p id="sec-login-subtext" class="text-[11px] text-neutral-500 mt-1">Enter credentials to unlock context</p>
+                </div>
+
+                <!-- Tabbed Switching Controls with active amber accent underline states -->
                 <div class="flex border-b border-neutral-900 mb-6 text-center">
                     <button id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none">
                         SIGN IN
@@ -160,29 +110,15 @@
                     </button>
                 </div>
 
-                <!-- SIGN-IN TAB COMPONENT MATRIX (Strict Match to Screenshot 456.png) -->
-                <div id="login-tab-view" class="space-y-6">
-                    
-                    <!-- Apex Security Lock Brand Emblem Header -->
-                    <div class="flex flex-col items-center text-center">
-                        <div class="w-14 h-14 bg-amberAccent/5 border border-amberAccent/20 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(245,158,11,0.12)]">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-amberAccent filter drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">
-                                <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <h2 id="app-brand-title" class="text-2xl font-black text-white tracking-widest">ROAJI</h2>
-                        <p id="sec-login-subtitle" class="text-[10px] text-amberAccent font-bold tracking-[0.2em] mt-1.5 uppercase">ENTERPRISE SECURE LOGIN</p>
-                        <p id="sec-login-subtext" class="text-[11px] text-neutral-500 mt-1">Enter credentials to unlock context</p>
-                    </div>
-
-                    <!-- Sign In Active Form -->
+                <!-- SIGN-IN TAB COMPONENT MATRIX -->
+                <div id="login-tab-view" class="space-y-4">
                     <form id="login-form-container" onsubmit="executeStandardLogin(event)" class="space-y-4">
                         <div>
                             <label id="lbl-login-email" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
                             <input id="login-email" type="email" required placeholder="merchant@example.com" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
                         </div>
                         <div>
-                            <label id="lbl-login-password" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE PASSWORD</label>
+                            <label id="lbl-login-password" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
                             <div class="relative">
                                 <input id="login-password" type="password" required placeholder="••••••••" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 pr-10 text-white outline-none">
                                 <!-- Eye Icon Visibility Toggle -->
@@ -204,17 +140,14 @@
                             <a href="#" onclick="triggerForgotPasswordToast()" id="link-forgot-password" class="text-amberAccent hover:underline">Forgot Password?</a>
                         </div>
 
-                        <button id="btn-submit-login" type="submit" class="w-full bg-amberAccent hover:bg-amber-500 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-6 shadow-[0_0_20px_rgba(245,158,11,0.12)]">
-                            Sign In
+                        <button id="btn-submit-login" type="submit" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-6 shadow-[0_0_20px_rgba(245,158,11,0.12)]">
+                            AUTHENTICATE SESSION
                         </button>
                     </form>
-
                 </div>
 
-                <!-- ONBOARD SHOP TAB COMPONENT MATRIX (Strict Match to Screenshot 486.png) -->
+                <!-- ONBOARD SHOP TAB COMPONENT MATRIX -->
                 <div id="register-tab-view" class="space-y-4 hidden">
-                    
-                    <!-- Onboard Active Form -->
                     <form id="register-form-container" onsubmit="executeMerchantOnboarding(event)" class="space-y-3.5">
                         <div>
                             <label id="lbl-reg-merchant" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">MERCHANT OWNER NAME</label>
@@ -246,10 +179,9 @@
                         </div>
 
                         <button id="btn-submit-reg" type="submit" class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-6 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
-                            SUBMIT VERIFICATION ONBOARDING
+                            REGISTER SHOP & ACTIVATE
                         </button>
                     </form>
-
                 </div>
 
             </div>
@@ -261,17 +193,16 @@
     <!-- Operational System Toast Notifications Component -->
     <div id="ui-toast" class="fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
         </svg>
         <span id="toast-message-body">Operational execution success.</span>
     </div>
 
-    <!-- Statutory Platform Footer with Hidden Diagnostic Switch -->
+    <!-- Statutory Platform Footer -->
     <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4">
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider">
             <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
-            <!-- Clicking the ISO compliance text toggles the sandbox panel dynamically -->
-            <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
+            <span id="lang-footer-desc">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
         </div>
     </footer>
 
@@ -286,19 +217,20 @@
         // Structured English / Tamil Translation Dictionary Matrix
         const appTranslationMatrix = {
             en: {
-                appHeader: "ROAJI GATEWAY // ONBOARDING PLATFORM",
-                btnConfigs: "Configurations",
+                appHeader: "ROAJI",
+                secLoginSubtitle: "ENTERPRISE SECURE LOGIN",
+                secLoginSubtext: "Enter credentials to unlock context",
                 tabLogin: "SIGN IN",
                 tabRegister: "ONBOARD SHOP",
                 lblEmail: "OFFICIAL EMAIL ADDRESS",
-                lblPassword: "SECURE PASSWORD",
-                btnSubmitLogin: "Sign In",
+                lblPassword: "SECURE ACCESS PASSWORD",
+                btnSubmitLogin: "AUTHENTICATE SESSION",
                 lblRegMerchant: "MERCHANT OWNER NAME",
                 lblRegShop: "SHOP / FRANCHISE NAME",
                 lblRegEmail: "OFFICIAL EMAIL ADDRESS",
                 lblRegPassword: "SECURE ACCESS PASSWORD",
                 lblRegMobile: "CONTACT MOBILE NUMBER",
-                btnSubmitReg: "SUBMIT VERIFICATION ONBOARDING",
+                btnSubmitReg: "REGISTER SHOP & ACTIVATE",
                 maintHeader: "GATEWAY LOCKED",
                 maintDesc: "System maintenance active. Access is temporarily restricted. Onboarding and validation pathways are locked.",
                 toastRegPending: "Onboarding success! Your account is active under status: Active_Lifetime_Free.",
@@ -314,26 +246,25 @@
                 placeholderMerchant: "e.g. Ajith Kumar",
                 placeholderShop: "e.g. Sri Vari Premium Plaza",
                 placeholderMobile: "+91 94440 XXXXX",
-                secLoginSubtitle: "ENTERPRISE SECURE LOGIN",
-                secLoginSubtext: "Enter credentials to unlock context",
                 lblRememberMe: "Remember Me",
                 linkForgot: "Forgot Password?",
                 toastForgotMsg: "Contact the enterprise system administrator to initiate password restoration."
             },
             ta: {
-                appHeader: "ரோஜி நுழைவாயில் // பதிவு தளம்",
-                btnConfigs: "அமைப்புகள்",
+                appHeader: "ரோஜி",
+                secLoginSubtitle: "நிறுவன பாதுகாப்பு உள்நுழைவு",
+                secLoginSubtext: "அணுகலைத் திறக்க நற்சான்றிதழ்களை உள்ளிடவும்",
                 tabLogin: "உள்நுழைக",
                 tabRegister: "கடை பதிவு",
                 lblEmail: "மின்னஞ்சல் முகவரி",
                 lblPassword: "பாதுகாப்பான கடவுச்சொல்",
-                btnSubmitLogin: "உள்நுழைக",
+                btnSubmitLogin: "அங்கீகரிக்கவும்",
                 lblRegMerchant: "வணிகர் உரிமையாளர் பெயர்",
                 lblRegShop: "கடை / உரிமையாளர் பெயர்",
                 lblRegEmail: "மின்னஞ்சல் முகவரி",
                 lblRegPassword: "பாதுகாப்பான கடவுச்சொல்",
                 lblRegMobile: "தொடர்பு கைபேசி எண்",
-                btnSubmitReg: "பதிவு விண்ணப்பத்தை சமர்ப்பிக்கவும்",
+                btnSubmitReg: "பதிவு செய்து செயல்படுத்தவும்",
                 maintHeader: "நுழைவாயில் முடக்கப்பட்டுள்ளது",
                 maintDesc: "கணினி பராமரிப்பு வேலைகள் நடக்கின்றன. அனுமதி தற்காலிகமாக நிறுத்தப்பட்டுள்ளது.",
                 toastRegPending: "பதிவு வெற்றிகரமாக முடிந்தது! கணக்கு உடனடியாக செயல்படுத்தப்பட்டது (Active_Lifetime_Free).",
@@ -349,8 +280,6 @@
                 placeholderMerchant: "எ.கா. அஜித் குமார்",
                 placeholderShop: "எ.கா. ஸ்ரீ வாரி பிரீமியம் பிளாசா",
                 placeholderMobile: "+91 94440 XXXXX",
-                secLoginSubtitle: "நிறுவன பாதுகாப்பு உள்நுழைவு",
-                secLoginSubtext: "அணுகலைத் திறக்க நற்சான்றிதழ்களை உள்ளிடவும்",
                 lblRememberMe: "நினைவில் வை",
                 linkForgot: "கடவுச்சொல் மறந்துவிட்டதா?",
                 toastForgotMsg: "கடவுச்சொல்லை மீட்டமைக்க கணினி நிர்வாகியைத் தொடர்பு கொள்ளவும்."
@@ -392,32 +321,13 @@
             }
         }
 
-        // Pull array and diagnostics from localStorage
+        // Pull array from localStorage
         function synchronizeStateAndLogs() {
             const rawShops = localStorage.getItem('roaji_shops');
             try {
                 registeredShopsArray = JSON.parse(rawShops) || [];
             } catch (e) {
                 registeredShopsArray = [];
-            }
-
-            // Sync diagnostics display in sandbox safely
-            const diagContainer = document.getElementById('sandbox-diag-accounts');
-            if (diagContainer) {
-                if (registeredShopsArray.length === 0) {
-                    diagContainer.textContent = "No accounts registered in `roaji_shops` database.";
-                } else {
-                    diagContainer.innerHTML = '';
-                    registeredShopsArray.forEach((user, idx) => {
-                        const div = document.createElement('div');
-                        div.className = "border-b border-neutral-900 pb-1 mb-1 last:border-0 text-left";
-                        div.innerHTML = `
-                            <span class="text-amberAccent">[${idx+1}]</span> <strong>${user.name}</strong> (${user.email})<br>
-                            <span class="text-neutral-500">Status:</span> <span class="text-emeraldAccent font-semibold">${user.status || 'Active_Lifetime_Free'}</span> | <span class="text-neutral-500">Channels:</span> ${user.selectedShops ? user.selectedShops.length : 0}
-                        `;
-                        diagContainer.appendChild(div);
-                    });
-                }
             }
         }
 
@@ -500,21 +410,19 @@
             }
         }
 
-        // Error-free Bilingual translation context swapper
+        // Error-free Bilingual translation context swapper safely isolating existing properties
         function mutateLanguageContext(lang) {
             activeLanguageContext = lang;
             const t = appTranslationMatrix[lang];
 
             // 1. Strictly translate only DOM elements existing inside index.html entryway to prevent null exceptions
-            safeSetText('app-title-header', t.appHeader);
-            safeSetText('lang-btn-configs', t.btnConfigs);
-            safeSetText('tab-btn-login', t.tabLogin);
-            safeSetText('tab-btn-register', t.tabRegister);
-
-            // Login Labels & branding subtexts
             safeSetText('app-brand-title', t.appHeader);
             safeSetText('sec-login-subtitle', t.secLoginSubtitle);
             safeSetText('sec-login-subtext', t.secLoginSubtext);
+            safeSetText('tab-btn-login', t.tabLogin);
+            safeSetText('tab-btn-register', t.tabRegister);
+
+            // Login Labels & subtext configs
             safeSetText('lbl-login-email', t.lblEmail);
             safeSetText('lbl-login-password', t.lblPassword);
             safeSetText('lbl-remember-me', t.lblRememberMe);
@@ -655,27 +563,6 @@
                 // Authentication variables mismatch block
                 triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginFailed);
             }
-        }
-
-        // Toggle Configurations Panel Drawer
-        function toggleConfigLogPanel() {
-            const panel = document.getElementById('configs-drawer-panel');
-            panel.classList.toggle('hidden');
-        }
-
-        // Override Maintenance Status
-        function overrideMaintenance(state) {
-            localStorage.setItem('roaji_maintenance_mode', state);
-            pollMaintenanceInterceptorState();
-            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastConfigSaved);
-        }
-
-        // Flush and seed demo parameters to database
-        function forceCleanResetSeed() {
-            localStorage.removeItem('roaji_shops');
-            initializeDatabaseMockSeeds();
-            synchronizeStateAndLogs();
-            triggerUINotification("Databases cleared and seed values re-installed.");
         }
 
         // Trigger Forgot Password Notification safely
