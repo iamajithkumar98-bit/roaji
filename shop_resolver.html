@@ -1,415 +1,626 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS - Sub-Folder Workspace Resolver</title>
+    <title>ROAJI - Shop Resolver Workspace</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #050505; /* Obsidian Black Premium Base Theme */
-            color: #F5F5F4;
-            margin: 0;
-            overflow-x: hidden;
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandDark: '#050505',
+                        brandGlass: 'rgba(15, 15, 15, 0.85)',
+                        amberAccent: '#f59e0b',
+                        emeraldAccent: '#10b981',
+                    }
+                }
+            }
         }
-        .premium-glass {
-            background: rgba(18, 16, 15, 0.75); /* Premium Stone-900 Alpha */
+    </script>
+    <style>
+        /* Cinematic obsidian-dark styling utilities */
+        .glass-panel {
+            background: rgba(12, 12, 12, 0.85);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
         }
-        .glow-focus:focus {
-            outline: none;
-            border-color: #F97316; /* Orange-500 Neon Accents */
-            box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
+        .glass-card {
+            background: rgba(16, 16, 16, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .text-neon-gold {
-            color: #F59E0B;
-            text-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
+        .glass-card:hover {
+            border-color: #f59e0b;
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15);
+            transform: translateY(-4px);
         }
     </style>
 </head>
-<body id="resolver-body" class="min-h-screen relative overflow-x-hidden p-4 md:p-8 flex flex-col justify-between">
+<body class="bg-brandDark text-neutral-100 min-h-full font-sans antialiased flex flex-col justify-between selection:bg-amber-500/20 selection:text-amber-300 relative overflow-hidden">
 
-    <!-- Background Radial Neon Ambiance Glows -->
-    <div class="absolute top-[-20%] left-[-15%] w-[65vw] h-[65vw] rounded-full bg-amber-500/10 blur-[130px] pointer-events-none"></div>
-    <div class="absolute bottom-[-20%] right-[-15%] w-[65vw] h-[65vw] rounded-full bg-orange-600/10 blur-[130px] pointer-events-none"></div>
+    <!-- Ambient Amber Background Radial Glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-amber-500/5 rounded-full blur-[160px] pointer-events-none z-0"></div>
 
-    <!-- TOAST CONTAINER -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
-
-    <!-- MAIN INTERFACE CORE WRAPPER -->
-    <div class="w-full max-w-6xl mx-auto z-10 space-y-6">
-
-        <!-- GLOBAL SYSTEM BROADCASTER MARQUEE BANNER -->
-        <div id="marquee-container" class="w-full py-2.5 px-4 bg-orange-600/10 border border-orange-500/20 rounded-2xl overflow-hidden hidden">
-            <marquee id="marquee-ticker" behavior="scroll" direction="left" class="text-xs font-bold text-orange-400 tracking-wider uppercase"></marquee>
-        </div>
-
-        <!-- HEADER AREA -->
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-stone-900">
-            <div class="space-y-1">
-                <h1 id="app-title" data-key="app_title" class="text-xl font-bold tracking-tight text-white uppercase">வணிகத் தேர்வுக் கன்சோல்</h1>
-                <p id="app-subtitle" class="text-xs text-stone-500 font-semibold uppercase tracking-wider">Multi-Shop Sub-Folder Gateway Resolver</p>
+    <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
+    <div id="maintenance-overlay" class="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[9999] hidden flex-col items-center justify-center p-6 text-center">
+        <div class="glass-panel p-8 rounded-3xl border-red-500/30 max-w-md w-full">
+            <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
             </div>
-
-            <!-- Global Language Toggle -->
-            <div class="glass-panel p-1 rounded-2xl flex items-center shadow-sm bg-stone-900/60 border border-stone-850">
-                <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 bg-orange-600 text-white shadow">EN</button>
-                <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
-            </div>
-        </header>
-
-        <!-- 13 SHOP MODULES DYNAMIC SELECTION GRID -->
-        <div class="space-y-4">
-            <h2 id="lbl-select-shop" data-key="lbl_select_shop" class="text-sm font-bold text-stone-400 uppercase tracking-widest">Select Workspace to Launch</h2>
-            
-            <div id="shops-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <!-- Loaded Dynamically -->
+            <h2 id="lang-maint-header" class="text-2xl font-bold tracking-tight text-white mb-2">WORKSPACE LOCKED</h2>
+            <p id="lang-maint-desc" class="text-neutral-400 text-sm mb-6">System maintenance active. Workspace routing and micro-services are temporarily frozen. Standard selections are locked.</p>
+            <div class="text-[11px] text-amberAccent font-mono uppercase tracking-wider py-1.5 px-3 bg-amberAccent/10 rounded border border-amberAccent/20 inline-block">
+                Interceptor Flag: SYSTEM_MAINT_OVERLAY_LOCK
             </div>
         </div>
-
     </div>
 
-    <!-- ==================== PREMIUM EXPIRED PAYWALL MODAL ==================== -->
-    <div id="paywall-modal" class="fixed inset-0 bg-stone-950/90 backdrop-blur-md z-50 items-center justify-center p-4 hidden transition-all duration-300">
-        <div class="w-full max-w-lg premium-glass p-6 rounded-3xl shadow-xl transform scale-95 transition-all space-y-4 text-center border-orange-500/20">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-500/10 text-orange-500 border border-orange-500/25 mb-2" style="width: 48px; height: 48px;">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:24px; height:24px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-            </div>
-            <h3 id="paywall-title" data-key="paywall_title" class="text-base font-bold text-white">SaaS Subscription Expired</h3>
-            <p id="paywall-desc" data-key="paywall_desc" class="text-xs text-stone-400 leading-relaxed">Your active subscription cycle has expired. Upgrade your workspace scale below using our automated UPI payment gateway to restore access immediately.</p>
-            
-            <!-- Dynamic UPI QR container -->
-            <div class="p-4 bg-stone-950/60 border border-stone-850 rounded-2xl flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <div class="text-left space-y-2">
-                    <span id="lbl-selected-plan" class="inline-block px-2 py-0.5 text-[8px] font-bold tracking-wider uppercase text-orange-400 bg-orange-500/10 rounded-md">Pro Package Renewal</span>
-                    <h4 class="text-[10px] font-bold text-white uppercase">Automated UPI payment</h4>
-                    <p id="paywall-qr-info" data-key="paywall_qr_info" class="text-[10px] text-stone-500">Scan the QR code on GPay/PhonePe to renew your workspace instantly.</p>
+    <!-- Master Workspace Layout Container -->
+    <div class="relative z-10 flex flex-1 h-full">
+
+        <!-- Left Navigation Sidebar Console -->
+        <aside class="w-64 border-r border-neutral-900 bg-neutral-950/80 flex flex-col justify-between hidden md:flex shrink-0">
+            <div class="p-6 space-y-6">
+                <!-- Top Brand Logo -->
+                <div class="flex items-center space-x-3 pb-4 border-b border-neutral-900">
+                    <div class="w-8 h-8 bg-amberAccent/10 border border-amberAccent/30 rounded-lg flex items-center justify-center">
+                        <span class="text-amberAccent font-black text-sm tracking-wider">R</span>
+                    </div>
+                    <span class="text-xs font-bold text-neutral-300 tracking-wider">ROAJI SYSTEM</span>
                 </div>
-                <div class="p-2 bg-white rounded-xl">
-                    <!-- Dynamic UPI QR generator -->
-                    <img id="paywall-qr-img" src="" alt="UPI QR Code" style="width:100px; height:100px;">
-                </div>
+
+                <!-- Navigation List -->
+                <nav class="space-y-1">
+                    <a href="#" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg bg-amberAccent/10 text-amberAccent text-xs font-bold tracking-wider font-mono">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.003 0 009.75 9.75c.896 0 1.7-.393 2.25-1.015a3.3 3.3 0 012.25 1.015c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 003.75.614m-16.5 0L12 3.352l5.54 4.54" />
+                        </svg>
+                        <span id="lang-side-resolver">SHOP RESOLVER</span>
+                    </a>
+                    <a href="#" onclick="forceLogout()" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-neutral-400 hover:text-red-400 hover:bg-red-500/5 text-xs font-bold tracking-wider font-mono transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                        </svg>
+                        <span id="lang-side-logout">LOGOUT</span>
+                    </a>
+                </nav>
             </div>
 
-            <!-- UTR Input Form -->
-            <form id="paywall-utr-form" onsubmit="handlePaywallUtrSubmit(event)" class="space-y-3 text-left">
+            <!-- Developer diagnostic panel toggler in sidebar bottom -->
+            <div class="p-6 border-t border-neutral-900">
+                <button onclick="toggleConfigLogPanel()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-500 hover:text-neutral-300 font-mono py-2 rounded-lg transition-all uppercase tracking-wider">
+                    Diagnostic Console
+                </button>
+            </div>
+        </aside>
+
+        <!-- Right Side: Content Scrollable Workspace Area -->
+        <div class="flex-1 flex flex-col justify-between overflow-y-auto">
+            
+            <!-- Workspace Top Bar -->
+            <header class="border-b border-neutral-900 bg-neutral-950/40 py-4 px-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <label id="paywall-utr-label" data-key="paywall_utr_label" class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Enter UTR / Transaction ID (பணப் பரிவர்த்தனை எண்)</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="paywall-utr-input" required maxlength="12" placeholder="e.g. 389021840194" class="flex-1 px-4 py-2 bg-stone-900 border border-stone-850 rounded-xl text-stone-150 text-xs glow-focus">
-                        <button type="submit" id="paywall-btn-submit" data-key="paywall_btn_submit" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-xs transition">Submit Payment</button>
+                    <h2 id="lang-welcome-title" class="text-sm font-bold text-neutral-300 tracking-wider font-mono">DASHBOARD</h2>
+                    <p id="active-merchant-info" class="text-[11px] text-neutral-500 font-mono mt-0.5">Verified Tenant Workspace Profile</p>
+                </div>
+                <!-- Bilingual localization switch row -->
+                <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex">
+                    <button id="lang-toggle-en" onclick="mutateLanguageContext('en')" class="px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">
+                        EN
+                    </button>
+                    <button id="lang-toggle-ta" onclick="mutateLanguageContext('ta')" class="px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono">
+                        தமிழ்
+                    </button>
+                </div>
+            </header>
+
+            <div class="max-w-7xl w-full mx-auto px-6 sm:px-8 py-8 space-y-6 flex-1">
+
+                <!-- Dynamic SaaS Control & Estimate Slasher Board (Part 5 Subscription Matrix) -->
+                <div class="glass-panel rounded-3xl p-6 relative overflow-hidden">
+                    <!-- Amber background radial glow accent -->
+                    <div class="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center justify-between">
+                        <!-- Left Package status -->
+                        <div>
+                            <span id="lang-badge-tier-title" class="text-[9px] bg-amberAccent/10 text-amberAccent font-mono border border-amberAccent/20 px-2.5 py-1 rounded-md uppercase tracking-widest font-semibold">Active Subscription Matrix</span>
+                            <h3 class="text-lg font-bold text-white mt-2 flex items-center gap-2">
+                                <span id="merchant-shop-name">Demo Premium Plaza</span>
+                            </h3>
+                            <div class="text-xs text-neutral-400 font-mono mt-0.5 flex items-center gap-1.5">
+                                <span class="text-neutral-500" id="lang-merchant-tier-label">Operational Tier:</span> 
+                                <span id="merchant-account-tier" class="text-amberAccent font-bold">Active_Lifetime_Free</span>
+                            </div>
+                        </div>
+
+                        <!-- Slashed Invoices Allocation Counters -->
+                        <div class="bg-neutral-950/60 border border-neutral-900 rounded-2xl p-4 flex flex-col justify-between h-full">
+                            <span id="lang-metric-slashed-lbl" class="text-[9px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Slashed Invoices Allocation</span>
+                            <div class="flex items-baseline space-x-2 mt-2">
+                                <span id="metric-slashed-count" class="text-2xl font-black text-emeraldAccent font-mono">942</span>
+                                <span class="text-xs text-neutral-500 font-mono">/ 1000 limit</span>
+                            </div>
+                            <div class="w-full bg-neutral-900 h-1.5 rounded-full mt-2 overflow-hidden border border-neutral-950">
+                                <div id="metric-slashed-progress" class="bg-emeraldAccent h-full" style="width: 94.2%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Operational days valid count down tracker -->
+                        <div class="bg-neutral-950/60 border border-neutral-900 rounded-2xl p-4 flex flex-col justify-between h-full">
+                            <span id="lang-metric-validity-lbl" class="text-[9px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Workspace Operational Validity</span>
+                            <div class="flex items-baseline space-x-2 mt-2">
+                                <span id="metric-validity-days" class="text-2xl font-black text-amberAccent font-mono">365</span>
+                                <span id="lang-metric-days-text" class="text-xs text-neutral-500 font-mono">Days Remaining</span>
+                            </div>
+                            <p id="lang-package-disclaimer" class="text-[9px] text-neutral-500 font-mono mt-2 uppercase tracking-tighter">Enterprise compliance index active</p>
+                        </div>
                     </div>
                 </div>
-            </form>
 
-            <button onclick="logoutFromResolver()" data-key="back_dashboard" class="w-full py-2 bg-stone-850 hover:bg-stone-800 text-stone-300 rounded-xl text-xs font-semibold transition">Back to Login</button>
-        </div>
-    </div>
+                <!-- Multi-Business Supported Grid Integration Title -->
+                <div class="flex items-center justify-between pt-4">
+                    <div>
+                        <h3 id="lang-grid-title" class="text-sm font-bold text-neutral-400 uppercase tracking-widest">Multi-Business Core Matrix</h3>
+                        <p id="lang-grid-desc" class="text-xs text-neutral-500 font-mono mt-0.5">Select active operations workspace node to route transaction ledger.</p>
+                    </div>
+                </div>
 
-    <!-- ==================== SYSTEM MAINTENANCE MODE INTERCEPTOR ==================== -->
-    <div id="maintenance-view" class="fixed inset-0 bg-stone-950 z-50 items-center justify-center p-4 hidden transition-all duration-300">
-        <div class="w-full max-w-md text-center space-y-4">
-            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/25 mb-2" style="width: 56px; height: 56px;">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:32px; height:32px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                <!-- 13 Niches Multi-Business Grid Structure -->
+                <div id="business-grid-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Injected dynamically in state mapping -->
+                </div>
+
             </div>
-            <h2 id="lbl-maintenance-title" class="text-xl font-bold text-white">System Maintenance Active</h2>
-            <p id="lbl-maintenance-desc" class="text-xs text-stone-400 leading-relaxed">Software under optimization by ROAJI admin suite. Normal access will be restored shortly.</p>
+
+            <!-- Standard platform footer -->
+            <footer class="border-t border-neutral-900 bg-neutral-950/40 py-4 px-6 text-center text-[10px] text-neutral-500 font-mono uppercase tracking-wider">
+                <span>© 2026 ROAJI SUPPLY CHAIN GOVERNANCE HUB. SYSTEM SECURED BY ISO/IEC 27001 COMPLIANCE.</span>
+            </footer>
+
         </div>
+
     </div>
 
-    <!-- FOOTER AREA -->
-    <footer class="w-full max-w-6xl mx-auto border-t border-stone-900 pt-4 text-center text-[10px] text-stone-600 font-semibold">
-        <p>ROAJI Multi-Tenant Workspace Gateway & Sub-Folder Paywall Resolver.</p>
-    </footer>
+    <!-- Operational System Toast Notifications Component -->
+    <div id="ui-toast" class="fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
+        </svg>
+        <span id="toast-message-body">Session initialization sequence executed.</span>
+    </div>
 
-    <!-- VANILLA JS STATE & GATEWAY ENGINE -->
+    <!-- Core Security Resolver Execution Scripts -->
     <script>
-        const langData = {
+        // System state matrices
+        let activeLanguageContext = "en";
+        let activeMerchantSession = null;
+        let registeredShopsArray = [];
+        let systemMaintenanceFlag = false;
+
+        // Structured English / Tamil Translation Dictionary Matrix
+        const appTranslationMatrix = {
             en: {
-                app_title: "Workspace Portal Resolver",
-                lbl_select_shop: "Select Workspace to Launch",
-                paywall_title: "SaaS Subscription Expired",
-                paywall_desc: "Your active subscription cycle has expired. Upgrade your workspace scale below using our automated UPI payment gateway to restore access immediately.",
-                paywall_qr_info: "Scan the QR code on GPay/PhonePe to renew your workspace instantly.",
-                paywall_utr_label: "Enter UTR / Transaction ID (பணப் பரிவர்த்தனை எண்)",
-                paywall_btn_submit: "Submit Payment",
-                back_dashboard: "Back to Login / பின்செல்ல",
-                lbl_locked_card: "Locked Niche",
-                toast_switched: "Workspace context loaded! Redirecting...",
-                toast_utr_submitted: "Payment proof uploaded! Awaiting Admin verification approval."
+                appHeader: "ROAJI",
+                sideResolver: "SHOP RESOLVER",
+                sideLogout: "LOGOUT",
+                welcomeTitle: "DASHBOARD",
+                badgeTierTitle: "Active Subscription Matrix",
+                merchantTierLabel: "Operational Tier:",
+                metricSlashedLbl: "Slashed Invoices Allocation",
+                metricValidityLbl: "Workspace Operational Validity",
+                metricDaysText: "Days Remaining",
+                packageDisclaimer: "Enterprise compliance index active",
+                gridTitle: "Multi-Business Core Matrix",
+                gridDesc: "Select active operations workspace node to route transaction ledger.",
+                maintHeader: "WORKSPACE LOCKED",
+                maintDesc: "System maintenance active. Workspace routing and micro-services are temporarily frozen. Standard selections are locked.",
+                toastMaintActive: "SYSTEM LOCK ACTIVE. Workspace routing is blocked.",
+                toastConfigSaved: "Maintenance settings updated.",
+                toastRouting: "Routing to selected micro-SaaS instance...",
+                toastLockedNiche: "Access denied. Niche is locked in your SaaS trial package.",
+                statusSecVault: "Security Vault Armed",
+                vlePrefix: "VLE Merchant Profile",
+                diagnosticTitle: "Configurations Diagnostics Panel",
+                statusActiveFree: "Active_Lifetime_Free",
+                statusActiveTrial: "Active_Trial",
+                statusActivePro: "SaaS_Paid_Plan",
+                btnConfigs: "Configurations",
+                "stationery-title": "Xerox & Stationery Counter",
+                "stationery-desc": "Quick checkout ledger for copy pages, notebooks, and binders.",
+                "gifts-title": "Premium Gifts & Toys",
+                "gifts-desc": "Multi-channel packaging logistics tracker for retail and Meesho.",
+                "mobile-title": "Mobile Repair & Accessories",
+                "mobile-desc": "Slab-based hardware configuration diagnostics and accessories.",
+                "esevai-title": "e-Sevai CSC Portal",
+                "esevai-desc": "Digital CSC government applications database registry hub.",
+                "toys-title": "Toys Zone & Meesho Packing",
+                "toys-desc": "Supply chain shipping matrix with custom bubblewrap multipliers.",
+                "money_transfer-title": "DMT Money Transfer Desk",
+                "money_transfer-desc": "Dynamic financial slab commission routing and settlement ledger.",
+                "fabrication-title": "Welding & SS Fabrication",
+                "fabrication-desc": "SqFt dimension weight estimation multiplier calculator engine.",
+                "bakery-title": "Bakery Core Counter",
+                "bakery-desc": "Fresh cake piece weight dynamic metric POS counter interface.",
+                "teashop-title": "Tea Shop Quick POS",
+                "teashop-desc": "Ultra-rapid hot beverage button click quantity increments.",
+                "pharmacy-title": "Pharmacy Hub POS",
+                "pharmacy-desc": "Statutory pharmaceutical formulation batch matrix billing tracker.",
+                "supermarket-title": "Supermarket Billing",
+                "supermarket-desc": "Bulk barcode scan register with high-speed invoice draft queues.",
+                "boutique-title": "Boutique & Tailoring",
+                "boutique-desc": "Apparel measurement log sheet and pattern delivery tracker.",
+                "laundry-title": "Laundry & Dry Cleaning",
+                "laundry-desc": "Dynamic fabric tag tracker, processing stage log sheets, and dispatch."
             },
             ta: {
-                app_title: "வணிகத் தேர்வுக் கன்சோல்",
-                lbl_select_shop: "துவங்க வேண்டிய வணிகத்தைத் தேர்ந்தெடுக்கவும்",
-                paywall_title: "SaaS உரிமக் காலம் முடிவடைந்தது",
-                paywall_desc: "உங்களது வணிகச் சந்தாக் காலம் முடிவடைந்துவிட்டது. எங்களது தானியங்கி யுபிஐ கியூஆர் மூலமாகப் பணம் செலுத்தி உடனடி அணுகலை மீட்டெடுக்கவும்.",
-                paywall_qr_info: "GPay/PhonePe மூலம் கட்டணம் செலுத்தி கடையை உடனடியாகத் திறக்கவும்.",
-                paywall_utr_label: "12-இலக்க யுபிஐ குறிப்பு எண் (UTR) உள்ளிடவும்",
-                paywall_btn_submit: "பணத்தை செலுத்து",
-                back_dashboard: "Back to Login / பின்செல்ல",
-                lbl_locked_card: "லாக் செய்யப்பட்டுள்ளது",
-                toast_switched: "வணிகத் தளம் வெற்றிகரமாகத் தேர்ந்தெடுக்கப்பட்டது! துவங்குகிறது...",
-                toast_utr_submitted: "பரிவர்த்தனை விபரங்கள் பதியப்பட்டன! அட்மின் சரிபார்ப்பிற்குப் பின் களம் திறக்கப்படும்."
+                appHeader: "ரோஜி",
+                sideResolver: "சாதனத் தேர்வு",
+                sideLogout: "வெளியேறு",
+                welcomeTitle: "டாஷ்போர்டு",
+                badgeTierTitle: "செயலில் உள்ள சந்தா மேலாண்மை",
+                merchantTierLabel: "இயக்க அடுக்கு நிலை:",
+                metricSlashedLbl: "பயன்படுத்தப்பட்ட பில்கள் அளவு",
+                metricValidityLbl: "கணினி செல்லுபடியாகும் காலம்",
+                metricDaysText: "நாட்கள் மீதமுள்ளன",
+                packageDisclaimer: "நிறுவன இணக்கக் குறியீடு செயலில் உள்ளது",
+                gridTitle: "வணிகத் தேர்வுப் பட்டியல்",
+                gridDesc: "பரிவர்த்தனைப் பதிவை மேற்கொள்ள விரும்பிய வணிகத் தேர்வு அடுக்கைத் தேர்ந்தெடுக்கவும்.",
+                maintHeader: "கணினி முடக்கப்பட்டுள்ளது",
+                maintDesc: "இ-சேவை மற்றும் பிற பில்லிங் சேவைகள் பராமரிப்பு வேலைகள் காரணமாக தற்காலிகமாக முடக்கப்பட்டுள்ளன.",
+                toastMaintActive: "கணினி முடக்கம் செயலில் உள்ளது. போர்ட்டல் அணுகல் தடுக்கப்பட்டுள்ளது.",
+                toastConfigSaved: "பராமரிப்பு அமைப்புகள் சேமிக்கப்பட்டன.",
+                toastRouting: "தேர்ந்தெடுக்கப்பட்ட பில்லிங் பிரிவிற்கு மாற்றியமைக்கப்படுகிறது...",
+                toastLockedNiche: "அனுமதி மறுக்கப்பட்டது! இந்தத் துறை உங்கள் சோதனைக் கணக்கில் பூட்டப்பட்டுள்ளது.",
+                statusSecVault: "பாதுகாப்பானது",
+                vlePrefix: "வணிகர் கணக்கு விவரம்",
+                diagnosticTitle: "நிர்வாக அமைப்புகள் கண்டறிதல் பலகம்",
+                statusActiveFree: "ஆயுட்கால இலவசம் (Active_Lifetime_Free)",
+                statusActiveTrial: "சோதனைக் கணக்கு (Active_Trial)",
+                statusActivePro: "பிரீமியம் சந்தா (SaaS_Paid_Plan)",
+                btnConfigs: "அமைப்புகள்",
+                "stationery-title": "ஜெராக்ஸ் & ஸ்டேஷனரி கவுண்டர்",
+                "stationery-desc": "நகல் தாள்கள், குறிப்பேடுகள் மற்றும் பைண்டர்களுக்கான விரைவான பில்லிங்.",
+                "gifts-title": "பிரீமியம் பரிசுகள் & பொம்மைகள்",
+                "gifts-desc": "சில்லறை மற்றும் மீஷோவுக்கான பேக்கேஜிங் லாஜிஸ்டிக்ஸ் டிராக்கர்.",
+                "mobile-title": "மொபைல் ரிப்பேர் & உபகரணங்கள்",
+                "mobile-desc": "வன்பொருள் கண்டறிதல் மற்றும் உபகரணங்கள் பில்லிங் மேலாண்மை.",
+                "esevai-title": "இ-சேவை சிஎஸ்சி போர்ட்டல்",
+                "esevai-desc": "அரசு டிஜிட்டல் விண்ணப்பங்களுக்கான கணக்கு பதிவு மேலாண்மை.",
+                "toys-title": "பொம்மைகள் & மீஷோ பேக்கிங்",
+                "toys-desc": "ஏர் பப்பில் ரேப் பெருக்கிகளுடன் விநியோகச் சங்கிலி கப்பல் தளம்.",
+                "money_transfer-title": "பண பரிமாற்ற பில்லிங்",
+                "money_transfer-desc": "சேவை கட்டணம் மற்றும் பட்டுவாடா முறை மேலாண்மை.",
+                "fabrication-title": "வெல்டிங் & எஸ்எஸ் ஃபேப்ரிகேஷன்",
+                "fabrication-desc": "அளவுகள் மற்றும் எடை அடிப்படையிலான மதிப்பீட்டு கால்குலேட்டர்.",
+                "bakery-title": "பேக்கரி கவுண்டர் பில்லிங்",
+                "bakery-desc": "கேக்குகள், பப்ஸ், இனிப்புகளுக்கான எடை அடிப்படையிலான பில்லிங்.",
+                "teashop-title": "டீ ஷாப் விரைவு பில்லிங்",
+                "teashop-desc": "பானங்கள் மற்றும் சிற்றுண்டிகளுக்கான விரைவான பில்லிங்.",
+                "pharmacy-title": "பார்மசி பில்லிங்",
+                "pharmacy-desc": "மருந்து தொகுப்பு மற்றும் பில்லிங் கண்காணிப்பு மேலாண்மை.",
+                "supermarket-title": "சூப்பர் மார்க்கெட் பில்லிங்",
+                "supermarket-desc": "பார்கோடு ஸ்கேன் மூலம் அதிவேக பில்லிங் மேலாண்மை.",
+                "boutique-title": "பொடிக்கு & தையல் கலை",
+                "boutique-desc": "அளவீடுகள் மற்றும் விநியோக கண்காணிப்பு மேலாண்மை.",
+                "laundry-title": "சலவை மற்றும் டிரை க்ளீனிங்",
+                "laundry-desc": "துணி டேக் டிராக்கர், செயலாக்க நிலைகள் மற்றும் அனுப்புதல்."
             }
         };
 
-        const blueprintShopsData = [
-            { id: "xerox", name: { en: "Xerox Matrix", ta: "ஜெராக்ஸ் மேட்ரிக்ஸ்" }, price: 150, route: "modules/xerox/billing.html" },
-            { id: "photo_studio", name: { en: "Photo Studio", ta: "போட்டோ ஸ்டுடியோ" }, price: 200, route: "modules/studio/billing.html" },
-            { id: "custom_frames", name: { en: "Custom Frames", ta: "பிரேம் யூனிட்" }, price: 200, route: "modules/frames/billing.html" },
-            { id: "stationery", name: { en: "Stationery Zone", ta: "ஸ்டேஷனரி அங்காடி" }, price: 100, route: "modules/stationery/billing.html" },
-            { id: "premium_gifts", name: { en: "Premium Gifts Zone", ta: "பரிசுப் பொருட்கள்" }, price: 150, route: "modules/gifts/billing.html" },
-            { id: "mobile_tech", name: { en: "Mobile & Tech", ta: "மொபைல் & ஸ்பேர்ஸ்" }, price: 150, route: "modules/mobile/billing.html" },
-            { id: "printing_tech", name: { en: "Printing & Tech Suite", ta: "பிரிண்டிங் சிஸ்டம்ஸ்" }, price: 200, route: "modules/printing_suite/billing.html" },
-            { id: "csc_esevai", name: { en: "Internet Cafe & e-Sevai / CSC", ta: "இணைய சேவை & இ-சேவை" }, price: 250, route: "modules/esevai/billing.html" },
-            { id: "toys_meesho", name: { en: "Toys Zone & Meesho Packing", ta: "விளையாட்டுப் பொருட்கள் & Meesho" }, price: 150, route: "modules/toys/billing.html" },
-            { id: "money_transfer", name: { en: "Money Transfer Ledger", ta: "பணப் பரிமாற்றம்" }, price: 300, route: "modules/money_transfer/billing.html" },
-            { id: "fabrication", name: { en: "Welding, Roof & SS Fabrication Works", ta: "வெல்டிங் & ஃபேப்ரிகேஷன்" }, price: 400, route: "modules/fabrication/billing.html" },
-            { id: "bakery_core", name: { en: "Bakery Core Counter", ta: "பேக்கரி கவுண்டர்" }, price: 300, route: "modules/bakery/billing.html" },
-            { id: "teashop", name: { en: "Tea Shop Quick Billing", ta: "டீ ஷாப் கவுண்டர்" }, price: 100, route: "modules/teashop/billing.html" }
+        // All 13 core workspace channels catalog
+        const coreNicheShopsCatalog = [
+            { id: "stationery", path: "modules/stationery/billing.html", iconBg: "bg-blue-500/10 text-blue-400" },
+            { id: "gifts", path: "modules/gifts/billing.html", iconBg: "bg-purple-500/10 text-purple-400" },
+            { id: "mobile", path: "modules/mobile/billing.html", iconBg: "bg-teal-500/10 text-teal-400" },
+            { id: "esevai", path: "modules/esevai/billing.html", iconBg: "bg-cyan-500/10 text-cyan-400" },
+            { id: "toys", path: "modules/toys/billing.html", iconBg: "bg-pink-500/10 text-pink-400" },
+            { id: "money_transfer", path: "modules/money_transfer/billing.html", iconBg: "bg-emerald-500/10 text-emerald-400" },
+            { id: "fabrication", path: "modules/fabrication/billing.html", iconBg: "bg-orange-500/10 text-orange-400" },
+            { id: "bakery", path: "modules/bakery/billing.html", iconBg: "bg-yellow-500/10 text-yellow-400" },
+            { id: "teashop", path: "modules/teashop/billing.html", iconBg: "bg-rose-500/10 text-rose-400" },
+            { id: "pharmacy", path: "modules/pharmacy/billing.html", iconBg: "bg-indigo-500/10 text-indigo-400" },
+            { id: "supermarket", path: "modules/supermarket/billing.html", iconBg: "bg-sky-500/10 text-sky-400" },
+            { id: "boutique", path: "modules/boutique/billing.html", iconBg: "bg-fuchsia-500/10 text-fuchsia-400" },
+            { id: "laundry", path: "modules/laundry/billing.html", iconBg: "bg-lime-500/10 text-lime-400" }
         ];
 
-        let currentLang = 'en';
-        let activeMerchantShop = null;
-
-        // ON RUNTIME START
+        // Initialize state, load dynamic active session from localStorage
         window.addEventListener('DOMContentLoaded', () => {
-            // STEP A: Security Identity Validation
-            const sessionClaims = JSON.parse(sessionStorage.getItem('roaji_session_claims'));
-            if (!sessionClaims || sessionClaims.role !== "OWNER") {
-                window.location.href = "https://iamajithkumar98-bit.github.io/roaji/index.html";
-                return;
-            }
-
-            // Retrieve active onboarding merchant shop configuration
-            const registeredSaaSShops = JSON.parse(localStorage.getItem('roaji_shops')) || [];
-            activeMerchantShop = registeredSaaSShops.find(s => s.owner_email === sessionClaims.email);
-
-            const savedGlobalLang = localStorage.getItem('roaji_language');
-            if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
-                currentLang = savedGlobalLang;
-            }
-            applyLanguage();
-
-            // Check Maintenance interceptor
-            evaluateSystemMaintenance();
-
-            // Check Paywall expiration
-            evaluateSaaSPaywallGate();
-
-            renderShopsGrid();
+            evaluateLocalDatabaseSeeds();
+            loadActiveMerchantSession();
+            mutateLanguageContext('en');
+            pollMaintenanceInterceptorState();
+            setInterval(pollMaintenanceInterceptorState, 3000); // Continuous safety check loop
         });
 
-        // LANGUAGE TOGGLE
-        function changeLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('roaji_language', lang);
-            applyLanguage();
-            renderShopsGrid();
-        }
-
-        function applyLanguage() {
-            const btnTa = document.getElementById('lang-btn-ta');
-            const btnEn = document.getElementById('lang-btn-en');
-
-            if (currentLang === 'ta') {
-                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
-                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
-            } else {
-                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
-                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+        // Seed fallback databases if empty
+        function evaluateLocalDatabaseSeeds() {
+            if (!localStorage.getItem('roaji_shops')) {
+                const defaultVerifiedUser = {
+                    merchantName: "Ajith Kumar",
+                    name: "SRI VARI PREMIUM PLAZA",
+                    email: "demo@roaji.com",
+                    password: "password123",
+                    phone: "+91 94440 98765",
+                    status: "Active_Lifetime_Free",
+                    package: "SaaS_Paid_Plan",
+                    selectedShops: [
+                        "stationery", "gifts", "mobile", "esevai", "toys", 
+                        "money_transfer", "fabrication", "bakery", "teashop", 
+                        "pharmacy", "supermarket", "boutique", "laundry"
+                    ]
+                };
+                localStorage.setItem('roaji_shops', JSON.stringify([defaultVerifiedUser]));
             }
 
-            const elements = document.querySelectorAll('[data-key]');
-            elements.forEach(element => {
-                const key = element.getAttribute('data-key');
-                if (langData[currentLang][key]) {
-                    element.innerText = langData[currentLang][key];
+            if (!localStorage.getItem('roaji_maintenance_mode')) {
+                localStorage.setItem('roaji_maintenance_mode', "OFF");
+            }
+        }
+
+        // Pull verified active user session parameters
+        function loadActiveMerchantSession() {
+            const rawSession = localStorage.getItem('roaji_active_shop_session');
+            if (rawSession) {
+                try {
+                    activeMerchantSession = JSON.parse(rawSession);
+                } catch (e) {
+                    activeMerchantSession = null;
                 }
+            }
+
+            // Fallback default mock user if session is undefined
+            if (!activeMerchantSession) {
+                const shopsArray = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+                activeMerchantSession = shopsArray[0] || {
+                    merchantName: "Demo Merchant",
+                    name: "DEMO ENTERPRISE OUTLET",
+                    status: "Active_Lifetime_Free",
+                    selectedShops: ["stationery", "gifts", "mobile", "esevai", "toys", "money_transfer", "fabrication", "bakery", "teashop"]
+                };
+            }
+
+            // Calculate dynamic billing values
+            recalculateSaaSAllocationCounters();
+            synchronizeStateAndLogs();
+        }
+
+        // Dynamically recalculate and decrement capacity weights
+        function recalculateSaaSAllocationCounters() {
+            if (!activeMerchantSession) return;
+
+            // Generate seeded initial values for invoice counters if not set yet inside profile object
+            if (activeMerchantSession.slashedInvoicesCount === undefined) {
+                activeMerchantSession.slashedInvoicesCount = 942; // default
+            }
+            if (activeMerchantSession.daysValidity === undefined) {
+                activeMerchantSession.daysValidity = 365; // default
+            }
+
+            // Write dynamically calculated variables to DOM elements
+            document.getElementById('merchant-shop-name').textContent = activeMerchantSession.name;
+            document.getElementById('merchant-account-tier').textContent = activeMerchantSession.status || "Active_Lifetime_Free";
+            document.getElementById('metric-slashed-count').textContent = activeMerchantSession.slashedInvoicesCount;
+            document.getElementById('metric-validity-days').textContent = activeMerchantSession.daysValidity;
+
+            const progressPercentage = (activeMerchantSession.slashedInvoicesCount / 1000) * 100;
+            document.getElementById('metric-slashed-progress').style.width = `${progressPercentage}%`;
+
+            const headerInfo = document.getElementById('active-merchant-info');
+            if (headerInfo) {
+                headerInfo.textContent = `${activeMerchantSession.merchantName} // Mobile: ${activeMerchantSession.phone || '--'}`;
+            }
+        }
+
+        // Re-draw dynamic workspace channels grid mapping (Part 2)
+        function drawMultiBusinessGrid() {
+            const container = document.getElementById('business-grid-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            const t = appTranslationMatrix[activeLanguageContext];
+
+            coreNicheShopsCatalog.forEach(shop => {
+                // Check lock state based on user's authorized selectedShops token
+                const isUnlocked = activeMerchantSession && activeMerchantSession.selectedShops && activeMerchantSession.selectedShops.includes(shop.id);
+
+                const card = document.createElement('div');
+                card.onclick = () => handleShopCardRouting(shop.id, shop.path, isUnlocked);
+                
+                // Focus highlight amber border if unlocked and hover state
+                const cardStyle = isUnlocked 
+                    ? "glass-card border-neutral-800/80 cursor-pointer" 
+                    : "opacity-45 bg-neutral-950/40 border-neutral-900 cursor-not-allowed";
+
+                // Unique niche variables translation safe lookup
+                const title = t[`${shop.id}-title`] || shop.id;
+                const desc = t[`${shop.id}-desc`] || "";
+
+                card.className = `p-5 rounded-2xl border flex flex-col justify-between h-48 relative overflow-hidden group select-none transition-all ${cardStyle}`;
+                card.innerHTML = `
+                    <div class="space-y-3 relative z-10">
+                        <!-- Icon Base -->
+                        <div class="w-10 h-10 ${shop.iconBg} rounded-xl flex items-center justify-center border border-white/5 shadow-inner">
+                            <span class="font-bold text-xs font-mono uppercase">${shop.id.substring(0, 3)}</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-neutral-100 group-hover:text-amberAccent transition-colors font-mono tracking-wide uppercase">${title}</h4>
+                            <p class="text-[10px] text-neutral-500 mt-1 leading-normal leading-relaxed">${desc}</p>
+                        </div>
+                    </div>
+
+                    <!-- Action State Footer Indicators -->
+                    <div class="flex items-center justify-between mt-4 border-t border-neutral-900 pt-2.5 relative z-10 text-[10px] font-mono tracking-wider">
+                        <span class="text-neutral-500 uppercase font-semibold">Node Status</span>
+                        ${isUnlocked 
+                            ? `<span class="text-emeraldAccent font-bold uppercase flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emeraldAccent animate-ping"></span> Active
+                               </span>` 
+                            : `<span class="text-neutral-600 font-bold uppercase">Locked</span>`
+                        }
+                    </div>
+
+                    <!-- Ambient luxury background element -->
+                    <div class="absolute -bottom-12 -right-12 w-24 h-24 bg-amber-500/0 group-hover:bg-amber-500/5 rounded-full blur-2xl transition-all duration-300"></div>
+                `;
+                container.appendChild(card);
             });
         }
 
-        // ==================== SYSTEM INTERCEPTORS ====================
-        function evaluateSystemMaintenance() {
-            const state = localStorage.getItem('roaji_maintenance_mode') || 'OFF';
-            if (state === 'ON') {
-                document.getElementById('maintenance-view').classList.remove('hidden');
-                document.getElementById('maintenance-view').classList.add('flex');
-            }
-        }
-
-        function evaluateSaaSPaywallGate() {
-            if (!activeMerchantShop) return;
-
-            // Bypasses lock completely for Active_Lifetime_Free
-            if (activeMerchantShop.status === "Active_Lifetime_Free") {
+        // Workspace card routing interceptor logic
+        function handleShopCardRouting(shopId, path, isUnlocked) {
+            if (systemMaintenanceFlag) {
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastMaintActive);
                 return;
             }
 
-            // Hard check for expiring SaaS plans
-            if (activeMerchantShop.status === "SaaS_Paid_Plan" && activeMerchantShop.is_expired) {
-                // Initialize Payment variables
-                const masterUpiId = localStorage.getItem('roaji_admin_upi_id') || 'roajisystems@upi';
-                const baseQrApi = localStorage.getItem('roaji_admin_qr_link') || 'https://api.qrserver.com/v1/create-qr-code/';
-                
-                const qrImage = document.getElementById('paywall-qr-img');
-                const priceTotalPayload = 1499; // Mock Pro Suite package weight
-
-                qrImage.src = `${baseQrApi}?size=150x150&data=upi://pay?pa=${masterUpiId}%26am=${priceTotalPayload}%26cu=INR`;
-
-                // Display blocking overlay modal
-                const modal = document.getElementById('paywall-modal');
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            }
-        }
-
-        // ==================== RENDER INTEGRATED SHops GRID ====================
-        function renderShopsGrid() {
-            const grid = document.getElementById('shops-grid');
-            grid.innerHTML = '';
-
-            const authorizedModulesString = activeMerchantShop ? activeMerchantShop.type : '';
-            const authorizedModulesArray = authorizedModulesString.split(', ');
-
-            blueprintShopsData.forEach(shop => {
-                // Check if shop niche exists inside verified merchant claims
-                const isUnlocked = authorizedModulesArray.includes(shop.id) || authorizedModulesArray.includes(shop.name.en);
-
-                if (isUnlocked) {
-                    // UNLOCKED CLICKABLE CORE CARD
-                    grid.innerHTML += `
-                        <div onclick="launchStoreDashboard('${shop.id}', '${shop.route}')" class="p-5 bg-stone-950/40 border border-stone-850 hover:border-orange-500 rounded-3xl cursor-pointer transition-all duration-300 flex flex-col justify-between h-40 group shadow-md hover:shadow-orange-500/10">
-                            <div>
-                                <span class="inline-block px-2.5 py-0.5 text-[8px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded uppercase tracking-wider">Active</span>
-                                <h3 class="font-bold text-stone-200 text-xs mt-3 leading-snug group-hover:text-white">${shop.name[currentLang]}</h3>
-                            </div>
-                            <div class="flex items-center justify-between border-t border-stone-900 pt-3">
-                                <span class="text-[10px] text-stone-500 font-bold uppercase tracking-wider">Launch POS</span>
-                                <span class="text-stone-600 group-hover:text-orange-500 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
-                                </span>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    // LOCKED GREYSCALE CARD
-                    const lockedText = langData[currentLang]['lbl_locked_card'];
-                    grid.innerHTML += `
-                        <div class="p-5 bg-stone-950/20 border border-stone-900 rounded-3xl h-40 flex flex-col justify-between filter grayscale opacity-45 cursor-not-allowed select-none">
-                            <div>
-                                <span class="inline-block px-2.5 py-0.5 text-[8px] font-bold bg-stone-800 text-stone-400 border border-stone-850 rounded uppercase tracking-wider">${lockedText}</span>
-                                <h3 class="font-bold text-stone-500 text-xs mt-3 leading-snug">${shop.name[currentLang]}</h3>
-                            </div>
-                            <div class="flex items-center justify-between border-t border-stone-900/60 pt-3 text-stone-600">
-                                <span class="text-[9px] font-bold uppercase tracking-wider">Locked</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:16px; height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-
-            // Append dynamic marquee if present
-            evaluateScrollingMarqueeAlert();
-        }
-
-        function evaluateScrollingMarqueeAlert() {
-            const bannerString = localStorage.getItem('roaji_global_banner') || '';
-            const marqueeBlock = document.getElementById('marquee-container');
-            const marqueeTicker = document.getElementById('marquee-ticker');
-
-            if (bannerString.trim() !== '') {
-                marqueeTicker.innerText = bannerString;
-                marqueeBlock.classList.remove('hidden');
-            } else {
-                marqueeBlock.classList.add('hidden');
-            }
-        }
-
-        // ==================== REDIRECTION CONTROLLERS ====================
-        function launchStoreDashboard(shopId, routeFile) {
-            // Save selected context parameters into local storage
-            localStorage.setItem('roaji_active_billing_shop', shopId);
-            showToast(langData[currentLang]['toast_switched'], "success");
-
-            // Absolute sub-folder programmatic path window redirect (CRITICAL REDIRECT PATH FIX)
-            setTimeout(() => {
-                window.location.href = `https://iamajithkumar98-bit.github.io/roaji/${routeFile}`;
-            }, 800);
-        }
-
-        function handlePaywallUtrSubmit(event) {
-            event.preventDefault();
-            const utr = document.getElementById('paywall-utr-input').value.trim();
-
-            if (utr.length < 12) {
-                showToast("UTR reference must be exactly 12 digits long!", "error");
+            if (!isUnlocked) {
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLockedNiche);
                 return;
             }
 
-            // Update registration status to PENDING_SUPER_ADMIN_APPROVAL
-            if (activeMerchantShop) {
-                activeMerchantShop.status = "PENDING_SUPER_ADMIN_APPROVAL";
-                activeMerchantShop.address += ` | Paywall UTR: ${utr}`;
+            // Decrement remaining invoices allotment on action click (Simulation of active billing decrement)
+            if (activeMerchantSession && activeMerchantSession.slashedInvoicesCount > 0) {
+                activeMerchantSession.slashedInvoicesCount -= 1;
+                localStorage.setItem('roaji_active_shop_session', JSON.stringify(activeMerchantSession));
                 
-                // Commit to storage
-                const registeredSaaSShops = JSON.parse(localStorage.getItem('roaji_shops')) || [];
-                const idx = registeredSaaSShops.findIndex(s => s.owner_email === activeMerchantShop.owner_email);
-                if (idx !== -1) {
-                    registeredSaaSShops[idx] = activeMerchantShop;
-                    localStorage.setItem('roaji_shops', JSON.stringify(registeredSaaSShops));
+                // Write update back to global array in roaji_shops
+                const shopsArray = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+                const matchedIdx = shopsArray.findIndex(user => user.email === activeMerchantSession.email);
+                if (matchedIdx !== -1) {
+                    shopsArray[matchedIdx].slashedInvoicesCount = activeMerchantSession.slashedInvoicesCount;
+                    localStorage.setItem('roaji_shops', JSON.stringify(shopsArray));
                 }
+                recalculateSaaSAllocationCounters();
             }
 
-            showToast(langData[currentLang]['toast_utr_submitted'], "info");
-
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastRouting);
             setTimeout(() => {
-                window.location.href = "https://iamajithkumar98-bit.github.io/roaji/index.html"; // Redirect to lock entryway waiting for Super Admin verify
+                window.location.href = path;
             }, 1200);
         }
 
-        function logoutFromResolver() {
-            sessionStorage.removeItem('roaji_session_claims');
-            localStorage.removeItem('roaji_active_shop_id');
-            window.location.href = "https://iamajithkumar98-bit.github.io/roaji/index.html";
+        // Safe Element Text Updater
+        function safeSetText(id, text) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = text;
+            }
         }
 
-        // TOAST NOTIFICATIONS ENGINE
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            let bgClass = 'bg-stone-900 text-white border-stone-850';
-            let iconSvg = '';
+        // Error-free Bilingual translation context swapper safely isolating existing properties (Bypass Language Mutation Bug)
+        function mutateLanguageContext(lang) {
+            activeLanguageContext = lang;
+            const t = appTranslationMatrix[lang];
 
-            if (type === 'success') {
-                bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
-                iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-            } else if (type === 'error') {
-                bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
-                iconSvg = `<svg class="h-5 w-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-            } else if (type === 'info') {
-                bgClass = 'bg-amber-950/90 border border-amber-500/30 text-amber-300';
-                iconSvg = `<svg class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            // Translating existing textual wrappers securely
+            safeSetText('lang-side-resolver', t.sideResolver);
+            safeSetText('lang-side-logout', t.sideLogout);
+            safeSetText('lang-welcome-title', t.welcomeTitle);
+            safeSetText('lang-badge-tier-title', t.badgeTierTitle);
+            safeSetText('lang-merchant-tier-label', t.merchantTierLabel);
+            safeSetText('lang-metric-slashed-lbl', t.metricSlashedLbl);
+            safeSetText('lang-metric-validity-lbl', t.metricValidityLbl);
+            safeSetText('lang-metric-days-text', t.metricDaysText);
+            safeSetText('lang-package-disclaimer', t.packageDisclaimer);
+            safeSetText('lang-grid-title', t.gridTitle);
+            safeSetText('lang-grid-desc', t.gridDesc);
+
+            // Maintenance overlay labels translation
+            safeSetText('lang-maint-header', t.maintHeader);
+            safeSetText('lang-maint-desc', t.maintDesc);
+
+            // Redraw Grid with translated niches
+            drawMultiBusinessGrid();
+
+            // Active toggle switcher highlights
+            if (lang === 'en') {
+                document.getElementById('lang-toggle-en').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                document.getElementById('lang-toggle-ta').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            } else {
+                document.getElementById('lang-toggle-ta').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                document.getElementById('lang-toggle-en').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            }
+        }
+
+        // Force user logout and flush active workspace session
+        function forceLogout() {
+            localStorage.removeItem('roaji_active_shop_session');
+            localStorage.removeItem('roaji_shops_active');
+            window.location.href = "index.html";
+        }
+
+        // Pull diagnostic diagnostics array inside configurations console drawer
+        function synchronizeStateAndLogs() {
+            const rawShops = localStorage.getItem('roaji_shops');
+            let array = [];
+            try {
+                array = JSON.parse(rawShops) || [];
+            } catch (e) {
+                array = [];
             }
 
-            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
-            toast.innerHTML = `<div class="flex-shrink-0">${iconSvg}</div><div class="text-xs font-semibold leading-relaxed">${message}</div>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.classList.remove('translate-x-12', 'opacity-0'); }, 10);
+            const diagContainer = document.getElementById('sandbox-diag-accounts');
+            if (diagContainer) {
+                if (array.length === 0) {
+                    diagContainer.textContent = "No accounts registered in `roaji_shops` database.";
+                } else {
+                    diagContainer.innerHTML = '';
+                    array.forEach((user, idx) => {
+                        const div = document.createElement('div');
+                        div.className = "border-b border-neutral-900 pb-1 mb-1 last:border-0 text-left";
+                        div.innerHTML = `
+                            <span class="text-amberAccent">[${idx+1}]</span> <strong>${user.name}</strong> (${user.email})<br>
+                            <span class="text-neutral-500">Status:</span> <span class="text-emeraldAccent font-semibold">${user.status || 'Active_Lifetime_Free'}</span> | <span class="text-neutral-500">Channels:</span> ${user.selectedShops ? user.selectedShops.length : 0}
+                        `;
+                        diagContainer.appendChild(div);
+                    });
+                }
+            }
+        }
+
+        // Toggle Diagnostic configurations panel drawer
+        function toggleConfigLogPanel() {
+            const panel = document.getElementById('configs-drawer-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        // Override Maintenance Status
+        function overrideMaintenance(state) {
+            localStorage.setItem('roaji_maintenance_mode', state);
+            pollMaintenanceInterceptorState();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastConfigSaved);
+        }
+
+        // Flush and seed demo parameters to database
+        function forceCleanResetSeed() {
+            localStorage.removeItem('roaji_shops');
+            evaluateLocalDatabaseSeeds();
+            loadActiveMerchantSession();
+            triggerUINotification("Databases cleared and seed values re-installed.");
+        }
+
+        // System Alert Toast notifications utility
+        function triggerUINotification(message) {
+            const toast = document.getElementById('ui-toast');
+            document.getElementById('toast-message-body').textContent = message;
+
+            toast.className = "fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-0 opacity-100 transition-all duration-300 z-50 flex items-center gap-2";
+
             setTimeout(() => {
-                toast.classList.add('translate-x-12', 'opacity-0');
-                setTimeout(() => { toast.remove(); }, 300);
-            }, 4000);
+                toast.className = "fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2";
+            }, 3000);
         }
     </script>
 </body>
