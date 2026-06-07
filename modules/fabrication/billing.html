@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welding, Roofing & SS Fabrication - Commercial Billing & Estimation Console</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandDark: '#050505',
+                        brandGlass: 'rgba(23, 23, 23, 0.75)',
+                        amberAccent: '#f59e0b',
+                        emeraldAccent: '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styling for sleek glassmorphic container displays */
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        /* Custom scrollbar configurations for dark console environments */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 2.5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+        /* Standard Media isolation print stylesheets for thermal 3-inch slip rolls */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #thermal-receipt-container, #thermal-receipt-container * {
+                visibility: visible;
+            }
+            #thermal-receipt-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 80mm;
+                background: white !important;
+                color: black !important;
+                padding: 4mm;
+                font-family: monospace;
+            }
+        }
+    </style>
+</head>
+<body class="bg-brandDark text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-amber-500/20 selection:text-amber-300">
+
+    <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
+    <div id="maintenance-overlay" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[9999] hidden flex-col items-center justify-center p-6 text-center">
+        <div class="glass-panel p-8 rounded-2xl border-red-500/30 max-w-md w-full">
+            <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+            </div>
+            <h2 id="maint-title" class="text-2xl font-bold tracking-tight text-white mb-2">SYSTEM LOCKED</h2>
+            <p id="maint-desc" class="text-neutral-400 text-sm mb-6">Fabrication estimation desks, dimension calculators, and draft billing channels are temporarily locked for mandatory statutory maintenance updates. All operations are locked.</p>
+            <div class="text-[11px] text-amberAccent font-mono uppercase tracking-wider py-1.5 px-3 bg-amberAccent/10 rounded border border-amberAccent/20 inline-block">
+                Status Flag: FAB_ESTIMATE_MAINT_ACTIVE
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Top Header Context -->
+    <header class="border-b border-neutral-800 bg-neutral-950/60 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Metadata Identity -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-amberAccent/10 border border-amberAccent/30 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-amberAccent">
+                        <path d="M12.378 1.602a.75.75 0 00-.756 0L3 6.632l9 5.25 9-5.25-8.622-5.03zM21.75 7.93l-9 5.25v9l8.628-5.03a.75.75 0 00.372-.65V8.58a.75.75 0 00-.372-.65zM11.25 22.18v-9l-9-5.25v7.92a.75.75 0 00.372.65l8.628 5.03z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 id="app-title-header" class="text-sm font-bold text-white tracking-wider flex items-center gap-2 uppercase">
+                        WELDING & SS FABRICATION LEDGER
+                        <span class="text-[9px] bg-neutral-800 text-neutral-400 font-mono px-1.5 py-0.5 rounded border border-neutral-700">heavy-v9.2</span>
+                    </h1>
+                    <div class="text-[11px] text-neutral-400 font-mono flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emeraldAccent animate-pulse"></span>
+                        <span id="active-merchant-info">Loading Industrial Estimation Terminal...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactivity Actions Module -->
+            <div class="flex items-center space-x-4">
+                <!-- Sandbox Controls Drawer Open Switch -->
+                <button onclick="toggleConfigLogPanel()" class="text-xs bg-neutral-900 border border-neutral-800 hover:border-amberAccent/50 text-neutral-300 font-mono py-1.5 px-3 rounded flex items-center gap-1.5 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-3.5 h-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                    </svg>
+                    <span id="lang-btn-configs">Configurations</span>
+                </button>
+
+                <!-- Translation Engine Switch Component -->
+                <div class="bg-neutral-900 border border-neutral-800 p-0.5 rounded-lg flex">
+                    <button id="lang-toggle-en" onclick="mutateLanguageContext('en')" class="px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">
+                        EN
+                    </button>
+                    <button id="lang-toggle-ta" onclick="mutateLanguageContext('ta')" class="px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono">
+                        தமிழ்
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Administrative Sandbox Configurations Panel Drawer -->
+    <div id="configs-drawer-panel" class="hidden border-b border-amber-500/20 bg-neutral-950 px-4 py-5 transition-all">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4">
+            
+            <!-- Fabrication Shop profile parameters mapping -->
+            <div class="glass-panel p-3.5 rounded-xl border-neutral-800">
+                <label class="block text-[10px] text-amberAccent font-mono uppercase mb-2">Merchant Profile Registry (`roaji_shops`)</label>
+                <input id="db-shop-name" type="text" placeholder="Shop Name" class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white mb-2 focus:border-amberAccent outline-none">
+                <input id="db-shop-phone" type="text" placeholder="Phone" class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white mb-2 focus:border-amberAccent outline-none">
+                <input id="db-shop-address" type="text" placeholder="Address" class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white mb-2 focus:border-amberAccent outline-none">
+                <input id="db-shop-gstin" type="text" placeholder="GSTIN" class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white focus:border-amberAccent outline-none">
+            </div>
+
+            <!-- Receipt branding text -->
+            <div class="glass-panel p-3.5 rounded-xl border-neutral-800 flex flex-col justify-between">
+                <div>
+                    <label class="block text-[10px] text-amberAccent font-mono uppercase mb-2">Footer Branding (`roaji_bill_footer_branding`)</label>
+                    <textarea id="db-bill-footer" rows="4" placeholder="Eco-friendly packaging dispatch disclaimer..." class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white resize-none focus:border-amberAccent outline-none"></textarea>
+                </div>
+                <span class="text-[9px] text-neutral-500 font-mono">Receipt Structural Disclaimers</span>
+            </div>
+
+            <!-- Pricing rules and structural parameters overrides DB -->
+            <div class="glass-panel p-3.5 rounded-xl border-neutral-800 flex flex-col justify-between">
+                <div>
+                    <label class="block text-[10px] text-amberAccent font-mono uppercase mb-2">Pricing Rules Overrides (`roaji_global_pricing_rules`)</label>
+                    <textarea id="db-pricing-rules" rows="4" placeholder="JSON structured rules override..." class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white font-mono leading-tight resize-none focus:border-amberAccent outline-none"></textarea>
+                </div>
+                <span class="text-[9px] text-neutral-500 font-mono">Job labor and base metal multipliers.</span>
+            </div>
+
+            <!-- System Protection Override Interceptors -->
+            <div class="glass-panel p-3.5 rounded-xl border-neutral-800 flex flex-col justify-between">
+                <div>
+                    <label class="block text-[10px] text-amberAccent font-mono uppercase mb-2">Statutory Interceptor Override</label>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="overrideLockoutStatus('ON')" class="text-xs font-mono font-semibold py-2 bg-red-950/20 border border-red-800/40 text-red-400 hover:bg-red-900 hover:text-white rounded transition-all">ON (Lock)</button>
+                        <button onclick="overrideLockoutStatus('OFF')" class="text-xs font-mono font-semibold py-2 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:border-emeraldAccent hover:text-emeraldAccent hover:border-transparent rounded transition-all">OFF (Active)</button>
+                    </div>
+                </div>
+                <button onclick="commitSandboxedDatabaseChanges()" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold text-xs py-2.5 rounded-lg transition-all mt-4 uppercase tracking-wider">
+                    Commit Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workspace Console Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Sq.Ft & Metal Weight Estimator Hub (7 Columns) -->
+        <section class="lg:col-span-7 flex flex-col space-y-6">
+
+            <!-- Square Feet & Weight Multiplier Estimation Engine (Part 9 Heavy Engineering Engine) -->
+            <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 left-0 h-1 bg-amberAccent w-1/3"></div>
+                <h2 id="sec-title-estimation" class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Structural Multiplier Estimation Console</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label id="lbl-job-type" class="block text-xs font-semibold text-neutral-400 mb-1.5">Select Fabrication Project Category</label>
+                        <select id="job-dropdown-catalog" onchange="applyJobCatalogSelection()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none transition-all">
+                            <option value="">-- Choose Job Type --</option>
+                            <option value="JOB-GATE">SS Safety Gate Structural Work</option>
+                            <option value="JOB-ROOF">Iron Roofing Shed Profile Work</option>
+                            <option value="JOB-GRILL">Decorative Window Grill Fabrication</option>
+                            <option value="JOB-WELD">General Spot Welding Structural Repairs</option>
+                        </select>
+                    </div>
+                    <div class="col-span-1 md:col-span-2">
+                        <label id="lbl-job-manual-name" class="block text-xs font-semibold text-neutral-400 mb-1.5">Structural Scope Description</label>
+                        <input id="job-manual-name" type="text" placeholder="e.g. Spiral Staircase & SS Handrails" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none">
+                    </div>
+                </div>
+
+                <!-- Dimension parameters (Calculates sq.ft) -->
+                <div class="grid grid-cols-3 gap-3 mb-4 bg-neutral-900/30 p-3 rounded-lg border border-neutral-800/40">
+                    <div>
+                        <label id="lbl-length" class="block text-xs font-semibold text-neutral-400 mb-1.5">Length (Feet)</label>
+                        <input id="job-length" type="number" step="0.1" value="0" oninput="recalculateDimensionsAndEstimates()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label id="lbl-width" class="block text-xs font-semibold text-neutral-400 mb-1.5">Width (Feet)</label>
+                        <input id="job-width" type="number" step="0.1" value="0" oninput="recalculateDimensionsAndEstimates()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label id="lbl-area" class="block text-xs font-semibold text-neutral-400 mb-1.5">Total Area (Sq.Ft)</label>
+                        <input id="job-area" type="number" step="0.1" value="0" disabled class="w-full text-sm bg-neutral-950 border border-neutral-800 rounded-lg py-2.5 px-3 text-amberAccent outline-none font-mono font-bold">
+                    </div>
+                </div>
+
+                <!-- Weight and Raw Metal multipliers -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 items-end">
+                    <div>
+                        <label id="lbl-weight" class="block text-xs font-semibold text-neutral-400 mb-1.5">Metal Weight (kg)</label>
+                        <input id="job-weight" type="number" step="0.5" value="0" oninput="recalculateDimensionsAndEstimates()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label id="lbl-metal-rate" class="block text-xs font-semibold text-neutral-400 mb-1.5">Base Rate (₹/kg)</label>
+                        <input id="job-metal-rate" type="number" step="1.0" value="0" oninput="recalculateDimensionsAndEstimates()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label id="lbl-labor-rate" class="block text-xs font-semibold text-neutral-400 mb-1.5">Labor (₹/Sq.Ft)</label>
+                        <input id="job-labor-rate" type="number" step="1.0" value="0" oninput="recalculateDimensionsAndEstimates()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <button id="btn-add-estimate" onclick="registerEstimationRow()" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold py-2.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                            <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                        </svg>
+                        <span id="lang-btn-add-estimate">Add Estimate</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Customer Registration & Immediate Project advance Ledger -->
+            <div class="glass-panel rounded-2xl p-6">
+                <h3 id="sec-title-registration" class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Project Client Registration & Ledger Surcharges</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="col-span-1">
+                        <label id="lbl-cust-name" class="block text-xs font-semibold text-neutral-400 mb-1.5">Customer Full Name</label>
+                        <input id="cust-name" type="text" placeholder="e.g. Ramesh Kumar" oninput="synchronizeIdentityLedger()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none">
+                    </div>
+                    <div class="col-span-1">
+                        <label id="lbl-cust-mobile" class="block text-xs font-semibold text-neutral-400 mb-1.5">Customer Mobile Number</label>
+                        <input id="cust-mobile" type="text" placeholder="e.g. +91 94447 XXXXX" oninput="synchronizeIdentityLedger()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div class="col-span-1 bg-amberAccent/5 p-2.5 rounded-lg border border-amberAccent/10">
+                        <label id="lbl-advance" class="block text-xs font-semibold text-amberAccent mb-1">Advance Paid (₹)</label>
+                        <input id="ledger-advance" type="number" step="100" value="0" oninput="recalculateAccumulatedProjectTotals()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-1.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div class="col-span-1 bg-emeraldAccent/5 p-2.5 rounded-lg border border-emeraldAccent/10">
+                        <label id="lbl-balance" class="block text-xs font-semibold text-emeraldAccent mb-1">Balance Due (₹)</label>
+                        <input id="ledger-balance" type="number" value="0" disabled class="w-full text-sm bg-neutral-950 border border-neutral-800 rounded-lg py-1.5 px-3 text-emeraldAccent outline-none font-mono font-bold">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workspace Transaction Ledger List Grid (Part 9 Estimation Metrics logic) -->
+            <div class="glass-panel rounded-2xl p-6 flex-1 flex flex-col min-h-[300px]">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="sec-title-ledger" class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Active Estimation Workspace</h3>
+                    <!-- Database Overrides Active Alert Flag -->
+                    <div id="overrides-active-badge" class="hidden text-[10px] font-mono text-amberAccent bg-amberAccent/10 border border-amberAccent/20 px-2.5 py-0.5 rounded-full items-center gap-1 animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v4.59L7.3 13.3a.75.75 0 101.05 1.07l2.9-2.9a.75.75 0 00.22-.53v-5.19z" clip-rule="evenodd" />
+                        </svg>
+                        <span id="lang-pricing-overridden">Pricing Overrides Active</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-x-auto">
+                    <table class="w-full min-w-[550px]">
+                        <thead>
+                            <tr class="border-b border-neutral-800 text-[10px] font-mono text-neutral-500 text-left uppercase tracking-wider">
+                                <th id="th-code" class="pb-3 w-1/5">Project Code</th>
+                                <th id="th-desc" class="pb-3 w-2/5">Structural Project Description</th>
+                                <th id="th-metal" class="pb-3 text-right">Metal Cost</th>
+                                <th id="th-labor" class="pb-3 text-right">Labor Cost</th>
+                                <th id="th-dimensions" class="pb-3 text-center">Dimensions</th>
+                                <th id="th-total" class="pb-3 text-right">Subtotal (₹)</th>
+                                <th class="pb-3 text-center w-12">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-table-tbody" class="divide-y divide-neutral-800/50 text-xs">
+                            <!-- Populated dynamically via JavaScript calculations -->
+                        </tbody>
+                    </table>
+
+                    <!-- Workspace Empty State Fallback -->
+                    <div id="cart-empty-placeholder" class="py-14 flex flex-col items-center justify-center text-center">
+                        <div class="w-11 h-11 rounded-full border border-dashed border-neutral-700 flex items-center justify-center text-neutral-600 mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
+                        </div>
+                        <p id="lang-empty-cart-msg" class="text-xs text-neutral-500 max-w-xs">Project estimation workspace is empty. Add SS safety gates, structural roofing profiles or general welding job rows above.</p>
+                    </div>
+                </div>
+
+                <!-- Cumulative Financial Aggregates -->
+                <div class="border-t border-neutral-800 pt-4 mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                    <div class="bg-neutral-900/40 p-2.5 rounded-lg border border-neutral-800/60">
+                        <div id="lang-sum-metal" class="text-[9px] text-neutral-500 font-mono uppercase tracking-wide">Metal Raw Material Sum</div>
+                        <div id="total-metal-sum" class="text-sm font-bold text-white font-mono">₹ 0.00</div>
+                    </div>
+                    <div class="bg-neutral-900/40 p-2.5 rounded-lg border border-neutral-800/60">
+                        <div id="lang-sum-labor" class="text-[9px] text-neutral-500 font-mono uppercase tracking-wide font-semibold text-amberAccent">Project Labor Charges</div>
+                        <div id="total-labor-sum" class="text-sm font-bold text-amberAccent font-mono">₹ 0.00</div>
+                    </div>
+                    <div class="bg-neutral-900/40 p-2.5 rounded-lg border border-neutral-800/60">
+                        <div id="lang-sum-gst" class="text-[9px] text-neutral-500 font-mono uppercase tracking-wide">Total GST (18%)</div>
+                        <div id="total-gst-sum" class="text-sm font-bold text-neutral-300 font-mono">₹ 0.00</div>
+                    </div>
+                    <div class="bg-neutral-950 p-2.5 rounded-lg border border-amberAccent/20">
+                        <div id="lang-sum-net" class="text-[9px] text-amberAccent font-mono uppercase tracking-wide font-bold">Net Project Estimate</div>
+                        <div id="total-net-sum" class="text-base font-black text-emeraldAccent font-mono">₹ 0.00</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: 3-Inch Universal Fabrication Thermal Receipt Output (5 Columns) -->
+        <section class="lg:col-span-5 flex flex-col space-y-6">
+            
+            <!-- Quick Workspace Actions Bar -->
+            <div class="glass-panel rounded-2xl p-4 flex gap-3 items-center justify-between">
+                <button onclick="flushActiveWorkspace()" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-white px-4 py-2.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-3.5 h-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                    <span id="lang-btn-flush">Flush State</span>
+                </button>
+
+                <button onclick="commitAndProcessTransaction()" class="bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 font-bold px-6 py-2.5 rounded-xl text-xs tracking-wide transition-all flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
+                    </svg>
+                    <span id="lang-btn-lock">Lock & Register</span>
+                </button>
+            </div>
+
+            <!-- White-Label Thermal Receipt Container (Part 10 Framework Mockup Interface) -->
+            <div class="glass-panel rounded-2xl p-6 flex-1 flex flex-col">
+                <div class="flex items-center justify-between mb-4 border-b border-neutral-800 pb-3">
+                    <h3 id="lang-rec-pane-title" class="text-xs font-bold text-neutral-400 uppercase tracking-widest">3-Inch Thermal Receipt Preview</h3>
+                    <button onclick="triggerThermalSlipPrint()" class="text-neutral-400 hover:text-emeraldAccent transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.897l1.32-2.204a.513.513 0 01.83 0l1.32 2.204c.15.25.15.568 0 .818a1.65 1.65 0 00.3 2.22c.3.3.7.4 1.1.25.4-.15.7-.5.7-.9V8.25c0-.62-.25-1.21-.707-1.664A2.35 2.35 0 008.25 6H6.75a2.35 2.35 0 00-1.343.586A2.35 2.35 0 004.707 8.25v6.518c0 .4.3.75.7.9.4.15.8.05 1.1-.25a1.65 1.65 0 00.3-2.22.513.513 0 01-.087-.3zM15 13.897l1.32-2.204a.513.513 0 01.83 0l1.32 2.204c.15.25.15.568 0 .818a1.65 1.65 0 00.3 2.22c.3.3.7.4 1.1.25.4-.15.7-.5.7-.9V8.25c0-.62-.25-1.21-.707-1.664A2.35 2.35 0 0016.5 6H15a2.35 2.35 0 00-1.343.586A2.35 2.35 0 0012.957 8.25v6.518c0 .4.3.75.7.9.4.15.8.05 1.1-.25a1.65 1.65 0 00.3-2.22.513.513 0 01-.087-.3z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Virtual Paper Component mimicking direct thermal roll output -->
+                <div id="thermal-receipt-container" class="flex-1 bg-neutral-100 text-neutral-900 p-5 rounded-xl font-mono text-[11px] leading-tight flex flex-col justify-between overflow-y-auto max-h-[460px]">
+                    <div>
+                        <!-- Active Merchant Profile Header (Synced with localStorage roaji_shops) -->
+                        <div class="text-center mb-4 pb-3 border-b border-dashed border-neutral-400">
+                            <h4 id="rec-shop-name" class="font-bold text-xs uppercase tracking-wide">-- Live Fabrication Workshop --</h4>
+                            <p id="rec-shop-address" class="text-[9px] text-neutral-600">-- Profile Unregistered --</p>
+                            <p id="rec-shop-phone" class="text-[9px] text-neutral-600">Phone: --</p>
+                            <p id="rec-shop-gstin" class="text-[9px] text-neutral-600 font-bold uppercase">GSTIN: --</p>
+                        </div>
+
+                        <!-- Client and structural estimate reference details metadata -->
+                        <div class="mb-4 text-[9px] text-neutral-600 border-b border-dashed border-neutral-300 pb-2.5">
+                            <div class="flex justify-between">
+                                <span>DATE: <span id="rec-date">--</span></span>
+                                <span>TIME: <span id="rec-time">--</span></span>
+                            </div>
+                            <div class="flex justify-between mt-1">
+                                <span>EST REF: <span id="rec-invoice-ref">FAB-EST-XXXX</span></span>
+                                <span>CUSTOMER: <span id="rec-client-name" class="font-semibold text-neutral-900">--</span></span>
+                            </div>
+                            <div class="flex justify-between mt-0.5">
+                                <span>MOBILE: <span id="rec-client-mobile">--</span></span>
+                                <span class="uppercase font-bold text-[8px] bg-neutral-800 text-white px-1 py-0.5">ESTIMATE DRAFT</span>
+                            </div>
+                        </div>
+
+                        <!-- 3-Inch Grid Column Layout Structure -->
+                        <div class="border-b border-dashed border-neutral-400 pb-2 mb-3">
+                            <div class="flex font-bold text-[9px] border-b border-neutral-300 pb-1.5 mb-2 uppercase">
+                                <span class="w-[40%] text-left">structural item description</span>
+                                <span class="w-[18%] text-right">WEIGHT</span>
+                                <span class="w-[18%] text-right">AREA</span>
+                                <span class="w-[24%] text-right">TOTAL</span>
+                            </div>
+                            <div id="rec-items-tbody" class="space-y-1.5">
+                                <div class="text-center text-neutral-400 py-3 italic text-[9px]">No items listed in current active workspace</div>
+                            </div>
+                        </div>
+
+                        <!-- Calculations Overview -->
+                        <div class="space-y-1 border-b border-dashed border-neutral-400 pb-3 mb-3 text-[10px]">
+                            <div class="flex justify-between text-neutral-700">
+                                <span>Base Material Multiplier Net</span>
+                                <span id="rec-sum-metal">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-neutral-700">
+                                <span>Project Labor Charges</span>
+                                <span id="rec-sum-labor">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-neutral-700 font-semibold">
+                                <span>CGST @ 9.0%</span>
+                                <span id="rec-sum-cgst">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-neutral-700 font-semibold">
+                                <span>SGST @ 9.0%</span>
+                                <span id="rec-sum-sgst">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between font-bold text-xs border-t border-neutral-300 pt-2 mt-1 text-black">
+                                <span id="rec-lbl-due">TOTAL PROJECT ESTIMATE</span>
+                                <span id="rec-sum-net">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between font-bold text-[10px] text-amber-800">
+                                <span id="rec-lbl-adv">ADVANCE AMOUNT PAID</span>
+                                <span id="rec-sum-adv">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between font-bold text-[10px] text-emerald-800">
+                                <span id="rec-lbl-bal">BALANCE AMOUNT DUE</span>
+                                <span id="rec-sum-bal">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic White-Label Footer Branding Sync (Part 10 Framework) -->
+                    <div class="text-center pt-2 mt-3 border-t border-dashed border-neutral-300">
+                        <p id="rec-footer-branding" class="text-[9px] font-semibold text-neutral-600 uppercase tracking-tight">
+                            Structural project estimation dynamic branding footer.
+                        </p>
+                        <p class="text-[8px] text-neutral-500 mt-1 uppercase tracking-widest font-mono">heavy engineering compliance index</p>
+                    </div>
+                </div>
+
+                <!-- Print slip trigger -->
+                <button id="btn-print-receipt" onclick="triggerThermalSlipPrint()" class="w-full bg-neutral-900 border border-neutral-800 hover:border-emeraldAccent hover:text-emeraldAccent text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all mt-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.897l1.32-2.204a.513.513 0 01.83 0l1.32 2.204c.15.25.15.568 0 .818a1.65 1.65 0 00.3 2.22c.3.3.7.4 1.1.25.4-.15.7-.5.7-.9V8.25c0-.62-.25-1.21-.707-1.664A2.35 2.35 0 008.25 6H6.75a2.35 2.35 0 00-1.343.586A2.35 2.35 0 004.707 8.25v6.518c0 .4.3.75.7.9.4.15.8.05 1.1-.25a1.65 1.65 0 00.3-2.22.513.513 0 01-.087-.3zM15 13.897l1.32-2.204a.513.513 0 01.83 0l1.32 2.204c.15.25.15.568 0 .818a1.65 1.65 0 00.3 2.22c.3.3.7.4 1.1.25.4-.15.7-.5.7-.9V8.25c0-.62-.25-1.21-.707-1.664A2.35 2.35 0 0016.5 6H15a2.35 2.35 0 00-1.343.586A2.35 2.35 0 0012.957 8.25v6.518c0 .4.3.75.7.9.4.15.8.05 1.1-.25a1.65 1.65 0 00.3-2.22.513.513 0 01-.087-.3z" />
+                    </svg>
+                    <span id="lang-btn-print">Print Receipt</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Operational System Toast Notifications Component -->
+    <div id="ui-toast" class="fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-lg border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
+        </svg>
+        <span id="toast-message-body">Operational execution success.</span>
+    </div>
+
+    <!-- Core Interactive Fabrication & Heavy Engineering Billing Engine -->
+    <script>
+        // Baseline catalog fallbacks for welding and ss fabrication structures
+        const CATALOG_JOBS_FALLBACK = {
+            "JOB-GATE": { name: "SS Safety Gate Structural Work", metal_rate: 260.00, labor_rate: 120.00 },
+            "JOB-ROOF": { name: "Iron Roofing Shed Profile Work", metal_rate: 85.00, labor_rate: 65.00 },
+            "JOB-GRILL": { name: "Decorative Window Grill Fabrication", metal_rate: 110.00, labor_rate: 45.00 },
+            "JOB-WELD": { name: "General Spot Welding Structural Repairs", metal_rate: 75.00, labor_rate: 35.00 }
+        };
+
+        // Application State Matrices
+        let activeLanguageContext = "en";
+        let activeCartLedgerMemory = [];
+        let globalPricingRules = {};
+        let systemMaintenanceFlag = false;
+
+        // Structured English / Tamil Translation Dictionary Matrix
+        const appTranslationMatrix = {
+            en: {
+                appTitleHeader: "WELDING & SS FABRICATION LEDGER",
+                secTitleEstimation: "Structural Multiplier Estimation Console",
+                lblJobType: "Select Fabrication Project Category",
+                lblJobManualName: "Structural Scope Description",
+                lblLength: "Length (Feet)",
+                lblWidth: "Width (Feet)",
+                lblArea: "Total Area (Sq.Ft)",
+                lblWeight: "Metal Weight (kg)",
+                lblMetalRate: "Base Rate (₹/kg)",
+                lblLaborRate: "Labor (₹/Sq.Ft)",
+                langBtnAddEstimate: "Add Estimate",
+                secTitleRegistration: "Project Client Registration & Ledger Surcharges",
+                lblCustName: "Customer Full Name",
+                lblCustMobile: "Customer Mobile Number",
+                lblAdvance: "Advance Paid (₹)",
+                lblBalance: "Balance Due (₹)",
+                secTitleLedger: "Active Estimation Workspace",
+                langPricingOverridden: "Pricing Overrides Active",
+                thCode: "Project Code",
+                thDesc: "Structural Project Description",
+                thMetal: "Metal Cost",
+                thLabor: "Labor Cost",
+                thDimensions: "Dimensions",
+                thTotal: "Subtotal (₹)",
+                langEmptyCartMsg: "Project estimation workspace is empty. Add SS safety gates, structural roofing profiles or general welding job rows above.",
+                langSumMetal: "Metal Raw Material Sum",
+                langSumLabor: "Project Labor Charges",
+                langSumGst: "Total GST (18%)",
+                langSumNet: "Net Project Estimate",
+                langBtnFlush: "Flush State",
+                langBtnLock: "Lock & Register",
+                langRecPaneTitle: "3-Inch Thermal Receipt Preview",
+                recLblDue: "TOTAL PROJECT ESTIMATE",
+                recLblAdv: "ADVANCE AMOUNT PAID",
+                recLblBal: "BALANCE AMOUNT DUE",
+                langBtnPrint: "Print Receipt",
+                maintTitle: "SYSTEM LOCKED",
+                maintDesc: "Fabrication estimation desks, dimension calculators, and draft billing channels are temporarily locked for mandatory statutory maintenance updates. All operations are locked.",
+                langBtnConfigs: "Configurations",
+                toastAdded: "Row successfully appended to active workspace.",
+                toastRemoved: "Operational entry row purged from workspace.",
+                toastFlushed: "Active workspace records flushed.",
+                toastLocked: "Estimation registered. Thermal invoice ready.",
+                toastConfigSaved: "Fabrication parameters successfully updated.",
+                walkIn: "Walk-In Client"
+            },
+            ta: {
+                appTitleHeader: "வெல்டிங் மற்றும் எஸ்எஸ் ஃபேப்ரிகேஷன் மேலாண்மை",
+                secTitleEstimation: "கட்டமைப்பு மதிப்பீட்டு கால்குலேட்டர்",
+                lblJobType: "ஃபேப்ரிகேஷன் வேலை வகையைத் தேர்ந்தெடுக்கவும்",
+                lblJobManualName: "வேலை விவர விளக்கம்",
+                lblLength: "நீளம் (அடி)",
+                lblWidth: "அகலம் (அடி)",
+                lblArea: "மொத்த பரப்பு (சதுர அடி)",
+                lblWeight: "உலோக எடை (கிலோ)",
+                lblMetalRate: "அடிப்படை விலை (₹/கிலோ)",
+                lblLaborRate: "உழைப்பு கட்டணம் (₹/சதுர அடி)",
+                langBtnAddEstimate: "மதிப்பீட்டை சேர்க்க",
+                secTitleRegistration: "வாடிக்கையாளர் பதிவு மற்றும் முன்பணம் கணக்கு",
+                lblCustName: "வாடிக்கையாளர் முழு பெயர்",
+                lblCustMobile: "வாடிக்கையாளர் கைபேசி எண்",
+                lblAdvance: "முன்பணம் (₹)",
+                lblBalance: "மீதித் தொகை (₹)",
+                secTitleLedger: "செயலில் உள்ள மதிப்பீட்டு பட்டியல்",
+                langPricingOverridden: "மாற்று விலை விதியமைக்கப்பட்டுள்ளது",
+                thCode: "திட்ட குறியீடு",
+                thDesc: "வேலை விவர விளக்கம்",
+                thMetal: "உலோக கட்டணம்",
+                thLabor: "உழைப்பு கட்டணம்",
+                thDimensions: "அளவுகள்",
+                thTotal: "துணைத்தொகை (₹)",
+                langEmptyCartMsg: "மதிப்பீட்டு பட்டியல் காலியாக உள்ளது. எஸ்எஸ் பாதுகாப்பு கேட், ரூஃபிங் ஷெட் அல்லது பொது வெல்டிங் வேலை விவரங்களை மேலே உள்ள படிவங்களில் சேர்க்கவும்.",
+                langSumMetal: "மொத்த உலோக பொருள் கட்டணம்",
+                langSumLabor: "திட்ட உழைப்பு கட்டணங்கள்",
+                langSumGst: "மொத்த ஜிஎஸ்டி வரி (18%)",
+                langSumNet: "மொத்த திட்ட மதிப்பீடு",
+                langBtnFlush: "பட்டியலை அழிக்க",
+                langBtnLock: "உறுதிசெய்து பதிவு செய்க",
+                langRecPaneTitle: "3-இன்ச் தெர்மல் ரசீது முன்னோட்டம்",
+                recLblDue: "மொத்த திட்ட மதிப்பீடு",
+                recLblAdv: "பெறப்பட்ட முன்பணம்",
+                recLblBal: "செலுத்த வேண்டிய மீதித் தொகை",
+                langBtnPrint: "ரசீது அச்சிடுக",
+                maintTitle: "கணினி முடக்கப்பட்டுள்ளது",
+                maintDesc: "ஃபேப்ரிகேஷன் மதிப்பீடு மற்றும் பில்லிங் சேவைகள் தற்காலிகமாக முடக்கப்பட்டுள்ளன.",
+                langBtnConfigs: "அமைப்புகள்",
+                toastAdded: "மதிப்பீட்டு வரிசை வெற்றிகரமாக சேர்க்கப்பட்டது.",
+                toastRemoved: "மதிப்பீட்டு வரிசை நீக்கப்பட்டது.",
+                toastFlushed: "மதிப்பீட்டு பட்டியல் காலியாக்கப்பட்டது.",
+                toastLocked: "திட்டம் கணக்கில் பதிவு செய்யப்பட்டது. ரசீது தயார்.",
+                toastConfigSaved: "நிர்வாக அமைப்புகள் வெற்றிகரமாக சேமிக்கப்பட்டன.",
+                walkIn: "வாடிக்கையாளர்"
+            }
+        };
+
+        // On document ready initialization triggers
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeConfigDatabaseSeeds();
+            loadGlobalConfigMetadata();
+            mutateLanguageContext('en');
+            pollMaintenanceInterceptorState();
+            setInterval(pollMaintenanceInterceptorState, 3000); // Continuous safety check loop
+        });
+
+        // Seed default parameters to localStorage context if keys do not exist
+        function initializeConfigDatabaseSeeds() {
+            if (!localStorage.getItem('roaji_shops')) {
+                const defaultShop = {
+                    name: "SRI VARI WELDING & FABRICATION WORKS",
+                    phone: "+91 94447 98765",
+                    address: "45, Industrial Estate, Guindy, Chennai - 600032",
+                    gstin: "33AACCS1032F1ZA"
+                };
+                localStorage.setItem('roaji_shops', JSON.stringify(defaultShop));
+            }
+            if (!localStorage.getItem('roaji_bill_footer_branding')) {
+                localStorage.setItem('roaji_bill_footer_branding', "Thank you for your business. 50% advance required on raw material order. Structural warranty active.");
+            }
+            if (!localStorage.getItem('roaji_global_pricing_rules')) {
+                const defaultRules = {
+                    "JOB-GATE": { name: "SS Safety Gate (Override Active)", metal_rate: 280.00, labor_rate: 150.00 },
+                    "JOB-ROOF": { name: "Iron Roofing Shed (Override Active)", metal_rate: 90.00, labor_rate: 75.00 }
+                };
+                localStorage.setItem('roaji_global_pricing_rules', JSON.stringify(defaultRules));
+            }
+            if (!localStorage.getItem('roaji_maintenance_mode')) {
+                localStorage.setItem('roaji_maintenance_mode', "OFF");
+            }
+        }
+
+        // Pull dynamic properties from storage variables and sync with DOM inputs
+        function loadGlobalConfigMetadata() {
+            // Synchronize shop profile mapping
+            const shopMeta = JSON.parse(localStorage.getItem('roaji_shops'));
+            if (shopMeta) {
+                document.getElementById('active-merchant-info').textContent = `${shopMeta.name} // GSTIN: ${shopMeta.gstin}`;
+                document.getElementById('rec-shop-name').textContent = shopMeta.name;
+                document.getElementById('rec-shop-address').textContent = shopMeta.address;
+                document.getElementById('rec-shop-phone').textContent = `Phone: ${shopMeta.phone}`;
+                document.getElementById('rec-shop-gstin').textContent = `GSTIN: ${shopMeta.gstin}`;
+
+                // Populating sandboxed inputs
+                document.getElementById('db-shop-name').value = shopMeta.name;
+                document.getElementById('db-shop-phone').value = shopMeta.phone;
+                document.getElementById('db-shop-address').value = shopMeta.address;
+                document.getElementById('db-shop-gstin').value = shopMeta.gstin;
+            }
+
+            // Sync thermal bottom footer
+            const footerBranding = localStorage.getItem('roaji_bill_footer_branding');
+            if (footerBranding) {
+                document.getElementById('rec-footer-branding').textContent = footerBranding;
+                document.getElementById('db-bill-footer').value = footerBranding;
+            }
+
+            // Sync Overrides DB rules
+            const overridesText = localStorage.getItem('roaji_global_pricing_rules');
+            if (overridesText) {
+                document.getElementById('db-pricing-rules').value = overridesText;
+                try {
+                    globalPricingRules = JSON.parse(overridesText);
+                } catch(e) {
+                    globalPricingRules = {};
+                }
+            }
+        }
+
+        // Continuous flag check validator (Part 9 safety feature)
+        function pollMaintenanceInterceptorState() {
+            const flag = localStorage.getItem('roaji_maintenance_mode');
+            const overlay = document.getElementById('maintenance-overlay');
+            if (flag === "ON") {
+                systemMaintenanceFlag = true;
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+            } else {
+                systemMaintenanceFlag = false;
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            }
+        }
+
+        // Apply dynamic Job selection drop-down (Checks overrides rule index)
+        function applyJobCatalogSelection() {
+            const code = document.getElementById('job-dropdown-catalog').value;
+            const nameInput = document.getElementById('job-manual-name');
+            const metalRateInp = document.getElementById('job-metal-rate');
+            const laborRateInp = document.getElementById('job-labor-rate');
+
+            if (!code) {
+                nameInput.value = '';
+                metalRateInp.value = '0';
+                laborRateInp.value = '0';
+                return;
+            }
+
+            let name = "";
+            let metalRate = 0;
+            let laborRate = 0;
+
+            if (globalPricingRules && globalPricingRules[code]) {
+                const targetRule = globalPricingRules[code];
+                name = targetRule.name || CATALOG_JOBS_FALLBACK[code].name;
+                metalRate = targetRule.metal_rate !== undefined ? targetRule.metal_rate : CATALOG_JOBS_FALLBACK[code].metal_rate;
+                laborRate = targetRule.labor_rate !== undefined ? targetRule.labor_rate : CATALOG_JOBS_FALLBACK[code].labor_rate;
+            } else {
+                const targetBaseline = CATALOG_JOBS_FALLBACK[code];
+                name = targetBaseline.name;
+                metalRate = targetBaseline.metal_rate;
+                laborRate = targetBaseline.labor_rate;
+            }
+
+            nameInput.value = name;
+            metalRateInp.value = metalRate;
+            laborRateInp.value = laborRate;
+            recalculateDimensionsAndEstimates();
+            evaluateOverridesActiveBadge();
+        }
+
+        // Recalculates total area from length and width
+        function recalculateDimensionsAndEstimates() {
+            const length = parseFloat(document.getElementById('job-length').value) || 0;
+            const width = parseFloat(document.getElementById('job-width').value) || 0;
+
+            const computedArea = length * width;
+            document.getElementById('job-area').value = computedArea.toFixed(1);
+        }
+
+        // Check if dynamic override is used to display badge
+        function evaluateOverridesActiveBadge() {
+            const code = document.getElementById('job-dropdown-catalog').value;
+            const badge = document.getElementById('overrides-active-badge');
+
+            const hasOverride = code && globalPricingRules && globalPricingRules[code];
+
+            if (hasOverride) {
+                badge.classList.remove('hidden');
+                badge.classList.add('flex');
+            } else {
+                badge.classList.add('hidden');
+                badge.classList.remove('flex');
+            }
+        }
+
+        // Identity & Project references synchronizer
+        function synchronizeIdentityLedger() {
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-mobile').value.trim();
+
+            const walkInLabel = appTranslationMatrix[activeLanguageContext].walkIn;
+
+            document.getElementById('rec-client-name').textContent = name ? name : walkInLabel;
+            document.getElementById('rec-client-mobile').textContent = phone ? phone : "--";
+            
+            recalculateAccumulatedProjectTotals();
+        }
+
+        // Register direct structural estimation row
+        function registerEstimationRow() {
+            if (systemMaintenanceFlag) return;
+
+            const dropdownCode = document.getElementById('job-dropdown-catalog').value;
+            const code = dropdownCode ? dropdownCode : "JOB-MANUAL";
+            const name = document.getElementById('job-manual-name').value.trim();
+            
+            const length = parseFloat(document.getElementById('job-length').value) || 0;
+            const width = parseFloat(document.getElementById('job-width').value) || 0;
+            const area = parseFloat(document.getElementById('job-area').value) || 0;
+
+            const weight = parseFloat(document.getElementById('job-weight').value) || 0;
+            const metalRate = parseFloat(document.getElementById('job-metal-rate').value) || 0;
+            const laborRate = parseFloat(document.getElementById('job-labor-rate').value) || 0;
+
+            if (!name || isNaN(area) || isNaN(weight) || isNaN(metalRate) || isNaN(laborRate)) {
+                triggerUINotification("Please fill standard project parameters.");
+                return;
+            }
+
+            // Heavy Engineering multi-tier pricing logic (Weight multiplier + Area labor charger)
+            const computedMetalTotal = weight * metalRate;
+            const computedLaborTotal = area * laborRate;
+            const netRowTotal = computedMetalTotal + computedLaborTotal;
+
+            const item = {
+                id: 'FAB-' + Date.now(),
+                code: code,
+                description: name,
+                length: length,
+                width: width,
+                area: area,
+                weight: weight,
+                metalRate: metalRate,
+                laborRate: laborRate,
+                metalTotal: computedMetalTotal,
+                laborTotal: computedLaborTotal,
+                netTotal: netRowTotal
+            };
+
+            activeCartLedgerMemory.push(item);
+            calculateStructuralTotals();
+            clearEstimationForm();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastAdded);
+        }
+
+        // Delete active cart row
+        function purgeCartRow(id) {
+            activeCartLedgerMemory = activeCartLedgerMemory.filter(item => item.id !== id);
+            calculateStructuralTotals();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastRemoved);
+        }
+
+        // Core dynamic structural project calculations engine
+        function calculateStructuralTotals() {
+            const tbody = document.getElementById('cart-table-tbody');
+            const placeholder = document.getElementById('cart-empty-placeholder');
+
+            tbody.innerHTML = '';
+
+            if (activeCartLedgerMemory.length === 0) {
+                placeholder.classList.remove('hidden');
+                drawCalculatedFinances(0, 0, 0, 0);
+                drawThermalSlipItems();
+                return;
+            }
+
+            placeholder.classList.add('hidden');
+
+            let metalAccumulator = 0;
+            let laborAccumulator = 0;
+
+            activeCartLedgerMemory.forEach(item => {
+                metalAccumulator += item.metalTotal;
+                laborAccumulator += item.laborTotal;
+
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-neutral-800/40 hover:bg-neutral-900/40 transition-colors';
+
+                const dimensionsDisplay = `${item.length}' × ${item.width}'`;
+
+                tr.innerHTML = `
+                    <td class="py-3.5 font-mono text-xs text-amberAccent">${item.code}</td>
+                    <td class="py-3.5">
+                        <p class="font-medium text-neutral-200">${item.description}</p>
+                        <p class="text-[10px] text-neutral-500 font-mono">${item.area.toFixed(1)} Sq.Ft // ${item.weight.toFixed(1)} kg</p>
+                    </td>
+                    <td class="py-3.5 text-right font-mono text-xs">₹${item.metalTotal.toFixed(2)}</td>
+                    <td class="py-3.5 text-right font-mono text-xs">₹${item.laborTotal.toFixed(2)}</td>
+                    <td class="py-3.5 text-center font-mono text-xs text-neutral-400">${dimensionsDisplay}</td>
+                    <td class="py-3.5 text-right font-mono text-xs text-emeraldAccent">₹${item.netTotal.toFixed(2)}</td>
+                    <td class="py-3.5 text-center">
+                        <button onclick="purgeCartRow('${item.id}')" class="text-neutral-500 hover:text-red-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-4 h-4 mx-auto">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 18% GST baseline calculation modeling strictly on service + metal elements
+            const totalTaxable = metalAccumulator + laborAccumulator;
+            const totalGst = totalTaxable * 0.18;
+            const finalNetPayable = totalTaxable + totalGst;
+
+            drawCalculatedFinances(metalAccumulator, laborAccumulator, totalGst, finalNetPayable);
+            drawThermalSlipItems();
+        }
+
+        // Draw and update active summary DOM
+        function drawCalculatedFinances(metalSum, laborSum, gstSum, netSum) {
+            document.getElementById('total-metal-sum').textContent = `₹ ${metalSum.toFixed(2)}`;
+            document.getElementById('total-labor-sum').textContent = `₹ ${laborSum.toFixed(2)}`;
+            document.getElementById('total-gst-sum').textContent = `₹ ${gstSum.toFixed(2)}`;
+            document.getElementById('total-net-sum').textContent = `₹ ${netSum.toFixed(2)}`;
+
+            // Thermal Slip outputs mirror
+            document.getElementById('rec-sum-metal').textContent = `₹${metalSum.toFixed(2)}`;
+            document.getElementById('rec-sum-labor').textContent = `₹${laborSum.toFixed(2)}`;
+            
+            // split tax CGST and SGST representation
+            const splitTaxValue = gstSum / 2;
+            document.getElementById('rec-sum-cgst').textContent = `₹${splitTaxValue.toFixed(2)}`;
+            document.getElementById('rec-sum-sgst').textContent = `₹${splitTaxValue.toFixed(2)}`;
+            document.getElementById('rec-sum-net').textContent = `₹${netSum.toFixed(2)}`;
+
+            recalculateAccumulatedProjectTotals();
+        }
+
+        // Recalculates final dues based on advance paid inputs
+        function recalculateAccumulatedProjectTotals() {
+            const netValText = document.getElementById('total-net-sum').textContent;
+            // Extract numeric value from text
+            const netVal = parseFloat(netValText.replace(/[^\d.]/g, '')) || 0;
+            const advance = parseFloat(document.getElementById('ledger-advance').value) || 0;
+
+            const balance = netVal - advance;
+            document.getElementById('ledger-balance').value = balance.toFixed(2);
+
+            // Mirror to slip
+            document.getElementById('rec-sum-adv').textContent = `₹${advance.toFixed(2)}`;
+            document.getElementById('rec-sum-bal').textContent = `₹${balance.toFixed(2)}`;
+        }
+
+        // Render virtual thermal output receipt listings
+        function drawThermalSlipItems() {
+            const container = document.getElementById('rec-items-tbody');
+            container.innerHTML = '';
+
+            if (activeCartLedgerMemory.length === 0) {
+                container.innerHTML = `<div class="text-center text-neutral-400 py-3 italic text-[9px]">No items listed in current active workspace</div>`;
+                return;
+            }
+
+            activeCartLedgerMemory.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-start text-[10px] leading-tight';
+
+                itemDiv.innerHTML = `
+                    <span class="w-[40%] text-left uppercase font-semibold break-words">${item.description}</span>
+                    <span class="w-[18%] text-right font-mono">${item.weight.toFixed(1)}kg</span>
+                    <span class="w-[18%] text-right font-mono">${item.area.toFixed(1)}sft</span>
+                    <span class="w-[24%] text-right font-mono font-bold">₹${item.netTotal.toFixed(2)}</span>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        // Reset individual input forms helpers
+        function clearEstimationForm() {
+            document.getElementById('job-dropdown-catalog').value = '';
+            document.getElementById('job-manual-name').value = '';
+            document.getElementById('job-length').value = '0';
+            document.getElementById('job-width').value = '0';
+            document.getElementById('job-area').value = '0';
+            document.getElementById('job-weight').value = '0';
+            document.getElementById('job-metal-rate').value = '0';
+            document.getElementById('job-labor-rate').value = '0';
+            evaluateOverridesActiveBadge();
+        }
+
+        // Reset workspace configurations
+        function flushActiveWorkspace() {
+            activeCartLedgerMemory = [];
+            calculateStructuralTotals();
+
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-mobile').value = '';
+            document.getElementById('ledger-advance').value = '0';
+            document.getElementById('ledger-balance').value = '0';
+            synchronizeIdentityLedger();
+
+            clearEstimationForm();
+
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastFlushed);
+        }
+
+        // Commit active structural estimation transactions
+        function commitAndProcessTransaction() {
+            if (systemMaintenanceFlag) return;
+            if (activeCartLedgerMemory.length === 0) {
+                triggerUINotification("Workspace is currently empty.");
+                return;
+            }
+
+            const now = new Date();
+            document.getElementById('rec-date').textContent = now.toLocaleDateString();
+            document.getElementById('rec-time').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('rec-invoice-ref').textContent = "EST-" + Math.floor(100000 + Math.random() * 900000);
+
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLocked);
+        }
+
+        function triggerThermalSlipPrint() {
+            commitAndProcessTransaction();
+            window.print();
+        }
+
+        // Bilingual context switching logic
+        function mutateLanguageContext(lang) {
+            activeLanguageContext = lang;
+
+            const t = appTranslationMatrix[lang];
+
+            // Toggle languages button CSS
+            if (lang === 'en') {
+                document.getElementById('lang-toggle-en').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                document.getElementById('lang-toggle-ta').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            } else {
+                document.getElementById('lang-toggle-ta').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                document.getElementById('lang-toggle-en').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            }
+
+            // Interface labels and headers
+            document.getElementById('app-title-header').innerHTML = `${t.appTitleHeader} <span class="text-[9px] bg-neutral-800 text-neutral-400 font-mono px-1.5 py-0.5 rounded border border-neutral-700">heavy-v9.2</span>`;
+            document.getElementById('sec-title-estimation').textContent = t.secTitleEstimation;
+            document.getElementById('lbl-job-type').textContent = t.lblJobType;
+            document.getElementById('lbl-job-manual-name').textContent = t.lblJobManualName;
+            document.getElementById('lbl-length').textContent = t.lblLength;
+            document.getElementById('lbl-width').textContent = t.lblWidth;
+            document.getElementById('lbl-area').textContent = t.lblArea;
+            document.getElementById('lbl-weight').textContent = t.lblWeight;
+            document.getElementById('lbl-metal-rate').textContent = t.lblMetalRate;
+            document.getElementById('lbl-labor-rate').textContent = t.lblLaborRate;
+            document.getElementById('lang-btn-add-estimate').textContent = t.langBtnAddEstimate;
+
+            document.getElementById('sec-title-registration').textContent = t.secTitleRegistration;
+            document.getElementById('lbl-cust-name').textContent = t.lblCustName;
+            document.getElementById('lbl-cust-mobile').textContent = t.lblCustMobile;
+            document.getElementById('lbl-advance').textContent = t.lblAdvance;
+            document.getElementById('lbl-balance').textContent = t.lblBalance;
+
+            document.getElementById('sec-title-ledger').textContent = t.secTitleLedger;
+            document.getElementById('lang-pricing-overridden').textContent = t.langPricingOverridden;
+            document.getElementById('th-code').textContent = t.thCode;
+            document.getElementById('th-desc').textContent = t.thDesc;
+            document.getElementById('th-metal').textContent = t.thMetal;
+            document.getElementById('th-labor').textContent = t.thLabor;
+            document.getElementById('th-dimensions').textContent = t.thDimensions;
+            document.getElementById('th-total').textContent = t.thTotal;
+            document.getElementById('lang-empty-cart-msg').textContent = t.langEmptyCartMsg;
+
+            document.getElementById('lang-sum-metal').textContent = t.langSumMetal;
+            document.getElementById('lang-sum-labor').textContent = t.langSumLabor;
+            document.getElementById('lang-sum-gst').textContent = t.langSumGst;
+            document.getElementById('lang-sum-net').textContent = t.langSumNet;
+
+            document.getElementById('lang-btn-flush').textContent = t.langBtnFlush;
+            document.getElementById('lang-btn-lock').textContent = t.langBtnLock;
+            document.getElementById('lang-rec-pane-title').textContent = t.langRecPaneTitle;
+            document.getElementById('rec-lbl-due').textContent = t.recLblDue;
+            document.getElementById('rec-lbl-adv').textContent = t.recLblAdv;
+            document.getElementById('rec-lbl-bal').textContent = t.recLblBal;
+            document.getElementById('lang-btn-print').textContent = t.langBtnPrint;
+            document.getElementById('lang-btn-configs').textContent = t.langBtnConfigs;
+
+            document.getElementById('maint-title').textContent = t.maintTitle;
+            document.getElementById('maint-desc').textContent = t.maintDesc;
+
+            translateDropdownValues();
+            synchronizeIdentityLedger();
+        }
+
+        // Translates drop-down selector options
+        function translateDropdownValues() {
+            const selectJob = document.getElementById('job-dropdown-catalog');
+            selectJob.options[1].text = activeLanguageContext === 'en' ? "SS Safety Gate Structural Work" : "எஸ்எஸ் பாதுகாப்பு கேட் கட்டமைப்பு";
+            selectJob.options[2].text = activeLanguageContext === 'en' ? "Iron Roofing Shed Profile Work" : "இரும்பு கூரை ஷெட் கட்டமைப்பு";
+            selectJob.options[3].text = activeLanguageContext === 'en' ? "Decorative Window Grill Fabrication" : "ஜன்னல் கிரில் தயாரிப்பு";
+            selectJob.options[4].text = activeLanguageContext === 'en' ? "General Spot Welding Structural Repairs" : "பொது ஸ்பாட் வெல்டிங் பழுதுபார்ப்பு";
+        }
+
+        // Administrative Sandboxed Settings Actions
+        function toggleConfigLogPanel() {
+            const panel = document.getElementById('configs-drawer-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function commitSandboxedDatabaseChanges() {
+            // Write input fields parameters to localStorage keys
+            const updatedShop = {
+                name: document.getElementById('db-shop-name').value.trim() || "SRI VARI WELDING & FABRICATION WORKS",
+                phone: document.getElementById('db-shop-phone').value.trim() || "--",
+                address: document.getElementById('db-shop-address').value.trim() || "--",
+                gstin: document.getElementById('db-shop-gstin').value.trim() || "33AACCS1032F1ZA"
+            };
+            localStorage.setItem('roaji_shops', JSON.stringify(updatedShop));
+
+            const brandingText = document.getElementById('db-bill-footer').value.trim();
+            localStorage.setItem('roaji_bill_footer_branding', brandingText);
+
+            const pricingRulesStr = document.getElementById('db-pricing-rules').value.trim();
+            try {
+                JSON.parse(pricingRulesStr); // Verification syntax validation check
+                localStorage.setItem('roaji_global_pricing_rules', pricingRulesStr);
+            } catch(e) {
+                alert("Incorrect overrides structure JSON schema syntax! Flushed pricing rules changes.");
+                localStorage.setItem('roaji_global_pricing_rules', '{}');
+            }
+
+            loadGlobalConfigMetadata();
+            applyJobCatalogSelection();
+            synchronizeIdentityLedger();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastConfigSaved);
+            toggleConfigLogPanel();
+        }
+
+        function overrideLockoutStatus(state) {
+            localStorage.setItem('roaji_maintenance_mode', state);
+            pollMaintenanceInterceptorState();
+            triggerUINotification(`Statutory Interceptor set to ${state}`);
+        }
+
+        // Dynamic System Alert Notifications
+        function triggerUINotification(message) {
+            const toast = document.getElementById('ui-toast');
+            document.getElementById('toast-message-body').textContent = message;
+
+            toast.className = "fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-lg border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-0 opacity-100 transition-all duration-300 z-50 flex items-center gap-2";
+
+            setTimeout(() => {
+                toast.className = "fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-lg border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
