@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internet Cafe & e-Sevai / CSC Center - Dynamic Billing Console</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandDark: '#050505',
+                        brandGlass: 'rgba(23, 23, 23, 0.75)',
+                        amberAccent: '#f59e0b',
+                        emeraldAccent: '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CSS custom glass panels */
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 2.5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+        /* Isolation print stylesheets for standard 80mm thermal receipt slips */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #thermal-receipt-container, #thermal-receipt-container * {
+                visibility: visible;
+            }
+            #thermal-receipt-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 80mm;
+                background: white !important;
+                color: black !important;
+                padding: 4mm;
+                font-family: monospace;
+            }
+        }
+    </style>
+</head>
+<body class="bg-brandDark text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-amber-500/20 selection:text-amber-300">
+
+    <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
+    <div id="maintenance-overlay" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[9999] hidden flex-col items-center justify-center p-6 text-center">
+        <div class="glass-panel p-8 rounded-2xl border-red-500/30 max-w-md w-full">
+            <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+            </div>
+            <h2 id="maint-title" class="text-2xl font-bold tracking-tight text-white mb-2">SYSTEM LOCKED</h2>
+            <p id="maint-desc" class="text-neutral-400 text-sm mb-6">e-Sevai and Internet Cafe billing modules are temporarily locked for mandatory statutory system database maintenance. All operations are locked.</p>
+            <div class="text-[11px] text-amberAccent font-mono uppercase tracking-wider py-1.5 px-3 bg-amberAccent/10 rounded border border-amberAccent/20 inline-block">
+                Status Flag: CSC_CAFE_MAINT_ACTIVE
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Top Header Context -->
+    <header class="border-b border-neutral-800 bg-neutral-950/60 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Metadata Identity -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-amberAccent/10 border border-amberAccent/30 rounded-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-amberAccent">
+                        <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 01-.984-1.133 4.753 4.753 0 015.223 0 .75.75 0 01-.984 1.133zm-3.255 3.834c.89.777 2.366.777 3.255 0a.75.75 0 01.984 1.133 4.753 4.753 0 01-5.223 0 .75.75 0 01.984-1.133zM10.5 11a.5.5 0 11-1 0 .5.5 0 011 0zm4 0a.5.5 0 11-1 0 .5.5 0 011 0z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 id="app-title-header" class="text-sm font-bold text-white tracking-wider flex items-center gap-2 uppercase">
+                        e-SEVAI & CSC CAFE PORTAL
+                        <span class="text-[9px] bg-neutral-800 text-neutral-400 font-mono px-1.5 py-0.5 rounded border border-neutral-700">CSC v6.2</span>
+                    </h1>
+                    <div class="text-[11px] text-neutral-400 font-mono flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emeraldAccent animate-pulse"></span>
+                        <span id="active-merchant-info">Loading CSC Terminal...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactivity Actions Module -->
+            <div class="flex items-center space-x-4">
+                <!-- Sandbox Controls Open Switch -->
+                <button onclick="toggleConfigLogPanel()" class="text-xs bg-neutral-900 border border-neutral-800 hover:border-amberAccent/50 text-neutral-300 font-mono py-1.5 px-3 rounded flex items-center gap-1.5 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-3.5 h-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                    </svg>
+                    <span id="lang-btn-configs">Configurations</span>
+                </button>
+
+                <!-- Translation Engine Switch Component -->
+                <div class="bg-neutral-900 border border-neutral-800 p-0.5 rounded-lg flex">
+                    <button id="lang-toggle-en" onclick="mutateLanguageContext('en')" class="px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">
+                        EN
+                    </button>
+                    <button id="lang-toggle-ta" onclick="mutateLanguageContext('ta')" class="px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono">
+                        தமிழ்
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Administrative Sandbox Configurations Panel Drawer -->
+    <div id="configs-drawer-panel" class="hidden border-b border-amber-500/20 bg-neutral-950 px-4 py-5 transition-all">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4">
+            
+            <!-- CSC Shop profile parameters mapping -->
+            <div class="glass-panel p-3.5 rounded-xl border-neutral-800">
+                <label class="block text-[10px] text-amberAccent font-mono uppercase mb-2">CSC Franchise Registry (`roaji_shops`)</label>
+                <input id="db-shop-name" type="text" placeholder="Shop Name" class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white mb-2 focus:border-amberAccent outline-none">
+                <input id="db-shop-phone" type="text" placeholder="Phone" class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white mb-2 focus:border-amberAccent outline-none">
+                <input id="db-shop-address" type="text" placeholder="Address" class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white mb-2 focus:border-amberAccent outline-none">
+                <input id="db-shop-vleid" type="text" placeholder="VLE ID / Franchise ID" class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white focus:border-amberAccent outline-none">
+            </div>
+
+            <!-- Receipt branding text -->
+            <div class="glass-panel p-3.5 rounded-xl border-neutral-800 flex flex-col justify-between">
+                <div>
+                    <label class="block text-[10px] text-amberAccent font-mono uppercase mb-2">Footer Branding (`roaji_bill_footer_branding`)</label>
+                    <textarea id="db-bill-footer" rows="4" placeholder="Official CSC acknowledgement disclaimer message..." class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white resize-none focus:border-amberAccent outline-none"></textarea>
+                </div>
+                <span class="text-[9px] text-neutral-500 font-mono">Receipt Statuary Disclaimers</span>
+            </div>
+
+            <!-- Portal Rates and Browsing Pricing Overrides DB -->
+            <div class="glass-panel p-3.5 rounded-xl border-neutral-800 flex flex-col justify-between">
+                <div>
+                    <label class="block text-[10px] text-amberAccent font-mono uppercase mb-2">CSC Pricing Rules (`roaji_global_pricing_rules`)</label>
+                    <textarea id="db-pricing-rules" rows="4" placeholder="JSON structured rules override..." class="w-full text-xs bg-neutral-900 border border-neutral-800 rounded p-2 text-white font-mono leading-tight resize-none focus:border-amberAccent outline-none"></textarea>
+                </div>
+                <span class="text-[9px] text-neutral-500 font-mono">Hourly Rates & Gov application overrides.</span>
+            </div>
+
+            <!-- System Protection Override Interceptors -->
+            <div class="glass-panel p-3.5 rounded-xl border-neutral-800 flex flex-col justify-between">
+                <div>
+                    <label class="block text-[10px] text-amberAccent font-mono uppercase mb-2">statutory Interceptor Override</label>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button onclick="overrideLockoutStatus('ON')" class="text-xs font-mono font-semibold py-2 bg-red-950/20 border border-red-800/40 text-red-400 hover:bg-red-900 hover:text-white rounded transition-all">ON (Lock)</button>
+                        <button onclick="overrideLockoutStatus('OFF')" class="text-xs font-mono font-semibold py-2 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:border-emeraldAccent hover:text-emeraldAccent hover:border-transparent rounded transition-all">OFF (Active)</button>
+                    </div>
+                </div>
+                <button onclick="commitSandboxedDatabaseChanges()" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold text-xs py-2.5 rounded-lg transition-all mt-4 uppercase tracking-wider">
+                    Commit Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workspace Console Grid -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: e-Sevai Applications & Internet Cafe Logging Modules (7 Columns) -->
+        <section class="lg:col-span-7 flex flex-col space-y-6">
+
+            <!-- Government Digital e-Sevai Service Console (Part 6 CSC Application POS) -->
+            <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 left-0 h-1 bg-amberAccent w-1/3"></div>
+                <h2 id="sec-title-gov" class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Government e-Sevai Application Console</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label id="lbl-select-gov" class="block text-xs font-semibold text-neutral-400 mb-1.5">Select Government Digital Service</label>
+                        <select id="gov-dropdown-catalog" onchange="applyGovServiceSelection()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none transition-all">
+                            <option value="">-- Choose statutory Portal Service --</option>
+                            <option value="SRV-INC">Income Certificate Application</option>
+                            <option value="SRV-COM">Community Certificate Application</option>
+                            <option value="SRV-PAN">Statutory PAN Card Processing</option>
+                            <option value="SRV-EXAM">Competitive Exam Application Portal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="lbl-gov-manual-name" class="block text-xs font-semibold text-neutral-400 mb-1.5">Statutory Application Service Name</label>
+                        <input id="gov-manual-name" type="text" placeholder="e.g. Legal Heir Certificate" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
+                    <div>
+                        <label id="lbl-gov-fee" class="block text-xs font-semibold text-neutral-400 mb-1.5">Gov Fee (₹)</label>
+                        <input id="gov-fee" type="number" step="0.01" placeholder="0.00" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label id="lbl-srv-charge" class="block text-xs font-semibold text-neutral-400 mb-1.5">Portal Service (₹)</label>
+                        <input id="srv-charge" type="number" step="0.01" placeholder="0.00" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label id="lbl-gov-qty" class="block text-xs font-semibold text-neutral-400 mb-1.5">Applications</label>
+                        <input id="gov-qty" type="number" step="1" value="1" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label id="lbl-gov-disc" class="block text-xs font-semibold text-neutral-400 mb-1.5">Discount (₹)</label>
+                        <input id="gov-disc" type="number" step="1" value="0" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <button id="btn-add-gov" onclick="registerGovApplicationRow()" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold py-2.5 px-3 rounded-lg text-xs flex items-center justify-center gap-1 transition-all col-span-2 md:col-span-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                            <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                        </svg>
+                        <span id="lang-btn-add-gov">Add Application</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Internet Cafe Browsing Duration Tracker Module (Part 6 CSC Hourly Matrix) -->
+            <div class="glass-panel rounded-2xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 left-0 h-1 bg-amberAccent w-1/3"></div>
+                <h2 id="sec-title-browsing" class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Internet Browsing Duration Tracker</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <div class="col-span-1 md:col-span-2">
+                        <label id="lbl-browse-desc" class="block text-xs font-semibold text-neutral-400 mb-1.5">Browsing Terminal Allocation</label>
+                        <select id="browse-terminal" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none transition-all font-mono">
+                            <option value="PC-01">High-Speed Terminal PC-01</option>
+                            <option value="PC-02">High-Speed Terminal PC-02</option>
+                            <option value="PC-03">High-Speed Terminal PC-03</option>
+                            <option value="PC-04">High-Speed Terminal PC-04</option>
+                            <option value="PC-05">High-Speed Terminal PC-05</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="lbl-browse-mins" class="block text-xs font-semibold text-neutral-400 mb-1.5">Duration (Minutes)</label>
+                        <input id="browse-mins" type="number" step="1" placeholder="e.g. 45" oninput="recalculateBrowsingValue()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label id="lbl-browse-rate" class="block text-xs font-semibold text-neutral-400 mb-1.5">Hourly Rate (₹)</label>
+                        <input id="browse-hourly-rate" type="number" step="1.0" value="30" oninput="recalculateBrowsingValue()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-neutral-800/60 items-center justify-between">
+                    <div class="text-xs text-neutral-400 font-mono">
+                        <span id="lang-calc-cost-label">Calculated Browsing Fee:</span> <span class="text-amberAccent font-bold font-mono">₹ <span id="browsing-calculated-fee">0.00</span></span>
+                    </div>
+                    <div></div>
+                    <button id="btn-add-browsing" onclick="registerBrowsingDurationRow()" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clip-rule="evenodd" />
+                        </svg>
+                        <span id="lang-btn-add-browsing">Add Browsing Charge</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- statutory Customer Registration & CSC VLE Reference -->
+            <div class="glass-panel rounded-2xl p-6">
+                <h3 id="sec-title-registration" class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4">Statutory Customer Registration & References</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label id="lbl-cust-name" class="block text-xs font-semibold text-neutral-400 mb-1.5">Customer Name</label>
+                        <input id="cust-name" type="text" placeholder="e.g. Palani Swamy" oninput="synchronizeIdentityLedger()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none">
+                    </div>
+                    <div>
+                        <label id="lbl-cust-mobile" class="block text-xs font-semibold text-neutral-400 mb-1.5">Customer Mobile Number</label>
+                        <input id="cust-mobile" type="text" placeholder="e.g. +91 94445 XXXXX" oninput="synchronizeIdentityLedger()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label id="lbl-ack-ref" class="block text-xs font-semibold text-neutral-400 mb-1.5">Acknowledgement / App Reference</label>
+                        <input id="ack-ref" type="text" placeholder="e.g. TN-55202410221" oninput="synchronizeIdentityLedger()" class="w-full text-sm bg-neutral-900 border border-neutral-800 focus:border-amberAccent focus:ring-1 focus:ring-amberAccent rounded-lg py-2.5 px-3 text-white outline-none font-mono">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workspace Transaction Ledger List Grid (Part 6 Cumulative CSC Pricing Logic) -->
+            <div class="glass-panel rounded-2xl p-6 flex-1 flex flex-col min-h-[300px]">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="sec-title-cart" class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Active Workspace Cart</h3>
+                    <!-- Database Overrides Active Alert Flag -->
+                    <div id="overrides-active-badge" class="hidden text-[10px] font-mono text-amberAccent bg-amberAccent/10 border border-amberAccent/20 px-2.5 py-0.5 rounded-full items-center gap-1 animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v4.59L7.3 13.3a.75.75 0 101.05 1.07l2.9-2.9a.75.75 0 00.22-.53v-5.19z" clip-rule="evenodd" />
+                        </svg>
+                        <span id="lang-pricing-overridden">Pricing Overrides Active</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-x-auto">
+                    <table class="w-full min-w-[550px]">
+                        <thead>
+                            <tr class="border-b border-neutral-800 text-[10px] font-mono text-neutral-500 text-left uppercase tracking-wider">
+                                <th id="th-code" class="pb-3 w-1/5">Service Code</th>
+                                <th id="th-desc" class="pb-3 w-2/5">Statutory Operations Description</th>
+                                <th id="th-govfee" class="pb-3 text-right">Gov Fee</th>
+                                <th id="th-portal" class="pb-3 text-right">Portal Svc</th>
+                                <th id="th-qty" class="pb-3 text-center">Qty / Mins</th>
+                                <th id="th-total" class="pb-3 text-right">Subtotal (₹)</th>
+                                <th class="pb-3 text-center w-12">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-table-tbody" class="divide-y divide-neutral-800/50 text-xs">
+                            <!-- Populated dynamically via JavaScript calculations -->
+                        </tbody>
+                    </table>
+
+                    <!-- Workspace Empty State Fallback -->
+                    <div id="cart-empty-placeholder" class="py-14 flex flex-col items-center justify-center text-center">
+                        <div class="w-11 h-11 rounded-full border border-dashed border-neutral-700 flex items-center justify-center text-neutral-600 mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
+                        </div>
+                        <p id="lang-empty-cart-msg" class="text-xs text-neutral-500 max-w-xs">Statutory application workspace cart is empty. Add online service requests or PC browsing time models above.</p>
+                    </div>
+                </div>
+
+                <!-- statutory Cumulative Tax Split Aggregates (Gov fees are non-taxable, portal/browsing has 18% GST) -->
+                <div class="border-t border-neutral-800 pt-4 mt-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                    <div class="bg-neutral-900/40 p-2.5 rounded-lg border border-neutral-800/60">
+                        <div id="lang-sum-gov" class="text-[9px] text-neutral-500 font-mono uppercase tracking-wide">Statutory Gov Fees (Tax-Exempt)</div>
+                        <div id="total-gov-sum" class="text-sm font-bold text-white font-mono">₹ 0.00</div>
+                    </div>
+                    <div class="bg-neutral-900/40 p-2.5 rounded-lg border border-neutral-800/60">
+                        <div id="lang-sum-portal" class="text-[9px] text-neutral-500 font-mono uppercase tracking-wide font-semibold text-amberAccent">Taxable Service Fees</div>
+                        <div id="total-taxable-sum" class="text-sm font-bold text-amberAccent font-mono">₹ 0.00</div>
+                    </div>
+                    <div class="bg-neutral-900/40 p-2.5 rounded-lg border border-neutral-800/60">
+                        <div id="lang-sum-gst" class="text-[9px] text-neutral-500 font-mono uppercase tracking-wide">GST (18% on service only)</div>
+                        <div id="total-gst-sum" class="text-sm font-bold text-neutral-300 font-mono">₹ 0.00</div>
+                    </div>
+                    <div class="bg-neutral-950 p-2.5 rounded-lg border border-amberAccent/20">
+                        <div id="lang-sum-net" class="text-[9px] text-amberAccent font-mono uppercase tracking-wide">Net CSC Balance Due</div>
+                        <div id="total-net-sum" class="text-base font-black text-emeraldAccent font-mono">₹ 0.00</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: 3-Inch Universal CSC e-Sevai Thermal Receipt Output (5 Columns) -->
+        <section class="lg:col-span-5 flex flex-col space-y-6">
+            
+            <!-- Quick Workspace Actions Bar -->
+            <div class="glass-panel rounded-2xl p-4 flex gap-3 items-center justify-between">
+                <button onclick="flushActiveWorkspace()" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 hover:text-white px-4 py-2.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-3.5 h-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                    <span id="lang-btn-flush">Flush State</span>
+                </button>
+
+                <button onclick="commitAndProcessTransaction()" class="bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 font-bold px-6 py-2.5 rounded-xl text-xs tracking-wide transition-all flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
+                    </svg>
+                    <span id="lang-btn-lock">Lock & Register</span>
+                </button>
+            </div>
+
+            <!-- White-Label Thermal Receipt Container (Part 10 Framework Mockup Interface) -->
+            <div class="glass-panel rounded-2xl p-6 flex-1 flex flex-col">
+                <div class="flex items-center justify-between mb-4 border-b border-neutral-800 pb-3">
+                    <h3 id="lang-rec-pane-title" class="text-xs font-bold text-neutral-400 uppercase tracking-widest">3-Inch CSC Thermal Output</h3>
+                    <button onclick="triggerThermalSlipPrint()" class="text-neutral-400 hover:text-emeraldAccent transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.897l1.32-2.204a.513.513 0 01.83 0l1.32 2.204c.15.25.15.568 0 .818a1.65 1.65 0 00.3 2.22c.3.3.7.4 1.1.25.4-.15.7-.5.7-.9V8.25c0-.62-.25-1.21-.707-1.664A2.35 2.35 0 008.25 6H6.75a2.35 2.35 0 00-1.343.586A2.35 2.35 0 004.707 8.25v6.518c0 .4.3.75.7.9.4.15.8.05 1.1-.25a1.65 1.65 0 00.3-2.22.513.513 0 01-.087-.3zM15 13.897l1.32-2.204a.513.513 0 01.83 0l1.32 2.204c.15.25.15.568 0 .818a1.65 1.65 0 00.3 2.22c.3.3.7.4 1.1.25.4-.15.7-.5.7-.9V8.25c0-.62-.25-1.21-.707-1.664A2.35 2.35 0 0016.5 6H15a2.35 2.35 0 00-1.343.586A2.35 2.35 0 0012.957 8.25v6.518c0 .4.3.75.7.9.4.15.8.05 1.1-.25a1.65 1.65 0 00.3-2.22.513.513 0 01-.087-.3z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Virtual Paper Component mimicking direct thermal roll output -->
+                <div id="thermal-receipt-container" class="flex-1 bg-neutral-100 text-neutral-900 p-5 rounded-xl font-mono text-[11px] leading-tight flex flex-col justify-between overflow-y-auto max-h-[460px]">
+                    <div>
+                        <!-- Active Merchant Profile Header (Synced with localStorage roaji_shops) -->
+                        <div class="text-center mb-4 pb-3 border-b border-dashed border-neutral-400">
+                            <h4 id="rec-shop-name" class="font-bold text-xs uppercase tracking-wide">-- Live CSC Franchise --</h4>
+                            <p id="rec-shop-address" class="text-[9px] text-neutral-600">-- Profile Unregistered --</p>
+                            <p id="rec-shop-phone" class="text-[9px] text-neutral-600">Phone: --</p>
+                            <p id="rec-shop-gstin" class="text-[9px] text-neutral-600 font-bold uppercase">GSTIN: --</p>
+                            <p class="text-[9px] text-neutral-600 font-bold">VLE ID: <span id="rec-shop-vleid" class="text-neutral-900">--</span></p>
+                        </div>
+
+                        <!-- Client and Acknowledgement references metadata -->
+                        <div class="mb-4 text-[9px] text-neutral-600 border-b border-dashed border-neutral-300 pb-2.5">
+                            <div class="flex justify-between">
+                                <span>DATE: <span id="rec-date">--</span></span>
+                                <span>TIME: <span id="rec-time">--</span></span>
+                            </div>
+                            <div class="flex justify-between mt-1">
+                                <span>SLIP REF: <span id="rec-invoice-ref">CSC-XXXX</span></span>
+                                <span>CUSTOMER: <span id="rec-client-name" class="font-semibold text-neutral-900">Walk-In</span></span>
+                            </div>
+                            <div class="flex justify-between mt-0.5">
+                                <span>ACK REF: <span id="rec-ack-ref">--</span></span>
+                                <span>TEL: <span id="rec-client-mobile">--</span></span>
+                            </div>
+                            <div class="flex justify-between mt-1.5">
+                                <span class="uppercase font-bold text-[8px] bg-neutral-800 text-white px-1 py-0.5">STATUTORY CSC COPY</span>
+                                <span class="uppercase font-bold text-[8px] bg-neutral-800 text-white px-1 py-0.5">PAID</span>
+                            </div>
+                        </div>
+
+                        <!-- 3-Inch Grid Column Layout Structure -->
+                        <div class="border-b border-dashed border-neutral-400 pb-2 mb-3">
+                            <div class="flex font-bold text-[9px] border-b border-neutral-300 pb-1.5 mb-2 uppercase">
+                                <span class="w-[45%] text-left">portal service</span>
+                                <span class="w-[15%] text-right">GOV</span>
+                                <span class="w-[15%] text-right">SVC</span>
+                                <span class="w-[25%] text-right">TOTAL</span>
+                            </div>
+                            <div id="rec-items-tbody" class="space-y-1.5">
+                                <div class="text-center text-neutral-400 py-3 italic text-[9px]">No items listed in current active workspace</div>
+                            </div>
+                        </div>
+
+                        <!-- Calculations Overview -->
+                        <div class="space-y-1 border-b border-dashed border-neutral-400 pb-3 mb-3">
+                            <div class="flex justify-between text-neutral-700">
+                                <span>Gov Fees (Tax Exempt)</span>
+                                <span id="rec-sum-gov">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-neutral-700">
+                                <span>Portal Service Fees</span>
+                                <span id="rec-sum-portal">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-neutral-700 font-semibold">
+                                <span>CGST @ 9.0% (on Service)</span>
+                                <span id="rec-sum-cgst">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between text-neutral-700 font-semibold">
+                                <span>SGST @ 9.0% (on Service)</span>
+                                <span id="rec-sum-sgst">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between font-bold text-xs border-t border-neutral-300 pt-2 mt-1.5 text-black">
+                                <span id="rec-lbl-due">TOTAL AMOUNT DUE</span>
+                                <span id="rec-sum-net">₹0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic White-Label Footer Branding Sync (Part 10 Framework) -->
+                    <div class="text-center pt-2 mt-3 border-t border-dashed border-neutral-300">
+                        <p id="rec-footer-branding" class="text-[9px] font-semibold text-neutral-600 uppercase tracking-tight">
+                            CSC acknowledgement dynamic branding footer.
+                        </p>
+                        <p class="text-[8px] text-neutral-500 mt-1 uppercase tracking-widest font-mono">digital csc compliance index</p>
+                    </div>
+                </div>
+
+                <!-- Print slip trigger -->
+                <button id="btn-print-receipt" onclick="triggerThermalSlipPrint()" class="w-full bg-neutral-900 border border-neutral-800 hover:border-emeraldAccent hover:text-emeraldAccent text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all mt-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.897l1.32-2.204a.513.513 0 01.83 0l1.32 2.204c.15.25.15.568 0 .818a1.65 1.65 0 00.3 2.22c.3.3.7.4 1.1.25.4-.15.7-.5.7-.9V8.25c0-.62-.25-1.21-.707-1.664A2.35 2.35 0 008.25 6H6.75a2.35 2.35 0 00-1.343.586A2.35 2.35 0 004.707 8.25v6.518c0 .4.3.75.7.9.4.15.8.05 1.1-.25a1.65 1.65 0 00.3-2.22.513.513 0 01-.087-.3zM15 13.897l1.32-2.204a.513.513 0 01.83 0l1.32 2.204c.15.25.15.568 0 .818a1.65 1.65 0 00.3 2.22c.3.3.7.4 1.1.25.4-.15.7-.5.7-.9V8.25c0-.62-.25-1.21-.707-1.664A2.35 2.35 0 0016.5 6H15a2.35 2.35 0 00-1.343.586A2.35 2.35 0 0012.957 8.25v6.518c0 .4.3.75.7.9.4.15.8.05 1.1-.25a1.65 1.65 0 00.3-2.22.513.513 0 01-.087-.3z" />
+                    </svg>
+                    <span id="lang-btn-print">Print Receipt</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Operational System Toast Notifications Component -->
+    <div id="ui-toast" class="fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-lg border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
+        </svg>
+        <span id="toast-message-body">Operational execution success.</span>
+    </div>
+
+    <!-- Core Interactive CSC & Cafe Operations Billing Engine -->
+    <script>
+        // Baseline inventory & services databases fallback declarations
+        const CATALOG_GOV_FALLBACK = {
+            "SRV-INC": { name: "Income Certificate Application", gov_fee: 60.00, service_fee: 40.00 },
+            "SRV-COM": { name: "Community Certificate Application", gov_fee: 60.00, service_fee: 40.00 },
+            "SRV-PAN": { name: "Statutory PAN Card Processing", gov_fee: 107.00, service_fee: 93.00 },
+            "SRV-EXAM": { name: "Competitive Exam Application Portal", gov_fee: 0.00, service_fee: 150.00 }
+        };
+
+        // Application State Matrices
+        let activeLanguageContext = "en";
+        let activeCartLedgerMemory = [];
+        let globalPricingRules = {};
+        let systemMaintenanceFlag = false;
+
+        // Structured English / Tamil Translation Dictionary Matrix
+        const appTranslationMatrix = {
+            en: {
+                appTitleHeader: "e-SEVAI & CSC CAFE PORTAL",
+                secTitleGov: "Government e-Sevai Application Console",
+                lblSelectGov: "Select Government Digital Service",
+                lblGovManualName: "Statutory Application Service Name",
+                lblGovFee: "Gov Fee (₹)",
+                lblSrvCharge: "Portal Service (₹)",
+                lblGovQty: "Applications",
+                lblGovDisc: "Discount (₹)",
+                langBtnAddGov: "Add Application",
+                secTitleBrowsing: "Internet Browsing Duration Tracker",
+                lblBrowseDesc: "Browsing Terminal Allocation",
+                lblBrowseMins: "Duration (Minutes)",
+                lblBrowseRate: "Hourly Rate (₹)",
+                langCalcCostLabel: "Calculated Browsing Fee:",
+                langBtnAddBrowsing: "Add Browsing Charge",
+                secTitleRegistration: "Statutory Customer Registration & References",
+                lblCustName: "Customer Name",
+                lblCustMobile: "Customer Mobile Number",
+                lblAckRef: "Acknowledgement / App Reference",
+                secTitleCart: "Active Workspace Cart",
+                langPricingOverridden: "Pricing Overrides Active",
+                thCode: "Service Code",
+                thDesc: "Statutory Operations Description",
+                thGovfee: "Gov Fee",
+                thPortal: "Portal Svc",
+                thQty: "Qty / Mins",
+                thTotal: "Subtotal (₹)",
+                langEmptyCartMsg: "Statutory application workspace cart is empty. Add online service requests or PC browsing time models above.",
+                langSumGov: "Statutory Gov Fees (Tax-Exempt)",
+                langSumPortal: "Taxable Service Fees",
+                langSumGst: "GST (18% on service only)",
+                langSumNet: "Net CSC Balance Due",
+                langBtnFlush: "Flush State",
+                langBtnLock: "Lock & Register",
+                langRecPaneTitle: "3-Inch CSC Thermal Output",
+                recLblDue: "TOTAL AMOUNT DUE",
+                langBtnPrint: "Print Receipt",
+                maintTitle: "SYSTEM LOCKED",
+                maintDesc: "e-Sevai and Internet Cafe billing modules are temporarily locked for mandatory statutory system database maintenance. All operations are locked.",
+                langBtnConfigs: "Configurations",
+                toastAdded: "Row successfully appended to active workspace.",
+                toastRemoved: "Operational entry row purged from workspace.",
+                toastFlushed: "Active workspace records flushed.",
+                toastLocked: "CSC transaction registered. Thermal invoice ready.",
+                toastConfigSaved: "CSC Administrative properties successfully updated.",
+                walkIn: "Walk-In Client"
+            },
+            ta: {
+                appTitleHeader: "இ-சேவை & சிஎஸ்சி டிஜிட்டல் மையம்",
+                secTitleGov: "அரசு இ-சேவை விண்ணப்ப மேலாண்மை",
+                lblSelectGov: "அரசு டிஜிட்டல் சேவையைத் தேர்ந்தெடுக்கவும்",
+                lblGovManualName: "சட்டப்பூர்வ விண்ணப்ப சேவை பெயர்",
+                lblGovFee: "அரசு கட்டணம் (₹)",
+                lblSrvCharge: "மைய சேவை (₹)",
+                lblGovQty: "விண்ணப்பங்கள்",
+                lblGovDisc: "தள்ளுபடி (₹)",
+                langBtnAddGov: "விண்ணப்பத்தை சேர்க்க",
+                secTitleBrowsing: "இணைய உலாவி நேர கண்காணிப்பு",
+                lblBrowseDesc: "இணைய கணினி ஒதுக்கீடு",
+                lblBrowseMins: "உலாவு நேரம் (நிமிடங்கள்)",
+                lblBrowseRate: "மணிநேர உலாவு கட்டணம் (₹)",
+                langCalcCostLabel: "கணக்கிடப்பட்ட உலாவு கட்டணம்:",
+                langBtnAddBrowsing: "உலாவு கட்டணம் சேர்",
+                secTitleRegistration: "வாடிக்கையாளர் பதிவு மற்றும் ஒப்புகை குறிப்பு",
+                lblCustName: "வாடிக்கையாளர் பெயர்",
+                lblCustMobile: "வாடிக்கையாளர் கைபேசி எண்",
+                lblAckRef: "ஒப்புகை / விண்ணப்ப எண்",
+                secTitleCart: "செயலில் உள்ள பில்லிங் கூடை",
+                langPricingOverridden: "மாற்று விலை விதியமைக்கப்பட்டுள்ளது",
+                thCode: "சேவை குறியீடு",
+                thDesc: "சட்டப்பூர்வ சேவை விளக்கம்",
+                thGovfee: "அரசு கட்டணம்",
+                thPortal: "மைய கட்டணம்",
+                thQty: "அளவு / நிமிடம்",
+                thTotal: "துணைத்தொகை (₹)",
+                langEmptyCartMsg: "பில்லிங் கூடை காலியாக உள்ளது. ஆன்லைன் இ-சேவை அல்லது கணினி உலாவு நேர விவரங்களை மேலே உள்ள படிவங்களில் சேர்க்கவும்.",
+                langSumGov: "அரசு கட்டணங்கள் (வரி விலக்கு பெற்றது)",
+                langSumPortal: "வரி விதிக்கத்தக்க மைய கட்டணம்",
+                langSumGst: "ஜிஎஸ்டி வரி (மைய சேவைக்கு மட்டும் 18%)",
+                langSumNet: "மொத்த செலுத்த வேண்டிய தொகை",
+                langBtnFlush: "பட்டியலை அழிக்க",
+                langBtnLock: "உறுதிசெய்து பதிவு செய்க",
+                langRecPaneTitle: "3-இன்ச் சிஎஸ்சி தெர்மல் ரசீது",
+                recLblDue: "செலுத்த வேண்டிய தொகை",
+                langBtnPrint: "ரசீது அச்சிடுக",
+                maintTitle: "கணினி முடக்கப்பட்டுள்ளது",
+                maintDesc: "இ-சேவை மற்றும் இணைய மைய பில்லிங் சேவைகள் கணினி பராமரிப்பு காரணங்களுக்காக தற்காலிகமாக முடக்கப்பட்டுள்ளன.",
+                langBtnConfigs: "அமைப்புகள்",
+                toastAdded: "பில்லிங் வரிசை வெற்றிகரமாக சேர்க்கப்பட்டது.",
+                toastRemoved: "பில்லிங் வரிசை நீக்கப்பட்டது.",
+                toastFlushed: "பில்லிங் பட்டியல் காலியாக்கப்பட்டது.",
+                toastLocked: "பரிவர்த்தனை கணக்கில் பதிவு செய்யப்பட்டது. ரசீது தயார்.",
+                toastConfigSaved: "சிஎஸ்சி நிர்வாக அமைப்புகள் வெற்றிகரமாக சேமிக்கப்பட்டன.",
+                walkIn: "வாடிக்கையாளர்"
+            }
+        };
+
+        // On document ready initialization triggers
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeConfigDatabaseSeeds();
+            loadGlobalConfigMetadata();
+            mutateLanguageContext('en');
+            pollMaintenanceInterceptorState();
+            setInterval(pollMaintenanceInterceptorState, 3000); // Continuous safety check loop
+        });
+
+        // Seed default parameters to localStorage context if keys do not exist
+        function initializeConfigDatabaseSeeds() {
+            if (!localStorage.getItem('roaji_shops')) {
+                const defaultCSC = {
+                    name: "CSC E-SEVAI DIGITAL PLAZA",
+                    phone: "+91 94445 12345",
+                    address: "12, VLE Digital Hub, Anna Nagar, Chennai - 600040",
+                    gstin: "33AACCT9920A1Z5",
+                    vle_id: "VLE-TN-55291"
+                };
+                localStorage.setItem('roaji_shops', JSON.stringify(defaultCSC));
+            }
+            if (!localStorage.getItem('roaji_bill_footer_branding')) {
+                localStorage.setItem('roaji_bill_footer_branding', "Always ask for printed official receipt. e-Sevai applications processed under statutory timelines.");
+            }
+            if (!localStorage.getItem('roaji_global_pricing_rules')) {
+                const defaultRules = {
+                    "SRV-INC": { name: "Income Certificate App (Override Applied)", gov_fee: 60.00, service_fee: 50.00 },
+                    "BROWSING-RATE": { price: 40.00 }
+                };
+                localStorage.setItem('roaji_global_pricing_rules', JSON.stringify(defaultRules));
+            }
+            if (!localStorage.getItem('roaji_maintenance_mode')) {
+                localStorage.setItem('roaji_maintenance_mode', "OFF");
+            }
+        }
+
+        // Pull dynamic properties from storage variables and sync with DOM inputs
+        function loadGlobalConfigMetadata() {
+            // Synchronize shop profile mapping
+            const shopMeta = JSON.parse(localStorage.getItem('roaji_shops'));
+            if (shopMeta) {
+                document.getElementById('active-merchant-info').textContent = `${shopMeta.name} // VLE ID: ${shopMeta.vle_id}`;
+                document.getElementById('rec-shop-name').textContent = shopMeta.name;
+                document.getElementById('rec-shop-address').textContent = shopMeta.address;
+                document.getElementById('rec-shop-phone').textContent = `Phone: ${shopMeta.phone}`;
+                document.getElementById('rec-shop-gstin').textContent = `GSTIN: ${shopMeta.gstin}`;
+                document.getElementById('rec-shop-vleid').textContent = shopMeta.vle_id;
+
+                // Populating sandboxed inputs
+                document.getElementById('db-shop-name').value = shopMeta.name;
+                document.getElementById('db-shop-phone').value = shopMeta.phone;
+                document.getElementById('db-shop-address').value = shopMeta.address;
+                document.getElementById('db-shop-vleid').value = shopMeta.vle_id;
+            }
+
+            // Sync thermal bottom footer
+            const footerBranding = localStorage.getItem('roaji_bill_footer_branding');
+            if (footerBranding) {
+                document.getElementById('rec-footer-branding').textContent = footerBranding;
+                document.getElementById('db-bill-footer').value = footerBranding;
+            }
+
+            // Sync Overrides DB rules & Browsing rates
+            const overridesText = localStorage.getItem('roaji_global_pricing_rules');
+            if (overridesText) {
+                document.getElementById('db-pricing-rules').value = overridesText;
+                try {
+                    globalPricingRules = JSON.parse(overridesText);
+                } catch(e) {
+                    globalPricingRules = {};
+                }
+            }
+
+            // Set dynamic browsing rate based on overrides lookup
+            if (globalPricingRules && globalPricingRules["BROWSING-RATE"]) {
+                document.getElementById('browse-hourly-rate').value = globalPricingRules["BROWSING-RATE"].price;
+            } else {
+                document.getElementById('browse-hourly-rate').value = 30; // Baseline fallback
+            }
+        }
+
+        // Continuous flag check validator (Part 6 CSC security feature)
+        function pollMaintenanceInterceptorState() {
+            const flag = localStorage.getItem('roaji_maintenance_mode');
+            const overlay = document.getElementById('maintenance-overlay');
+            if (flag === "ON") {
+                systemMaintenanceFlag = true;
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+            } else {
+                systemMaintenanceFlag = false;
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            }
+        }
+
+        // Apply dynamic Gov Service Selection drop-down (Checks overrides rule index)
+        function applyGovServiceSelection() {
+            const code = document.getElementById('gov-dropdown-catalog').value;
+            const nameInput = document.getElementById('gov-manual-name');
+            const govFeeInput = document.getElementById('gov-fee');
+            const srvChargeInput = document.getElementById('srv-charge');
+
+            if (!code) {
+                nameInput.value = '';
+                govFeeInput.value = '';
+                srvChargeInput.value = '';
+                return;
+            }
+
+            let name = "";
+            let govFee = 0;
+            let serviceFee = 0;
+
+            if (globalPricingRules && globalPricingRules[code]) {
+                const targetRule = globalPricingRules[code];
+                name = targetRule.name || CATALOG_GOV_FALLBACK[code].name;
+                govFee = targetRule.gov_fee !== undefined ? targetRule.gov_fee : CATALOG_GOV_FALLBACK[code].gov_fee;
+                serviceFee = targetRule.service_fee !== undefined ? targetRule.service_fee : CATALOG_GOV_FALLBACK[code].service_fee;
+            } else {
+                const targetBaseline = CATALOG_GOV_FALLBACK[code];
+                name = targetBaseline.name;
+                govFee = targetBaseline.gov_fee;
+                serviceFee = targetBaseline.service_fee;
+            }
+
+            nameInput.value = name;
+            govFeeInput.value = govFee.toFixed(2);
+            srvChargeInput.value = serviceFee.toFixed(2);
+            evaluateOverridesActiveBadge();
+        }
+
+        // Live calculation tracker for browsing duration block
+        function recalculateBrowsingValue() {
+            const minutes = parseInt(document.getElementById('browse-mins').value) || 0;
+            const hourlyRate = parseFloat(document.getElementById('browse-hourly-rate').value) || 0;
+
+            const computedFee = (minutes / 60) * hourlyRate;
+            document.getElementById('browsing-calculated-fee').textContent = computedFee.toFixed(2);
+        }
+
+        // Check if dynamic override is used to display badge
+        function evaluateOverridesActiveBadge() {
+            const govCode = document.getElementById('gov-dropdown-catalog').value;
+            const badge = document.getElementById('overrides-active-badge');
+
+            const hasGovOverride = govCode && globalPricingRules && globalPricingRules[govCode];
+            const hasBrowseOverride = globalPricingRules && globalPricingRules["BROWSING-RATE"];
+
+            if (hasGovOverride || hasBrowseOverride) {
+                badge.classList.remove('hidden');
+                badge.classList.add('flex');
+            } else {
+                badge.classList.add('hidden');
+                badge.classList.remove('flex');
+            }
+        }
+
+        // Identity & References synchronizer
+        function synchronizeIdentityLedger() {
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-mobile').value.trim();
+            const ack = document.getElementById('ack-ref').value.trim();
+
+            const walkInLabel = appTranslationMatrix[activeLanguageContext].walkIn;
+
+            document.getElementById('rec-client-name').textContent = name ? name : walkInLabel;
+            document.getElementById('rec-client-mobile').textContent = phone ? phone : "--";
+            document.getElementById('rec-ack-ref').textContent = ack ? ack : "--";
+        }
+
+        // Register Government service application to active ledger
+        function registerGovApplicationRow() {
+            if (systemMaintenanceFlag) return;
+
+            const dropdownCode = document.getElementById('gov-dropdown-catalog').value;
+            const code = dropdownCode ? dropdownCode : "SRV-MANUAL";
+            const name = document.getElementById('gov-manual-name').value.trim();
+            const govFee = parseFloat(document.getElementById('gov-fee').value);
+            const serviceFee = parseFloat(document.getElementById('srv-charge').value);
+            const qty = parseInt(document.getElementById('gov-qty').value);
+            const discount = parseFloat(document.getElementById('gov-disc').value) || 0;
+
+            if (!name || isNaN(govFee) || isNaN(serviceFee) || isNaN(qty) || qty <= 0) {
+                triggerUINotification("Please fill standard portal service parameters.");
+                return;
+            }
+
+            // Calculation logic
+            const baseGovTotal = govFee * qty;
+            const baseServiceTotal = serviceFee * qty;
+            const netRowTotal = (baseGovTotal + baseServiceTotal) - discount;
+
+            const item = {
+                id: 'GOV-' + Date.now(),
+                code: code,
+                description: name,
+                govFee: govFee,
+                serviceFee: serviceFee,
+                qty: qty,
+                discount: discount,
+                netTotal: netRowTotal,
+                isBrowsing: false
+            };
+
+            activeCartLedgerMemory.push(item);
+            calculateCSCWorkspaceTotals();
+            clearGovApplicationForm();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastAdded);
+        }
+
+        // Register Browsing charge allocation to active ledger
+        function registerBrowsingDurationRow() {
+            if (systemMaintenanceFlag) return;
+
+            const terminal = document.getElementById('browse-terminal').value;
+            const minutes = parseInt(document.getElementById('browse-mins').value);
+            const hourlyRate = parseFloat(document.getElementById('browse-hourly-rate').value);
+
+            if (isNaN(minutes) || minutes <= 0 || isNaN(hourlyRate) || hourlyRate < 0) {
+                triggerUINotification("Please specify valid browsing minutes.");
+                return;
+            }
+
+            const computedBrowsingFee = (minutes / 60) * hourlyRate;
+
+            const item = {
+                id: 'BROWSING-' + Date.now(),
+                code: terminal,
+                description: `High-Speed Browsing Station: ${terminal}`,
+                govFee: 0.00,
+                serviceFee: computedBrowsingFee,
+                qty: minutes,
+                discount: 0,
+                netTotal: computedBrowsingFee,
+                isBrowsing: true
+            };
+
+            activeCartLedgerMemory.push(item);
+            calculateCSCWorkspaceTotals();
+            clearBrowsingForm();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastAdded);
+        }
+
+        // Delete active cart row
+        function purgeCartRow(id) {
+            activeCartLedgerMemory = activeCartLedgerMemory.filter(item => item.id !== id);
+            calculateCSCWorkspaceTotals();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastRemoved);
+        }
+
+        // Core dynamic financial calculations engine (Statutory Tax Split Applied)
+        function calculateCSCWorkspaceTotals() {
+            const tbody = document.getElementById('cart-table-tbody');
+            const placeholder = document.getElementById('cart-empty-placeholder');
+
+            tbody.innerHTML = '';
+
+            if (activeCartLedgerMemory.length === 0) {
+                placeholder.classList.remove('hidden');
+                drawCalculatedFinances(0, 0, 0, 0);
+                drawThermalSlipItems();
+                return;
+            }
+
+            placeholder.classList.add('hidden');
+
+            let govAccumulator = 0;
+            let serviceAccumulator = 0;
+
+            activeCartLedgerMemory.forEach(item => {
+                govAccumulator += item.govFee * (item.isBrowsing ? 1 : item.qty);
+                // Reduce row totals calculation based on discounts logic
+                if (item.isBrowsing) {
+                    serviceAccumulator += item.serviceFee;
+                } else {
+                    serviceAccumulator += (item.serviceFee * item.qty) - item.discount;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-neutral-800/40 hover:bg-neutral-900/40 transition-colors';
+                
+                const itemCodeStyle = item.isBrowsing 
+                    ? "text-amberAccent" 
+                    : "text-emeraldAccent";
+
+                const displayQtyUnit = item.isBrowsing ? `${item.qty} mins` : `${item.qty} app`;
+
+                tr.innerHTML = `
+                    <td class="py-3.5 font-mono text-xs ${itemCodeStyle}">${item.code}</td>
+                    <td class="py-3.5 font-medium text-neutral-200">${item.description}</td>
+                    <td class="py-3.5 text-right font-mono text-xs">₹${item.govFee.toFixed(2)}</td>
+                    <td class="py-3.5 text-right font-mono text-xs">₹${item.serviceFee.toFixed(2)}</td>
+                    <td class="py-3.5 text-center font-mono text-xs">${displayQtyUnit}</td>
+                    <td class="py-3.5 text-right font-mono text-xs text-emeraldAccent">₹${item.netTotal.toFixed(2)}</td>
+                    <td class="py-3.5 text-center">
+                        <button onclick="purgeCartRow('${item.id}')" class="text-neutral-500 hover:text-red-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-4 h-4 mx-auto">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 18% GST calculation on Center Service Fee ONLY (Government statutory fees are strictly exempt)
+            const calculatedServiceGst = serviceAccumulator * 0.18;
+            const grandTotalDue = govAccumulator + serviceAccumulator + calculatedServiceGst;
+
+            drawCalculatedFinances(govAccumulator, serviceAccumulator, calculatedServiceGst, grandTotalDue);
+            drawThermalSlipItems();
+        }
+
+        // Draw and update active summary DOM
+        function drawCalculatedFinances(govSum, serviceSum, gstSum, netSum) {
+            document.getElementById('total-gov-sum').textContent = `₹ ${govSum.toFixed(2)}`;
+            document.getElementById('total-taxable-sum').textContent = `₹ ${serviceSum.toFixed(2)}`;
+            document.getElementById('total-gst-sum').textContent = `₹ ${gstSum.toFixed(2)}`;
+            document.getElementById('total-net-sum').textContent = `₹ ${netSum.toFixed(2)}`;
+
+            // Thermal Slip outputs mirror
+            document.getElementById('rec-sum-gov').textContent = `₹${govSum.toFixed(2)}`;
+            document.getElementById('rec-sum-portal').textContent = `₹${serviceSum.toFixed(2)}`;
+            
+            // split tax 9% CGST and 9% SGST represented strictly on center portal fee
+            const splitTaxValue = gstSum / 2;
+            document.getElementById('rec-sum-cgst').textContent = `₹${splitTaxValue.toFixed(2)}`;
+            document.getElementById('rec-sum-sgst').textContent = `₹${splitTaxValue.toFixed(2)}`;
+            document.getElementById('rec-sum-net').textContent = `₹${netSum.toFixed(2)}`;
+        }
+
+        // Render virtual thermal output receipt listings
+        function drawThermalSlipItems() {
+            const container = document.getElementById('rec-items-tbody');
+            container.innerHTML = '';
+
+            if (activeCartLedgerMemory.length === 0) {
+                container.innerHTML = `<div class="text-center text-neutral-400 py-3 italic text-[9px]">No items listed in current active workspace</div>`;
+                return;
+            }
+
+            activeCartLedgerMemory.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-start text-[10px] leading-tight';
+                
+                const totalGovCost = item.isBrowsing ? 0 : item.govFee * item.qty;
+                const totalPortalCost = item.isBrowsing ? item.serviceFee : (item.serviceFee * item.qty) - item.discount;
+
+                itemDiv.innerHTML = `
+                    <span class="w-[45%] text-left uppercase font-semibold break-words">${item.description}</span>
+                    <span class="w-[15%] text-right font-mono">₹${totalGovCost.toFixed(0)}</span>
+                    <span class="w-[15%] text-right font-mono">₹${totalPortalCost.toFixed(0)}</span>
+                    <span class="w-[25%] text-right font-mono font-bold">₹${item.netTotal.toFixed(2)}</span>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        // Reset individual input forms helpers
+        function clearGovApplicationForm() {
+            document.getElementById('gov-dropdown-catalog').value = '';
+            document.getElementById('gov-manual-name').value = '';
+            document.getElementById('gov-fee').value = '';
+            document.getElementById('srv-charge').value = '';
+            document.getElementById('gov-qty').value = '1';
+            document.getElementById('gov-disc').value = '0';
+            evaluateOverridesActiveBadge();
+        }
+
+        function clearBrowsingForm() {
+            document.getElementById('browse-terminal').value = 'PC-01';
+            document.getElementById('browse-mins').value = '';
+            document.getElementById('browsing-calculated-fee').textContent = '0.00';
+            evaluateOverridesActiveBadge();
+        }
+
+        // Reset workspace configurations
+        function flushActiveWorkspace() {
+            activeCartLedgerMemory = [];
+            calculateCSCWorkspaceTotals();
+
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-mobile').value = '';
+            document.getElementById('ack-ref').value = '';
+            synchronizeIdentityLedger();
+
+            clearGovApplicationForm();
+            clearBrowsingForm();
+
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastFlushed);
+        }
+
+        // Commit active ledger transactions
+        function commitAndProcessTransaction() {
+            if (systemMaintenanceFlag) return;
+            if (activeCartLedgerMemory.length === 0) {
+                triggerUINotification("Workspace is currently empty.");
+                return;
+            }
+
+            const now = new Date();
+            document.getElementById('rec-date').textContent = now.toLocaleDateString();
+            document.getElementById('rec-time').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('rec-invoice-ref').textContent = "CSC-" + Math.floor(100000 + Math.random() * 900000);
+
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLocked);
+        }
+
+        function triggerThermalSlipPrint() {
+            commitAndProcessTransaction();
+            window.print();
+        }
+
+        // Bilingual context switching logic
+        function mutateLanguageContext(lang) {
+            activeLanguageContext = lang;
+
+            const t = appTranslationMatrix[lang];
+
+            // Toggle languages button CSS
+            if (lang === 'en') {
+                document.getElementById('lang-toggle-en').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                document.getElementById('lang-toggle-ta').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            } else {
+                document.getElementById('lang-toggle-ta').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                document.getElementById('lang-toggle-en').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            }
+
+            // Interface labels and headers
+            document.getElementById('app-title-header').innerHTML = `${t.appTitleHeader} <span class="text-[9px] bg-neutral-800 text-neutral-400 font-mono px-1.5 py-0.5 rounded border border-neutral-700">CSC v6.2</span>`;
+            document.getElementById('sec-title-gov').textContent = t.secTitleGov;
+            document.getElementById('lbl-select-gov').textContent = t.lblSelectGov;
+            document.getElementById('lbl-gov-manual-name').textContent = t.lblGovManualName;
+            document.getElementById('lbl-gov-fee').textContent = t.lblGovFee;
+            document.getElementById('lbl-srv-charge').textContent = t.lblSrvCharge;
+            document.getElementById('lbl-gov-qty').textContent = t.lblGovQty;
+            document.getElementById('lbl-gov-disc').textContent = t.lblGovDisc;
+            document.getElementById('lang-btn-add-gov').textContent = t.langBtnAddGov;
+
+            document.getElementById('sec-title-browsing').textContent = t.secTitleBrowsing;
+            document.getElementById('lbl-browse-desc').textContent = t.lblBrowseDesc;
+            document.getElementById('lbl-browse-mins').textContent = t.lblBrowseMins;
+            document.getElementById('lbl-browse-rate').textContent = t.lblBrowseRate;
+            document.getElementById('lang-calc-cost-label').textContent = t.langCalcCostLabel;
+            document.getElementById('lang-btn-add-browsing').textContent = t.langBtnAddBrowsing;
+
+            document.getElementById('sec-title-registration').textContent = t.secTitleRegistration;
+            document.getElementById('lbl-cust-name').textContent = t.lblCustName;
+            document.getElementById('lbl-cust-mobile').textContent = t.lblCustMobile;
+            document.getElementById('lbl-ack-ref').textContent = t.lblAckRef;
+
+            document.getElementById('sec-title-cart').textContent = t.secTitleCart;
+            document.getElementById('lang-pricing-overridden').textContent = t.langPricingOverridden;
+            document.getElementById('th-code').textContent = t.thCode;
+            document.getElementById('th-desc').textContent = t.thDesc;
+            document.getElementById('th-govfee').textContent = t.thGovfee;
+            document.getElementById('th-portal').textContent = t.thPortal;
+            document.getElementById('th-qty').textContent = t.thQty;
+            document.getElementById('th-total').textContent = t.thTotal;
+            document.getElementById('lang-empty-cart-msg').textContent = t.langEmptyCartMsg;
+
+            document.getElementById('lang-sum-gov').textContent = t.langSumGov;
+            document.getElementById('lang-sum-portal').textContent = t.langSumPortal;
+            document.getElementById('lang-sum-gst').textContent = t.langSumGst;
+            document.getElementById('lang-sum-net').textContent = t.langSumNet;
+
+            document.getElementById('lang-btn-flush').textContent = t.langBtnFlush;
+            document.getElementById('lang-btn-lock').textContent = t.langBtnLock;
+            document.getElementById('lang-rec-pane-title').textContent = t.langRecPaneTitle;
+            document.getElementById('rec-lbl-due').textContent = t.recLblDue;
+            document.getElementById('lang-btn-print').textContent = t.langBtnPrint;
+            document.getElementById('lang-btn-configs').textContent = t.langBtnConfigs;
+
+            document.getElementById('maint-title').textContent = t.maintTitle;
+            document.getElementById('maint-desc').textContent = t.maintDesc;
+
+            translateDropdownValues();
+            synchronizeIdentityLedger();
+        }
+
+        // Translates drop-down selector options
+        function translateDropdownValues() {
+            // e-Sevai Options translation
+            const selectGov = document.getElementById('gov-dropdown-catalog');
+            selectGov.options[1].text = activeLanguageContext === 'en' ? "Income Certificate Application" : "வருமான சான்றிதழ் விண்ணப்பம்";
+            selectGov.options[2].text = activeLanguageContext === 'en' ? "Community Certificate Application" : "சாதி சான்றிதழ் விண்ணப்பம்";
+            selectGov.options[3].text = activeLanguageContext === 'en' ? "Statutory PAN Card Processing" : "புதிய பான் கார்டு விண்ணப்பம்";
+            selectGov.options[4].text = activeLanguageContext === 'en' ? "Competitive Exam Application Portal" : "போட்டித் தேர்வு விண்ணப்ப பதிவு";
+
+            // Terminals Options Translation
+            const selectTerm = document.getElementById('browse-terminal');
+            selectTerm.options[0].text = activeLanguageContext === 'en' ? "High-Speed Terminal PC-01" : "கணினி முனையம் PC-01";
+            selectTerm.options[1].text = activeLanguageContext === 'en' ? "High-Speed Terminal PC-02" : "கணினி முனையம் PC-02";
+            selectTerm.options[2].text = activeLanguageContext === 'en' ? "High-Speed Terminal PC-03" : "கணினி முனையம் PC-03";
+            selectTerm.options[3].text = activeLanguageContext === 'en' ? "High-Speed Terminal PC-04" : "கணினி முனையம் PC-04";
+            selectTerm.options[4].text = activeLanguageContext === 'en' ? "High-Speed Terminal PC-05" : "கணினி முனையம் PC-05";
+        }
+
+        // Administrative Sandboxed Settings Actions
+        function toggleConfigLogPanel() {
+            const panel = document.getElementById('configs-drawer-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function commitSandboxedDatabaseChanges() {
+            // Write input fields parameters to localStorage keys
+            const updatedShop = {
+                name: document.getElementById('db-shop-name').value.trim() || "CSC E-SEVAI DIGITAL PLAZA",
+                phone: document.getElementById('db-shop-phone').value.trim() || "--",
+                address: document.getElementById('db-shop-address').value.trim() || "--",
+                gstin: document.getElementById('db-shop-gstin').value.trim() || "33AACCT9920A1Z5",
+                vle_id: document.getElementById('db-shop-vleid').value.trim() || "VLE-TN-55291"
+            };
+            localStorage.setItem('roaji_shops', JSON.stringify(updatedShop));
+
+            const brandingText = document.getElementById('db-bill-footer').value.trim();
+            localStorage.setItem('roaji_bill_footer_branding', brandingText);
+
+            const pricingRulesStr = document.getElementById('db-pricing-rules').value.trim();
+            try {
+                JSON.parse(pricingRulesStr); // Verification syntax validation check
+                localStorage.setItem('roaji_global_pricing_rules', pricingRulesStr);
+            } catch(e) {
+                alert("Incorrect overrides structure JSON schema syntax! Flushed pricing rules changes.");
+                localStorage.setItem('roaji_global_pricing_rules', '{}');
+            }
+
+            loadGlobalConfigMetadata();
+            applyGovServiceSelection();
+            synchronizeIdentityLedger();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastConfigSaved);
+            toggleConfigLogPanel();
+        }
+
+        function overrideLockoutStatus(state) {
+            localStorage.setItem('roaji_maintenance_mode', state);
+            pollMaintenanceInterceptorState();
+            triggerUINotification(`Statutory Interceptor set to ${state}`);
+        }
+
+        // Dynamic System Alert Notifications
+        function triggerUINotification(message) {
+            const toast = document.getElementById('ui-toast');
+            document.getElementById('toast-message-body').textContent = message;
+
+            toast.className = "fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-lg border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-0 opacity-100 transition-all duration-300 z-50 flex items-center gap-2";
+
+            setTimeout(() => {
+                toast.className = "fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-lg border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
