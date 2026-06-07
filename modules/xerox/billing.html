@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roaji SaaS Suite - Xerox & Printing POS Terminal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050505; /* Deep luxury streaming-app dark base */
+            color: #F5F5F4;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .premium-card {
+            background: rgba(18, 16, 15, 0.85); /* Premium Stone-900 Alpha */
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+        .glow-focus:focus {
+            outline: none;
+            border-color: #F97316; /* Orange-500 Neon */
+            box-shadow: 0 0 15px rgba(249, 115, 22, 0.35);
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-invoice-area, #printable-invoice-area * {
+                visibility: visible;
+            }
+            #printable-invoice-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative p-4 md:p-6 flex flex-col items-center justify-start overflow-hidden">
+
+    <!-- Background Ambiance Glows -->
+    <div class="absolute top-[-25%] left-[-15%] w-[65vw] h-[65vw] rounded-full bg-amber-500/5 blur-[130px] pointer-events-none"></div>
+    <div class="absolute bottom-[-25%] right-[-15%] w-[65vw] h-[65vw] rounded-full bg-orange-600/5 blur-[130px] pointer-events-none"></div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
+
+    <!-- MAIN CORE CONTAINER -->
+    <div id="pos-main-container" class="w-full max-w-7xl z-10 space-y-4">
+
+        <!-- HEADER AREA -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-3 border-b border-stone-900">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <a href="../../shop_resolver.html" data-key="back_dashboard" class="text-xs font-bold text-amber-700 hover:text-amber-800 transition">← வணிகத் தேர்விற்குச் செல்</a>
+                </div>
+                <h1 id="app-title" class="text-lg font-bold tracking-tight text-white uppercase">ஜெராக்ஸ் மற்றும் பிரிண்டிங் முனையம்</h1>
+                <p id="active-shop-header-title" class="text-xs text-stone-500 font-semibold uppercase tracking-wider">Xerox Matrix & Instant Printing Terminal</p>
+            </div>
+
+            <!-- Topbar options -->
+            <div class="flex flex-wrap items-center gap-3 self-end md:self-auto">
+                <!-- Global Language Toggle -->
+                <div class="glass-panel p-1 rounded-2xl flex items-center shadow-sm bg-stone-900/60 border border-stone-850">
+                    <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200">EN</button>
+                    <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3.5 py-1.5 text-xs font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            <!-- LEFT AREA: CALCULATOR INPUTS (Col 7) -->
+            <div class="lg:col-span-7 space-y-4">
+                
+                <!-- Sizing & Pricing parameters card -->
+                <div class="premium-card p-5 rounded-3xl space-y-5">
+                    <h3 data-key="config_parameters_lbl" class="text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-stone-850 pb-2">பிரிண்டிங் உள்ளீடுகள்</h3>
+                    
+                    <form id="calc-form" class="space-y-4" onsubmit="addXeroxToCart(event)">
+                        
+                        <!-- Paper Sizes & Print Modes -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label data-key="lbl_paper_size" class="block text-[10px] font-bold text-stone-500 uppercase mb-1.5">தாள் அளவு / Paper Size</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button type="button" onclick="setPaperSize('A4')" id="size-btn-A4" class="py-2.5 bg-orange-600 text-white text-xs font-bold rounded-xl transition">A4</button>
+                                    <button type="button" onclick="setPaperSize('A3')" id="size-btn-A3" class="py-2.5 bg-stone-950 border border-stone-850 text-stone-300 text-xs font-bold rounded-xl transition">A3</button>
+                                    <button type="button" onclick="setPaperSize('Legal')" id="size-btn-Legal" class="py-2.5 bg-stone-950 border border-stone-850 text-stone-300 text-xs font-bold rounded-xl transition">Legal</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label data-key="lbl_print_mode" class="block text-[10px] font-bold text-stone-500 uppercase mb-1.5">பிரிண்டிங் முறை / Print Mode</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" onclick="setPrintMode('BW')" id="mode-btn-BW" class="py-2.5 bg-orange-600 text-white text-xs font-bold rounded-xl transition">Black & White</button>
+                                    <button type="button" onclick="setPrintMode('Color')" id="mode-btn-Color" class="py-2.5 bg-stone-950 border border-stone-850 text-stone-300 text-xs font-bold rounded-xl transition">Color Laser</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Side options (Single / Double side) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label data-key="lbl_side_mode" class="block text-[10px] font-bold text-stone-500 uppercase mb-1.5">பக்கங்கள் / Side Mode</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" onclick="setSideMode('SS')" id="side-btn-SS" class="py-2.5 bg-orange-600 text-white text-xs font-bold rounded-xl transition">Single Side</button>
+                                    <button type="button" onclick="setSideMode('DS')" id="side-btn-DS" class="py-2.5 bg-stone-950 border border-stone-850 text-stone-300 text-xs font-bold rounded-xl transition">Double Side</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label data-key="lbl_page_count" class="block text-[10px] font-bold text-stone-500 uppercase mb-1.5">பக்கங்கள் / Pages</label>
+                                    <input type="number" id="page-count" value="1" min="1" oninput="calculateInstantPreviewPrice()" class="w-full px-3 py-2 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 text-xs glow-focus font-bold text-center">
+                                </div>
+                                <div>
+                                    <label data-key="lbl_copy_qty" class="block text-[10px] font-bold text-stone-500 uppercase mb-1.5">அளவு / Copies</label>
+                                    <input type="number" id="copy-qty" value="1" min="1" oninput="calculateInstantPreviewPrice()" class="w-full px-3 py-2 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-100 text-xs glow-focus font-bold text-center">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Rate Indicator badge and Add button -->
+                        <div class="flex items-center justify-between border-t border-stone-850 pt-4 gap-4">
+                            <span id="instant-rate-badge" class="px-3.5 py-2 text-xs font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20 rounded-xl tracking-wider">Estimated Rate: ₹2.00 / page</span>
+                            <button type="submit" class="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-stone-950 font-bold text-xs rounded-xl transition shadow active:scale-[0.98]">
+                                + Add to Bill
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <!-- Active Running Cart Block -->
+                <div class="premium-card p-5 rounded-3xl space-y-4">
+                    <h3 data-key="cart_title_lbl" class="text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-stone-850 pb-2">உள்ளூர் பட்டி / Active Bill</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="border-b border-stone-850 text-stone-500 font-bold">
+                                    <th class="py-2.5 px-2">பொருள்</th>
+                                    <th class="py-2.5 px-2 text-center">விலை</th>
+                                    <th class="py-2.5 px-2 text-center">பக்கங்கள்</th>
+                                    <th class="py-2.5 px-2 text-center">அளவு</th>
+                                    <th class="py-2.5 px-2 text-right">மொத்தம்</th>
+                                    <th class="py-2.5 px-2"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-table-body" class="divide-y divide-stone-900">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT AREA: PAYMENT & METADATA (Col 5) -->
+            <div class="lg:col-span-5 space-y-4">
+                
+                <!-- Client metadata selection -->
+                <div class="premium-card p-5 rounded-3xl space-y-4">
+                    <h3 data-key="crm_block_lbl" class="text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-stone-850 pb-2">வாடிக்கையாளர் CRM (விருப்பத்திற்குரியது)</h3>
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <input id="client-name" type="text" placeholder="Customer Name" class="w-full px-3 py-2 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-200">
+                        <input id="client-phone" type="tel" placeholder="Mobile Number" class="w-full px-3 py-2 bg-stone-950/50 border border-stone-850 rounded-xl text-stone-200">
+                    </div>
+                </div>
+
+                <!-- Calculations & Save bills checkout matrix -->
+                <div class="premium-card p-5 rounded-3xl space-y-4">
+                    <h3 data-key="checkout_calc_lbl" class="text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-stone-850 pb-2">பில்தொகை விபரங்கள்</h3>
+                    
+                    <div class="space-y-3 text-xs text-stone-600">
+                        <div class="flex justify-between">
+                            <span data-key="checkout_subtotal">துணைத் தொகை:</span>
+                            <span id="calc-subtotal" class="text-stone-300 font-bold">₹0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>GST Tax (18%):</span>
+                            <span id="calc-tax" class="text-stone-300 font-bold">₹0.00</span>
+                        </div>
+                        <div class="flex justify-between text-base font-bold text-stone-200 border-t border-stone-850 pt-2">
+                            <span data-key="checkout_grand_total">மொத்தத் தொகை:</span>
+                            <span id="calc-grand-total">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <button onclick="saveAndPrintXeroxInvoice()" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-stone-950 font-bold rounded-2xl text-xs transition shadow flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:18px; height:18px; max-width:100%;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                        <span data-key="bill_print_btn">பில் போடு (Save & Print)</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ==================== LIVE BILL PREVIEW / PRINT TEMPLATE POPUP ==================== -->
+    <div id="invoice-modal" class="fixed inset-0 bg-stone-950/90 backdrop-blur-md z-50 items-center justify-center p-4 hidden overflow-y-auto">
+        <div class="w-full max-w-sm bg-white border border-stone-200 p-6 rounded-3xl shadow-2xl transform scale-95 transition-all flex flex-col gap-4">
+            <div id="printable-invoice-area" class="p-5 bg-stone-50 border border-stone-300 mx-auto" style="width: 100mm; max-width: 100%; font-family: monospace; color: #000; font-size: 11px;">
+                <!-- Dynamically filled with merchant profile, GSTIN, and custom admin bill footer -->
+            </div>
+            <div class="flex gap-2 pt-2 border-t border-stone-100">
+                <button onclick="closeInvoiceModal()" data-key="modal_btn_close" class="flex-1 py-2 bg-stone-100 text-stone-750 font-bold rounded-xl text-xs">Close</button>
+                <button onclick="window.print()" data-key="print_now_btn" class="flex-1 py-2 bg-amber-600 text-stone-950 font-bold rounded-xl text-xs">Print Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SYSTEM GATEWAY INTERCEPTORS & CALC ENGINE -->
+    <script>
+        const langData = {
+            ta: {
+                app_title: "ஜெராக்ஸ் மற்றும் பிரிண்டிங் முனையம்",
+                back_dashboard: "← வணிகத் தேர்விற்குச் செல்",
+                th_item: "பொருள்",
+                th_price: "விலை",
+                th_qty: "அளவு",
+                th_total: "மொத்தம்",
+                config_parameters_lbl: "பிரிண்டிங் உள்ளீடுகள்",
+                lbl_paper_size: "தாள் அளவு / Paper Size",
+                lbl_print_mode: "பிரிண்டிங் முறை / Print Mode",
+                lbl_side_mode: "பக்கங்கள் / Side Mode",
+                lbl_page_count: "பக்கங்கள்",
+                lbl_copy_qty: "அளவு",
+                cart_title_lbl: "உள்ளூர் பட்டி / Active Bill",
+                crm_block_lbl: "வாடிக்கையாளர் CRM (விருப்பத்திற்குரியது)",
+                checkout_calc_lbl: "பில்தொகை விபரங்கள்",
+                checkout_subtotal: "துணைத் தொகை:",
+                checkout_grand_total: "மொத்தத் தொகை:",
+                bill_print_btn: "பில் போடு (Save & Print)",
+                invoice_preview_lbl: "நேரடி இன்வாய்ஸ் முன்னோட்டம்",
+                modal_btn_close: "மூடவும் / Close",
+                print_now_btn: "அச்சிடு / Print Now",
+                toast_cart_added: "உள்ளீடு பட்டியலுடன் சேர்க்கப்பட்டது!"
+            },
+            en: {
+                app_title: "Xerox & Printing POS Console",
+                back_dashboard: "← Go back to Shop Resolver",
+                th_item: "Item",
+                th_price: "Price",
+                th_qty: "Qty",
+                th_total: "Total",
+                config_parameters_lbl: "Printing Parameters",
+                lbl_paper_size: "Paper Size Profile",
+                lbl_print_mode: "Printing Mode Variable",
+                lbl_side_mode: "Side Mode Selection",
+                lbl_page_count: "Pages count",
+                lbl_copy_qty: "Copies quantity",
+                cart_title_lbl: "Active Bill Inward Items",
+                crm_block_lbl: "Customer CRM Metadata (Optional)",
+                checkout_calc_lbl: "POS Calculation Matrix",
+                checkout_subtotal: "Subtotal:",
+                checkout_grand_total: "Grand Total:",
+                bill_print_btn: "Create Bill (Save & Print)",
+                invoice_preview_lbl: "Live Invoice Customizer Preview",
+                modal_btn_close: "Close Preview",
+                print_now_btn: "Print Now",
+                toast_cart_added: "Inward transaction item added to bill!"
+            }
+        };
+
+        let currentLang = 'en';
+
+        // STATIC BILLING CONFIGS
+        let activePaperSize = 'A4';
+        let activePrintMode = 'BW';
+        let activeSideMode = 'SS';
+
+        // SHARED SYSTEM DATABASE DATAS
+        let activeShopObj = null;
+        let cart = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // STEP 3: Secure Maintenance Mode Interceptor (CRITICAL SECURITY ACTION)
+            evaluateSystemMaintenance();
+
+            const savedGlobalLang = localStorage.getItem('roaji_language');
+            if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
+                currentLang = savedGlobalLang;
+            }
+
+            // STEP 1: Dynamic Active Shop Context Parsing
+            const activeShopId = localStorage.getItem('roaji_active_shop_id') || 'shop_gift';
+            const registeredSaaSShops = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+            activeShopObj = registeredSaaSShops.find(s => s.id === activeShopId);
+
+            if (activeShopObj) {
+                document.getElementById('active-shop-header-title').innerText = `Workspace Context: ${activeShopObj.name} | Active Plan: ${activeShopObj.plan}`;
+            }
+
+            applyLanguage();
+            calculateInstantPreviewPrice();
+        });
+
+        // SECURE MAINTENANCE MODE INTERCEPTOR
+        function evaluateSystemMaintenance() {
+            const state = localStorage.getItem('roaji_maintenance_mode') || 'OFF';
+            if (state === 'ON') {
+                alert("System Maintenance Mode Active. Directing back to resolver dashboard.");
+                window.location.href = "https://iamajithkumar98-bit.github.io/roaji/shop_resolver.html";
+            }
+        }
+
+        // LANGUAGE TOGGLE
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('roaji_language', lang);
+            applyLanguage();
+            renderActiveCart();
+        }
+
+        function applyLanguage() {
+            const btnTa = document.getElementById('lang-btn-ta');
+            const btnEn = document.getElementById('lang-btn-en');
+
+            if (currentLang === 'ta') {
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+            } else {
+                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
+                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
+            }
+
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (langData[currentLang][key]) {
+                    element.innerText = langData[currentLang][key];
+                }
+            });
+        }
+
+        // NICHE CONFIG PARAMETERS CHIPS
+        function setPaperSize(size) {
+            activePaperSize = size;
+            ['A4', 'A3', 'Legal'].forEach(s => {
+                const el = document.getElementById(`size-btn-${s}`);
+                el.className = s === size 
+                    ? "py-2.5 bg-orange-600 text-white text-xs font-bold rounded-xl transition" 
+                    : "py-2.5 bg-stone-950 border border-stone-850 text-stone-300 text-xs font-bold rounded-xl transition";
+            });
+            calculateInstantPreviewPrice();
+        }
+
+        function setPrintMode(mode) {
+            activePrintMode = mode;
+            ['BW', 'Color'].forEach(m => {
+                const el = document.getElementById(`mode-btn-${m}`);
+                el.className = m === mode 
+                    ? "py-2.5 bg-orange-600 text-white text-xs font-bold rounded-xl transition" 
+                    : "py-2.5 bg-stone-950 border border-stone-850 text-stone-300 text-xs font-bold rounded-xl transition";
+            });
+            calculateInstantPreviewPrice();
+        }
+
+        // ==================== STEP 2: DYNAMIC PRICING HOOKS & BULK TIER CALCULATIONS ====================
+        function setSideMode(side) {
+            activeSideMode = side;
+            ['SS', 'DS'].forEach(s => {
+                const el = document.getElementById(`side-btn-${s}`);
+                el.className = s === side 
+                    ? "py-2.5 bg-orange-600 text-white text-xs font-bold rounded-xl transition" 
+                    : "py-2.5 bg-stone-950 border border-stone-850 text-stone-300 text-xs font-bold rounded-xl transition";
+            });
+            calculateInstantPreviewPrice();
+        }
+
+        let activeCalculatedUnitPrice = 2.00;
+
+        function calculateInstantPreviewPrice() {
+            // STEP 2: Fetch global pricing baseline overrides from Super Admin
+            const localPricingRules = JSON.parse(localStorage.getItem('roaji_global_pricing_rules')) || {};
+            
+            // Baseline prices fallbacks
+            let baseRateBW = localPricingRules['xerox'] || 2.00; // default 2 Rs/page
+            let baseRateColor = localPricingRules['photo_studio'] || 10.00; // default 10 Rs/page for color laser
+
+            let unitPrice = activePrintMode === 'BW' ? baseRateBW : baseRateColor;
+
+            // Apply size multipliers
+            if (activePaperSize === 'A3') unitPrice *= 2; // double rate for A3
+            if (activePaperSize === 'Legal') unitPrice += 1; // legal paper cost bump
+
+            // Apply side discount
+            if (activeSideMode === 'DS') {
+                unitPrice *= 0.85; // 15% discount on double-sided prints
+            }
+
+            // STEP 2: Bulk Discount Tier Matrix
+            const pageCount = parseInt(document.getElementById('page-count').value) || 1;
+            const copyQty = parseInt(document.getElementById('copy-qty').value) || 1;
+            const totalPageFlow = pageCount * copyQty;
+
+            if (totalPageFlow >= 100) {
+                unitPrice *= 0.80; // auto-apply 20% discount if printing in high-frequency volume (>100 pages)
+            }
+
+            activeCalculatedUnitPrice = unitPrice;
+
+            document.getElementById('instant-rate-badge').innerText = `Estimated Rate: ₹${unitPrice.toFixed(2)} / page`;
+        }
+
+        // ==================== TRANSACTION LEDGER INWARD ====================
+        function addXeroxToCart(event) {
+            event.preventDefault();
+            const pages = parseInt(document.getElementById('page-count').value) || 1;
+            const qty = parseInt(document.getElementById('copy-qty').value) || 1;
+
+            const itemName = `Xerox (${activePaperSize} - ${activePrintMode} - ${activeSideMode})`;
+            const total = activeCalculatedUnitPrice * pages * qty;
+
+            cart.push({
+                name: itemName,
+                unitPrice: activeCalculatedUnitPrice,
+                pages: pages,
+                qty: qty,
+                total: total
+            });
+
+            // Reset default parameters
+            document.getElementById('page-count').value = '1';
+            document.getElementById('copy-qty').value = '1';
+
+            renderActiveCart();
+            showToast(langData[currentLang]['toast_cart_added'], "success");
+        }
+
+        function removeCartItem(index) {
+            cart.splice(index, 1);
+            renderActiveCart();
+        }
+
+        let calculatedTotals = { subtotal: 0, tax: 0, grandTotal: 0 };
+
+        function updateCalculations() {
+            let subtotal = 0;
+            cart.forEach(item => {
+                subtotal += item.total;
+            });
+
+            const taxSum = subtotal * 0.18; // standard GST 18%
+            const grandTotal = subtotal + taxSum;
+
+            calculatedTotals = { subtotal, tax: taxSum, grandTotal };
+
+            document.getElementById('calc-subtotal').innerText = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('calc-tax').innerText = `₹${taxSum.toFixed(2)}`;
+            document.getElementById('calc-grand-total').innerText = `₹${grandTotal.toFixed(2)}`;
+        }
+
+        function renderActiveCart() {
+            const tableBody = document.getElementById('cart-table-body');
+            const emptyMsg = document.getElementById('empty-cart-message');
+
+            tableBody.innerHTML = '';
+            if (cart.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                updateCalculations();
+                return;
+            }
+            emptyMsg.classList.add('hidden');
+
+            cart.forEach((item, index) => {
+                tableBody.innerHTML += `
+                    <tr class="border-b border-stone-850 py-2 hover:bg-stone-900/30 transition">
+                        <td class="py-3 px-2 font-semibold text-stone-200">${item.name}</td>
+                        <td class="py-3 px-2 text-center font-bold">₹${item.unitPrice.toFixed(2)}</td>
+                        <td class="py-3 px-2 text-center font-bold font-mono">${item.pages}</td>
+                        <td class="py-3 px-2 text-center font-bold font-mono">${item.qty}</td>
+                        <td class="py-3 px-2 text-right font-bold text-orange-500">₹${item.total.toFixed(2)}</td>
+                        <td class="py-3 px-2 text-center">
+                            <button onclick="removeCartItem(${index})" class="text-rose-600 hover:text-rose-800 ml-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width:16px; height:16px; max-width:100%;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            updateCalculations();
+        }
+
+        // ==================== DISPATCH PRINTING & WRITE-LABEL BRANDING ====================
+        function saveAndPrintXeroxInvoice() {
+            if (cart.length === 0) {
+                showToast("Please add items before generating invoice!", "error");
+                return;
+            }
+
+            // Fetch custom Super Admin white-label branding (STEP 1)
+            const whiteLabelBranding = localStorage.getItem('roaji_bill_footer_branding') || "ROAJI SaaS Matrix Billing Engine";
+
+            // Fetch active merchant store profile metadata (STEP 1)
+            const storeName = activeShopObj ? activeShopObj.name : "ROAJI INSTANT PRINT";
+            const storePhone = activeShopObj ? (activeShopObj.phone || '9876543210') : '9876543210';
+            const storeAddress = activeShopObj ? (activeShopObj.address || 'Chennai, TN') : 'Chennai, TN';
+            const storeGstin = activeShopObj ? (activeShopObj.gstin || 'N/A') : 'N/A';
+
+            // Customer details if filled
+            const clientName = document.getElementById('client-name').value.trim() || 'Walk-in Customer';
+            const clientPhone = document.getElementById('client-phone').value.trim() || 'N/A';
+
+            let itemsRowHTML = '';
+            let totalPagesProcured = 0;
+            cart.forEach(item => {
+                totalPagesProcured += item.pages * item.qty;
+                itemsRowHTML += `
+                    <div class="flex justify-between py-1 border-b border-stone-200/50">
+                        <span>${item.name} x${item.qty}</span>
+                        <span>₹${item.total.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('printable-invoice-area').innerHTML = `
+                <div style="font-family: monospace; color: #000; line-height: 1.4;">
+                    <div style="text-align: center; border-bottom: 2px dashed #000; padding-bottom: 8px; margin-bottom: 8px;">
+                        <h3 style="font-size: 13px; font-weight: bold; margin: 0;">${storeName}</h3>
+                        <p style="font-size: 10px; margin: 2px 0;">${storeAddress}</p>
+                        <p style="font-size: 9px; margin: 2px 0;">Phone: ${storePhone} | GSTIN: ${storeGstin}</p>
+                    </div>
+
+                    <div style="font-size: 10px; line-height: 1.5; margin-bottom: 8px;">
+                        <div>Invoice No: <strong>ROAJI-${Math.floor(100000 + Math.random() * 900000)}</strong></div>
+                        <div>Date: <strong>${new Date().toLocaleDateString()}</strong></div>
+                        <div>Customer: <strong>${clientName} (${clientPhone})</strong></div>
+                    </div>
+
+                    <p style="margin: 4px 0; border-top: 1px dashed #000;"></p>
+                    <div style="font-size: 10px; margin-top: 4px;">
+                        ${itemsRowHTML}
+                    </div>
+                    <p style="margin: 4px 0; border-top: 1px dashed #000;"></p>
+
+                    <div style="text-align: right; font-size: 10px; line-height: 1.6; margin-top: 4px;">
+                        <div>Pages Printed: <strong>${totalPagesProcured} pages</strong></div>
+                        <div>Subtotal: <strong>₹${calculatedTotals.subtotal.toFixed(2)}</strong></div>
+                        <div>Tax Sum (18%): <strong>₹${calculatedTotals.tax.toFixed(2)}</strong></div>
+                        <div style="font-size: 11px; font-weight: bold; border-top: 1px dashed #000; padding-top: 2px; margin-top: 2px; color: #ea580c;">
+                            Grand Total: ₹${calculatedTotals.grandTotal.toFixed(2)}
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; font-size: 8px; margin-top: 16px; border-t: 1px dashed #000; padding-top: 4px;">
+                        ${whiteLabelBranding}
+                    </div>
+                </div>
+            `;
+
+            // Log dynamic transaction out to SaaS central sales DB
+            const salesHistory = JSON.parse(localStorage.getItem('roaji_sales')) || [];
+            salesHistory.unshift({
+                invoiceNo: "ROAJI-" + Math.floor(100000 + Math.random() * 900000),
+                date: new Date().toISOString().split('T')[0],
+                customer: clientName,
+                cost: calculatedTotals.subtotal * 0.4, // estimated cost margin
+                total: calculatedTotals.grandTotal,
+                tax: calculatedTotals.tax,
+                profit: calculatedTotals.grandTotal - (calculatedTotals.subtotal * 0.4)
+            });
+            localStorage.setItem('roaji_sales', JSON.stringify(salesHistory));
+
+            openInvoiceModal();
+        }
+
+        function openInvoiceModal() {
+            const modal = document.getElementById('invoice-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeInvoiceModal() {
+            const modal = document.getElementById('invoice-modal');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                
+                // Clear cart state
+                cart = [];
+                renderActiveCart();
+
+                document.getElementById('client-name').value = '';
+                document.getElementById('client-phone').value = '';
+            }, 200);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgClass = 'bg-stone-900 text-white border-stone-850';
+            let iconSvg = '';
+
+            if (type === 'success') {
+                bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
+                iconSvg = `<svg class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (type === 'error') {
+                bgClass = 'bg-rose-950/90 border border-rose-500/30 text-rose-300';
+                iconSvg = `<svg class="h-5 w-5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+
+            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
+            toast.innerHTML = `<div class="flex-shrink-0">${iconSvg}</div><div class="text-xs font-semibold leading-relaxed">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('translate-x-12', 'opacity-0'); }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
