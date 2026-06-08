@@ -75,7 +75,7 @@
             
             <!-- Left Branding Identity -->
             <div class="flex items-center space-x-3.5">
-                <div class="w-10 h-10 bg-amberAccent/10 border border-amberAccent/30 rounded-lg flex items-center justify-center">
+                <div class="w-10 h-10 bg-amberAccent/10 border border-amberAccent/30 rounded-xl flex items-center justify-center">
                     <span class="text-amberAccent font-black text-xl tracking-wider">A</span>
                 </div>
                 <div>
@@ -166,7 +166,7 @@
                         </div>
                         <div>
                             <label id="lbl-admin-bio" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Professional Bio</label>
-                            <textarea id="inp-admin-bio" required rows="2" placeholder="e.g. Root SaaS Architect & Governance Specialist" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60 resize-none"></textarea>
+                            <textarea id="inp-admin-bio" required rows="2" placeholder="e.g. Root SaaS Architect & Supply Chain Governance Specialist" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60 resize-none"></textarea>
                         </div>
                         <div>
                             <label id="lbl-admin-email" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Primary Official Email</label>
@@ -393,19 +393,19 @@
                     <div class="space-y-4 text-xs font-mono">
                         <div>
                             <label id="lbl-niche-rate-override" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Base Niche Rate Override (₹)</label>
-                            <input id="inp-niche-rate" type="number" step="5" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent">
+                            <input id="inp-niche-rate" type="number" step="5" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-stationery-tempered-override" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">ACC-TEMP Glass Price Override (₹)</label>
-                            <input id="inp-acc-temp" type="number" step="10" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent">
+                            <input id="inp-acc-temp" type="number" step="10" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-stationery-flashing-override" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">SRV-FLASH Repair Price Override (₹)</label>
-                            <input id="inp-srv-flash" type="number" step="10" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent">
+                            <input id="inp-srv-flash" type="number" step="10" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-money-transfer-slab-override" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Slab Transfer Limit Commission Override (₹)</label>
-                            <input id="inp-slab-limit" type="number" step="5" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent">
+                            <input id="inp-slab-limit" type="number" step="5" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
                         </div>
                     </div>
                 </div>
@@ -513,7 +513,6 @@
     <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4 shrink-0">
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold">
             <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
-            <!-- Clicking compliance text toggles the hidden sandboxed panel dynamically for debugging convenience -->
             <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors text-center" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
         </div>
     </footer>
@@ -579,7 +578,45 @@
                 toastConfigSaved: "Maintenance settings updated.",
                 toastProfileSaved: "Administrative profile settings updated.",
                 toastPaymentSaved: "Dynamic payment configurations bound successfully.",
-                toastProvisionSuccess: "New merchant provisioned instantly under Lifetime Free access!"
+                toastProvisionSuccess: "New merchant provisioned instantly under Lifetime Free access!",
+                secProfileTitle: "Master Profile Configuration",
+                secProfileDesc: "Persist administrator credentials and bio context within the local terminal registry.",
+                lblAdminName: "Admin Full Name",
+                lblAdminBio: "Professional Bio",
+                lblAdminEmail: "Primary Official Email",
+                lblAdminPassword: "Secure Gate Password",
+                lblAdminBackup: "Backup Recovery Email",
+                btnSaveProfile: "Update Admin Profile",
+                secProvisionTitle: "Manual Merchant Provisioning & Permissions Gate",
+                secProvisionDesc: "Directly provision verified SaaS merchant pipelines bypassing normal onboarding queues.",
+                lblProvMerchant: "Merchant Name",
+                lblProvEmail: "Account Email",
+                lblProvPassword: "Password",
+                lblProvBrand: "Shop Brand Name",
+                lblProvMobile: "Mobile Contact",
+                lblProvValidity: "Allotment Expiration",
+                lblSelectNiches: "SELECT WORKSPACE MODULE CHANNELS",
+                lblGrantLifetime: "Grant Continuous Lifetime Free Access",
+                btnSubmitProvision: "PROVISION MERCHANT",
+                secPaymentTitle: "UPI QR Code & Payment APIs Gate",
+                secPaymentDesc: "Binds UPI ID and QR APIs straight into packaging billing paywalls of regular merchants.",
+                lblPaymentUpi: "Admin Corporate UPI ID",
+                lblPaymentQrApi: "QR Code Server API Endpoint URL",
+                lblPaymentApiKeys: "Secure B2B Payment API Keys",
+                btnSavePayment: "Save Payment API Keys",
+                "niche-lbl-xerox": "Xerox Matrix",
+                "niche-lbl-photo": "Photo Studio Suite",
+                "niche-lbl-frames": "Custom Photo Frames",
+                "niche-lbl-stationery": "Stationery Zone POS",
+                "niche-lbl-gifts": "Premium Gifts Zone",
+                "niche-lbl-mobile": "Mobile Repair & Tech",
+                "niche-lbl-printing": "Printing Suite POS",
+                "niche-lbl-esevai": "e-Sevai & CSC Portal",
+                "niche-lbl-toys": "Toys Zone & Meesho Packing",
+                "niche-lbl-money_transfer": "Money Transfer Ledger",
+                "niche-lbl-fabrication": "Welding & SS Fabrication",
+                "niche-lbl-bakery": "Bakery Core Counter",
+                "niche-lbl-teashop": "Tea Shop Quick POS"
             },
             ta: {
                 appHeader: "ரோஜி // சூப்பர் அட்மின் கட்டுப்பாட்டு அறை",
@@ -631,7 +668,45 @@
                 toastConfigSaved: "பராமரிப்பு அமைப்புகள் சேமிக்கப்பட்டன.",
                 toastProfileSaved: "நிர்வாக சுயவிவர அமைப்புகள் சேமிக்கப்பட்டன.",
                 toastPaymentSaved: "கட்டண இணைப்புகள் வெற்றிகரமாக பிணைக்கப்பட்டுள்ளன.",
-                toastProvisionSuccess: "புதிய வணிகர் கணக்கு உடனடியாக ஆயுட்கால இலவசமாக உருவாக்கப்பட்டது!"
+                toastProvisionSuccess: "புதிய வணிகர் கணக்கு உடனடியாக ஆயுட்கால இலவசமாக உருவாக்கப்பட்டது!",
+                secProfileTitle: "சுயவிவர கட்டமைப்பு",
+                secProfileDesc: "நிர்வாகி நற்சான்றிதழ்கள் மற்றும் சுயவிவர விபரங்களை உள்ளூர் கணினியில் சேமிக்கவும்.",
+                lblAdminName: "நிர்வாகி முழு பெயர்",
+                lblAdminBio: "தொழில்முறை சுயவிவரம்",
+                lblAdminEmail: "அதிகாரப்பூர்வ மின்னஞ்சல்",
+                lblAdminPassword: "பாதுகாப்பு கடவுச்சொல்",
+                lblAdminBackup: "மாற்று மீட்பு மின்னஞ்சல்",
+                btnSaveProfile: "சுயவிவரத்தை புதுப்பிக்கவும்",
+                secProvisionTitle: "நேரடி வணிகர் அனுமதி மற்றும் பில்லிங் பிரிவு அனுமதி",
+                secProvisionDesc: "ஆன்போர்டிங் வரிசைகளை தவிர்த்து நேரடியாக ஒரு வணிகருக்கு பில்லிங் அனுமதிகளை வழங்கவும்.",
+                lblProvMerchant: "வணிகர் பெயர்",
+                lblProvEmail: "கணக்கு மின்னஞ்சல்",
+                lblProvPassword: "கடவுச்சொல்",
+                lblProvBrand: "கடை பெயர்",
+                lblProvMobile: "கைபேசி எண்",
+                lblProvValidity: "அனுமதி காலாவதி",
+                lblSelectNiches: "பணி இட தொகுப்புத் துறைகளைத் தேர்ந்தெடுக்கவும்",
+                lblGrantLifetime: "ஆயுட்கால இலவச அனுமதி வழங்கவும் (Active_Lifetime_Free)",
+                btnSubmitProvision: "நேரடி வணிகரை உருவாக்கு",
+                secPaymentTitle: "UPI QR கோடு & கட்டண API அமைப்புகள்",
+                secPaymentDesc: "அனைத்து வணிகர்களின் பில்லிங் திரையிலும் அட்மினின் UPI ID மற்றும் QR API ஐ இணைக்கவும்.",
+                lblPaymentUpi: "அட்மின் கார்ப்பரேட் UPI ID",
+                lblPaymentQrApi: "QR கோடு சர்வர் API முகவரி",
+                lblPaymentApiKeys: "பாதுகாப்பான B2B கட்டண API சாவிகள்",
+                btnSavePayment: "கட்டண API சாவிகளைச் சேமி",
+                "niche-lbl-xerox": "ஜெராக்ஸ் மேட்ரிக்ஸ்",
+                "niche-lbl-photo": "புகைப்பட ஸ்டுடியோ",
+                "niche-lbl-frames": "விருப்ப புகைப்பட பிரேம்கள்",
+                "niche-lbl-stationery": "ஸ்டேஷனரி சோன் பில்லிங்",
+                "niche-lbl-gifts": "பிரீமியம் பரிசுகள் சோன்",
+                "niche-lbl-mobile": "மொபைல் பழுதுபார்ப்பு & டெக்",
+                "niche-lbl-printing": "பிரிண்டிங் சூட் பில்லிங்",
+                "niche-lbl-esevai": "இ-சேவை & சிஎஸ்சி போர்ட்டல்",
+                "niche-lbl-toys": "பொம்மைகள் & மீஷோ பேக்கிங்",
+                "niche-lbl-money_transfer": "பண பரிமாற்ற பில்லிங்",
+                "niche-lbl-fabrication": "வெல்டிங் & ஃபேப்ரிகேஷன்",
+                "niche-lbl-bakery": "பேக்கரி கவுண்டர் பில்லிங்",
+                "niche-lbl-teashop": "டீ Shop விரைவு பில்லிங்"
             }
         };
 
@@ -1105,10 +1180,6 @@
             safeSetText('lbl-security-2fa', t.lblSecurity2fa);
             safeSetText('btn-toggle-2fa', enforce2FAState ? "ENABLED" : t.btnToggle2fa);
 
-            // Maintenance Banner labels
-            safeSetText('lang-maint-header', t.maintHeader);
-            safeSetText('lang-maint-desc', t.maintDesc);
-
             // Static Footer translations
             safeSetText('lang-footer-desc', t.footerDesc);
 
@@ -1267,7 +1338,7 @@
                     password: "password123",
                     phone: "+91 94440 98765",
                     address: "12, Cathedral Road, Chennai",
-                    status: "Verified",
+                    status: "Verified", // Active out-of-the-box
                     package: "Active_Lifetime_Free",
                     selectedShops: ["Xerox Matrix", "Photo Studio", "Custom Frames", "Stationery Zone", "Premium Gifts Zone"]
                 },
