@@ -21,7 +21,7 @@
         }
     </script>
     <style>
-        /* Orange/Amber glowing tech typography text-shadow bloom effects matching Screen 502.png */
+        /* Orange/Amber glowing tech typography text-shadow bloom effects matching Screen 499.png */
         .bloom-text {
             text-shadow: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
         }
@@ -143,27 +143,23 @@
         
         <div class="w-full max-w-md mx-auto my-auto">
             
-            <!-- Centered Capsule Container (Screenshot 502.png Style Refactored for Mobile UI Resilience) -->
+            <!-- Centered Capsule Container (Screenshot 499.png Style Refactored for Mobile UI Resilience) -->
             <div class="glass-capsule w-full rounded-2xl sm:rounded-3xl p-5 sm:p-8 relative overflow-hidden">
                 <!-- Top delicate ambient neon line -->
                 <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amberAccent to-transparent"></div>
 
                 <!-- Apex Security Brand Emblem Header -->
                 <div class="flex flex-col items-center text-center mb-6">
+                    <!-- Flawless, non-broken valid padlock SVG emblem centered at form apex -->
+                    <div class="w-14 h-14 bg-amberAccent/5 border border-amberAccent/20 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(245,158,11,0.12)]">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-amberAccent filter drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">
+                            <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
                     <!-- Amber glowing brand name header -->
                     <h1 id="app-brand-title" class="text-3xl sm:text-4xl font-black text-white tracking-widest bloom-text transition-all duration-300">ROAJI</h1>
                     <p id="sec-login-subtitle" class="text-[10px] sm:text-[11px] text-amberAccent font-bold tracking-[0.2em] mt-2.5 uppercase">ROAJI BILLING SOFTWARE</p>
                     <p id="sec-login-subtext" class="text-[10px] sm:text-xs text-neutral-500 mt-1">Enter credentials to unlock context</p>
-                </div>
-
-                <!-- Tabbed Switching Controls with active amber accent underline states -->
-                <div class="flex border-b border-neutral-900 mb-6 text-center">
-                    <button id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none">
-                        SIGN IN
-                    </button>
-                    <button id="tab-btn-register" onclick="switchAuthTab('register')" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none">
-                        ONBOARD SHOP
-                    </button>
                 </div>
 
                 <!-- SIGN-IN TAB COMPONENT MATRIX (Screenshot 502.png style) -->
