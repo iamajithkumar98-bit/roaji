@@ -84,7 +84,7 @@
         <div class="flex items-center space-x-3 sm:space-x-5">
             <!-- Active Green Status Beacon -->
             <div class="flex items-center space-x-2 bg-neutral-900/60 px-2.5 sm:px-3.5 py-1.5 rounded-full border border-neutral-800">
-                <span class="inline-block w-2 h-2 rounded-full bg-emeraldAccent animate-pulse"></span>
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emeraldAccent animate-pulse"></span>
                 <span id="active-database-status" class="text-[8px] sm:text-[10px] text-neutral-400 font-mono uppercase tracking-wider font-semibold">Security Vault Armed</span>
             </div>
 
@@ -828,7 +828,7 @@
             triggerUINotification(appTranslationMatrix[activeLanguageContext].toastRegPending);
         }
 
-        // Secure Credentials Authentication Gate Core Switch
+        // Secure Credentials Authentication Gate Core Switch (stringifies proper JSON payload)
         function executeStandardLogin(event) {
             event.preventDefault();
             if (systemMaintenanceFlag) {
@@ -841,8 +841,8 @@
 
             // Interceptor 1: Master Super Admin Bypass Gate check
             if (email.toLowerCase() === "iamajithkumar98@gmail.com") {
-                // Populate claims token inside sessionStorage
-                sessionStorage.setItem('roaji_session_claims', 'SUPER_ADMIN');
+                // Stringify proper JSON object payload to prevent JSON.parse crashes downstream
+                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: "iamajithkumar98@gmail.com", role: "SUPER_ADMIN", status: "active" }));
                 
                 triggerUINotification(appTranslationMatrix[activeLanguageContext].toastAdminRedirect);
                 setTimeout(() => {
@@ -863,8 +863,8 @@
                     return;
                 }
 
-                // Write verified 'OWNER' claims payload matrix into sessionStorage
-                sessionStorage.setItem('roaji_session_claims', 'OWNER');
+                // Stringify proper JSON object payload to prevent JSON.parse crashes downstream
+                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: matchUser.email, role: "OWNER", status: "active" }));
                 localStorage.setItem('roaji_active_shop_session', JSON.stringify(matchUser));
                 
                 // Backward compatible object seed mapping required by POS modules
