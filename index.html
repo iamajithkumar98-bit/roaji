@@ -21,7 +21,7 @@
         }
     </script>
     <style>
-        /* Orange/Amber glowing tech typography text-shadow bloom effects matching Screen 515.png */
+        /* Orange/Amber glowing tech typography text-shadow bloom effects matching Screen 524.png */
         .bloom-text {
             text-shadow: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
         }
@@ -143,14 +143,14 @@
         
         <div class="w-full max-w-md mx-auto my-auto">
             
-            <!-- Centered Capsule Container (Screenshot 515.png Style Refactored for Mobile UI Resilience) -->
+            <!-- Centered Capsule Container (Screenshot 524.png Style Refactored for Mobile UI Resilience) -->
             <div class="glass-capsule w-full rounded-2xl sm:rounded-3xl p-5 sm:p-8 relative overflow-hidden shadow-2xl">
                 <!-- Top delicate ambient neon line -->
                 <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amberAccent to-transparent"></div>
 
                 <!-- Apex Security Brand Emblem Header -->
                 <div class="flex flex-col items-center text-center mb-6">
-                    <!-- Complete vector orange/amber security padlock emblem centered at the apex -->
+                    <!-- Flawless, non-broken valid padlock SVG emblem centered at form apex -->
                     <div class="w-14 h-14 bg-amberAccent/5 border border-amberAccent/20 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(245,158,11,0.12)]">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-amberAccent filter drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">
                             <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
@@ -374,7 +374,7 @@
 
     <!-- Core Security & Onboarding Execution Scripts -->
     <script>
-        // Hardcoded Master Administrative Variable Definitions (Strict Refactoring & Handshake specs)
+        // Global Admin Constant (Strict Refactoring Constants)
         const SUPER_ADMIN_EMAIL = "iamajithkumar98@gmail.com";
 
         // System state matrices
@@ -837,67 +837,7 @@
             triggerUINotification(appTranslationMatrix[activeLanguageContext].toastRegPending);
         }
 
-        // Secure Credentials Authentication Gate Core Switch (stringifies proper JSON payload)
-        function executeStandardLogin(event) {
-            event.preventDefault();
-            if (systemMaintenanceFlag) {
-                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastMaintActive);
-                return;
-            }
-
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            // Interceptor 1: Master Super Admin Bypass Gate check
-            if (email.toLowerCase() === SUPER_ADMIN_EMAIL) {
-                // Clear any legacy session states and build a flawless structured JSON object payload
-                sessionStorage.removeItem('roaji_session_claims');
-                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: "iamajithkumar98@gmail.com", role: "SUPER_ADMIN", status: "active" }));
-                
-                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastAdminRedirect);
-                setTimeout(() => {
-                    // Unconditional immediate routing hook
-                    window.location.replace("super_admin_panel.html");
-                }, 1500);
-                return;
-            }
-
-            // Interceptor 2: Standard Tenant Merchant validation search
-            const matchUser = registeredShopsArray.find(user => 
-                user.email.toLowerCase() === email.toLowerCase() && user.password === password
-            );
-
-            if (matchUser) {
-                // Verify account is approved
-                if (matchUser.status === "PENDING_SUPER_ADMIN_APPROVAL") {
-                    triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginFailed);
-                    return;
-                }
-
-                // Stringify proper JSON object payload to prevent JSON.parse crashes downstream
-                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: matchUser.email, role: "OWNER", status: "active" }));
-                localStorage.setItem('roaji_active_shop_session', JSON.stringify(matchUser));
-                
-                // Backward compatible object seed mapping required by POS modules
-                const compatibilityMeta = {
-                    name: matchUser.name,
-                    phone: matchUser.phone,
-                    address: matchUser.address || "Main Plaza Outlet, Chennai",
-                    gstin: matchUser.gstin || "33AACCS1032F1ZA"
-                };
-                localStorage.setItem('roaji_shops_active', JSON.stringify(compatibilityMeta));
-
-                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginSuccess);
-                setTimeout(() => {
-                    window.location.href = "shop_resolver.html";
-                }, 1500);
-            } else {
-                // Authentication variables mismatch block
-                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginFailed);
-            }
-        }
-
-        // Toggle Configurations Panel Drawer
+        // Toggle Diagnostic Configurations panel drawer
         function toggleConfigLogPanel() {
             const panel = document.getElementById('configs-drawer-panel');
             panel.classList.toggle('hidden');
@@ -934,6 +874,66 @@
                 toast.className = "fixed bottom-6 right-6 glass-capsule py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2";
             }, 3000);
         }
+
+        // Window-level global script execution mapping scope hook trigger (Fixes Unresponsive Login Button Freeze)
+        window.executeStandardLogin = function(event) {
+            event.preventDefault();
+            if (systemMaintenanceFlag) {
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastMaintActive);
+                return;
+            }
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            // Interceptor 1: Master Super Admin Bypass Gate check
+            if (email.toLowerCase() === SUPER_ADMIN_EMAIL) {
+                // Clear any legacy session states and write valid stringified JSON claims token to sessionStorage
+                sessionStorage.removeItem('roaji_session_claims');
+                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "SUPER_ADMIN", status: "active" }));
+                
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastAdminRedirect);
+                setTimeout(() => {
+                    // Unconditional immediate routing hook
+                    window.location.replace("super_admin_panel.html");
+                }, 1500);
+                return;
+            }
+
+            // Interceptor 2: Standard Tenant Merchant validation search
+            const matchUser = registeredShopsArray.find(user => 
+                user.email.toLowerCase() === email.toLowerCase() && user.password === password
+            );
+
+            if (matchUser) {
+                // Verify account is approved
+                if (matchUser.status === "PENDING_SUPER_ADMIN_APPROVAL") {
+                    triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginFailed);
+                    return;
+                }
+
+                // Stringify proper JSON object payload to sessionStorage key "roaji_session_claims"
+                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: matchUser.email, role: "OWNER", status: "active" }));
+                localStorage.setItem('roaji_active_shop_session', JSON.stringify(matchUser));
+                
+                // Backward compatible object seed mapping required by POS modules
+                const compatibilityMeta = {
+                    name: matchUser.name,
+                    phone: matchUser.phone,
+                    address: matchUser.address || "Main Plaza Outlet, Chennai",
+                    gstin: matchUser.gstin || "33AACCS1032F1ZA"
+                };
+                localStorage.setItem('roaji_shops_active', JSON.stringify(compatibilityMeta));
+
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginSuccess);
+                setTimeout(() => {
+                    window.location.href = "shop_resolver.html";
+                }, 1500);
+            } else {
+                // Authentication variables mismatch block
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginFailed);
+            }
+        };
     </script>
 </body>
 </html>
