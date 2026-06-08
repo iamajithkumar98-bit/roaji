@@ -55,7 +55,7 @@
 </head>
 <body class="min-h-screen bg-brandDark flex flex-col justify-between overflow-y-auto text-neutral-100 font-sans antialiased selection:bg-amber-500/20 selection:text-amber-300 relative p-4">
 
-    <!-- Ambient Subtle Amber Background Radial Glow -->
+    <!-- Ambient Subtle Background Radial Glow -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
 
     <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
@@ -344,7 +344,7 @@
     </main>
 
     <!-- Operational System Toast Notifications Component -->
-    <div id="ui-toast" class="fixed bottom-6 right-6 glass-capsule py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+    <div id="ui-toast" class="fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
         </svg>
@@ -445,7 +445,7 @@
                 lblRegAddress: "அலுவலக கடை முகவரி",
                 lblSelectNiches: "பணி இட தொகுப்புத் துறைகளைத் தேர்ந்தெடுக்கவும்",
                 lblCaptcha: "மனித சரிபார்ப்பு",
-                btnSubmitReg: "பதிவு விண்ணப்பத்தைச் சமர்ப்பிக்கவும்",
+                btnSubmitReg: "பதிவு செய்து செயல்படுத்தவும்",
                 maintHeader: "நுழைவாயில் முடக்கப்பட்டுள்ளது",
                 maintDesc: "கணினி பராமரிப்பு வேலைகள் நடக்கின்றன. அனுமதி தற்காலிகமாக நிறுத்தப்பட்டுள்ளது.",
                 lblEstimatedAmount: "மதிப்பிடப்பட்ட மொத்த தொகுப்புத் திட்டக் கட்டணம்:",
@@ -585,7 +585,7 @@
             }
         }
 
-        // Page navigation simulation switcher to cleanly toggle views (Eradicates duplicate display issues)
+        // Navigation Page switcher to cleanly toggle views (Eradicates duplicate display issues)
         function switchAuthMode(mode) {
             if (systemMaintenanceFlag) {
                 triggerUINotification(appTranslationMatrix[activeLanguageContext].toastMaintActive);
@@ -730,6 +730,8 @@
             // Register Labels
             safeSetText('lbl-new-reg-section', t.lblNewRegSection);
             safeSetText('desc-new-reg-section', t.descNewRegSection);
+            safeSetText('lbl-signin-section', t.lblSignInSection);
+            safeSetText('desc-signin-section', t.descSignInSection);
             safeSetText('lbl-reg-merchant', t.lblRegMerchant);
             safeSetText('lbl-reg-shop', t.lblRegShop);
             safeSetText('lbl-reg-email', t.lblRegEmail);
