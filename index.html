@@ -24,12 +24,12 @@
     <style>
         /* High-end cinematic glow effects matching modern premium look */
         .glow-rose {
-            filter: drop-shadow(0 0 12px rgba(244, 63, 94, 0.7));
+            filter: drop-shadow(0 0 15px rgba(244, 63, 94, 0.85));
         }
         .bloom-text {
             text-shadow: 0 0 12px rgba(244, 63, 94, 0.6), 0 0 24px rgba(245, 158, 11, 0.3);
         }
-        /* Aurora Rotating Border Animation around the glassmorphic card */
+        /* Aurora Rotating Border Animation around the main split-view card */
         @keyframes rotate-aurora {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -38,7 +38,7 @@
             position: relative;
             padding: 1px;
             overflow: hidden;
-            border-radius: 24px;
+            border-radius: 28px;
         }
         .aurora-border-bg {
             position: absolute;
@@ -54,9 +54,16 @@
             position: relative;
             z-index: 10;
             background: rgba(12, 12, 12, 0.93);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: 23px;
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border-radius: 27px;
+        }
+        /* Logo glowing container wrapper */
+        .logo-glowing-wrapper {
+            position: relative;
+            padding: 1px;
+            overflow: hidden;
+            border-radius: 20px;
         }
         /* Custom inputs styling */
         .glass-input {
@@ -71,19 +78,12 @@
             box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.3);
             background: rgba(12, 12, 12, 0.95);
         }
-        /* Rigid layout view-mode control class to ensure space isolation */
-        .view-mode-active {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            height: auto !important;
-        }
     </style>
 </head>
 <body class="min-h-screen bg-brandDark flex flex-col justify-between overflow-y-auto text-neutral-100 font-sans antialiased selection:bg-amber-500/20 selection:text-amber-300 relative p-4">
 
     <!-- Ambient Subtle Background Radial Glow -->
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber-500/5 rounded-full blur-[160px] pointer-events-none z-0"></div>
 
     <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
     <div id="maintenance-overlay" class="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[9999] hidden flex-col items-center justify-center p-6 text-center">
@@ -135,7 +135,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <button onclick="overrideMaintenance('ON')" class="text-xs font-mono font-semibold py-1.5 bg-red-950/20 border border-red-800/40 text-red-400 hover:bg-red-900 hover:text-white rounded transition-all">ON (Lock)</button>
-                    <button onclick="overrideMaintenance('OFF')" class="text-xs font-mono font-semibold py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:border-emeraldAccent hover:text-emeraldAccent hover:border-transparent rounded transition-all">OFF (Active)</button>
+                    <button onclick="overrideMaintenance('OFF')" class="text-xs font-mono font-semibold py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-emeraldAccent hover:text-emeraldAccent hover:border-transparent rounded transition-all">OFF (Active)</button>
                 </div>
             </div>
 
@@ -162,222 +162,211 @@
     </div>
 
     <!-- Main Workspace Console Grid -->
-    <main class="relative z-10 flex-1 flex items-center justify-center py-6 sm:py-10">
+    <main class="relative z-10 flex-1 flex flex-col items-center justify-center py-6 sm:py-10">
         
-        <div class="w-full max-w-5xl mx-auto">
+        <div class="w-full max-w-5xl mx-auto space-y-6">
+
+            <!-- Rose-Integrated Brand Identity Glowing Apex Capsule -->
+            <div class="aurora-border-wrapper shadow-2xl max-w-sm mx-auto">
+                <div class="aurora-border-bg"></div>
+                <div class="aurora-card-content py-4 px-6 flex flex-col items-center text-center">
+                    <div class="mb-2">
+                        <!-- High-resolution vector Rose flower icon -->
+                        <svg class="w-12 h-12 text-roseAccent glow-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10c0-4.418-3.582-8-8-8S4 7.582 4 12c0 6 8 10 8 10z" />
+                            <path d="M12 21a9.975 9.975 0 0 1-5-3M12 21a9.975 9.975 0 0 0 5-3" />
+                            <path d="M12 12c1.5-1.5 2-3 1-4s-3-.5-4 1 0 3.5 3 3z" />
+                            <path d="M12 12c-1.5-1.5-2-3-1-4s3-.5 4 1 0 3.5-3 3z" />
+                            <path d="M12 2a4.5 4.5 0 0 0-4.5 4.5c0 1.5 1 3.5 4.5 5.5 3.5-2 4.5-4 4.5-5.5A4.5 4.5 0 0 0 12 2z" />
+                        </svg>
+                    </div>
+                    <h2 id="app-brand-title" class="text-3xl font-black text-white tracking-widest bloom-text">ROAJI</h2>
+                    <p id="sec-login-subtitle" class="text-[10px] text-amberAccent font-bold tracking-[0.2em] mt-1.5 uppercase">ROAJI BILLING SOFTWARE</p>
+                </div>
+            </div>
             
-            <!-- Animated Aurora Gradient Border Wrapper -->
+            <!-- Animated Aurora Gradient Border Wrapper around the entire split-view card -->
             <div class="aurora-border-wrapper shadow-2xl">
                 <div class="aurora-border-bg"></div>
                 
-                <!-- Center Glassmorphic Content Card (Landscape and Stack-on-Mobile Layout) -->
-                <div class="aurora-card-content p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-start">
+                <!-- Center Glassmorphic Content Card (Side-by-Side Split View Layout) -->
+                <div class="aurora-card-content p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-start">
                     
-                    <!-- Left Side: Brand Logo transformation & Sign In Form (5 Columns on Desktop) -->
-                    <div class="lg:col-span-5 space-y-6">
-                        
-                        <!-- Premium Logo Section featuring dynamic Rose Vector SVG with ambient light bloom -->
-                        <div class="flex flex-col items-center text-center">
-                            <div class="mb-4">
-                                <svg class="w-16 h-14 text-roseAccent glow-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 22s8-4 8-10c0-4.418-3.582-8-8-8S4 7.582 4 12c0 6 8 10 8 10z" />
-                                    <path d="M12 21a9.975 9.975 0 0 1-5-3M12 21a9.975 9.975 0 0 0 5-3" />
-                                    <path d="M12 12c1.5-1.5 2-3 1-4s-3-.5-4 1 0 3.5 3 3z" />
-                                    <path d="M12 12c-1.5-1.5-2-3-1-4s3-.5 4 1 0 3.5-3 3z" />
-                                    <path d="M12 2a4.5 4.5 0 0 0-4.5 4.5c0 1.5 1 3.5 4.5 5.5 3.5-2 4.5-4 4.5-5.5A4.5 4.5 0 0 0 12 2z" />
-                                </svg>
-                            </div>
-                            <h2 id="app-brand-title" class="text-3xl font-black text-white tracking-widest bloom-text">ROAJI</h2>
-                            <p id="sec-login-subtitle" class="text-[10px] text-amberAccent font-bold tracking-[0.2em] mt-1 uppercase">ROAJI BILLING SOFTWARE</p>
-                            <p id="sec-login-subtext" class="text-xs text-neutral-500 mt-1">Enter credentials to unlock context</p>
+                    <!-- Left Column: The Sign In form (Email, Password, Eye Icon, Remember Me, Forgot Password, Sign In Button) -->
+                    <div class="space-y-6">
+                        <div class="pb-3 border-b border-neutral-900/60 mb-2 text-center lg:text-left">
+                            <h3 id="lbl-signin-section" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">SIGN IN Portal</h3>
+                            <p id="desc-signin-section" class="text-[10px] text-neutral-500 font-mono mt-0.5">Enter credentials to unlock active workspace context.</p>
                         </div>
 
-                        <!-- Sign In Form -->
-                        <div id="login-tab-view" class="space-y-4">
-                            <form id="login-form-container" onsubmit="executeStandardLogin(event)" class="space-y-4">
+                        <form id="login-form" onsubmit="executeStandardLogin(event)" class="space-y-4">
+                            <div>
+                                <label id="lbl-login-email" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
+                                <input id="login-email" type="email" required placeholder="Enter your official email address" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
+                            </div>
+                            <div>
+                                <label id="lbl-login-password" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
+                                <div class="relative">
+                                    <input id="login-password" type="password" required placeholder="Enter secure password" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 pr-10 text-white outline-none">
+                                    <!-- Eye Icon Visibility Toggle -->
+                                    <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors">
+                                        <svg id="eye-icon-login" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Checkbox & Forgot Password row -->
+                            <div class="flex items-center justify-between text-[11px] text-neutral-400">
+                                <label class="flex items-center space-x-2 cursor-pointer select-none">
+                                    <input type="checkbox" class="accent-amberAccent rounded border-neutral-800 bg-neutral-900 focus:ring-0 focus:ring-offset-0">
+                                    <span id="lbl-remember-me">Remember Me</span>
+                                </label>
+                                <a href="#" onclick="triggerForgotPasswordToast()" id="link-forgot-password" class="text-amberAccent hover:underline">Forgot Password?</a>
+                            </div>
+
+                            <button id="btn-submit-login" type="submit" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-4 shadow-[0_0_20px_rgba(245,158,11,0.12)]">
+                                SIGN IN
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Right Side: The "New Registration" form (Merchant Name, Shop Name, Email, Password, Mobile, Address, Checklist, Math Lock) -->
+                    <div class="space-y-4 border-t lg:border-t-0 lg:border-l border-neutral-900 pt-8 lg:pt-0 lg:pl-10">
+                        <div class="pb-3 border-b border-neutral-900/60 mb-2">
+                            <h3 id="lbl-new-reg-section" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">New Registration / Onboard Shop</h3>
+                            <p id="desc-new-reg-section" class="text-[10px] text-neutral-500 font-mono mt-0.5">Fill physical parameters to activate dynamic 13-niche workspace operations.</p>
+                        </div>
+
+                        <form id="register-form" onsubmit="executeMerchantOnboarding(event)" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                                 <div>
-                                    <label id="lbl-login-email" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
-                                    <input id="login-email" type="email" required placeholder="Enter your official email address" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
+                                    <label id="lbl-reg-merchant" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">MERCHANT OWNER NAME</label>
+                                    <input id="reg-merchant-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
                                 </div>
                                 <div>
-                                    <label id="lbl-login-password" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
+                                    <label id="lbl-reg-shop" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SHOP / FRANCHISE NAME</label>
+                                    <input id="reg-shop-name" type="text" required placeholder="e.g. Sri Vari Premium Plaza" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div>
+                                    <label id="lbl-reg-email" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
+                                    <input id="reg-email" type="email" required placeholder="merchant@example.com" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono">
+                                </div>
+                                <div>
+                                    <label id="lbl-reg-password" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
                                     <div class="relative">
-                                        <input id="login-password" type="password" required placeholder="Enter secure password" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 pr-10 text-white outline-none">
-                                        <!-- Eye Icon Visibility Toggle -->
-                                        <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors">
-                                            <svg id="eye-icon-login" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                                        <input id="reg-password" type="password" required placeholder="••••••••" class="w-full glass-input text-sm rounded-xl py-2 px-3 pr-10 text-white outline-none">
+                                        <button type="button" onclick="togglePasswordVisibility('reg-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors">
+                                            <svg id="eye-icon-reg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                            <div>
+                                <label id="lbl-reg-mobile" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CONTACT MOBILE NUMBER</label>
+                                <input id="reg-mobile" type="text" required placeholder="+91 94440 XXXXX" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
+                            </div>
+                            <div>
+                                <label id="lbl-reg-address" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CORPORATE SHOP ADDRESS</label>
+                                <textarea id="reg-address" required rows="2" placeholder="Enter physical store address details..." class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none resize-none"></textarea>
+                            </div>
 
-                                <!-- Checkbox & Forgot Password row -->
-                                <div class="flex items-center justify-between text-[11px] text-neutral-400">
-                                    <label class="flex items-center space-x-2 cursor-pointer select-none">
-                                        <input type="checkbox" class="accent-amberAccent rounded border-neutral-800 bg-neutral-900 focus:ring-0 focus:ring-offset-0">
-                                        <span id="lbl-remember-me">Remember Me</span>
+                            <!-- 13 Niche Checkbox Selection Grid (Mobile optimized layout, max-height 400px with smooth scrollbars) -->
+                            <div class="bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
+                                <h4 id="lbl-select-niches" class="text-[10px] font-bold text-amberAccent mb-3 uppercase tracking-wider text-left">SELECT WORKSPACE MODULE CHANNELS</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto p-2.5 bg-black/50 border border-neutral-900 rounded-xl font-mono text-[10px] text-left select-none">
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Xerox Matrix" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-xerox">Xerox Matrix</span>
                                     </label>
-                                    <a href="#" onclick="triggerForgotPasswordToast()" id="link-forgot-password" class="text-amberAccent hover:underline">Forgot Password?</a>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Photo Studio" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-photo">Photo Studio Suite</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Custom Frames" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-frames">Custom Photo Frames</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Stationery Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-stationery">Stationery Zone POS</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Premium Gifts Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-gifts">Premium Gifts Zone</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Mobile & Tech" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-mobile">Mobile Repair & Tech</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Printing & Tech Suite" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-printing">Printing Suite POS</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Internet Cafe & e-Sevai / CSC" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-esevai">e-Sevai & CSC Portal</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Toys Zone & Meesho Packing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-toys">Toys Zone & Meesho Packing</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Money Transfer Ledger" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-money_transfer">Money Transfer Ledger</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Welding/Fabrication Works" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-fabrication">Welding & SS Fabrication</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Bakery Core Counter" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-bakery">Bakery Core Counter</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                        <input type="checkbox" value="Tea Shop Quick Billing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                        <span id="niche-lbl-teashop">Tea Shop Quick POS</span>
+                                    </label>
                                 </div>
 
-                                <button id="btn-submit-login" type="submit" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-4 shadow-[0_0_20px_rgba(245,158,11,0.12)]">
-                                    SIGN IN
-                                </button>
-                            </form>
-
-                            <!-- Clickable inline switch link for registration -->
-                            <div class="text-center pt-3 border-t border-neutral-900/60 mt-4">
-                                <a href="#" onclick="switchAuthMode('register')" id="link-switch-to-register" class="text-xs text-amberAccent hover:underline tracking-wide font-semibold uppercase">New Registration / Onboard Shop</a>
+                                <!-- Live Price Estimation & Marketing Plan Badge row -->
+                                <div class="border-t border-neutral-800/80 mt-4 pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
+                                    <div class="text-neutral-400 text-center sm:text-left">
+                                        <span id="lbl-estimated-amount">Estimated Total Package Plan Amount:</span>
+                                        <span class="text-amberAccent font-bold block sm:inline mt-0.5 sm:mt-0">₹ <span id="onboarding-total-estimate">1950.00</span></span>
+                                    </div>
+                                    <div class="text-center shrink-0">
+                                        <span id="lbl-saas-status" class="block text-[8px] text-neutral-500 uppercase tracking-widest font-semibold mb-1">SaaS License Status:</span>
+                                        <span id="lbl-trial-badge" class="bg-amberAccent/10 text-amberAccent text-[9px] font-bold px-2.5 py-1 rounded border border-amberAccent/20">Mapped under 30-Day Risk-Free Trial Package</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                    </div>
-
-                    <!-- Right Side: Onboarding Registration Fields (7 Columns on Desktop, Flowed in same viewport) -->
-                    <div class="lg:col-span-7 border-t lg:border-t-0 lg:border-l border-neutral-900 pt-8 lg:pt-0 lg:pl-10 space-y-4">
-                        <div class="pb-3 border-b border-neutral-900/60 mb-2">
-                            <h3 id="lbl-new-reg-section" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">New Registration / Onboard Shop</h3>
-                            <p id="desc-new-reg-section" class="text-[10px] text-neutral-500 font-mono mt-0.5">Fill physical parameters to activate dynamic 13-niche workspace operations.</p>
-                        </div>
-
-                        <!-- ONBOARD SHOP COMPONENT REGISTER FORM -->
-                        <div id="register-tab-view" class="space-y-4 hidden">
-                            <form id="register-form-container" onsubmit="executeMerchantOnboarding(event)" class="space-y-4">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                    <div>
-                                        <label id="lbl-reg-merchant" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">MERCHANT OWNER NAME</label>
-                                        <input id="reg-merchant-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
-                                    </div>
-                                    <div>
-                                        <label id="lbl-reg-shop" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SHOP / FRANCHISE NAME</label>
-                                        <input id="reg-shop-name" type="text" required placeholder="e.g. Sri Vari Premium Plaza" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                                    <div>
-                                        <label id="lbl-reg-email" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
-                                        <input id="reg-email" type="email" required placeholder="merchant@example.com" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono">
-                                    </div>
-                                    <div>
-                                        <label id="lbl-reg-password" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
-                                        <div class="relative">
-                                            <input id="reg-password" type="password" required placeholder="••••••••" class="w-full glass-input text-sm rounded-xl py-2 px-3 pr-10 text-white outline-none">
-                                            <button type="button" onclick="togglePasswordVisibility('reg-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors">
-                                                <svg id="eye-icon-reg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
-                                            </button>
-                                        </div>
+                            <!-- Human Verification Block (CAPTCHA) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
+                                <div>
+                                    <label id="lbl-captcha" class="block text-[10px] font-bold text-amberAccent mb-1.5 uppercase tracking-wider text-left">HUMAN VERIFICATION</label>
+                                    <div class="text-sm font-bold text-white font-mono bg-neutral-950/80 py-2.5 px-3 rounded-lg border border-neutral-800/60 text-center tracking-widest select-none">
+                                        <span id="captcha-var-a">5</span> + <span id="captcha-var-b">3</span> = ?
                                     </div>
                                 </div>
                                 <div>
-                                    <label id="lbl-reg-mobile" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CONTACT MOBILE NUMBER</label>
-                                    <input id="reg-mobile" type="text" required placeholder="+91 94440 XXXXX" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
+                                    <label id="lbl-captcha-answer" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider text-left">Enter Code</label>
+                                    <input id="reg-captcha-input" type="text" oninput="verifyCaptchaValue()" required placeholder="Answer" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono text-center">
                                 </div>
-                                <div>
-                                    <label id="lbl-reg-address" class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CORPORATE SHOP ADDRESS</label>
-                                    <textarea id="reg-address" required rows="2" placeholder="Enter physical store address details..." class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none resize-none"></textarea>
-                                </div>
-
-                                <!-- 13 Niche Checkbox Selection Grid (Mobile optimized layout, 1-col on mobile, 2-col on desktop) -->
-                                <div class="bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
-                                    <h4 id="lbl-select-niches" class="text-[10px] font-bold text-amberAccent mb-3 uppercase tracking-wider text-left">SELECT WORKSPACE MODULE CHANNELS</h4>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2.5 bg-black/50 border border-neutral-900 rounded-xl font-mono text-[10px] text-left select-none">
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Xerox Matrix" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-xerox">Xerox Matrix</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Photo Studio" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-photo">Photo Studio Suite</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Custom Frames" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-frames">Custom Photo Frames</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Stationery Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-stationery">Stationery Zone POS</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Premium Gifts Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-gifts">Premium Gifts Zone</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Mobile & Tech" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-mobile">Mobile Repair & Tech</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Printing & Tech Suite" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-printing">Printing Suite POS</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Internet Cafe & e-Sevai / CSC" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-esevai">e-Sevai & CSC Portal</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Toys Zone & Meesho Packing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-toys">Toys Zone & Meesho Packing</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Money Transfer Ledger" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-money_transfer">Money Transfer Ledger</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Welding/Fabrication Works" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-fabrication">Welding & SS Fabrication</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Bakery Core Counter" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-bakery">Bakery Core Counter</span>
-                                        </label>
-                                        <label class="flex items-center space-x-2.5 cursor-pointer py-1">
-                                            <input type="checkbox" value="Tea Shop Quick Billing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
-                                            <span id="niche-lbl-teashop">Tea Shop Quick POS</span>
-                                        </label>
-                                    </div>
-
-                                    <!-- Live Price Estimation & Marketing Plan Badge row -->
-                                    <div class="border-t border-neutral-800/80 mt-4 pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
-                                        <div class="text-neutral-400 text-center sm:text-left">
-                                            <span id="lbl-estimated-amount">Estimated Total Package Plan Amount:</span>
-                                            <span class="text-amberAccent font-bold block sm:inline mt-0.5 sm:mt-0">₹ <span id="onboarding-total-estimate">1950.00</span></span>
-                                        </div>
-                                        <div class="text-center shrink-0">
-                                            <span id="lbl-saas-status" class="block text-[8px] text-neutral-500 uppercase tracking-widest font-semibold mb-1">SaaS License Status:</span>
-                                            <span id="lbl-trial-badge" class="bg-amberAccent/10 text-amberAccent text-[9px] font-bold px-2.5 py-1 rounded border border-amberAccent/20">Mapped under 30-Day Risk-Free Trial Package</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Human Verification Block (CAPTCHA) -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
-                                    <div>
-                                        <label id="lbl-captcha" class="block text-[10px] font-bold text-amberAccent mb-1.5 uppercase tracking-wider text-left">HUMAN VERIFICATION</label>
-                                        <div class="text-sm font-bold text-white font-mono bg-neutral-950/80 py-2.5 px-3 rounded-lg border border-neutral-800/60 text-center tracking-widest select-none">
-                                            <span id="captcha-var-a">5</span> + <span id="captcha-var-b">3</span> = ?
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label id="lbl-captcha-answer" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider text-left">Enter Code</label>
-                                        <input id="reg-captcha-input" type="text" oninput="verifyCaptchaValue()" required placeholder="Answer" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono text-center">
-                                    </div>
-                                </div>
-
-                                <button id="btn-submit-reg" type="submit" disabled class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 disabled:opacity-40 disabled:cursor-not-allowed font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-4 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
-                                    REGISTER SHOP & ACTIVATE
-                                </button>
-                            </form>
-
-                            <!-- Clickable inline switch link back to sign-in -->
-                            <div class="text-center pt-3 border-t border-neutral-900/60 mt-4">
-                                <a href="#" onclick="switchAuthMode('login')" id="link-switch-to-login" class="text-xs text-amberAccent hover:underline tracking-wide font-semibold uppercase">Already registered? Sign In</a>
                             </div>
-                        </div>
 
+                            <button id="btn-submit-reg" type="submit" disabled class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 disabled:opacity-40 disabled:cursor-not-allowed font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-4 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
+                                REGISTER SHOP & ACTIVATE
+                            </button>
+                        </form>
                     </div>
 
                 </div>
@@ -411,7 +400,7 @@
 
         // System state matrices
         let activeLanguageContext = "en";
-        let currentAuthTab = "login";
+        let currentAuthTab = "register"; // both forms are displayed in Split View
         let registeredShopsArray = [];
         let systemMaintenanceFlag = false;
         let captchaResultSum = 8; // static fallback
@@ -422,8 +411,6 @@
                 appHeader: "ROAJI",
                 secLoginSubtitle: "ROAJI BILLING SOFTWARE",
                 secLoginSubtext: "Enter credentials to unlock context",
-                tabLogin: "SIGN IN",
-                tabRegister: "ONBOARD SHOP",
                 lblEmail: "OFFICIAL EMAIL ADDRESS",
                 lblPassword: "SECURE ACCESS PASSWORD",
                 btnSubmitLogin: "SIGN IN",
@@ -460,8 +447,8 @@
                 toastForgotMsg: "Contact the enterprise system administrator to initiate password restoration.",
                 lblNewRegSection: "New Registration / Onboard Shop",
                 descNewRegSection: "Fill physical parameters to activate dynamic 13-niche workspace operations.",
-                linkToRegister: "New Registration / Onboard Shop",
-                linkToLogin: "Already registered? Sign In",
+                lblSignInSection: "SIGN IN Portal",
+                descSignInSection: "Enter credentials to unlock active workspace context.",
                 "niche-lbl-xerox": "Xerox Matrix",
                 "niche-lbl-photo": "Photo Studio Suite",
                 "niche-lbl-frames": "Custom Photo Frames",
@@ -516,8 +503,8 @@
                 toastForgotMsg: "கடவுச்சொல்லை மீட்டமைக்க கணினி நிர்வாகியைத் தொடர்பு கொள்ளவும்.",
                 lblNewRegSection: "புதிய பதிவு / கடை ஆன்போர்டிங்",
                 descNewRegSection: "கடையின் அளவு மற்றும் விபரங்களை உள்ளீடு செய்து 13-பிரிவு பில்லிங் அமைப்பைத் தொடங்கவும்.",
-                linkToRegister: "புதிய பதிவு / கடை ஆன்போர்டிங்",
-                linkToLogin: "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழைக",
+                lblSignInSection: "உள்நுழைவு தளம்",
+                descSignInSection: "செயலில் உள்ள பில்லிங் பிரிவை அணுக உங்கள் கணக்கில் உள்நுழையவும்.",
                 "niche-lbl-xerox": "ஜெராக்ஸ் மேட்ரிக்ஸ்",
                 "niche-lbl-photo": "புகைப்பட ஸ்டுடியோ",
                 "niche-lbl-frames": "விருப்ப புகைப்பட பிரேம்கள்",
@@ -633,55 +620,10 @@
             }
         }
 
-        // Rigid State Management View switcher (Prevents layout overlap / UI Clutter)
+        // Side-by-Side Split View enforces both registration and login components are displayed in static block frames
         function switchAuthMode(mode) {
-            if (systemMaintenanceFlag) {
-                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastMaintActive);
-                return;
-            }
-
-            currentAuthTab = mode;
-            
-            // Move DOM queries inside the function to ensure they always fetch latest element states
-            const viewLogin = document.getElementById('login-tab-view');
-            const viewRegister = document.getElementById('register-tab-view');
-            const tabBtnLogin = document.getElementById('tab-btn-login');
-            const tabBtnRegister = document.getElementById('tab-btn-register');
-
-            if (mode === 'login') {
-                // Ensure only active view takes up space (Eradicates duplicate display issues)
-                if (viewLogin) {
-                    viewLogin.classList.remove('hidden');
-                    viewLogin.style.display = 'block';
-                }
-                if (viewRegister) {
-                    viewRegister.classList.add('hidden');
-                    viewRegister.style.display = 'none';
-                }
-                if (tabBtnLogin) {
-                    tabBtnLogin.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none";
-                }
-                if (tabBtnRegister) {
-                    tabBtnRegister.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none";
-                }
-            } else {
-                if (viewRegister) {
-                    viewRegister.classList.remove('hidden');
-                    viewRegister.style.display = 'block';
-                }
-                if (viewLogin) {
-                    viewLogin.classList.add('hidden');
-                    viewLogin.style.display = 'none';
-                }
-                if (tabBtnRegister) {
-                    tabBtnRegister.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none";
-                }
-                if (tabBtnLogin) {
-                    tabBtnLogin.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none";
-                }
-                generateCaptchaNumbers();
-                recalculateOnboardingPriceEstimation();
-            }
+            // Keep both layout grids active and concurrent - switch tab simulate fallback redirects cleanly
+            mutateLanguageContext(activeLanguageContext);
         }
 
         // Fallback simulation support for classic horizontal tab row selector
@@ -689,10 +631,8 @@
             switchAuthMode(tab);
         }
 
-        // Onboarding Checkbox slasher math calculation (Only runs when register tab is visible to prevent console errors)
+        // Onboarding Checkbox slasher math calculation (Runs cleanly, optimized with safe DOM checks)
         function recalculateOnboardingPriceEstimation() {
-            if (currentAuthTab !== 'register') return;
-
             const checkboxes = document.querySelectorAll('.niche-checkbox');
             let selectedCount = 0;
 
@@ -779,9 +719,6 @@
             // 1. Strictly translate only DOM elements existing inside index.html entryway to prevent null exceptions
             safeSetText('app-brand-title', t.appHeader);
             safeSetText('sec-login-subtitle', t.secLoginSubtitle);
-            safeSetText('sec-login-subtext', t.secLoginSubtext);
-            safeSetText('tab-btn-login', t.tabLogin);
-            safeSetText('tab-btn-register', t.tabRegister);
 
             // Login Labels & subtext configs
             safeSetText('lbl-login-email', t.lblEmail);
@@ -789,12 +726,12 @@
             safeSetText('lbl-remember-me', t.lblRememberMe);
             safeSetText('link-forgot-password', t.linkForgot);
             safeSetText('btn-submit-login', t.btnSubmitLogin);
-            safeSetText('link-switch-to-register', t.linkToRegister);
-            safeSetText('link-switch-to-login', t.linkToLogin);
 
             // Register Labels
             safeSetText('lbl-new-reg-section', t.lblNewRegSection);
             safeSetText('desc-new-reg-section', t.descNewRegSection);
+            safeSetText('lbl-signin-section', t.lblSignInSection);
+            safeSetText('desc-signin-section', t.descSignInSection);
             safeSetText('lbl-reg-merchant', t.lblRegMerchant);
             safeSetText('lbl-reg-shop', t.lblRegShop);
             safeSetText('lbl-reg-email', t.lblRegEmail);
@@ -902,7 +839,8 @@
             document.getElementById('reg-address').value = '';
 
             synchronizeStateAndLogs();
-            switchAuthMode('login');
+            generateCaptchaNumbers();
+            recalculateOnboardingPriceEstimation();
             triggerUINotification(appTranslationMatrix[activeLanguageContext].toastRegPending);
         }
 
