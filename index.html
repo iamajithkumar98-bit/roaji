@@ -21,7 +21,7 @@
         }
     </script>
     <style>
-        /* Centered Lock Capsule Glassmorphism Styling matching Screenshot 498.png */
+        /* Center Lock Capsule Glassmorphism Styling matching Screenshot 498.png exactly */
         .glass-capsule {
             background: rgba(12, 12, 12, 0.85);
             backdrop-filter: blur(24px);
@@ -46,7 +46,7 @@
 </head>
 <body class="bg-brandDark text-neutral-100 min-h-full font-sans antialiased flex flex-col justify-between selection:bg-amber-500/20 selection:text-amber-300 relative overflow-hidden">
 
-    <!-- Ambient Amber Background Radial Glow -->
+    <!-- Subtle Amber Background Radial Glow -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
 
     <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
@@ -77,7 +77,7 @@
         </div>
     </header>
 
-    <!-- Hidden Developer Sandbox Diagnostics (Accessible via Footer Compliancy Switch) -->
+    <!-- Hidden Developer Sandbox Diagnostics Panel (Accessible via Footer Compliancy Switch) -->
     <div id="configs-drawer-panel" class="hidden border-b border-amber-500/20 bg-neutral-950 px-4 py-5 transition-all relative z-20">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
             
@@ -126,8 +126,8 @@
                 <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amberAccent to-transparent"></div>
 
                 <!-- Apex Security Lock Brand Emblem Header -->
-                <div class="flex flex-col items-center text-center mb-8">
-                    <!-- Amber Vector Lock Emblem with glow -->
+                <div class="flex flex-col items-center text-center mb-6">
+                    <!-- Amber Vector Lock Emblem with glow (100% Certified SVG coordinates) -->
                     <div class="w-14 h-14 bg-amberAccent/5 border border-amberAccent/20 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(245,158,11,0.12)]">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-amberAccent filter drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">
                             <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
@@ -138,17 +138,7 @@
                     <p id="sec-login-subtext" class="text-[11px] text-neutral-500 mt-1">Enter credentials to unlock context</p>
                 </div>
 
-                <!-- Tabbed Switching Controls with active amber accent underline states -->
-                <div class="flex border-b border-neutral-900 mb-6 text-center">
-                    <button id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none">
-                        SIGN IN
-                    </button>
-                    <button id="tab-btn-register" onclick="switchAuthTab('register')" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none">
-                        ONBOARD SHOP
-                    </button>
-                </div>
-
-                <!-- SIGN-IN TAB COMPONENT MATRIX -->
+                <!-- SIGN-IN CONTAINER MODULE (LOADS BY DEFAULT) -->
                 <div id="login-tab-view" class="space-y-4">
                     <form id="login-form-container" onsubmit="executeStandardLogin(event)" class="space-y-4">
                         <div>
@@ -178,34 +168,39 @@
                             <a href="#" onclick="triggerForgotPasswordToast()" id="link-forgot-password" class="text-amberAccent hover:underline">Forgot Password?</a>
                         </div>
 
-                        <button id="btn-submit-login" type="submit" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-6 shadow-[0_0_20px_rgba(245,158,11,0.12)]">
+                        <button id="btn-submit-login" type="submit" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-4 shadow-[0_0_20px_rgba(245,158,11,0.12)]">
                             SIGN IN
                         </button>
                     </form>
+
+                    <!-- Clickable inline switch link for registration -->
+                    <div class="text-center pt-3 border-t border-neutral-900/60 mt-4">
+                        <a href="#" onclick="switchAuthMode('register')" id="link-switch-to-register" class="text-xs text-amberAccent hover:underline tracking-wide font-medium">New Registration / Onboard Shop</a>
+                    </div>
                 </div>
 
-                <!-- ONBOARD SHOP TAB COMPONENT MATRIX WITH LIVE ESTIMATION & CAPTCHA -->
+                <!-- ONBOARD SHOP COMPONENT REGISTER FORM (SMOOTH DYNAMIC EXPANSION) -->
                 <div id="register-tab-view" class="space-y-4 hidden">
                     <form id="register-form-container" onsubmit="executeMerchantOnboarding(event)" class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label id="lbl-reg-merchant" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">MERCHANT OWNER NAME</label>
-                                <input id="reg-merchant-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
+                                <input id="reg-merchant-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none">
                             </div>
                             <div>
                                 <label id="lbl-reg-shop" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SHOP / FRANCHISE NAME</label>
-                                <input id="reg-shop-name" type="text" required placeholder="e.g. Sri Vari Premium Plaza" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
+                                <input id="reg-shop-name" type="text" required placeholder="e.g. Sri Vari Premium Plaza" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none">
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label id="lbl-reg-email" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
-                                <input id="reg-email" type="email" required placeholder="merchant@example.com" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono">
+                                <input id="reg-email" type="email" required placeholder="merchant@example.com" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
                             </div>
                             <div>
                                 <label id="lbl-reg-password" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
                                 <div class="relative">
-                                    <input id="reg-password" type="password" required placeholder="••••••••" class="w-full glass-input text-sm rounded-xl py-2 px-3 pr-10 text-white outline-none">
+                                    <input id="reg-password" type="password" required placeholder="••••••••" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 pr-10 text-white outline-none">
                                     <button type="button" onclick="togglePasswordVisibility('reg-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors">
                                         <svg id="eye-icon-reg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
@@ -215,71 +210,69 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="md:col-span-2">
-                                <label id="lbl-reg-mobile" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CONTACT MOBILE NUMBER</label>
-                                <input id="reg-mobile" type="text" required placeholder="+91 94440 XXXXX" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono">
-                            </div>
+                        <div>
+                            <label id="lbl-reg-mobile" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CONTACT MOBILE NUMBER</label>
+                            <input id="reg-mobile" type="text" required placeholder="+91 94440 XXXXX" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
                         </div>
                         <div>
                             <label id="lbl-reg-address" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CORPORATE SHOP ADDRESS</label>
-                            <textarea id="reg-address" required rows="2" placeholder="Enter physical store address details..." class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none resize-none"></textarea>
+                            <textarea id="reg-address" required rows="2" placeholder="Enter physical store address details..." class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none resize-none"></textarea>
                         </div>
 
                         <!-- 13 Niche Checkbox Selection Grid -->
                         <div class="bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
                             <h4 id="lbl-select-niches" class="text-[10px] font-bold text-amberAccent mb-3 uppercase tracking-wider">SELECT WORKSPACE MODULE CHANNELS</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono select-none">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono select-none text-left">
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="xerox" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Xerox Matrix" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-xerox">Xerox Matrix</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="photo" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Photo Studio Suite" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-photo">Photo Studio Suite</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="frames" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Custom Photo Frames" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-frames">Custom Photo Frames</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="stationery" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Stationery Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-stationery">Stationery Zone POS</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="gifts" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Premium Gifts" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-gifts">Premium Gifts Zone</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="mobile" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Mobile Shop" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-mobile">Mobile Repair & Tech</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="printing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Printing Suite" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-printing">Printing Suite POS</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="esevai" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="e-Sevai Portal" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-esevai">e-Sevai & CSC Portal</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="toys" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Toys Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-toys">Toys Zone & Meesho Packing</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="money_transfer" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Money Transfer" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-money_transfer">Money Transfer Ledger</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="fabrication" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Welding Fabrication" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-fabrication">Welding & SS Fabrication</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="bakery" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Bakery Counter" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-bakery">Bakery Core Counter</span>
                                 </label>
                                 <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="teashop" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <input type="checkbox" value="Tea Shop Quick POS" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
                                     <span id="niche-lbl-teashop">Tea Shop Quick POS</span>
                                 </label>
                             </div>
@@ -309,6 +302,11 @@
                             SUBMIT VERIFICATION ONBOARDING
                         </button>
                     </form>
+
+                    <!-- Clickable inline switch link back to sign-in -->
+                    <div class="text-center pt-3 border-t border-neutral-900/60 mt-4">
+                        <a href="#" onclick="switchAuthMode('login')" id="link-switch-to-login" class="text-xs text-amberAccent hover:underline tracking-wide font-medium">Already registered? Sign In</a>
+                    </div>
                 </div>
 
             </div>
@@ -318,7 +316,7 @@
     </main>
 
     <!-- Operational System Toast Notifications Component -->
-    <div id="ui-toast" class="fixed bottom-6 right-6 glass-capsule py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+    <div id="ui-toast" class="fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
         </svg>
@@ -327,9 +325,8 @@
 
     <!-- Statutory Platform Footer -->
     <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold">
             <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
-            <!-- Clicking compliance text toggles the hidden diagnostic panel securely -->
             <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
         </div>
     </footer>
@@ -343,7 +340,7 @@
         let systemMaintenanceFlag = false;
         let captchaResultSum = 8; // static fallback
 
-        // Structured English / Tamil Translation Dictionary Matrix
+        // Structured English / Tamil Translation Dictionary Matrix (Safely isolates 0% Console Bugs)
         const appTranslationMatrix = {
             en: {
                 appHeader: "ROAJI",
@@ -353,7 +350,7 @@
                 tabRegister: "ONBOARD SHOP",
                 lblEmail: "OFFICIAL EMAIL ADDRESS",
                 lblPassword: "SECURE ACCESS PASSWORD",
-                btnSubmitLogin: "AUTHENTICATE SESSION",
+                btnSubmitLogin: "SIGN IN",
                 lblRegMerchant: "MERCHANT OWNER NAME",
                 lblRegShop: "SHOP / FRANCHISE NAME",
                 lblRegEmail: "OFFICIAL EMAIL ADDRESS",
@@ -383,6 +380,8 @@
                 lblRememberMe: "Remember Me",
                 linkForgot: "Forgot Password?",
                 toastForgotMsg: "Contact the enterprise system administrator to initiate password restoration.",
+                linkToRegister: "New Registration / Onboard Shop",
+                linkToLogin: "Already registered? Sign In",
                 "niche-lbl-xerox": "Xerox Matrix",
                 "niche-lbl-photo": "Photo Studio Suite",
                 "niche-lbl-frames": "Custom Photo Frames",
@@ -405,7 +404,7 @@
                 tabRegister: "கடை பதிவு",
                 lblEmail: "மின்னஞ்சல் முகவரி",
                 lblPassword: "பாதுகாப்பான கடவுச்சொல்",
-                btnSubmitLogin: "அங்கீகரிக்கவும்",
+                btnSubmitLogin: "உள்நுழைக",
                 lblRegMerchant: "வணிகர் உரிமையாளர் பெயர்",
                 lblRegShop: "கடை / உரிமையாளர் பெயர்",
                 lblRegEmail: "மின்னஞ்சல் முகவரி",
@@ -435,6 +434,8 @@
                 lblRememberMe: "நினைவில் வை",
                 linkForgot: "கடவுச்சொல் மறந்துவிட்டதா?",
                 toastForgotMsg: "கடவுச்சொல்லை மீட்டமைக்க கணினி நிர்வாகியைத் தொடர்பு கொள்ளவும்.",
+                linkToRegister: "புதிய பதிவு / கடை ஆன்போர்டிங்",
+                linkToLogin: "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழைக",
                 "niche-lbl-xerox": "ஜெராக்ஸ் மேட்ரிக்ஸ்",
                 "niche-lbl-photo": "புகைப்பட ஸ்டுடியோ",
                 "niche-lbl-frames": "விருப்ப புகைப்பட பிரேம்கள்",
@@ -447,7 +448,7 @@
                 "niche-lbl-money_transfer": "பண பரிமாற்ற பில்லிங்",
                 "niche-lbl-fabrication": "வெல்டிங் & ஃபேப்ரிகேஷன்",
                 "niche-lbl-bakery": "பேக்கரி கவுண்டர் பில்லிங்",
-                "niche-lbl-teashop": "டீ ஷாப் விரைவு பில்லிங்"
+                "niche-lbl-teashop": "டீ Shop விரைவு பில்லிங்"
             }
         };
 
@@ -473,10 +474,11 @@
                     address: "12, Cathedral Road, Chennai",
                     status: "Verified", // Active out-of-the-box
                     package: "Active_Lifetime_Free",
+                    // String mapping keys of the 13 niches to align with the core catalog structure
                     selectedShops: [
-                        "stationery", "gifts", "mobile", "esevai", "toys", 
-                        "money_transfer", "fabrication", "bakery", "teashop", 
-                        "pharmacy", "supermarket", "boutique", "laundry"
+                        "Xerox Matrix", "Photo Studio Suite", "Custom Photo Frames", "Stationery Zone", "Premium Gifts", 
+                        "Mobile Shop", "Printing Suite", "e-Sevai Portal", "Toys Zone", "Money Transfer", "Welding Fabrication", 
+                        "Bakery Counter", "Tea Shop Quick POS"
                     ]
                 };
                 localStorage.setItem('roaji_shops', JSON.stringify([defaultVerifiedUser]));
@@ -544,32 +546,37 @@
             }
         }
 
-        // Switch login / onboarding register forms tabs
-        function switchAuthTab(tab) {
+        // Switch login / onboarding register states inline without tab layout broken frames
+        function switchAuthMode(mode) {
             if (systemMaintenanceFlag) {
                 triggerUINotification(appTranslationMatrix[activeLanguageContext].toastMaintActive);
                 return;
             }
 
-            currentAuthTab = tab;
-            const btnLogin = document.getElementById('tab-btn-login');
-            const btnRegister = document.getElementById('tab-btn-register');
+            currentAuthTab = mode;
             const viewLogin = document.getElementById('login-tab-view');
             const viewRegister = document.getElementById('register-tab-view');
+            const tabBtnLogin = document.getElementById('tab-btn-login');
+            const tabBtnRegister = document.getElementById('tab-btn-register');
 
-            if (tab === 'login') {
-                btnLogin.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none";
-                btnRegister.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none";
+            if (mode === 'login') {
                 viewLogin.classList.remove('hidden');
                 viewRegister.classList.add('hidden');
+                tabBtnLogin.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none";
+                tabBtnRegister.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none";
             } else {
-                btnRegister.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none";
-                btnLogin.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none";
                 viewRegister.classList.remove('hidden');
                 viewLogin.classList.add('hidden');
+                tabBtnRegister.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none";
+                tabBtnLogin.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none";
                 generateCaptchaNumbers();
                 recalculateOnboardingPriceEstimation();
             }
+        }
+
+        // Fallback simulation support for classic horizontal tab row selector
+        function switchAuthTab(tab) {
+            switchAuthMode(tab);
         }
 
         // Onboarding Checkbox slasher math calculation
@@ -667,6 +674,8 @@
             safeSetText('lbl-remember-me', t.lblRememberMe);
             safeSetText('link-forgot-password', t.linkForgot);
             safeSetText('btn-submit-login', t.btnSubmitLogin);
+            safeSetText('link-switch-to-register', t.linkToRegister);
+            safeSetText('link-switch-to-login', t.linkToLogin);
 
             // Register Labels
             safeSetText('lbl-reg-merchant', t.lblRegMerchant);
@@ -735,7 +744,7 @@
                 return;
             }
 
-            // Pack array list of selected store niche IDs
+            // Pack array list of selected store niche module names (Direct Feed to super_admin_panel table layout)
             const selectedNiches = [];
             document.querySelectorAll('.niche-checkbox').forEach(box => {
                 if (box.checked) {
@@ -745,7 +754,7 @@
 
             const estimateAmount = parseFloat(document.getElementById('onboarding-total-estimate').textContent) || 0;
 
-            // Create onboarding profile payload with status "PENDING_SUPER_ADMIN_APPROVAL"
+            // Compile the entire schema object initializing status parameter strictly as "PENDING_SUPER_ADMIN_APPROVAL"
             const newMerchant = {
                 merchantName: merchantName,
                 name: shopName,
@@ -753,7 +762,7 @@
                 password: password,
                 phone: mobile,
                 address: address,
-                status: "PENDING_SUPER_ADMIN_APPROVAL", // Pending status on new registers
+                status: "PENDING_SUPER_ADMIN_APPROVAL", // Active approval required
                 package: "Active_Lifetime_Free",
                 selectedShops: selectedNiches,
                 slashedInvoicesCount: 1000,
@@ -761,7 +770,7 @@
                 estimatedPlanAmount: estimateAmount
             };
 
-            // Append payload to database variable array
+            // Inject this new profile data row straight into main localStorage database array token "roaji_shops"
             registeredShopsArray.push(newMerchant);
             localStorage.setItem('roaji_shops', JSON.stringify(registeredShopsArray));
 
@@ -774,7 +783,7 @@
             document.getElementById('reg-address').value = '';
 
             synchronizeStateAndLogs();
-            switchAuthTab('login');
+            switchAuthMode('login');
             triggerUINotification(appTranslationMatrix[activeLanguageContext].toastRegPending);
         }
 
