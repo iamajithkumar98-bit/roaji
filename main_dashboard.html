@@ -28,6 +28,10 @@
         .bloom-text {
             text-shadow: 0 0 12px rgba(244, 63, 94, 0.6), 0 0 24px rgba(245, 158, 11, 0.3);
         }
+        /* Custom luxury drop shadow bloom for Rose SVG */
+        .glow-rose {
+            filter: drop-shadow(0 0 12px rgba(244, 63, 94, 0.7));
+        }
         /* Glassmorphic Panel Styling */
         .glass-panel {
             background: rgba(18, 18, 18, 0.85);
@@ -58,7 +62,7 @@
                 linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
         }
-        /* Theme Transitions */
+        /* Dynamic Theme Transitions */
         body {
             transition: background-color 0.3s ease, color 0.3s ease;
         }
@@ -77,8 +81,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                 </svg>
             </div>
-            <h2 id="lang-maint-header" class="text-2xl font-bold tracking-tight text-white mb-2">GATEWAY LOCKED</h2>
-            <p id="lang-maint-desc" class="text-neutral-400 text-sm mb-6">System maintenance active. Access is temporarily restricted. Onboarding and validation pathways are locked.</p>
+            <h2 id="lang-maint-header" class="text-2xl font-bold tracking-tight text-white mb-2">WORKSPACE LOCKED</h2>
+            <p id="lang-maint-desc" class="text-neutral-400 text-sm mb-6">System maintenance active. Workspace routing and micro-services are temporarily frozen. Standard selections are locked.</p>
             <div class="text-[11px] text-amberAccent font-mono uppercase tracking-wider py-1.5 px-3 bg-amberAccent/10 rounded border border-amberAccent/20 inline-block">
                 Interceptor Flag: SYSTEM_MAINT_OVERLAY_LOCK
             </div>
@@ -91,7 +95,7 @@
             <div class="w-8 h-8 bg-amberAccent/10 border border-amberAccent/30 rounded-lg flex items-center justify-center">
                 <span class="text-roseAccent font-black text-sm tracking-wider">R</span>
             </div>
-            <span class="text-xs font-extrabold text-neutral-200 tracking-wider">ROAJI CONSOLE</span>
+            <span id="active-mobile-brand-title" class="text-xs font-extrabold text-neutral-200 tracking-wider">ROAJI CONSOLE</span>
         </div>
         <button onclick="toggleMobileSidebar()" class="text-neutral-400 hover:text-white transition-colors focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-6 h-6">
@@ -101,12 +105,12 @@
     </header>
 
     <!-- LEFT SIDEBAR CONSOLE (Responsive & Floating Glassmorphic Structure) -->
-    <aside id="sidebar-console" class="fixed inset-y-0 left-0 -translate-x-full md:translate-x-0 md:relative w-64 border-r border-neutral-900 bg-neutral-950/80 flex flex-col justify-between shrink-0 z-40 transition-transform duration-300 ease-in-out">
+    <aside id="sidebar-console" class="fixed inset-y-0 left-0 -translate-x-full md:translate-x-0 md:relative w-64 border-r border-neutral-900 bg-neutral-950/80 flex flex-col justify-between shrink-0 z-40 transition-transform duration-300 ease-in-out h-full md:h-auto">
         <div class="p-6 space-y-6">
             <!-- Brand Logo pair -->
             <div class="flex items-center space-x-3 pb-4 border-b border-neutral-900/60">
                 <div class="w-10 h-10 bg-amberAccent/10 border border-amberAccent/30 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6 text-roseAccent glow-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-6 h-6 text-roseAccent glow-rose animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10c0-4.418-3.582-8-8-8S4 7.582 4 12c0 6 8 10 8 10z" />
                         <path d="M12 21a9.975 9.975 0 0 1-5-3M12 21a9.975 9.975 0 0 0 5-3" />
                         <path d="M12 12c1.5-1.5 2-3 1-4s-3-.5-4 1 0 3.5 3 3z" />
@@ -144,12 +148,20 @@
 
         <!-- Sidebar bottom triggers -->
         <div class="p-6 border-t border-neutral-900 space-y-4">
+            <!-- Dynamic hot-reload refresh engine trigger -->
+            <button onclick="refreshDashboardUI()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-400 hover:text-amberAccent font-mono py-2 rounded-xl transition-all uppercase tracking-wider flex items-center justify-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                <span>HOT RELOAD HUB</span>
+            </button>
+
             <!-- Language switcher -->
             <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex shrink-0 justify-between items-center">
                 <span class="text-[9px] text-neutral-500 font-mono font-bold px-2 uppercase">Locale</span>
                 <div class="flex">
-                    <button id="lang-btn-en" onclick="mutateLanguageContext('en')" class="px-2 py-1 text-[9px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">EN</button>
-                    <button id="lang-btn-ta" onclick="mutateLanguageContext('ta')" class="px-2 py-1 text-[9px] font-bold rounded transition-all text-neutral-400 font-mono">தமிழ்</button>
+                    <button id="lang-btn-en" onclick="mutateLanguageContext('en')" class="px-2.5 py-1 text-[9px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">EN</button>
+                    <button id="lang-btn-ta" onclick="mutateLanguageContext('ta')" class="px-2.5 py-1 text-[9px] font-bold rounded transition-all text-neutral-400 font-mono">தமிழ்</button>
                 </div>
             </div>
             <!-- Logout link -->
@@ -175,7 +187,7 @@
             <div class="flex items-center space-x-4">
                 <!-- Notification Bell -->
                 <button class="relative p-2 bg-neutral-900/60 border border-neutral-800 rounded-xl hover:border-amberAccent text-neutral-400 hover:text-white transition-all">
-                    <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-roseAccent"></span>
+                    <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-roseAccent animate-ping"></span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                     </svg>
@@ -187,8 +199,8 @@
                         <span class="text-amberAccent font-black text-xs">P</span>
                     </div>
                     <div class="text-left font-mono">
-                        <span id="active-shop-profile-name" class="block text-[10px] font-bold text-neutral-100 uppercase tracking-wide">Demo Plaza</span>
-                        <span id="active-shop-profile-package" class="block text-[8px] text-neutral-500 uppercase tracking-tighter">SaaS_Paid_Plan</span>
+                        <span id="active-shop-profile-name" class="block text-[10px] font-bold text-neutral-100 uppercase tracking-wide">-- Loading --</span>
+                        <span id="active-shop-profile-package" class="block text-[8px] text-neutral-500 uppercase tracking-tighter">-- Loading Package --</span>
                     </div>
                 </div>
             </div>
@@ -199,7 +211,7 @@
             
             <!-- WORKSPACE TAB 1: OVERVIEW DASHBOARD -->
             <div id="tab-view-dashboard" class="space-y-6">
-                <!-- BI Analytics Row Widgets -->
+                <!-- SaaS Dynamic Control Metrics Widgets (Part 5 Subscription Matrix) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
                         <span id="lang-wdg-revenue" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Today's Revenue Flow</span>
@@ -207,12 +219,12 @@
                         <span id="lang-wdg-revenue-sub" class="text-[9px] text-neutral-600 font-mono uppercase">IMPS / Cash direct settlement</span>
                     </div>
                     <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
-                        <span id="lang-wdg-limits" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold text-amberAccent">Invoice Limits Balance</span>
-                        <p id="wdg-invoice-limits" class="text-2xl font-black font-mono mt-1 text-amberAccent">942</p>
+                        <span id="lang-wdg-limits" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold text-amberAccent">Remaining Invoices Limit</span>
+                        <p id="wdg-invoice-limits" class="text-2xl font-black font-mono mt-1 text-amberAccent">1000</p>
                         <span id="lang-wdg-limits-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Slashed balance operational limits</span>
                     </div>
                     <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
-                        <span id="lang-wdg-validity" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">SaaS License Validity</span>
+                        <span id="lang-wdg-validity" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Workspace Operational Days</span>
                         <p id="wdg-license-validity" class="text-2xl font-black font-mono mt-1 text-emeraldAccent">365 Days</p>
                         <span id="lang-wdg-validity-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Remaining validity countdown</span>
                     </div>
@@ -241,8 +253,8 @@
                             <p id="lang-quick-billing-desc" class="text-[10px] text-neutral-500 font-mono mt-0.5">Instantly compile transactions ledger models.</p>
                         </div>
                         <div class="py-8 text-center space-y-4">
-                            <div class="w-16 h-16 bg-amberAccent/5 border border-dashed border-amberAccent/30 rounded-2xl flex items-center justify-center mx-auto text-amberAccent animate-pulse">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-7 h-7">
+                            <div class="w-16 h-16 bg-amberAccent/5 border border-dashed border-amberAccent/30 rounded-2xl flex items-center justify-center mx-auto text-amberAccent">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-7 h-7 animate-bounce">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
@@ -251,6 +263,18 @@
                         <button onclick="toggleBillingInvoiceModal()" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold text-xs py-3.5 rounded-xl transition-all uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.12)]">
                             Create New Bill
                         </button>
+                    </div>
+                </div>
+
+                <!-- Multi-Business Supported Dynamic Grid Integration (Part 2 Layout Matrix) -->
+                <div class="space-y-4 pt-4">
+                    <div>
+                        <h3 id="lang-grid-title" class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Multi-Business Core Matrix</h3>
+                        <p id="lang-grid-desc" class="text-xs text-neutral-500 font-mono mt-0.5">Select active operations workspace node to route transaction ledger. grayscaled options denote locked sub-POS licenses.</p>
+                    </div>
+
+                    <div id="business-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- Populated dynamically via Javascript based on selectShops array status (Active/Emerald vs Locked/Grayscale) -->
                     </div>
                 </div>
             </div>
@@ -383,7 +407,7 @@
                 </div>
             </div>
 
-            <!-- WORKSPACE TAB 6: SETTINGS (Includes Theme Selector) -->
+            <!-- WORKSPACE TAB 6: SETTINGS (Includes Theme Presets) -->
             <div id="tab-view-settings" class="space-y-6 hidden">
                 <div class="glass-panel p-6 rounded-2xl">
                     <div class="pb-4 border-b border-neutral-800/80 mb-6">
@@ -482,76 +506,252 @@
         const appTranslationMatrix = {
             en: {
                 appHeader: "ROAJI",
+                secLoginSubtitle: "ROAJI BILLING SOFTWARE",
+                secLoginSubtext: "Enter credentials to unlock context",
+                toastLogout: "Session invalidated successfully. Routing back to gateway...",
+                toastThemeSaved: "Ecosystem theme context mutated successfully.",
+                toastBillSuccess: "Transaction recorded in ledger database safely.",
+                toastEmptyFields: "Validation failed. Mandatory inputs must be filled.",
                 maintHeader: "GATEWAY LOCKED",
                 maintDesc: "System maintenance active. Access is temporarily restricted. Onboarding and validation pathways are locked.",
                 toastConfigSaved: "Maintenance settings updated.",
                 statusActiveFree: "Active_Lifetime_Free",
                 statusActiveTrial: "Active_Trial",
                 statusActivePro: "SaaS_Paid_Plan",
-                toastLogout: "Session invalidated successfully. Routing back to gateway...",
-                toastThemeSaved: "Ecosystem theme context mutated successfully.",
-                toastBillSuccess: "Transaction recorded in ledger database safely.",
-                toastEmptyFields: "Validation failed. Mandatory inputs must be filled."
+                "stationery-title": "Xerox & Stationery Counter",
+                "stationery-desc": "Quick checkout ledger for copy pages, notebooks, and binders.",
+                "gifts-title": "Premium Gifts & Toys",
+                "gifts-desc": "Multi-channel packaging logistics tracker for retail and Meesho.",
+                "mobile-title": "Mobile Repair & Accessories",
+                "mobile-desc": "Slab-based hardware configuration diagnostics and accessories.",
+                "esevai-title": "e-Sevai CSC Portal",
+                "esevai-desc": "Digital CSC government applications database registry hub.",
+                "toys-title": "Toys Zone & Meesho Packing",
+                "toys-desc": "Supply chain shipping matrix with custom bubblewrap multipliers.",
+                "money_transfer-title": "DMT Money Transfer Desk",
+                "money_transfer-desc": "Dynamic financial slab commission routing and settlement ledger.",
+                "fabrication-title": "Welding & SS Fabrication",
+                "fabrication-desc": "SqFt dimension weight estimation multiplier calculator engine.",
+                "bakery-title": "Bakery Core Counter",
+                "bakery-desc": "Fresh cake piece weight dynamic metric POS counter interface.",
+                "teashop-title": "Tea Shop Quick POS",
+                "teashop-desc": "Ultra-rapid hot beverage button click quantity increments.",
+                "pharmacy-title": "Pharmacy Hub POS",
+                "pharmacy-desc": "Statutory pharmaceutical formulation batch matrix billing tracker.",
+                "supermarket-title": "Supermarket Billing",
+                "supermarket-desc": "Bulk barcode scan register with high-speed invoice draft queues.",
+                "boutique-title": "Boutique & Tailoring",
+                "boutique-desc": "Apparel measurement log sheet and pattern delivery tracker.",
+                "laundry-title": "Laundry & Dry Cleaning",
+                "laundry-desc": "Dynamic fabric tag tracker, processing stage log sheets, and dispatch."
             },
             ta: {
                 appHeader: "ரோஜி",
+                secLoginSubtitle: "ரோஜி பில்லிங் சாப்ட்வேர்",
+                secLoginSubtext: "அணுகலைத் திறக்க நற்சான்றிதழ்களை உள்ளிடவும்",
+                toastLogout: "அமர்வு வெற்றிகரமாக வெளியேற்றப்பட்டது. பிரதான வாயிலுக்கு திருப்பி விடப்படுகிறது...",
+                toastThemeSaved: "கணினி தீம் வெற்றிகரமாக மாற்றப்பட்டது.",
+                toastBillSuccess: "பரிவர்த்தனை கணக்கு பதிவேட்டில் வெற்றிகரமாக பதிவு செய்யப்பட்டது.",
+                toastEmptyFields: "பிழை! அனைத்து கட்டாய புலன்களையும் பூர்த்தி செய்யவும்.",
                 maintHeader: "நுழைவாயில் முடக்கப்பட்டுள்ளது",
                 maintDesc: "கணினி பராமரிப்பு வேலைகள் நடக்கின்றன. அனுமதி தற்காலிகமாக நிறுத்தப்பட்டுள்ளது.",
                 toastConfigSaved: "பராமரிப்பு அமைப்புகள் சேமிக்கப்பட்டன.",
                 statusActiveFree: "ஆயுட்கால இலவசம்",
                 statusActiveTrial: "சோதனைக் கணக்கு",
                 statusActivePro: "பிரீமியம் சந்தா",
-                toastLogout: "அமர்வு வெற்றிகரமாக வெளியேற்றப்பட்டது. பிரதான வாயிலுக்கு திருப்பி விடப்படுகிறது...",
-                toastThemeSaved: "கணினி தீம் வெற்றிகரமாக மாற்றப்பட்டது.",
-                toastBillSuccess: "பரிவர்த்தனை கணக்கு பதிவேட்டில் வெற்றிகரமாக பதிவு செய்யப்பட்டது.",
-                toastEmptyFields: "பிழை! அனைத்து கட்டாய புலன்களையும் பூர்த்தி செய்யவும்."
+                "stationery-title": "ஜெராக்ஸ் & ஸ்டேஷனரி கவுண்டர்",
+                "stationery-desc": "நகல் தாள்கள், குறிப்பேடுகள் மற்றும் பைண்டர்களுக்கான விரைவான பில்லிங்.",
+                "gifts-title": "பிரீமியம் பரிசுகள் & பொம்மைகள்",
+                "gifts-desc": "சில்லறை மற்றும் மீஷோவுக்கான பேக்கேஜிங் லாஜிஸ்டிக்ஸ் டிராக்கர்.",
+                "mobile-title": "மொபைல் ரிப்பேர் & உபகரணங்கள்",
+                "mobile-desc": "வன்பொருள் கண்டறிதல் மற்றும் உபகரணங்கள் பில்லிங் மேலாண்மை.",
+                "esevai-title": "இ-சேவை சிஎஸ்சி போர்ட்டல்",
+                "esevai-desc": "அரசு டிஜிட்டல் விண்ணப்பங்களுக்கான கணக்கு பதிவு மேலாண்மை.",
+                "toys-title": "பொம்மைகள் & மீஷோ பேக்கிங்",
+                "toys-desc": "ஏர் பப்பில் ரேப் பெருக்கிகளுடன் விநியோகச் சங்கிலி கப்பல் தளம்.",
+                "money_transfer-title": "பண பரிமாற்ற பில்லிங்",
+                "money_transfer-desc": "சேவை கட்டணம் மற்றும் பட்டுவாடா முறை மேலாண்மை.",
+                "fabrication-title": "வெல்டிங் & எஸ்எஸ் ஃபேப்ரிகேஷன்",
+                "fabrication-desc": "அளவுகள் மற்றும் எடை அடிப்படையிலான மதிப்பீட்டு கால்குலேட்டர்.",
+                "bakery-title": "பேக்கரி கவுண்டர் பில்லிங்",
+                "bakery-desc": "கேக்குகள், பப்ஸ், இனிப்புகளுக்கான எடை அடிப்படையிலான பில்லிங்.",
+                "teashop-title": "டீ ஷாப் விரைவு பில்லிங்",
+                "teashop-desc": "பானங்கள் மற்றும் சிற்றுண்டிகளுக்கான விரைவான பில்லிங்.",
+                "pharmacy-title": "பார்மசி பில்லிங்",
+                "pharmacy-desc": "மருந்து தொகுப்பு மற்றும் பில்லிங் கண்காணிப்பு மேலாண்மை.",
+                "supermarket-title": "சூப்பர் மார்க்கெட் பில்லிங்",
+                "supermarket-desc": "பார்கோடு ஸ்கேன் மூலம் அதிவேக பில்லிங் மேலாண்மை.",
+                "boutique-title": "பொடிக்கு & தையல் கலை",
+                "boutique-desc": "அளவீடுகள் மற்றும் விநியோக கண்காணிப்பு மேலாண்மை.",
+                "laundry-title": "சலவை மற்றும் டிரை க்ளீனிங்",
+                "laundry-desc": "துணி டேக் டிராக்கர், செயலாக்க நிலைகள் மற்றும் அனுப்புதல்."
             }
         };
 
-        // DOM Content Loaded Initializer Hook
+        // All 13 core workspace channels catalog
+        const coreNicheShopsCatalog = [
+            { id: "stationery", path: "modules/stationery/billing.html", iconBg: "bg-blue-500/10 text-blue-400" },
+            { id: "gifts", path: "modules/gifts/billing.html", iconBg: "bg-purple-500/10 text-purple-400" },
+            { id: "mobile", path: "modules/mobile/billing.html", iconBg: "bg-teal-500/10 text-teal-400" },
+            { id: "esevai", path: "modules/esevai/billing.html", iconBg: "bg-cyan-500/10 text-cyan-400" },
+            { id: "toys", path: "modules/toys/billing.html", iconBg: "bg-pink-500/10 text-pink-400" },
+            { id: "money_transfer", path: "modules/money_transfer/billing.html", iconBg: "bg-emerald-500/10 text-emerald-400" },
+            { id: "fabrication", path: "modules/fabrication/billing.html", iconBg: "bg-orange-500/10 text-orange-400" },
+            { id: "bakery", path: "modules/bakery/billing.html", iconBg: "bg-yellow-500/10 text-yellow-400" },
+            { id: "teashop", path: "modules/teashop/billing.html", iconBg: "bg-rose-500/10 text-rose-400" },
+            { id: "pharmacy", path: "modules/pharmacy/billing.html", iconBg: "bg-indigo-500/10 text-indigo-400" },
+            { id: "supermarket", path: "modules/supermarket/billing.html", iconBg: "bg-sky-500/10 text-sky-400" },
+            { id: "boutique", path: "modules/boutique/billing.html", iconBg: "bg-fuchsia-500/10 text-fuchsia-400" },
+            { id: "laundry", path: "modules/laundry/billing.html", iconBg: "bg-lime-500/10 text-lime-400" }
+        ];
+
+        // Dynamic State Handshake on DOMContentLoaded (Part 2 & Part 5 Sync)
         window.addEventListener('DOMContentLoaded', () => {
             try {
-                // Safeguard against downstream JSON parse crashes from raw session storage calls
-                const rawClaims = sessionStorage.getItem('roaji_session_claims');
-                if (!rawClaims) {
+                // 1. Immediately read 'roaji_active_shop_session' from localStorage
+                const rawSession = localStorage.getItem('roaji_active_shop_session');
+                
+                // If this key is null, force redirect to 'index.html'
+                if (!rawSession) {
                     window.location.replace("index.html");
                     return;
                 }
-                const claims = JSON.parse(rawClaims);
-                if (claims && claims.role === "OWNER") {
-                    const body = document.getElementById('dashboard-body');
-                    if (body) {
-                        body.classList.remove('hidden');
-                    }
-                    
-                    loadActiveMerchantSession();
-                    mutateLanguageContext('en');
-                    initializeAnalyticsChartEngine();
-                } else {
-                    window.location.replace("index.html");
+
+                activeMerchantSession = JSON.parse(rawSession);
+
+                // Reveal Dashboard Workspace shell once validated successfully
+                const body = document.getElementById('dashboard-body');
+                if (body) {
+                    body.classList.remove('hidden');
                 }
-            } catch (e) {
-                console.error("Session verification crash prevented:", e);
+
+                // 2. Execute dynamic DOM Injection
+                refreshDashboardUI();
+                mutateLanguageContext('en');
+                pollMaintenanceInterceptorState();
+                initializeAnalyticsChartEngine();
+
+                setInterval(pollMaintenanceInterceptorState, 3000); // Continuous safety check loop
+            } catch (err) {
+                console.error("Critical session state startup error:", err);
                 window.location.replace("index.html");
             }
         });
 
-        // Pull verified active user session parameters
-        function loadActiveMerchantSession() {
+        // Pull active list array from localStorage
+        function loadLocalStorageDatabases() {
             try {
-                const rawSession = localStorage.getItem('roaji_active_shop_session');
-                if (rawSession) {
-                    activeMerchantSession = JSON.parse(rawSession);
-                    document.getElementById('active-shop-profile-name').textContent = activeMerchantSession.name || "Demo Plaza";
-                    document.getElementById('active-shop-profile-package').textContent = activeMerchantSession.package || "Active_Lifetime_Free";
-                    
-                    // Stats widget
-                    document.getElementById('wdg-invoice-limits').textContent = activeMerchantSession.slashedInvoicesCount !== undefined ? activeMerchantSession.slashedInvoicesCount : 1000;
-                    document.getElementById('wdg-license-validity').textContent = `${activeMerchantSession.daysValidity !== undefined ? activeMerchantSession.daysValidity : 365} Days`;
-                }
-            } catch (err) {
-                console.error("Failed to load active merchant session metrics:", err);
+                const rawShops = localStorage.getItem('roaji_shops');
+                registeredShopsArray = JSON.parse(rawShops) || [];
+            } catch(e) {
+                registeredShopsArray = [];
             }
+        }
+
+        // Hot Reload Refresh Dashboard UI (Re-scans state and updates DOM instantly)
+        function refreshDashboardUI() {
+            try {
+                loadLocalStorageDatabases();
+
+                // Find active merchant updated record inside the raw roaji_shops datastore array
+                if (activeMerchantSession && activeMerchantSession.email) {
+                    const freshData = registeredShopsArray.find(user => user.email.toLowerCase() === activeMerchantSession.email.toLowerCase());
+                    if (freshData) {
+                        // Merge update state parameters
+                        activeMerchantSession = freshData;
+                        localStorage.setItem('roaji_active_shop_session', JSON.stringify(activeMerchantSession));
+                    }
+                }
+
+                // a) Update Shop Name (in profile chip and center header)
+                const headerBrandName = document.getElementById('app-billing-software-header');
+                if (headerBrandName && activeMerchantSession.name) {
+                    headerBrandName.textContent = activeMerchantSession.name + " BILLING MODULE";
+                }
+                const profileChipName = document.getElementById('active-shop-profile-name');
+                if (profileChipName && activeMerchantSession.name) {
+                    profileChipName.textContent = activeMerchantSession.name;
+                }
+
+                // b) Update Operational Tier
+                const profileChipPkg = document.getElementById('active-shop-profile-package');
+                if (profileChipPkg && activeMerchantSession.status) {
+                    profileChipPkg.textContent = activeMerchantSession.status;
+                }
+
+                // Stats widget
+                safeSetText('wdg-invoice-limits', activeMerchantSession.slashedInvoicesCount !== undefined ? activeMerchantSession.slashedInvoicesCount : 1000);
+                safeSetText('wdg-license-validity', `${activeMerchantSession.daysValidity !== undefined ? activeMerchantSession.daysValidity : 365} Days`);
+
+                // c) Re-draw dynamic N Niches Modules Grid based on 'selectedShops' array checklist (Active/Emerald vs Locked/Grayscale)
+                drawDynamicNichesGrid();
+                
+                triggerUINotification("Workspace databases state updated successfully.");
+            } catch (err) {
+                console.error("Dashboard Hot Reload UI refresh error:", err);
+            }
+        }
+
+        // Draw and synchronize dynamic niches grid layout
+        function drawDynamicNichesGrid() {
+            const container = document.getElementById('business-grid-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+            const t = appTranslationMatrix[activeLanguageContext];
+
+            coreNicheShopsCatalog.forEach(shop => {
+                // Loop through 'selectedShops' array to evaluate active vs locked licenses
+                const isUnlocked = activeMerchantSession && activeMerchantSession.selectedShops && activeMerchantSession.selectedShops.includes(shop.id);
+
+                const card = document.createElement('div');
+                
+                // Focus highlight amber focus borders on active cards
+                const cardStyle = isUnlocked 
+                    ? "glass-panel border-neutral-800 hover:border-amberAccent/40 cursor-pointer hover:-translate-y-1" 
+                    : "opacity-40 border-neutral-900 bg-neutral-950/40 cursor-not-allowed filter grayscale";
+
+                if (isUnlocked) {
+                    card.onclick = () => handleActiveModuleRouting(shop.path);
+                } else {
+                    card.onclick = () => triggerUINotification("Access denied. Channel locked inside your trial package.");
+                }
+
+                const title = t[`${shop.id}-title`] || shop.id;
+                const desc = t[`${shop.id}-desc`] || "";
+
+                card.className = `p-5 rounded-2xl border flex flex-col justify-between h-44 relative overflow-hidden group select-none transition-all duration-300 ${cardStyle}`;
+                card.innerHTML = `
+                    <div class="space-y-3.5 relative z-10">
+                        <div class="flex items-center justify-between">
+                            <!-- Icon Base -->
+                            <div class="w-9 h-9 ${shop.iconBg} rounded-xl flex items-center justify-center border border-white/5">
+                                <span class="font-bold text-[10px] font-mono uppercase">${shop.id.substring(0, 3)}</span>
+                            </div>
+                            
+                            <!-- License Node Status Badge -->
+                            <span class="text-[9px] font-mono tracking-wider font-bold ${isUnlocked ? 'text-emeraldAccent' : 'text-neutral-500'}">
+                                ${isUnlocked ? 'ACTIVE' : 'LOCKED'}
+                            </span>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-neutral-100 group-hover:text-amberAccent transition-colors font-mono tracking-wide uppercase">${title}</h4>
+                            <p class="text-[10px] text-neutral-500 mt-1 leading-normal leading-relaxed">${desc}</p>
+                        </div>
+                    </div>
+                    <!-- Hover ambient glow element -->
+                    <div class="absolute -bottom-10 -right-10 w-20 h-20 bg-amber-500/0 group-hover:bg-amber-500/5 rounded-full blur-xl transition-all duration-300"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Active Niche Module redirection
+        function handleActiveModuleRouting(path) {
+            triggerUINotification("Routing to selected micro-SaaS workspace...");
+            setTimeout(() => {
+                window.location.href = path;
+            }, 1200);
         }
 
         // Toggle Mobile Navigation Sidebar drawer
@@ -692,7 +892,8 @@
             const t = appTranslationMatrix[lang];
 
             // Swapping DOM text content strings safely (0% console runtime bugs)
-            safeSetText('app-billing-software-header', t.secLoginSubtitle || "ROAJI BILLING SOFTWARE");
+            const activeBrandTitle = activeMerchantSession ? activeMerchantSession.name : "ROAJI";
+            safeSetText('app-billing-software-header', activeBrandTitle + " BILLING MODULE");
             safeSetText('sec-dashboard-sub', t.secLoginSubtext || "Supply Chain Multi-tenant Enterprise Management Workspace");
 
             // Sidebar translate
@@ -701,6 +902,9 @@
             // Maintenance Banner labels
             safeSetText('lang-maint-header', t.maintHeader || "GATEWAY LOCKED");
             safeSetText('lang-maint-desc', t.maintDesc || "System maintenance active.");
+
+            // Redraw active niches grid lists
+            drawDynamicNichesGrid();
 
             // Active button indicators class lists
             const btnEn = document.getElementById('lang-btn-en');
