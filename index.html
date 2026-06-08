@@ -139,7 +139,7 @@
         
         <div class="w-full max-w-md mx-auto my-auto">
             
-            <!-- Centered Capsule Container (Screenshot 524.png Style) -->
+            <!-- Centered Capsule Container (Screenshot 524.png Style with zero padlock traces) -->
             <div class="glass-capsule w-full rounded-3xl p-6 sm:p-8 relative overflow-hidden">
 
                 <!-- Apex Rose Brand Emblem Header -->
@@ -160,9 +160,9 @@
                     <p id="sec-login-subtext" class="text-[10px] sm:text-xs text-neutral-500 mt-1">Enter credentials to unlock context</p>
                 </div>
 
-                <!-- PAGE 1: SIGN-IN VIEW -->
+                <!-- PAGE 1: SIGN-IN VIEW (No overlapping tab layout) -->
                 <div id="login-tab-view" class="space-y-4">
-                    <form id="login-form-container" onsubmit="executeStandardLogin(event)" class="space-y-4">
+                    <form id="login-form-container" class="space-y-4">
                         <div>
                             <label id="lbl-login-email" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
                             <input id="login-email" type="email" required placeholder="Enter your official email address" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
@@ -203,7 +203,7 @@
 
                 <!-- PAGE 2: ONBOARD REGISTRATION MODULE (DYNAMIC PAGE STATE) -->
                 <div id="register-tab-view" class="space-y-4 hidden">
-                    <form id="register-form-container" onsubmit="executeMerchantOnboarding(event)" class="space-y-4">
+                    <form id="register-form-container" class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                             <div>
                                 <label id="lbl-reg-merchant" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">MERCHANT OWNER NAME</label>
@@ -493,6 +493,17 @@
             generateCaptchaNumbers();
             mutateLanguageContext('en');
             pollMaintenanceInterceptorState();
+            
+            // Attach form submission event listeners inside script block instead of HTML attributes
+            const loginForm = document.getElementById('login-form-container');
+            if (loginForm) {
+                loginForm.addEventListener('submit', window.executeStandardLogin);
+            }
+            const registerForm = document.getElementById('register-form-container');
+            if (registerForm) {
+                registerForm.addEventListener('submit', window.executeMerchantOnboarding);
+            }
+            
             setInterval(pollMaintenanceInterceptorState, 2500); // Continuous safety check loop
         });
 
