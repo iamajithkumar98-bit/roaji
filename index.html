@@ -139,12 +139,12 @@
         
         <div class="w-full max-w-md mx-auto my-auto">
             
-            <!-- Centered Capsule Container (Screenshot 524.png Style with zero padlock traces) -->
+            <!-- Centered Capsule Container (Screenshot 524.png Style) -->
             <div class="glass-capsule w-full rounded-3xl p-6 sm:p-8 relative overflow-hidden">
 
                 <!-- Apex Rose Brand Emblem Header -->
                 <div class="flex flex-col items-center text-center mb-6">
-                    <!-- Centered high-quality Vector Rose Flower SVG with neon pink/amber glow shadow -->
+                    <!-- Centered elegant Vector Rose Flower SVG with neon pink/amber glow shadow -->
                     <div class="w-16 h-16 flex items-center justify-center mb-2">
                         <svg class="w-14 h-14 text-roseAccent drop-shadow-glow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10c0-4.418-3.582-8-8-8S4 7.582 4 12c0 6 8 10 8 10z" />
@@ -238,7 +238,7 @@
                         </div>
                         <div>
                             <label id="lbl-reg-address" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CORPORATE SHOP ADDRESS</label>
-                            <textarea id="reg-address" required rows="2" placeholder="Enter physical store address details..." class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none resize-none"></textarea>
+                            <textarea id="reg-address" required rows="2" placeholder="Enter physical store address details..." class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none resize-none"></textarea>
                         </div>
 
                         <!-- 13 Niche Checkbox Selection Grid (Mobile optimized layout, 1-col on mobile, 2-col on desktop) -->
@@ -775,69 +775,138 @@
         }
 
         // Onboard Form Dynamic Registration Pipeline (Injects payload with pending approvals status)
-        function executeMerchantOnboarding(event) {
-            event.preventDefault();
+        window.executeMerchantOnboarding = function(event) {
+            if (event) {
+                event.preventDefault();
+            }
+
             if (systemMaintenanceFlag) {
-                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastMaintActive);
+                const t = appTranslationMatrix[activeLanguageContext];
+                triggerUINotification(t ? t.toastMaintActive : "SYSTEM LOCK ACTIVE. Gateway access is blocked.");
                 return;
             }
 
-            const merchantName = document.getElementById('reg-merchant-name').value.trim();
-            const shopName = document.getElementById('reg-shop-name').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const password = document.getElementById('reg-password').value;
-            const mobile = document.getElementById('reg-mobile').value.trim();
-            const address = document.getElementById('reg-address').value.trim();
+            try {
+                // 1. Defensive Programming: Verify all DOM elements exist before accessing properties (Prevent toLowerCase errors)
+                const merchantNameEl = document.getElementById('reg-merchant-name');
+                const shopNameEl = document.getElementById('reg-shop-name');
+                const emailEl = document.getElementById('reg-email');
+                const passwordEl = document.getElementById('reg-password');
+                const mobileEl = document.getElementById('reg-mobile');
+                const addressEl = document.getElementById('reg-address');
 
-            // Duplicate Email verification checker
-            const emailExists = registeredShopsArray.some(user => user.email.toLowerCase() === email.toLowerCase());
-            if (emailExists) {
-                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastRegEmailDup);
-                return;
-            }
-
-            // Pack array list of selected store niche module names (Direct Feed to super_admin_panel table layout)
-            const selectedNiches = [];
-            document.querySelectorAll('.niche-checkbox').forEach(box => {
-                if (box.checked) {
-                    selectedNiches.push(box.value);
+                if (!merchantNameEl || !merchantNameEl.value.trim()) {
+                    triggerUINotification("Merchant Owner Name is required!");
+                    return;
                 }
-            });
+                if (!shopNameEl || !shopNameEl.value.trim()) {
+                    triggerUINotification("Shop / Franchise Name is required!");
+                    return;
+                }
+                if (!emailEl || !emailEl.value.trim()) {
+                    triggerUINotification("Official Email Address is required!");
+                    return;
+                }
+                if (!passwordEl || !passwordEl.value) {
+                    triggerUINotification("Secure Access Password is required!");
+                    return;
+                }
+                if (!mobileEl || !mobileEl.value.trim()) {
+                    triggerUINotification("Contact Mobile Number is required!");
+                    return;
+                }
+                if (!addressEl || !addressEl.value.trim()) {
+                    triggerUINotification("Corporate Shop Address is required!");
+                    return;
+                }
 
-            const estimateAmount = parseFloat(document.getElementById('onboarding-total-estimate').textContent) || 0;
+                const merchantName = merchantNameEl.value.trim();
+                const shopName = shopNameEl.value.trim();
+                const email = emailEl.value.trim().toLowerCase();
+                const password = passwordEl.value;
+                const mobile = mobileEl.value.trim();
+                const address = addressEl.value.trim();
 
-            // Compile the entire schema object initializing status parameter strictly as "PENDING_SUPER_ADMIN_APPROVAL"
-            const newMerchant = {
-                merchantName: merchantName,
-                name: shopName,
-                email: email,
-                password: password,
-                phone: mobile,
-                address: address,
-                status: "PENDING_SUPER_ADMIN_APPROVAL", // Active approval required
-                package: "Active_Lifetime_Free",
-                selectedShops: selectedNiches,
-                slashedInvoicesCount: 1000,
-                daysValidity: 365,
-                estimatedPlanAmount: estimateAmount
-            };
+                // 2. Array Safety: Ensure the datastore array is fully initialized as an array
+                if (!Array.isArray(registeredShopsArray)) {
+                    const rawShops = localStorage.getItem('roaji_shops');
+                    try {
+                        registeredShopsArray = JSON.parse(rawShops) || [];
+                    } catch (e) {
+                        registeredShopsArray = [];
+                    }
+                    if (!Array.isArray(registeredShopsArray)) {
+                        registeredShopsArray = [];
+                    }
+                }
 
-            // Inject this new profile data row straight into main localStorage database array token "roaji_shops"
-            registeredShopsArray.push(newMerchant);
-            localStorage.setItem('roaji_shops', JSON.stringify(registeredShopsArray));
+                // Safeguard duplicate verification check
+                const emailExists = registeredShopsArray.some(user => {
+                    return user && typeof user.email === 'string' && user.email.toLowerCase() === email;
+                });
 
-            // Reset registration fields
-            document.getElementById('reg-merchant-name').value = '';
-            document.getElementById('reg-shop-name').value = '';
-            document.getElementById('reg-email').value = '';
-            document.getElementById('reg-password').value = '';
-            document.getElementById('reg-mobile').value = '';
-            document.getElementById('reg-address').value = '';
+                if (emailExists) {
+                    const t = appTranslationMatrix[activeLanguageContext];
+                    triggerUINotification(t ? t.toastRegEmailDup : "Registration failed. Email is already allocated.");
+                    return;
+                }
 
-            synchronizeStateAndLogs();
-            switchAuthMode('login');
-            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastRegPending);
-        }
+                // Pack array list of selected store niche module names
+                const selectedNiches = [];
+                document.querySelectorAll('.niche-checkbox').forEach(box => {
+                    if (box && box.checked) {
+                        selectedNiches.push(box.value);
+                    }
+                });
+
+                const estimateElement = document.getElementById('onboarding-total-estimate');
+                const estimateAmount = estimateElement ? parseFloat(estimateElement.textContent) || 0 : 0;
+
+                // Construct onboarding profile payload with status "PENDING_SUPER_ADMIN_APPROVAL"
+                const newMerchant = {
+                    merchantName: merchantName,
+                    name: shopName,
+                    email: email,
+                    password: password,
+                    phone: mobile,
+                    address: address,
+                    status: "PENDING_SUPER_ADMIN_APPROVAL",
+                    package: "Active_Lifetime_Free",
+                    selectedShops: selectedNiches,
+                    slashedInvoicesCount: 1000,
+                    daysValidity: 365,
+                    estimatedPlanAmount: estimateAmount
+                };
+
+                // Append payload to database variable array and write back to storage cleanly
+                registeredShopsArray.push(newMerchant);
+                localStorage.setItem('roaji_shops', JSON.stringify(registeredShopsArray));
+
+                // Reset registration fields safely
+                merchantNameEl.value = '';
+                shopNameEl.value = '';
+                emailEl.value = '';
+                passwordEl.value = '';
+                mobileEl.value = '';
+                addressEl.value = '';
+
+                const captchaInput = document.getElementById('reg-captcha-input');
+                if (captchaInput) {
+                    captchaInput.value = '';
+                }
+
+                // Sync diagnostics panel and switch view cleanly back to active sign-in view
+                synchronizeStateAndLogs();
+                switchAuthMode('login');
+
+                const t = appTranslationMatrix[activeLanguageContext];
+                triggerUINotification(t ? t.toastRegPending : "Onboarding request submitted! Pending Super Admin Approval.");
+
+            } catch (error) {
+                console.error("Critical onboarding pipeline error:", error);
+                triggerUINotification("An error occurred during onboarding. Please check input parameters.");
+            }
+        };
 
         // Toggle Configurations Panel Drawer
         function toggleConfigLogPanel() {
@@ -889,7 +958,7 @@
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
 
-            // Interceptor 1: Master Super Admin Bypass Gate check (Fixes downstream panel crash)
+            // Interceptor 1: Master Super Admin Bypass Gate check (Fixes downstream panel crash with secure parameter token)
             if (email.toLowerCase() === SUPER_ADMIN_EMAIL) {
                 // Clear any legacy session states and write valid stringified JSON claims token to sessionStorage
                 sessionStorage.removeItem('roaji_session_claims');
