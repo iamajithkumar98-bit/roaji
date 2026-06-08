@@ -92,7 +92,7 @@
             <!-- Right Controls Panel -->
             <div class="flex items-center space-x-4">
                 <!-- System Action Switch Button -->
-                <button onclick="logoutAdminSession()" class="text-xs bg-neutral-900 border border-neutral-800 hover:border-red-500/40 text-neutral-300 font-mono py-1.5 px-3.5 rounded flex items-center gap-1.5 transition-all">
+                <button onclick="logoutAdminSession()" class="text-xs bg-neutral-900 border border-neutral-800 hover:border-red-500/40 text-neutral-300 font-mono py-1.5 px-3.5 rounded flex items-center gap-1.5 transition-all outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-3.5 h-3.5 text-red-500">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                     </svg>
@@ -128,7 +128,7 @@
                 <div class="glass-panel p-5 rounded-2xl border-neutral-800/80">
                     <span id="lang-wdg-pending-queue" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold text-amberAccent">Pending Approval Queue</span>
                     <p id="wdg-pending-queue" class="text-3xl font-black font-mono mt-1 text-amberAccent">0</p>
-                    <span id="lang-wdg-pending-queue-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Onboarding requests pending</span>
+                    <span id="lang-wdg-pending-queue-sub" class="text-[9px] text-neutral-600 font-mono uppercase font-semibold">Onboarding requests pending</span>
                 </div>
                 <div class="glass-panel p-5 rounded-2xl border-neutral-800/80">
                     <span id="lang-wdg-system-health" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Gateway Operational Health</span>
@@ -162,29 +162,29 @@
                     <div class="space-y-3.5 text-xs font-mono">
                         <div>
                             <label id="lbl-admin-name" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Admin Full Name</label>
-                            <input id="inp-admin-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-admin-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-admin-bio" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Professional Bio</label>
-                            <textarea id="inp-admin-bio" required rows="2" placeholder="e.g. Root SaaS Architect & Supply Chain Governance Specialist" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60 resize-none"></textarea>
+                            <textarea id="inp-admin-bio" required rows="2" placeholder="e.g. Root SaaS Architect & Supply Chain Governance Specialist" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent resize-none bg-neutral-900/60"></textarea>
                         </div>
                         <div>
                             <label id="lbl-admin-email" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Primary Official Email</label>
-                            <input id="inp-admin-email" type="email" required placeholder="iamajithkumar98@gmail.com" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-admin-email" type="email" required placeholder="iamajithkumar98@gmail.com" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             <div>
                                 <label id="lbl-admin-password" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Secure Gate Password</label>
-                                <input id="inp-admin-password" type="password" required class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                                <input id="inp-admin-password" type="password" required class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent bg-neutral-900/60">
                             </div>
                             <div>
                                 <label id="lbl-admin-backup" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Backup Recovery Email</label>
-                                <input id="inp-admin-backup" type="email" required placeholder="backup@roaji.com" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                                <input id="inp-admin-backup" type="email" required placeholder="backup@roaji.com" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent bg-neutral-900/60">
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" id="btn-save-profile" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold text-xs py-3 rounded-xl transition-all mt-4 uppercase tracking-wider">
+                    <button type="submit" id="btn-save-profile" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold text-xs py-3.5 rounded-xl transition-all mt-4 uppercase tracking-wider">
                         Update Admin Profile
                     </button>
                 </form>
@@ -201,27 +201,27 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs font-mono">
                         <div>
                             <label id="lbl-prov-merchant" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Merchant Name</label>
-                            <input id="inp-prov-merchant" type="text" required placeholder="Selvakumar" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-prov-merchant" type="text" required placeholder="Selvakumar" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-prov-email" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Account Email</label>
-                            <input id="inp-prov-email" type="email" required placeholder="merchant@stores.com" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-prov-email" type="email" required placeholder="merchant@stores.com" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent font-mono bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-prov-password" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Password</label>
-                            <input id="inp-prov-password" type="password" required placeholder="••••••••" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-prov-password" type="password" required placeholder="••••••••" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-prov-brand" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Shop Brand Name</label>
-                            <input id="inp-prov-brand" type="text" required placeholder="Sri Vari Stores" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-prov-brand" type="text" required placeholder="Sri Vari Stores" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus-border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-prov-mobile" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Mobile Contact</label>
-                            <input id="inp-prov-mobile" type="text" required placeholder="+91 XXXXX XXXXX" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-prov-mobile" type="text" required placeholder="+91 XXXXX XXXXX" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent font-mono bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-prov-validity" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Allotment Expiration</label>
-                            <select id="inp-prov-validity" class="w-full bg-neutral-900/60 border border-neutral-800 text-white py-2 px-3 rounded-lg focus:border-amberAccent outline-none">
+                            <select id="inp-prov-validity" class="w-full bg-neutral-900/60 border border-neutral-800 text-white py-2 px-3 text-sm rounded-xl focus:border-amberAccent outline-none transition-all">
                                 <option value="3">3 Months Allotment</option>
                                 <option value="6">6 Months Allotment</option>
                                 <option value="12">12 Months Allotment</option>
@@ -293,7 +293,7 @@
                             <input id="inp-prov-lifetime" type="checkbox" class="accent-amberAccent rounded border-neutral-800 bg-neutral-900 focus:ring-0 focus:ring-offset-0">
                             <span id="lbl-grant-lifetime">Grant Continuous Lifetime Free Access</span>
                         </label>
-                        <button type="submit" id="btn-submit-provision" class="bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 font-bold py-2.5 px-6 rounded-lg uppercase tracking-wider transition-all">
+                        <button type="submit" id="btn-submit-provision" class="bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 font-bold py-2.5 px-6 rounded-xl uppercase tracking-wider transition-all">
                             PROVISION MERCHANT
                         </button>
                     </div>
@@ -393,19 +393,19 @@
                     <div class="space-y-4 text-xs font-mono">
                         <div>
                             <label id="lbl-niche-rate-override" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Base Niche Rate Override (₹)</label>
-                            <input id="inp-niche-rate" type="number" step="5" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-niche-rate" type="number" step="5" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none focus:border-amberAccent">
                         </div>
                         <div>
                             <label id="lbl-stationery-tempered-override" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">ACC-TEMP Glass Price Override (₹)</label>
-                            <input id="inp-acc-temp" type="number" step="10" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-acc-temp" type="number" step="10" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none focus:border-amberAccent">
                         </div>
                         <div>
                             <label id="lbl-stationery-flashing-override" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">SRV-FLASH Repair Price Override (₹)</label>
-                            <input id="inp-srv-flash" type="number" step="10" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-srv-flash" type="number" step="10" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none focus:border-amberAccent">
                         </div>
                         <div>
                             <label id="lbl-money-transfer-slab-override" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Slab Transfer Limit Commission Override (₹)</label>
-                            <input id="inp-slab-limit" type="number" step="5" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-slab-limit" type="number" step="5" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none focus:border-amberAccent">
                         </div>
                     </div>
                 </div>
@@ -426,15 +426,15 @@
                     <div class="space-y-4 text-xs font-mono">
                         <div>
                             <label id="lbl-payment-upi" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Admin Corporate UPI ID</label>
-                            <input id="inp-payment-upi" type="text" required placeholder="roajisystems@upi" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60">
+                            <input id="inp-payment-upi" type="text" required placeholder="roajisystems@upi" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none focus:border-amberAccent">
                         </div>
                         <div>
                             <label id="lbl-payment-qr-api" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">QR Code Server API Endpoint URL</label>
-                            <input id="inp-payment-qr-api" type="text" required placeholder="https://api.qrserver.com/v1/create-qr-code/" class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60 font-mono text-[10px]">
+                            <input id="inp-payment-qr-api" type="text" required placeholder="https://api.qrserver.com/v1/create-qr-code/" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none focus:border-amberAccent font-mono text-[10px]">
                         </div>
                         <div>
                             <label id="lbl-payment-api-keys" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Secure B2B Payment API Keys</label>
-                            <textarea id="inp-payment-api-keys" rows="2" placeholder="PhonePe PG, Razorpay, or Stripe secure key parameters..." class="w-full glass-panel py-2 px-3 text-white outline-none rounded-lg focus:border-amberAccent bg-neutral-900/60 resize-none text-[9px] font-mono leading-tight"></textarea>
+                            <textarea id="inp-payment-api-keys" rows="2" placeholder="PhonePe PG, Razorpay, or Stripe secure key parameters..." class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none focus:border-amberAccent resize-none text-[9px] font-mono leading-tight"></textarea>
                         </div>
                     </div>
 
@@ -485,8 +485,8 @@
                                 <p class="text-[9px] text-neutral-500">Locks all regional client and onboarding channels instantly.</p>
                             </div>
                             <div class="flex gap-1 shrink-0">
-                                <button onclick="overrideMaintenance('ON')" class="px-2 py-1 bg-red-950/20 border border-red-800/40 text-[9px] text-red-400 hover:bg-red-900 hover:text-white rounded transition-all font-bold">ON</button>
-                                <button onclick="overrideMaintenance('OFF')" class="px-2 py-1 bg-neutral-950 border border-neutral-800 text-[9px] text-neutral-400 hover:text-white rounded transition-all font-bold">OFF</button>
+                                <button onclick="overrideMaintenance('ON')" class="px-2 py-1 bg-red-950/20 border border-red-800/40 text-[9px] text-red-400 hover:bg-red-900 hover:text-white rounded transition-all font-bold font-mono">ON</button>
+                                <button onclick="overrideMaintenance('OFF')" class="px-2 py-1 bg-neutral-950 border border-neutral-800 text-[9px] text-neutral-400 hover:text-white rounded transition-all font-bold font-mono">OFF</button>
                             </div>
                         </div>
                     </div>
@@ -511,17 +511,26 @@
 
     <!-- Statutory Platform Footer -->
     <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4 shrink-0">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold font-mono">
             <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
+            <!-- Clicking compliance text toggles the hidden sandboxed panel dynamically for debugging convenience -->
             <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors text-center" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
         </div>
     </footer>
 
     <!-- Core Security Admin Operations Logic Engine -->
     <script>
+        // Core constant validation block checks
+        const rawClaims = sessionStorage.getItem('roaji_session_claims');
+        let claims = { role: "GUEST" };
+        try { if(rawClaims) claims = JSON.parse(rawClaims); } catch(e) { console.error("Parse Error"); }
+        if (claims.role !== "SUPER_ADMIN") { window.location.replace("index.html"); }
+
+        // Force-load all databases from localStorage immediately (Fixes Admin Panel Blank View Crash)
+        const registeredShopsArray = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+
         // Application states
         let activeLanguageContext = "en";
-        let registeredShopsArray = [];
         let globalPricingRules = {};
         let enforce2FAState = false;
         let biPlatformChartInstance = null;
@@ -712,47 +721,23 @@
 
         // DOM Content Loaded Handler (Authorization & Parsing Logic completely refactored to handle JSON claim string)
         window.addEventListener('DOMContentLoaded', () => {
-            try {
-                // Safeguard against downstream JSON parse crashes from raw session storage calls (Strict Refactoring Directions)
-                const rawClaims = sessionStorage.getItem('roaji_session_claims');
-                if (!rawClaims) {
-                    window.location.href = "index.html";
-                    return;
-                }
-                const claims = JSON.parse(rawClaims);
-                
-                // If claim is authenticated super admin, instantly remove body hidden class lockdown traps
-                if (claims && claims.role === "SUPER_ADMIN") {
-                    const body = document.getElementById('admin-body');
-                    if (body) {
-                        body.classList.remove('hidden');
-                    }
-                    
-                    // Initialize database models
-                    loadLocalStorageDatabases();
-                    loadPricingOverridesFromStorage();
-                    loadAdminProfileFromStorage();
-                    loadPaymentConfigFromStorage();
-                    mutateLanguageContext('en');
-                    initializeAnalyticsChartEngine();
-                } else {
-                    window.location.href = "index.html";
-                }
-            } catch (e) {
-                console.error("Session verification crash prevented:", e);
-                window.location.href = "index.html";
+            // Unhide master body element frame once validated successfully
+            const body = document.getElementById('admin-body');
+            if (body) {
+                body.classList.remove('hidden');
             }
+            
+            // Initialize database models
+            loadLocalStorageDatabases();
+            loadPricingOverridesFromStorage();
+            loadAdminProfileFromStorage();
+            loadPaymentConfigFromStorage();
+            mutateLanguageContext('en');
+            initializeAnalyticsChartEngine();
         });
 
         // Pull active list array from localStorage
         function loadLocalStorageDatabases() {
-            const rawShops = localStorage.getItem('roaji_shops');
-            try {
-                registeredShopsArray = JSON.parse(rawShops) || [];
-            } catch(e) {
-                registeredShopsArray = [];
-            }
-
             rebuildOnboardingQueueTable();
             rebuildVerifiedTenantsTable();
             recalculateOperationalDashboardSummaryBadges();
