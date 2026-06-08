@@ -21,7 +21,7 @@
         }
     </script>
     <style>
-        /* Orange/Amber glowing tech typography text-shadow bloom effects matching Screen 510.png */
+        /* Orange/Amber glowing tech typography text-shadow bloom effects matching Screen 515.png */
         .bloom-text {
             text-shadow: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
         }
@@ -143,14 +143,14 @@
         
         <div class="w-full max-w-md mx-auto my-auto">
             
-            <!-- Centered Capsule Container (Screenshot 510.png Style Refactored for Mobile UI Resilience) -->
-            <div class="glass-capsule w-full rounded-2xl sm:rounded-3xl p-5 sm:p-8 relative overflow-hidden">
+            <!-- Centered Capsule Container (Screenshot 515.png Style Refactored for Mobile UI Resilience) -->
+            <div class="glass-capsule w-full rounded-2xl sm:rounded-3xl p-5 sm:p-8 relative overflow-hidden shadow-2xl">
                 <!-- Top delicate ambient neon line -->
                 <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amberAccent to-transparent"></div>
 
                 <!-- Apex Security Brand Emblem Header -->
                 <div class="flex flex-col items-center text-center mb-6">
-                    <!-- Flawless, non-broken valid padlock SVG emblem centered at form apex -->
+                    <!-- Complete vector orange/amber security padlock emblem centered at the apex -->
                     <div class="w-14 h-14 bg-amberAccent/5 border border-amberAccent/20 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(245,158,11,0.12)]">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-amberAccent filter drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">
                             <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
@@ -172,7 +172,7 @@
                     </button>
                 </div>
 
-                <!-- SIGN-IN TAB COMPONENT MATRIX -->
+                <!-- SIGN-IN TAB COMPONENT MATRIX (Screenshot 515.png style) -->
                 <div id="login-tab-view" class="space-y-4">
                     <form id="login-form-container" onsubmit="executeStandardLogin(event)" class="space-y-4">
                         <div>
@@ -365,7 +365,7 @@
 
     <!-- Statutory Platform Footer -->
     <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4 shrink-0">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold font-mono">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold">
             <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
             <!-- Clicking compliance text toggles the hidden sandboxed panel dynamically for debugging convenience -->
             <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors text-center" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
@@ -374,6 +374,9 @@
 
     <!-- Core Security & Onboarding Execution Scripts -->
     <script>
+        // Hardcoded Master Administrative Variable Definitions (Strict Refactoring & Handshake specs)
+        const SUPER_ADMIN_EMAIL = "iamajithkumar98@gmail.com";
+
         // System state matrices
         let activeLanguageContext = "en";
         let currentAuthTab = "login";
@@ -846,13 +849,15 @@
             const password = document.getElementById('login-password').value;
 
             // Interceptor 1: Master Super Admin Bypass Gate check
-            if (email.toLowerCase() === "iamajithkumar98@gmail.com") {
-                // Stringify proper JSON object payload to prevent JSON.parse crashes downstream
+            if (email.toLowerCase() === SUPER_ADMIN_EMAIL) {
+                // Clear any legacy session states and build a flawless structured JSON object payload
+                sessionStorage.removeItem('roaji_session_claims');
                 sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: "iamajithkumar98@gmail.com", role: "SUPER_ADMIN", status: "active" }));
                 
                 triggerUINotification(appTranslationMatrix[activeLanguageContext].toastAdminRedirect);
                 setTimeout(() => {
-                    window.location.href = "super_admin_panel.html";
+                    // Unconditional immediate routing hook
+                    window.location.replace("super_admin_panel.html");
                 }, 1500);
                 return;
             }
