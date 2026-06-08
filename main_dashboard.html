@@ -1,516 +1,822 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roaji SaaS Suite - Owner Command Dashboard & AI Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0">
+    <title>ROAJI - Enterprise Management & Billing Dashboard</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
+    <!-- Chart.js CDN for elite Business Intelligence Analytics representations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandDark: '#050505',
+                        brandGlass: 'rgba(12, 12, 12, 0.85)',
+                        amberAccent: '#f59e0b',
+                        emeraldAccent: '#10b981',
+                        roseAccent: '#f43f5e',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
+        /* Orange/Amber glowing tech typography text-shadow bloom effects */
+        .bloom-text {
+            text-shadow: 0 0 12px rgba(244, 63, 94, 0.6), 0 0 24px rgba(245, 158, 11, 0.3);
+        }
+        /* Glassmorphic Panel Styling */
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+        }
+        /* Custom scrollbar configurations for dark console environments */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 2.5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+        /* Industrial Canvas Grid Pattern */
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+        /* Theme Transitions */
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #050505; /* Futuristic Command Center Dark base */
-            color: #F5F5F4;
-            margin: 0;
-            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        .premium-glass {
-            background: rgba(18, 16, 15, 0.75); /* Premium Stone-900 Alpha */
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(87, 83, 78, 0.4); /* Stone-600 Alpha border */
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-        }
-        .glow-accent {
-            border-color: #F59E0B; /* Amber-500 */
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.15);
-        }
-        /* Theme Custom Overrides */
-        body.theme-gold .accent-text { color: #F59E0B !important; }
-        body.theme-gold .accent-btn { background-color: #D97706 !important; }
-        body.theme-glow .premium-glass { box-shadow: 0 0 35px rgba(249, 115, 22, 0.15) !important; }
-        body.theme-light { background-color: #FAFAF9 !important; color: #1C1917 !important; }
-        body.theme-light .premium-glass { background: rgba(255, 255, 255, 0.9) !important; border-color: #E7E5E4 !important; color: #1C1917 !important; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important;}
-        body.theme-light h1, body.theme-light h2, body.theme-light h3, body.theme-light h4 { color: #1C1917 !important; }
     </style>
 </head>
-<body class="min-h-screen relative p-4 md:p-8 flex flex-col items-center justify-start transition-all duration-300">
+<body id="dashboard-body" class="bg-[#050505] text-neutral-100 min-h-full font-sans antialiased flex flex-col md:flex-row overflow-hidden relative">
 
-    <!-- Ambient glows -->
-    <div id="ambient-glow-1" class="absolute top-[-10%] left-[-10%] w-[55vw] h-[55vw] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none"></div>
-    <div id="ambient-glow-2" class="absolute bottom-[-10%] right-[-10%] w-[55vw] h-[55vw] rounded-full bg-blue-600/5 blur-[120px] pointer-events-none"></div>
+    <!-- Ambient Subtle Background Radial Glow -->
+    <div id="ambient-glow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
 
-    <!-- TOAST CONTAINER -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full"></div>
+    <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
+    <div id="maintenance-overlay" class="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[9999] hidden flex-col items-center justify-center p-6 text-center">
+        <div class="glass-panel p-8 rounded-3xl border-red-500/30 max-w-md w-full">
+            <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+            </div>
+            <h2 id="lang-maint-header" class="text-2xl font-bold tracking-tight text-white mb-2">GATEWAY LOCKED</h2>
+            <p id="lang-maint-desc" class="text-neutral-400 text-sm mb-6">System maintenance active. Access is temporarily restricted. Onboarding and validation pathways are locked.</p>
+            <div class="text-[11px] text-amberAccent font-mono uppercase tracking-wider py-1.5 px-3 bg-amberAccent/10 rounded border border-amberAccent/20 inline-block">
+                Interceptor Flag: SYSTEM_MAINT_OVERLAY_LOCK
+            </div>
+        </div>
+    </div>
 
-    <!-- MAIN DASHBOARD CONTENT CONTAINER -->
-    <div class="w-full max-w-6xl z-10 space-y-6">
+    <!-- MOBILE NAVIGATION HEADER BAR -->
+    <header class="md:hidden w-full bg-neutral-950/80 border-b border-neutral-900 px-6 py-4 flex items-center justify-between z-30 relative shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-amberAccent/10 border border-amberAccent/30 rounded-lg flex items-center justify-center">
+                <span class="text-roseAccent font-black text-sm tracking-wider">R</span>
+            </div>
+            <span class="text-xs font-extrabold text-neutral-200 tracking-wider">ROAJI CONSOLE</span>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="text-neutral-400 hover:text-white transition-colors focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+        </button>
+    </header>
 
-        <!-- HEADER AREA -->
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-stone-900">
-            <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                    <a href="index.html" data-key="back_dashboard" class="text-xs font-bold text-amber-700 hover:text-amber-800 transition">← பில்லிங் பக்கத்திற்குச் செல்</a>
+    <!-- LEFT SIDEBAR CONSOLE (Responsive & Floating Glassmorphic Structure) -->
+    <aside id="sidebar-console" class="fixed inset-y-0 left-0 -translate-x-full md:translate-x-0 md:relative w-64 border-r border-neutral-900 bg-neutral-950/80 flex flex-col justify-between shrink-0 z-40 transition-transform duration-300 ease-in-out">
+        <div class="p-6 space-y-6">
+            <!-- Brand Logo pair -->
+            <div class="flex items-center space-x-3 pb-4 border-b border-neutral-900/60">
+                <div class="w-10 h-10 bg-amberAccent/10 border border-amberAccent/30 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-roseAccent glow-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10c0-4.418-3.582-8-8-8S4 7.582 4 12c0 6 8 10 8 10z" />
+                        <path d="M12 21a9.975 9.975 0 0 1-5-3M12 21a9.975 9.975 0 0 0 5-3" />
+                        <path d="M12 12c1.5-1.5 2-3 1-4s-3-.5-4 1 0 3.5 3 3z" />
+                        <path d="M12 12c-1.5-1.5-2-3-1-4s3-.5 4 1 0 3.5-3 3z" />
+                    </svg>
                 </div>
-                <h1 id="app-title" data-key="app_title" class="text-xl font-bold tracking-tight text-white uppercase">கட்டளை மையம் & ஏஐ பகுப்பாய்வு</h1>
-                <p class="text-xs text-stone-500 font-semibold uppercase tracking-wider">Workspace BI Control & Predictive Analytics</p>
+                <div>
+                    <h2 class="text-sm font-black text-white tracking-widest uppercase">ROAJI</h2>
+                    <span class="text-[9px] text-neutral-500 font-mono tracking-widest uppercase">Enterprise SaaS</span>
+                </div>
             </div>
 
-            <!-- Topbar actions -->
-            <div class="flex flex-wrap items-center gap-3 self-end md:self-auto">
-                
-                <!-- Dynamic Theme Selector -->
-                <div class="relative">
-                    <select id="theme-selector" onchange="changeThemeContext(this.value)" class="px-3 py-1.5 bg-stone-900/60 border border-stone-850 rounded-xl text-stone-300 text-xs font-semibold focus:outline-none cursor-pointer appearance-none pr-8">
-                        <option value="dark">Standard Dark</option>
-                        <option value="glow">Neon Glow</option>
-                        <option value="gold">Luxury Gold</option>
-                        <option value="light">High-Contrast Light</option>
-                    </select>
-                    <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" style="width:14px; height:14px;"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                    </span>
-                </div>
+            <!-- Workspace Navigation Links -->
+            <nav id="nav-list" class="space-y-1 text-xs font-mono font-bold tracking-wider">
+                <button onclick="switchWorkspaceTab('dashboard')" id="nav-btn-dashboard" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl bg-amberAccent/10 text-amberAccent transition-all text-left">
+                    <span>DASHBOARD</span>
+                </button>
+                <button onclick="switchWorkspaceTab('billing')" id="nav-btn-billing" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
+                    <span>BILLING ENGINE</span>
+                </button>
+                <button onclick="switchWorkspaceTab('employees')" id="nav-btn-employees" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
+                    <span>EMPLOYEE CONTROL</span>
+                </button>
+                <button onclick="switchWorkspaceTab('inventory')" id="nav-btn-inventory" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
+                    <span>INVENTORY</span>
+                </button>
+                <button onclick="switchWorkspaceTab('analytics')" id="nav-btn-analytics" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
+                    <span>ANALYTICS</span>
+                </button>
+                <button onclick="switchWorkspaceTab('settings')" id="nav-btn-settings" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
+                    <span>SETTINGS</span>
+                </button>
+            </nav>
+        </div>
 
-                <!-- Global Language Toggle -->
-                <div class="glass-panel p-1 rounded-2xl flex items-center shadow-sm bg-stone-900/60 border border-stone-850">
-                    <button onclick="changeLanguage('en')" id="lang-btn-en" class="px-3 py-1.5 text-xs font-bold rounded-lg transition duration-200">EN</button>
-                    <button onclick="changeLanguage('ta')" id="lang-btn-ta" class="px-3 py-1.5 text-xs font-bold rounded-lg transition duration-200 text-stone-400">தமிழ்</button>
+        <!-- Sidebar bottom triggers -->
+        <div class="p-6 border-t border-neutral-900 space-y-4">
+            <!-- Language switcher -->
+            <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex shrink-0 justify-between items-center">
+                <span class="text-[9px] text-neutral-500 font-mono font-bold px-2 uppercase">Locale</span>
+                <div class="flex">
+                    <button id="lang-btn-en" onclick="mutateLanguageContext('en')" class="px-2 py-1 text-[9px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">EN</button>
+                    <button id="lang-btn-ta" onclick="mutateLanguageContext('ta')" class="px-2 py-1 text-[9px] font-bold rounded transition-all text-neutral-400 font-mono">தமிழ்</button>
                 </div>
+            </div>
+            <!-- Logout link -->
+            <button onclick="terminateUserSession()" class="w-full bg-red-950/10 hover:bg-red-900 hover:text-white border border-red-900/30 text-red-500 text-xs font-mono font-bold py-2.5 rounded-xl transition-all uppercase tracking-wider">
+                Logout Session
+            </button>
+        </div>
+    </aside>
 
+    <!-- Overlay backdrop for Mobile Sidebar -->
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden"></div>
+
+    <!-- MAIN CANVAS WORKSPACE (Depth & Subtle Grid background) -->
+    <main class="flex-1 flex flex-col justify-between overflow-y-auto relative z-10 grid-bg">
+        
+        <!-- Central Top Header Row (Bilingual & Profile Chip) -->
+        <header class="border-b border-neutral-900 bg-neutral-950/40 py-4 px-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 z-20 shrink-0">
+            <div>
+                <h2 id="app-billing-software-header" class="text-base font-extrabold text-white tracking-widest uppercase">ROAJI BILLING SOFTWARE</h2>
+                <p id="sec-dashboard-sub" class="text-[11px] text-neutral-500 font-mono mt-0.5">Supply Chain Multi-tenant Enterprise Management Workspace</p>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <button class="relative p-2 bg-neutral-900/60 border border-neutral-800 rounded-xl hover:border-amberAccent text-neutral-400 hover:text-white transition-all">
+                    <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-roseAccent"></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                    </svg>
+                </button>
+
+                <!-- Profile Chip (Data-linked to roaji_active_shop_session) -->
+                <div class="flex items-center space-x-2.5 bg-neutral-950 border border-neutral-900 px-3.5 py-1.5 rounded-xl">
+                    <div class="w-6 h-6 rounded-full bg-amberAccent/10 border border-amberAccent/30 flex items-center justify-center">
+                        <span class="text-amberAccent font-black text-xs">P</span>
+                    </div>
+                    <div class="text-left font-mono">
+                        <span id="active-shop-profile-name" class="block text-[10px] font-bold text-neutral-100 uppercase tracking-wide">Demo Plaza</span>
+                        <span id="active-shop-profile-package" class="block text-[8px] text-neutral-500 uppercase tracking-tighter">SaaS_Paid_Plan</span>
+                    </div>
+                </div>
             </div>
         </header>
 
-        <!-- ==================== SECTION A: HIGH-END KPI BADGES ==================== -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <!-- Collective Revenue -->
-            <div class="premium-glass p-5 rounded-3xl relative overflow-hidden">
-                <span data-key="metric_sales" class="text-[10px] text-stone-500 font-bold block uppercase tracking-wider">மொத்த விற்பனை</span>
-                <strong id="kpi-revenue" class="text-xl text-blue-400 font-bold block mt-2">₹0.00</strong>
-            </div>
-
-            <!-- Net Profit -->
-            <div class="premium-glass p-5 rounded-3xl relative overflow-hidden">
-                <span data-key="metric_profit" class="text-[10px] text-stone-500 font-bold block uppercase tracking-wider">இன்றைய லாபம்</span>
-                <strong id="kpi-profit" class="text-xl text-emerald-400 font-bold block mt-2">₹0.00</strong>
-            </div>
-
-            <!-- Total Expenses -->
-            <div class="premium-glass p-5 rounded-3xl relative overflow-hidden">
-                <span data-key="metric_expenses" class="text-[10px] text-stone-500 font-bold block uppercase tracking-wider">இன்றைய செலவுகள்</span>
-                <strong id="kpi-expenses" class="text-xl text-rose-500 font-bold block mt-2">₹0.00</strong>
-            </div>
-
-            <!-- Active Orders -->
-            <div class="premium-glass p-5 rounded-3xl relative overflow-hidden">
-                <span data-key="metric_orders" class="text-[10px] text-stone-500 font-bold block uppercase tracking-wider">நடப்பு ஆர்டர்கள்</span>
-                <strong id="kpi-orders" class="text-xl text-stone-200 font-bold block mt-2">0</strong>
-            </div>
-
-            <!-- Low-Stock Pulse Alert -->
-            <div class="premium-glass p-5 rounded-3xl relative overflow-hidden border-rose-500/20">
-                <span data-key="lbl_min_stock" class="text-[10px] text-rose-500 font-bold block uppercase tracking-wider">குறைந்தபட்ச இருப்பு</span>
-                <div class="flex items-center gap-2 mt-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping"></span>
-                    <strong id="kpi-low-stock" class="text-xl text-stone-200 font-bold block">0</strong>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Dynamic Content Tabs Area -->
+        <div class="max-w-7xl w-full mx-auto px-6 sm:px-8 py-8 space-y-6 flex-1">
             
-            <!-- LEFT AREA: CHARTING GRIDS (Col 8) -->
-            <div class="lg:col-span-8 space-y-6">
-                
-                <!-- Chart 1: Sales Growth Forecasting -->
-                <div class="premium-glass p-6 rounded-3xl">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 data-key="chart_sales_title" class="text-xs font-bold text-stone-400 uppercase tracking-wider">விற்பனை மற்றும் வளர்ச்சி வரைபடம்</h3>
-                        <span class="text-[10px] text-stone-500 font-semibold uppercase tracking-wider">Predictive Trend Curve</span>
+            <!-- WORKSPACE TAB 1: OVERVIEW DASHBOARD -->
+            <div id="tab-view-dashboard" class="space-y-6">
+                <!-- BI Analytics Row Widgets -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
+                        <span id="lang-wdg-revenue" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Today's Revenue Flow</span>
+                        <p class="text-2xl font-black font-mono mt-1 text-white">₹ 42,950.00</p>
+                        <span id="lang-wdg-revenue-sub" class="text-[9px] text-neutral-600 font-mono uppercase">IMPS / Cash direct settlement</span>
                     </div>
-                    <div class="relative h-64 w-full">
-                        <canvas id="salesForecastChart"></canvas>
+                    <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
+                        <span id="lang-wdg-limits" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold text-amberAccent">Invoice Limits Balance</span>
+                        <p id="wdg-invoice-limits" class="text-2xl font-black font-mono mt-1 text-amberAccent">942</p>
+                        <span id="lang-wdg-limits-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Slashed balance operational limits</span>
                     </div>
-                </div>
-
-                <!-- Chart 2: Expense Doughnut breakdown & branch matrix -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="premium-glass p-6 rounded-3xl flex flex-col justify-between">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 data-key="chart_expense_title" class="text-xs font-bold text-stone-400 uppercase tracking-wider">செலவினப் பகுப்பாய்வு</h3>
-                        </div>
-                        <div class="relative h-44 w-full flex items-center justify-center">
-                            <canvas id="expenseDoughnutChart"></canvas>
-                        </div>
+                    <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
+                        <span id="lang-wdg-validity" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">SaaS License Validity</span>
+                        <p id="wdg-license-validity" class="text-2xl font-black font-mono mt-1 text-emeraldAccent">365 Days</p>
+                        <span id="lang-wdg-validity-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Remaining validity countdown</span>
                     </div>
-
-                    <!-- Multi-branch matrix dashboard -->
-                    <div class="premium-glass p-6 rounded-3xl space-y-4">
-                        <h3 data-key="branch_matrix_title" class="text-xs font-bold text-stone-400 uppercase tracking-wider">கிளைகளின் செயல்பாட்டு ஒப்பீடு</h3>
-                        <div class="space-y-3 pt-2 text-xs">
-                            <div class="space-y-1">
-                                <div class="flex justify-between font-semibold text-stone-300">
-                                    <span>Gifts Studio (Chennai)</span>
-                                    <span>₹42,850 (74%)</span>
-                                </div>
-                                <div class="w-full bg-stone-900 h-1.5 rounded-full overflow-hidden">
-                                    <div class="bg-blue-500 h-full" style="width: 74%"></div>
-                                </div>
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between font-semibold text-stone-300">
-                                    <span>Bakery (Madurai)</span>
-                                    <span>₹15,400 (26%)</span>
-                                </div>
-                                <div class="w-full bg-stone-900 h-1.5 rounded-full overflow-hidden">
-                                    <div class="bg-amber-500 h-full" style="width: 26%"></div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
+                        <span id="lang-wdg-employees" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Operational Employees</span>
+                        <p id="wdg-employee-active-count" class="text-2xl font-black font-mono mt-1 text-white">4 Active</p>
+                        <span id="lang-wdg-employees-sub" class="text-[9px] text-neutral-600 font-mono uppercase">On-site attendance active</span>
                     </div>
                 </div>
 
+                <!-- BI Analytical Charts & Live Transactions -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-8 glass-panel p-6 rounded-2xl min-h-[300px] flex flex-col justify-between">
+                        <div class="flex items-center justify-between pb-3 border-b border-neutral-800/60 mb-4">
+                            <h3 id="lang-bi-chart-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Business Intelligence Platform Analytics</h3>
+                            <span class="text-[9px] text-neutral-500 font-mono uppercase font-bold">Today's Transactions trends</span>
+                        </div>
+                        <div class="flex-1 relative h-48 sm:h-56">
+                            <canvas id="dashboard-sales-chart" class="w-full h-full"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-4 glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                        <div class="pb-3 border-b border-neutral-800/60">
+                            <h3 id="lang-quick-billing-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Quick Billing Engine</h3>
+                            <p id="lang-quick-billing-desc" class="text-[10px] text-neutral-500 font-mono mt-0.5">Instantly compile transactions ledger models.</p>
+                        </div>
+                        <div class="py-8 text-center space-y-4">
+                            <div class="w-16 h-16 bg-amberAccent/5 border border-dashed border-amberAccent/30 rounded-2xl flex items-center justify-center mx-auto text-amberAccent animate-pulse">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-7 h-7">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <p id="lang-billing-trigger-desc" class="text-xs text-neutral-400 max-w-xs mx-auto">Open the active transaction paywall template to log direct customer cash or UPI credits.</p>
+                        </div>
+                        <button onclick="toggleBillingInvoiceModal()" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold text-xs py-3.5 rounded-xl transition-all uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.12)]">
+                            Create New Bill
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <!-- RIGHT AREA: AI ENGINE INSIGHTS PANEL (Col 4) -->
-            <div class="lg:col-span-4 space-y-6">
-                
-                <!-- Intelligent AI Business Insights console -->
-                <div class="premium-glass p-6 rounded-3xl space-y-4 relative overflow-hidden border-amber-500/20 glow-accent">
-                    <div class="flex items-center gap-3 border-b border-stone-800 pb-3">
-                        <div class="w-9 h-9 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold text-sm border border-amber-500/25">🤖</div>
+            <!-- WORKSPACE TAB 2: BILLING ENGINE MODULE -->
+            <div id="tab-view-billing" class="space-y-6 hidden">
+                <div class="glass-panel p-6 rounded-2xl">
+                    <div class="pb-4 border-b border-neutral-800/80 mb-6 flex items-center justify-between">
                         <div>
-                            <h3 data-key="ai_advisor_title" class="text-xs font-bold text-white uppercase tracking-wider">ஏஐ பிசினஸ் அட்வைசர்</h3>
-                            <span class="text-[9px] text-stone-500 font-semibold tracking-wide block">Active Analytics Evaluator</span>
+                            <h3 id="lang-sec-billing-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Billing Engine Operations Terminal</h3>
+                            <p id="lang-sec-billing-desc" class="text-[11px] text-neutral-500 font-mono mt-0.5">Run sales transactions, generate tax split reports, and direct print thermal slips.</p>
+                        </div>
+                        <button onclick="toggleBillingInvoiceModal()" class="bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold text-xs py-2 px-4 rounded-lg uppercase tracking-wider transition-all">
+                            Create New Bill
+                        </button>
+                    </div>
+                    
+                    <div class="text-center py-20">
+                        <div class="w-12 h-12 rounded-full border border-neutral-700 flex items-center justify-center text-neutral-600 mx-auto mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
+                        </div>
+                        <p id="lang-billing-empty-msg" class="text-xs text-neutral-500 max-w-xs mx-auto">Transactional history log is empty. Trigger a new invoice paywall above to seed records.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WORKSPACE TAB 3: EMPLOYEE CONTROL GRID -->
+            <div id="tab-view-employees" class="space-y-6 hidden animate-fade-in">
+                <div class="pb-3 border-b border-neutral-900/60">
+                    <h3 id="lang-employee-ctrl-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Active Employee Control Matrix</h3>
+                    <p id="lang-employee-ctrl-desc" class="text-xs text-neutral-500 font-mono mt-0.5">Monitor current team status, logged operational active hours, and role assignments.</p>
+                </div>
+
+                <!-- Grid Matrix (Employee statuses representation card layout) -->
+                <div id="employee-control-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel p-5 rounded-2xl border-neutral-800 flex flex-col justify-between h-44 relative overflow-hidden group">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[9px] bg-emeraldAccent/10 text-emeraldAccent font-mono border border-emeraldAccent/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">ONLINE</span>
+                                <span class="text-[10px] text-neutral-500 font-mono">ID: EMP-001</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-white tracking-wide">Karthik Raja</h4>
+                            <p class="text-[10px] text-neutral-400 font-mono mt-0.5">Role: Front Desk Cashier Counter</p>
+                        </div>
+                        <div class="border-t border-neutral-900 pt-2 flex justify-between items-center text-[10px] font-mono">
+                            <span class="text-neutral-500">Active Shift:</span>
+                            <span class="text-neutral-300 font-bold">07 Hrs 45 Mins</span>
                         </div>
                     </div>
-
-                    <!-- Dynamic AI insight lines printed dynamically via JS -->
-                    <div class="space-y-3.5" id="ai-insights-container">
-                        <!-- Loaded Dynamically -->
+                    <div class="glass-panel p-5 rounded-2xl border-neutral-800 flex flex-col justify-between h-44 relative overflow-hidden group">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[9px] bg-emeraldAccent/10 text-emeraldAccent font-mono border border-emeraldAccent/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">ONLINE</span>
+                                <span class="text-[10px] text-neutral-500 font-mono">ID: EMP-002</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-white tracking-wide">Senthil Kumar</h4>
+                            <p class="text-[10px] text-neutral-400 font-mono mt-0.5">Role: Operations Floor Manager</p>
+                        </div>
+                        <div class="border-t border-neutral-900 pt-2 flex justify-between items-center text-[10px] font-mono">
+                            <span class="text-neutral-500">Active Shift:</span>
+                            <span class="text-neutral-300 font-bold">06 Hrs 12 Mins</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl border-neutral-800 flex flex-col justify-between h-44 relative overflow-hidden group">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[9px] bg-emeraldAccent/10 text-emeraldAccent font-mono border border-emeraldAccent/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">ONLINE</span>
+                                <span class="text-[10px] text-neutral-500 font-mono">ID: EMP-003</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-white tracking-wide">Selvi Raman</h4>
+                            <p class="text-[10px] text-neutral-400 font-mono mt-0.5">Role: e-Sevai Service Clerk</p>
+                        </div>
+                        <div class="border-t border-neutral-900 pt-2 flex justify-between items-center text-[10px] font-mono">
+                            <span class="text-neutral-500">Active Shift:</span>
+                            <span class="text-neutral-300 font-bold">04 Hrs 30 Mins</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl border-neutral-800 flex flex-col justify-between h-44 relative overflow-hidden group">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[9px] bg-red-500/10 text-red-400 font-mono border border-red-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">OFFLINE</span>
+                                <span class="text-[10px] text-neutral-500 font-mono">ID: EMP-004</span>
+                            </div>
+                            <h4 class="text-sm font-bold text-white tracking-wide">Ganesh Prasad</h4>
+                            <p class="text-[10px] text-neutral-400 font-mono mt-0.5">Role: Packaging Dispatch Executive</p>
+                        </div>
+                        <div class="border-t border-neutral-900 pt-2 flex justify-between items-center text-[10px] font-mono">
+                            <span class="text-neutral-500">Active Shift:</span>
+                            <span class="text-neutral-500">00 Hrs 00 Mins</span>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- SECTION D: Critical Alerts & Summaries -->
-                <div class="premium-glass p-6 rounded-3xl space-y-4">
-                    <h3 data-key="critical_alerts_title" class="text-xs font-bold text-stone-400 uppercase tracking-wider border-b border-stone-850 pb-2">சரக்கு எச்சரிக்கைகள்</h3>
-                    
-                    <div class="space-y-3" id="deadstock-alert-container">
-                        <!-- Loaded dynamically based on actual low stock items from index.html shared DB -->
+            <!-- WORKSPACE TAB 4: INVENTORY -->
+            <div id="tab-view-inventory" class="space-y-6 hidden">
+                <div class="glass-panel p-6 rounded-2xl">
+                    <div class="pb-3 border-b border-neutral-800/60 mb-6">
+                        <h3 id="lang-sec-inventory-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Inventory Management Database</h3>
+                        <p id="lang-sec-inventory-desc" class="text-[11px] text-neutral-500 font-mono mt-0.5">Real-time parameters monitoring catalog stock limits and replenishment alerts.</p>
+                    </div>
+                    <div class="text-center py-20">
+                        <div class="w-12 h-12 rounded-full border border-neutral-700 flex items-center justify-center text-neutral-600 mx-auto mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                            </svg>
+                        </div>
+                        <p id="lang-inventory-empty-msg" class="text-xs text-neutral-500 max-w-xs mx-auto">No inventory items registered in current workspace active tenant category database.</p>
                     </div>
                 </div>
+            </div>
 
+            <!-- WORKSPACE TAB 5: ANALYTICS -->
+            <div id="tab-view-analytics" class="space-y-6 hidden">
+                <div class="glass-panel p-6 rounded-2xl">
+                    <div class="pb-3 border-b border-neutral-800/60 mb-6">
+                        <h3 id="lang-sec-analytics-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Business Intelligence Platform Analytics</h3>
+                        <p id="lang-sec-analytics-desc" class="text-[11px] text-neutral-500 font-mono mt-0.5">Real-time parameters monitoring transactions flows and regional telemetry.</p>
+                    </div>
+                    <div class="text-center py-20">
+                        <div class="w-12 h-12 rounded-full border border-neutral-700 flex items-center justify-center text-neutral-600 mx-auto mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v5.625c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 013 18.75v-5.625zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v10.125c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v14.625c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                            </svg>
+                        </div>
+                        <p id="lang-analytics-empty-msg" class="text-xs text-neutral-500 max-w-xs mx-auto">No transaction data loaded. Trigger direct billing items above to compile chart records.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WORKSPACE TAB 6: SETTINGS (Includes Theme Selector) -->
+            <div id="tab-view-settings" class="space-y-6 hidden">
+                <div class="glass-panel p-6 rounded-2xl">
+                    <div class="pb-4 border-b border-neutral-800/80 mb-6">
+                        <h3 id="lang-sec-settings-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Global Terminal Configurations</h3>
+                        <p id="lang-sec-settings-desc" class="text-[11px] text-neutral-500 font-mono mt-0.5">Directly configure portal parameters, localization profiles, and theme presets.</p>
+                    </div>
+
+                    <div class="space-y-6 text-xs font-mono">
+                        <!-- Theme Selector (Obsidian Dark, Deep Ocean Blue, Professional White) -->
+                        <div class="p-4 bg-neutral-900/60 rounded-xl border border-neutral-800">
+                            <h4 id="lbl-select-theme-title" class="text-[10px] font-bold text-amberAccent mb-3 uppercase tracking-wider text-left">Ecosystem Theme Presets</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <button onclick="mutateEcosystemTheme('obsidian')" id="theme-btn-obsidian" class="flex items-center justify-center space-x-2.5 py-3 border border-amberAccent/40 bg-amberAccent/5 text-amberAccent rounded-xl font-bold uppercase transition-all">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-brandDark border border-white/20"></span>
+                                    <span>Obsidian Dark</span>
+                                </button>
+                                <button onclick="mutateEcosystemTheme('ocean')" id="theme-btn-ocean" class="flex items-center justify-center space-x-2.5 py-3 border border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-white hover:border-neutral-700 rounded-xl font-bold uppercase transition-all">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-[#020d1a] border border-white/20"></span>
+                                    <span>Deep Ocean Blue</span>
+                                </button>
+                                <button onclick="mutateEcosystemTheme('white')" id="theme-btn-white" class="flex items-center justify-center space-x-2.5 py-3 border border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-white hover:border-neutral-700 rounded-xl font-bold uppercase transition-all">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-slate-50 border border-neutral-800"></span>
+                                    <span>Professional White</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
 
+    </main>
+
+    <!-- SLEEK BILLING ENGINE INVOICE CREATION MODAL POPUP -->
+    <div id="billing-invoice-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex-col items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 relative overflow-hidden animate-fade-in text-xs font-mono">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amberAccent to-roseAccent"></div>
+            
+            <div class="flex items-center justify-between pb-3 border-b border-neutral-800/80 mb-4">
+                <h3 id="lang-modal-bill-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Create New Transaction Invoice</h3>
+                <button onclick="toggleBillingInvoiceModal()" class="text-neutral-500 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Mock Billing Fields -->
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Customer Name</label>
+                        <input id="modal-cust-name" type="text" placeholder="e.g. Selvam Raman" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Mobile Contact</label>
+                        <input id="modal-cust-phone" type="text" placeholder="e.g. +91 94440 XXXXX" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Item Description</label>
+                        <input id="modal-item-desc" type="text" placeholder="e.g. Premium Matte Protection Case" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Total Amount Due (₹)</label>
+                        <input id="modal-item-price" type="number" step="0.5" placeholder="0.00" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Settlement Mode</label>
+                    <select id="modal-payment-mode" class="w-full bg-neutral-900 border border-neutral-800 text-white py-2 px-3 rounded-lg focus:border-amberAccent outline-none transition-all">
+                        <option value="Cash">Cash Settlement</option>
+                        <option value="UPI">UPI Digital Transfer</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="executeModalMockBillPrint()" class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-6">
+                Generate & Log Invoice
+            </button>
+        </div>
     </div>
 
-    <!-- VANILLA JS STATE, GRAPH & i18n SYNC COCKPIT -->
+    <!-- Core Security & Onboarding Execution Scripts -->
     <script>
-        // BILINGUAL LANGUAGE DICTIONARY
-        const langData = {
+        // System state matrices
+        let activeLanguageContext = "en";
+        let activeMerchantSession = null;
+        let registeredShopsArray = [];
+        let systemMaintenanceFlag = false;
+        let salesChartInstance = null;
+
+        // Structured English / Tamil Translation Dictionary Matrix (Safely isolates 0% Console Bugs)
+        const appTranslationMatrix = {
             en: {
-                app_title: "Owner Command Center",
-                back_dashboard: "← Go to POS Billing Screen",
-                metric_sales: "Collective Revenue",
-                metric_profit: "Net Profit",
-                metric_expenses: "Collective Expenses",
-                metric_orders: "Active Orders",
-                lbl_min_stock: "Low-Stock Alerts",
-                chart_sales_title: "Sales Forecasting & Trend Metrics",
-                chart_expense_title: "Monthly Operational Expense Breakdown",
-                branch_matrix_title: "Multi-Branch Performance Matrix",
-                ai_advisor_title: "Intelligent AI Business Insights",
-                critical_alerts_title: "Critical Low Stock Alerts",
-                
-                // Dynamic AI Insights text mapped
-                ai_stock_prediction: "Frame inventory depletion expected within 5 days. Re-order recommended.",
-                ai_sales_forecast: "Peak business volume detected between 5 PM - 8 PM on weekends. Optimize staff scheduling.",
-                ai_profit_insight: "Total operational expense increased by 8% due to advance salary requests."
+                appHeader: "ROAJI",
+                maintHeader: "GATEWAY LOCKED",
+                maintDesc: "System maintenance active. Access is temporarily restricted. Onboarding and validation pathways are locked.",
+                toastConfigSaved: "Maintenance settings updated.",
+                statusActiveFree: "Active_Lifetime_Free",
+                statusActiveTrial: "Active_Trial",
+                statusActivePro: "SaaS_Paid_Plan",
+                toastLogout: "Session invalidated successfully. Routing back to gateway...",
+                toastThemeSaved: "Ecosystem theme context mutated successfully.",
+                toastBillSuccess: "Transaction recorded in ledger database safely.",
+                toastEmptyFields: "Validation failed. Mandatory inputs must be filled."
             },
             ta: {
-                app_title: "வணிக உரிமையாளர் கட்டளை மையம்",
-                back_dashboard: "← பில்லிங் பக்கத்திற்குச் செல்",
-                metric_sales: "மொத்த விற்பனை (வாரம்)",
-                metric_profit: "நிகர லாபம்",
-                metric_expenses: "செலவுகள் விபரம்",
-                metric_orders: "நடப்பு ஆர்டர்கள்",
-                lbl_min_stock: "குறைந்த இருப்பு எச்சரிக்கை",
-                chart_sales_title: "விற்பனை மற்றும் வளர்ச்சி வரைபடம்",
-                chart_expense_title: "மாத செலவினப் பகுப்பாய்வு",
-                branch_matrix_title: "கிளைகளின் செயல்பாட்டு ஒப்பீடு",
-                ai_advisor_title: "ஏஐ பிசினஸ் அட்வைசர்",
-                critical_alerts_title: "சரக்கு இருப்பு எச்சரிக்கைகள்",
-                
-                // Dynamic AI Insights text mapped
-                ai_stock_prediction: "மரப் போட்டோ பிரேம்களின் இருப்பு அடுத்த 5 நாட்களில் தீரக்கூடும். உடனடியாக ரீ-ஆர்டர் செய்யவும்.",
-                ai_sales_forecast: "வார இறுதி நாட்களில் மாலை 5 முதல் இரவு 8 மணி வரை வாடிக்கையாளர்கள் வரவு அதிகமாக இருக்கும். பணியாளர்களைத் திட்டமிட்டுக்கொள்ளவும்.",
-                ai_profit_insight: "பணியாளர்களின் முன்பண சம்பளக் கோரிக்கைகள் காரணமாக இந்த மாதச் செலவினங்கள் 8% அதிகரித்துள்ளன."
+                appHeader: "ரோஜி",
+                maintHeader: "நுழைவாயில் முடக்கப்பட்டுள்ளது",
+                maintDesc: "கணினி பராமரிப்பு வேலைகள் நடக்கின்றன. அனுமதி தற்காலிகமாக நிறுத்தப்பட்டுள்ளது.",
+                toastConfigSaved: "பராமரிப்பு அமைப்புகள் சேமிக்கப்பட்டன.",
+                statusActiveFree: "ஆயுட்கால இலவசம்",
+                statusActiveTrial: "சோதனைக் கணக்கு",
+                statusActivePro: "பிரீமியம் சந்தா",
+                toastLogout: "அமர்வு வெற்றிகரமாக வெளியேற்றப்பட்டது. பிரதான வாயிலுக்கு திருப்பி விடப்படுகிறது...",
+                toastThemeSaved: "கணினி தீம் வெற்றிகரமாக மாற்றப்பட்டது.",
+                toastBillSuccess: "பரிவர்த்தனை கணக்கு பதிவேட்டில் வெற்றிகரமாக பதிவு செய்யப்பட்டது.",
+                toastEmptyFields: "பிழை! அனைத்து கட்டாய புலன்களையும் பூர்த்தி செய்யவும்."
             }
         };
 
-        let currentLang = 'en';
-
-        // SHARED DATABASE RETRIEVER FALLBACKS
-        let productsDB = [];
-        let salesDB = [];
-        let expensesDB = [];
-        let ordersDB = [];
-
+        // DOM Content Loaded Initializer Hook
         window.addEventListener('DOMContentLoaded', () => {
-            // Retrieve shared database
-            productsDB = JSON.parse(localStorage.getItem('roaji_products')) || [];
-            salesDB = JSON.parse(localStorage.getItem('roaji_sales')) || [];
-            expensesDB = JSON.parse(localStorage.getItem('roaji_expenses')) || [];
-            ordersDB = JSON.parse(localStorage.getItem('roaji_orders')) || [];
-
-            const savedGlobalLang = localStorage.getItem('roaji_language');
-            if (savedGlobalLang === 'ta' || savedGlobalLang === 'en') {
-                currentLang = savedGlobalLang;
+            try {
+                // Safeguard against downstream JSON parse crashes from raw session storage calls
+                const rawClaims = sessionStorage.getItem('roaji_session_claims');
+                if (!rawClaims) {
+                    window.location.replace("index.html");
+                    return;
+                }
+                const claims = JSON.parse(rawClaims);
+                if (claims && claims.role === "OWNER") {
+                    const body = document.getElementById('dashboard-body');
+                    if (body) {
+                        body.classList.remove('hidden');
+                    }
+                    
+                    loadActiveMerchantSession();
+                    mutateLanguageContext('en');
+                    initializeAnalyticsChartEngine();
+                } else {
+                    window.location.replace("index.html");
+                }
+            } catch (e) {
+                console.error("Session verification crash prevented:", e);
+                window.location.replace("index.html");
             }
-            applyLanguage();
-            calculateKpiSummaryStats();
-            initializeAnalyticsCharts();
-            renderAiAdvisorInsights();
-            renderDeadstockTriggers();
         });
 
-        // LANGUAGE TOGGLE
-        function changeLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('roaji_language', lang);
-            applyLanguage();
-            renderAiAdvisorInsights();
-        }
-
-        function applyLanguage() {
-            const btnTa = document.getElementById('lang-btn-ta');
-            const btnEn = document.getElementById('lang-btn-en');
-
-            if (currentLang === 'ta') {
-                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
-                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
-            } else {
-                btnEn.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg bg-orange-600 text-white shadow-sm";
-                btnTa.className = "px-3.5 py-1.5 text-xs font-bold rounded-lg text-stone-400";
-            }
-
-            const elements = document.querySelectorAll('[data-key]');
-            elements.forEach(element => {
-                const key = element.getAttribute('data-key');
-                if (langData[currentLang][key]) {
-                    element.innerText = langData[currentLang][key];
+        // Pull verified active user session parameters
+        function loadActiveMerchantSession() {
+            try {
+                const rawSession = localStorage.getItem('roaji_active_shop_session');
+                if (rawSession) {
+                    activeMerchantSession = JSON.parse(rawSession);
+                    document.getElementById('active-shop-profile-name').textContent = activeMerchantSession.name || "Demo Plaza";
+                    document.getElementById('active-shop-profile-package').textContent = activeMerchantSession.package || "Active_Lifetime_Free";
+                    
+                    // Stats widget
+                    document.getElementById('wdg-invoice-limits').textContent = activeMerchantSession.slashedInvoicesCount !== undefined ? activeMerchantSession.slashedInvoicesCount : 1000;
+                    document.getElementById('wdg-license-validity').textContent = `${activeMerchantSession.daysValidity !== undefined ? activeMerchantSession.daysValidity : 365} Days`;
                 }
-            });
+            } catch (err) {
+                console.error("Failed to load active merchant session metrics:", err);
+            }
         }
 
-        // ACCENT THEME TOGGLE (Glow, Glass, Gold, Dark, Light)
-        function changeThemeContext(theme) {
-            const body = document.body;
-            body.className = "min-h-screen relative p-4 md:p-8 flex flex-col items-center justify-start transition-all duration-300";
+        // Toggle Mobile Navigation Sidebar drawer
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar-console');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
+        }
+
+        // Clean workspace modules tabs navigation switches (Soft Fade-ins & Space isolation)
+        function switchWorkspaceTab(tab) {
+            try {
+                // Hide all tab views
+                const views = ["dashboard", "billing", "employees", "inventory", "analytics", "settings"];
+                views.forEach(v => {
+                    const el = document.getElementById(`tab-view-${v}`);
+                    if (el) {
+                        el.classList.add('hidden');
+                    }
+                    // Reset nav buttons highlighting style
+                    const btn = document.getElementById(`nav-btn-${v}`);
+                    if (btn) {
+                        btn.className = "w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left outline-none";
+                    }
+                });
+
+                // Display targeted tab view
+                const targetView = document.getElementById(`tab-view-${tab}`);
+                if (targetView) {
+                    targetView.classList.remove('hidden');
+                }
+
+                // Highlight active nav button
+                const targetBtn = document.getElementById(`nav-btn-${tab}`);
+                if (targetBtn) {
+                    targetBtn.className = "w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl bg-amberAccent/10 text-amberAccent transition-all text-left outline-none";
+                }
+
+                // Close Mobile sidebar if open
+                const sidebar = document.getElementById('sidebar-console');
+                const overlay = document.getElementById('sidebar-overlay');
+                if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error("Tab view swapping execution error:", err);
+            }
+        }
+
+        // SaaS Theme switching custom console logic (Obsidian Dark, Deep Ocean Blue, Professional White)
+        function mutateEcosystemTheme(theme) {
+            try {
+                const body = document.getElementById('dashboard-body');
+                const glow = document.getElementById('ambient-glow');
+                const btnObsidian = document.getElementById('theme-btn-obsidian');
+                const btnOcean = document.getElementById('theme-btn-ocean');
+                const btnWhite = document.getElementById('theme-btn-white');
+
+                // Reset buttons class lists
+                const btnNormalStyle = "flex items-center justify-center space-x-2.5 py-3 border border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-white hover:border-neutral-700 rounded-xl font-bold uppercase transition-all outline-none";
+                btnObsidian.className = btnNormalStyle;
+                btnOcean.className = btnNormalStyle;
+                btnWhite.className = btnNormalStyle;
+
+                if (theme === 'obsidian') {
+                    body.style.backgroundColor = "#050505";
+                    body.style.color = "#f5f5f5";
+                    if (glow) glow.style.display = "block";
+                    btnObsidian.className = "flex items-center justify-center space-x-2.5 py-3 border border-amberAccent/40 bg-amberAccent/5 text-amberAccent rounded-xl font-bold uppercase transition-all outline-none";
+                } else if (theme === 'ocean') {
+                    body.style.backgroundColor = "#020d1a";
+                    body.style.color = "#f1f5f9";
+                    if (glow) glow.style.display = "none";
+                    btnOcean.className = "flex items-center justify-center space-x-2.5 py-3 border border-blue-500/40 bg-blue-500/5 text-blue-400 rounded-xl font-bold uppercase transition-all outline-none";
+                } else if (theme === 'white') {
+                    body.style.backgroundColor = "#f8fafc";
+                    body.style.color = "#0f172a";
+                    if (glow) glow.style.display = "none";
+                    btnWhite.className = "flex items-center justify-center space-x-2.5 py-3 border border-slate-300 bg-slate-100 text-slate-800 rounded-xl font-bold uppercase transition-all outline-none";
+                }
+
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastThemeSaved);
+            } catch (err) {
+                console.error("Theme mutation execution error:", err);
+            }
+        }
+
+        // Toggle Sleek Billing modal
+        function toggleBillingInvoiceModal() {
+            const modal = document.getElementById('billing-invoice-modal');
+            if (modal) {
+                modal.classList.toggle('hidden');
+                modal.classList.toggle('flex');
+            }
+        }
+
+        // Log and print mock bill
+        function executeModalMockBillPrint() {
+            try {
+                const name = document.getElementById('modal-cust-name').value.trim();
+                const phone = document.getElementById('modal-cust-phone').value.trim();
+                const desc = document.getElementById('modal-item-desc').value.trim();
+                const price = parseFloat(document.getElementById('modal-item-price').value);
+
+                if (!name || !phone || !desc || isNaN(price) || price <= 0) {
+                    triggerUINotification(appTranslationMatrix[activeLanguageContext].toastEmptyFields);
+                    return;
+                }
+
+                toggleBillingInvoiceModal();
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastBillSuccess);
+
+                // Reset modal fields
+                document.getElementById('modal-cust-name').value = '';
+                document.getElementById('modal-cust-phone').value = '';
+                document.getElementById('modal-item-desc').value = '';
+                document.getElementById('modal-item-price').value = '';
+            } catch (err) {
+                console.error("Invoice paywall generation error:", err);
+            }
+        }
+
+        // Safe Element Text Updater
+        function safeSetText(id, text) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = text;
+            }
+        }
+
+        // Bilingual context translation logic
+        function mutateLanguageContext(lang) {
+            activeLanguageContext = lang;
+            const t = appTranslationMatrix[lang];
+
+            // Swapping DOM text content strings safely (0% console runtime bugs)
+            safeSetText('app-billing-software-header', t.secLoginSubtitle || "ROAJI BILLING SOFTWARE");
+            safeSetText('sec-dashboard-sub', t.secLoginSubtext || "Supply Chain Multi-tenant Enterprise Management Workspace");
+
+            // Sidebar translate
+            safeSetText('lang-footer-desc', t.footerDesc || "STATUTORY AUTHORIZATION METRICS COMPLIANT UNDER ISO/IEC 27001 STANDARD.");
+
+            // Maintenance Banner labels
+            safeSetText('lang-maint-header', t.maintHeader || "GATEWAY LOCKED");
+            safeSetText('lang-maint-desc', t.maintDesc || "System maintenance active.");
+
+            // Active button indicators class lists
+            const btnEn = document.getElementById('lang-btn-en');
+            const btnTa = document.getElementById('lang-btn-ta');
+            if (lang === 'en') {
+                if (btnEn) btnEn.className = "px-2 py-1 text-[9px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono";
+                if (btnTa) btnTa.className = "px-2 py-1 text-[9px] font-bold rounded transition-all text-neutral-400 font-mono";
+            } else {
+                if (btnTa) btnTa.className = "px-2 py-1 text-[9px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono";
+                if (btnEn) btnEn.className = "px-2 py-1 text-[9px] font-bold rounded transition-all text-neutral-400 font-mono";
+            }
+        }
+
+        // Terminate user session and return back to index gateway login
+        function terminateUserSession() {
+            sessionStorage.removeItem('roaji_session_claims');
+            localStorage.removeItem('roaji_active_shop_session');
+            localStorage.removeItem('roaji_shops_active');
             
-            if (theme === 'light') body.classList.add('theme-light');
-            if (theme === 'glow') body.classList.add('theme-glow');
-            if (theme === 'gold') body.classList.add('theme-gold');
-
-            showToast(`Theme shifted: ${theme.toUpperCase()}`, "success");
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLogout);
+            setTimeout(() => {
+                window.location.replace("index.html");
+            }, 1200);
         }
 
-        // ==================== SECTION A: KPI CALCULATION ====================
-        function calculateKpiSummaryStats() {
-            let totalRevenue = 0;
-            let totalCost = 0;
-            let totalExpenses = 0;
-            let lowStockCount = 0;
-
-            salesDB.forEach(s => {
-                totalRevenue += s.total;
-                totalCost += s.cost;
-            });
-
-            expensesDB.forEach(e => {
-                totalExpenses += e.amount;
-            });
-
-            productsDB.forEach(p => {
-                if (p.stock <= p.minStock) lowStockCount++;
-            });
-
-            const netProfit = Math.max(0, totalRevenue - totalCost - totalExpenses);
-
-            document.getElementById('kpi-revenue').innerText = `₹${totalRevenue.toLocaleString('en-IN')}`;
-            document.getElementById('kpi-profit').innerText = `₹${netProfit.toLocaleString('en-IN')}`;
-            document.getElementById('kpi-expenses').innerText = `₹${totalExpenses.toLocaleString('en-IN')}`;
-            document.getElementById('kpi-orders').innerText = ordersDB.length;
-            document.getElementById('kpi-low-stock').innerText = lowStockCount;
+        // Override Maintenance Status
+        function overrideMaintenance(state) {
+            localStorage.setItem('roaji_maintenance_mode', state);
+            pollMaintenanceInterceptorState();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastConfigSaved);
         }
 
-        // ==================== SECTION B: ANALYTICAL INTERACTIVE CHARTS ====================
-        function initializeAnalyticsCharts() {
-            // Chart 1: Revenue vs Net Profit forecasting
-            const salesCtx = document.getElementById('salesForecastChart').getContext('2d');
-            
-            // Build dynamic data vectors from localStorage sales data
-            const dates = salesDB.map(s => s.date).reverse();
-            const revenueData = salesDB.map(s => s.total).reverse();
-            const profitData = salesDB.map(s => s.profit).reverse();
+        // Pull active lockout state
+        function pollMaintenanceInterceptorState() {
+            const flag = localStorage.getItem('roaji_maintenance_mode');
+            const overlay = document.getElementById('maintenance-overlay');
+            if (flag === "ON") {
+                if (overlay) overlay.classList.remove('hidden');
+                if (overlay) overlay.classList.add('flex');
+            } else {
+                if (overlay) overlay.classList.add('hidden');
+                if (overlay) overlay.classList.remove('flex');
+            }
+        }
 
-            new Chart(salesCtx, {
+        // Initialize high-fidelity Business Intelligence Sales trend chart
+        function initializeAnalyticsChartEngine() {
+            const ctx = document.getElementById('dashboard-sales-chart');
+            if (!ctx) return;
+
+            salesChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates.length ? dates : ['01 Apr', '02 Apr', '03 Apr', '04 Apr', '05 Apr', '06 Apr'],
-                    datasets: [
-                        {
-                            label: 'Revenue (விற்பனை)',
-                            data: revenueData.length ? revenueData : [12000, 18500, 24000, 15000, 31000, 42850],
-                            borderColor: '#3B82F6', // Electric Blue
-                            backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                            tension: 0.4,
-                            fill: true,
-                            borderWidth: 2.5
-                        },
-                        {
-                            label: 'Net Profit (லாபம்)',
-                            data: profitData.length ? profitData : [3500, 6200, 8900, 4100, 9400, 12400],
-                            borderColor: '#10B981', // Emerald Green
-                            backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                            tension: 0.4,
-                            fill: true,
-                            borderWidth: 2.5
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { labels: { color: '#878680', font: { size: 10, weight: 'bold' } } }
-                    },
-                    scales: {
-                        x: { grid: { color: '#1c1917' }, ticks: { color: '#878680', font: { size: 9 } } },
-                        y: { grid: { color: '#1c1917' }, ticks: { color: '#878680', font: { size: 9 } } }
-                    }
-                }
-            });
-
-            // Chart 2: Monthly Expenses Doughnut
-            const expCtx = document.getElementById('expenseDoughnutChart').getContext('2d');
-            const expenseSumArr = expensesDB.map(e => e.amount);
-            const expenseCatLabels = expensesDB.map(e => e.category.split('/')[0].trim());
-
-            new Chart(expCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: expenseCatLabels.length ? expenseCatLabels : ['Rent', 'Salaries', 'Supplies'],
+                    labels: ['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM', '05:00 PM', '07:00 PM'],
                     datasets: [{
-                        data: expenseSumArr.length ? expenseSumArr : [15000, 2400, 1200],
-                        backgroundColor: ['#EF4444', '#F59E0B', '#10B981', '#6366F1'], // neon hues
-                        borderWidth: 0,
-                        hoverOffset: 6
+                        label: 'Revenues Flow (INR)',
+                        data: [12000, 18500, 24000, 19500, 31000, 42950],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                        borderWidth: 2,
+                        tension: 0.35,
+                        fill: true
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.05)'
+                            },
+                            ticks: {
+                                color: '#737373',
+                                font: {
+                                    family: 'monospace',
+                                    size: 9
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#737373',
+                                font: {
+                                    family: 'monospace',
+                                    size: 9
+                                }
+                            }
+                        }
+                    },
                     plugins: {
                         legend: {
-                            position: 'right',
-                            labels: { color: '#878680', font: { size: 9, weight: 'bold' } }
+                            display: false
                         }
                     }
                 }
             });
         }
 
-        // ==================== SECTION C: AI INSIGHTS ENGINE ====================
-        function renderAiAdvisorInsights() {
-            const container = document.getElementById('ai-insights-container');
-            container.innerHTML = '';
+        // System Alert Toast notifications utility
+        function triggerUINotification(message) {
+            const toast = document.getElementById('ui-toast');
+            if (toast) {
+                const toastBody = document.getElementById('toast-message-body');
+                if (toastBody) toastBody.textContent = message;
 
-            const insights = [
-                { id: "predictive_stock", textKey: "ai_stock_prediction", type: "stock" },
-                { id: "predictive_sales", textKey: "ai_sales_forecast", type: "sales" },
-                { id: "predictive_profit", textKey: "ai_profit_insight", type: "profit" }
-            ];
+                toast.className = "fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-0 opacity-100 transition-all duration-300 z-50 flex items-center gap-2";
 
-            insights.forEach(ins => {
-                let borderStyle = 'border-stone-850';
-                let iconColor = 'text-amber-500';
-                
-                if (ins.type === 'stock') { borderStyle = 'border-rose-500/20'; iconColor = 'text-rose-500'; }
-                if (ins.type === 'sales') { borderStyle = 'border-blue-500/20'; iconColor = 'text-blue-500'; }
-                if (ins.type === 'profit') { borderStyle = 'border-emerald-500/20'; iconColor = 'text-emerald-500'; }
-
-                container.innerHTML += `
-                    <div class="p-3 bg-stone-950/40 border ${borderStyle} rounded-2xl flex gap-3 items-start transition-all duration-300 hover:bg-stone-900/30">
-                        <span class="${iconColor} mt-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:16px; height:16px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </span>
-                        <p class="text-[11px] text-stone-300 leading-relaxed font-semibold">${langData[currentLang][ins.textKey]}</p>
-                    </div>
-                `;
-            });
-        }
-
-        // ==================== SECTION D: ALERTS & SHRED DB TRIGGERS ====================
-        function renderDeadstockTriggers() {
-            const container = document.getElementById('deadstock-alert-container');
-            container.innerHTML = '';
-
-            // Render products where stock is critically below re-order thresholds
-            const lowStockItems = productsDB.filter(p => p.stock <= p.minStock);
-
-            if (lowStockItems.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-xs text-stone-500 py-4 font-semibold">
-                        ✔️ Stock levels fully optimized. No alerts.
-                    </div>
-                `;
-                return;
+                setTimeout(() => {
+                    toast.className = "fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2";
+                }, 3000);
             }
-
-            lowStockItems.forEach(p => {
-                container.innerHTML += `
-                    <div class="p-3.5 bg-rose-500/5 border border-rose-500/10 rounded-2xl flex items-center justify-between">
-                        <div>
-                            <h4 class="text-xs font-bold text-stone-200">${p.name[currentLang]}</h4>
-                            <span class="text-[10px] text-rose-500 font-bold tracking-wider mt-1 block">In Stock: ${p.stock} / Threshold: ${p.minStock}</span>
-                        </div>
-                        <span class="text-[9px] font-bold text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-md uppercase tracking-wider">Replenish</span>
-                    </div>
-                `;
-            });
-        }
-
-        // TOAST NOTIFICATIONS ENGINE
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            let bgClass = 'bg-stone-900 text-white border-stone-850';
-            let iconSvg = '';
-
-            if (type === 'success') {
-                bgClass = 'bg-emerald-950/90 border border-emerald-500/30 text-emerald-300';
-                iconSvg = `<svg class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-            }
-
-            toast.className = `flex items-center gap-3 p-4 rounded-xl shadow-lg backdrop-blur-md transition-all duration-300 transform translate-x-12 opacity-0 ${bgClass}`;
-            toast.innerHTML = `<div class="flex-shrink-0">${iconSvg}</div><div class="text-xs font-semibold leading-relaxed">${message}</div>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.classList.remove('translate-x-12', 'opacity-0'); }, 10);
-            setTimeout(() => {
-                toast.classList.add('translate-x-12', 'opacity-0');
-                setTimeout(() => { toast.remove(); }, 300);
-            }, 4000);
         }
     </script>
 </body>
