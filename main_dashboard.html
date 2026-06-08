@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0">
-    <title>ROAJI - Enterprise Management & Billing Dashboard</title>
+    <title>ROAJI - Master Ledger Dashboard</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN for elite Business Intelligence Analytics representations -->
@@ -62,53 +62,19 @@
                 linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
         }
-        /* Dynamic Theme Transitions */
-        body {
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
     </style>
 </head>
-<body id="dashboard-body" class="bg-[#050505] text-neutral-100 min-h-full font-sans antialiased flex flex-col md:flex-row overflow-hidden relative">
+<body class="bg-[#050505] text-neutral-100 min-h-full font-sans antialiased flex flex-col justify-between relative overflow-y-auto grid-bg">
 
     <!-- Ambient Subtle Background Radial Glow -->
-    <div id="ambient-glow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
 
-    <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
-    <div id="maintenance-overlay" class="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[9999] hidden flex-col items-center justify-center p-6 text-center">
-        <div class="glass-panel p-8 rounded-3xl border-red-500/30 max-w-md w-full">
-            <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 animate-pulse">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                </svg>
-            </div>
-            <h2 id="lang-maint-header" class="text-2xl font-bold tracking-tight text-white mb-2">WORKSPACE LOCKED</h2>
-            <p id="lang-maint-desc" class="text-neutral-400 text-sm mb-6">System maintenance active. Workspace routing and micro-services are temporarily frozen. Standard selections are locked.</p>
-            <div class="text-[11px] text-amberAccent font-mono uppercase tracking-wider py-1.5 px-3 bg-amberAccent/10 rounded border border-amberAccent/20 inline-block">
-                Interceptor Flag: SYSTEM_MAINT_OVERLAY_LOCK
-            </div>
-        </div>
-    </div>
-
-    <!-- MOBILE NAVIGATION HEADER BAR -->
-    <header class="md:hidden w-full bg-neutral-950/80 border-b border-neutral-900 px-6 py-4 flex items-center justify-between z-30 relative shrink-0">
-        <div class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-amberAccent/10 border border-amberAccent/30 rounded-lg flex items-center justify-center">
-                <span class="text-roseAccent font-black text-sm tracking-wider">R</span>
-            </div>
-            <span id="active-mobile-brand-title" class="text-xs font-extrabold text-neutral-200 tracking-wider">ROAJI CONSOLE</span>
-        </div>
-        <button onclick="toggleMobileSidebar()" class="text-neutral-400 hover:text-white transition-colors focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-        </button>
-    </header>
-
-    <!-- LEFT SIDEBAR CONSOLE (Responsive & Floating Glassmorphic Structure) -->
-    <aside id="sidebar-console" class="fixed inset-y-0 left-0 -translate-x-full md:translate-x-0 md:relative w-64 border-r border-neutral-900 bg-neutral-950/80 flex flex-col justify-between shrink-0 z-40 transition-transform duration-300 ease-in-out h-full md:h-auto">
-        <div class="p-6 space-y-6">
-            <!-- Brand Logo pair -->
-            <div class="flex items-center space-x-3 pb-4 border-b border-neutral-900/60">
+    <!-- Master Header Row -->
+    <header class="relative z-10 border-b border-neutral-900 bg-neutral-950/60 sticky top-0 backdrop-blur-md shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            
+            <!-- Left Branding Identity -->
+            <div class="flex items-center space-x-3.5">
                 <div class="w-10 h-10 bg-amberAccent/10 border border-amberAccent/30 rounded-xl flex items-center justify-center">
                     <svg class="w-6 h-6 text-roseAccent glow-rose animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10c0-4.418-3.582-8-8-8S4 7.582 4 12c0 6 8 10 8 10z" />
@@ -118,321 +84,110 @@
                     </svg>
                 </div>
                 <div>
-                    <h2 class="text-sm font-black text-white tracking-widest uppercase">ROAJI</h2>
-                    <span class="text-[9px] text-neutral-500 font-mono tracking-widest uppercase">Enterprise SaaS</span>
+                    <h1 id="app-title-header" class="text-sm font-extrabold text-neutral-100 tracking-wider uppercase font-sans">
+                        ROAJI // MASTER LEDGER DASHBOARD
+                    </h1>
+                    <div class="text-[11px] text-neutral-500 font-mono flex items-center gap-1.5 mt-0.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emeraldAccent animate-pulse"></span>
+                        <span id="active-session-info">Global Ledger Status: Synchronization Verified</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Workspace Navigation Links -->
-            <nav id="nav-list" class="space-y-1 text-xs font-mono font-bold tracking-wider">
-                <button onclick="switchWorkspaceTab('dashboard')" id="nav-btn-dashboard" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl bg-amberAccent/10 text-amberAccent transition-all text-left">
-                    <span>DASHBOARD</span>
-                </button>
-                <button onclick="switchWorkspaceTab('billing')" id="nav-btn-billing" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
-                    <span>BILLING ENGINE</span>
-                </button>
-                <button onclick="switchWorkspaceTab('employees')" id="nav-btn-employees" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
-                    <span>EMPLOYEE CONTROL</span>
-                </button>
-                <button onclick="switchWorkspaceTab('inventory')" id="nav-btn-inventory" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
-                    <span>INVENTORY</span>
-                </button>
-                <button onclick="switchWorkspaceTab('analytics')" id="nav-btn-analytics" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
-                    <span>ANALYTICS</span>
-                </button>
-                <button onclick="switchWorkspaceTab('settings')" id="nav-btn-settings" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left">
-                    <span>SETTINGS</span>
-                </button>
-            </nav>
-        </div>
-
-        <!-- Sidebar bottom triggers -->
-        <div class="p-6 border-t border-neutral-900 space-y-4">
-            <!-- Dynamic hot-reload refresh engine trigger -->
-            <button onclick="refreshDashboardUI()" class="w-full bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[10px] text-neutral-400 hover:text-amberAccent font-mono py-2 rounded-xl transition-all uppercase tracking-wider flex items-center justify-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                </svg>
-                <span>HOT RELOAD HUB</span>
-            </button>
-
-            <!-- Language switcher -->
-            <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex shrink-0 justify-between items-center">
-                <span class="text-[9px] text-neutral-500 font-mono font-bold px-2 uppercase">Locale</span>
-                <div class="flex">
-                    <button id="lang-btn-en" onclick="mutateLanguageContext('en')" class="px-2.5 py-1 text-[9px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">EN</button>
-                    <button id="lang-btn-ta" onclick="mutateLanguageContext('ta')" class="px-2.5 py-1 text-[9px] font-bold rounded transition-all text-neutral-400 font-mono">தமிழ்</button>
-                </div>
-            </div>
-            <!-- Logout link -->
-            <button onclick="terminateUserSession()" class="w-full bg-red-950/10 hover:bg-red-900 hover:text-white border border-red-900/30 text-red-500 text-xs font-mono font-bold py-2.5 rounded-xl transition-all uppercase tracking-wider">
-                Logout Session
-            </button>
-        </div>
-    </aside>
-
-    <!-- Overlay backdrop for Mobile Sidebar -->
-    <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden md:hidden"></div>
-
-    <!-- MAIN CANVAS WORKSPACE (Depth & Subtle Grid background) -->
-    <main class="flex-1 flex flex-col justify-between overflow-y-auto relative z-10 grid-bg">
-        
-        <!-- Central Top Header Row (Bilingual & Profile Chip) -->
-        <header class="border-b border-neutral-900 bg-neutral-950/40 py-4 px-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 z-20 shrink-0">
-            <div>
-                <h2 id="app-billing-software-header" class="text-base font-extrabold text-white tracking-widest uppercase">ROAJI BILLING SOFTWARE</h2>
-                <p id="sec-dashboard-sub" class="text-[11px] text-neutral-500 font-mono mt-0.5">Supply Chain Multi-tenant Enterprise Management Workspace</p>
-            </div>
-            
+            <!-- Right Controls Panel -->
             <div class="flex items-center space-x-4">
-                <!-- Notification Bell -->
-                <button class="relative p-2 bg-neutral-900/60 border border-neutral-800 rounded-xl hover:border-amberAccent text-neutral-400 hover:text-white transition-all">
-                    <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-roseAccent animate-ping"></span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                <!-- System Action Reload Button -->
+                <button onclick="hotReloadLedgerData()" class="text-xs bg-neutral-900 border border-neutral-800 hover:border-amberAccent/40 text-neutral-300 font-mono py-1.5 px-3.5 rounded flex items-center gap-1.5 transition-all outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
                     </svg>
+                    <span id="lang-btn-refresh">Reload Ledger</span>
                 </button>
 
-                <!-- Profile Chip (Data-linked to roaji_active_shop_session) -->
-                <div class="flex items-center space-x-2.5 bg-neutral-950 border border-neutral-900 px-3.5 py-1.5 rounded-xl">
-                    <div class="w-6 h-6 rounded-full bg-amberAccent/10 border border-amberAccent/30 flex items-center justify-center">
-                        <span class="text-amberAccent font-black text-xs">P</span>
-                    </div>
-                    <div class="text-left font-mono">
-                        <span id="active-shop-profile-name" class="block text-[10px] font-bold text-neutral-100 uppercase tracking-wide">-- Loading --</span>
-                        <span id="active-shop-profile-package" class="block text-[8px] text-neutral-500 uppercase tracking-tighter">-- Loading Package --</span>
-                    </div>
+                <!-- Language Toggle switcher row -->
+                <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex shrink-0">
+                    <button id="lang-toggle-en" onclick="mutateLanguageContext('en')" class="px-2.5 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">
+                        EN
+                    </button>
+                    <button id="lang-toggle-ta" onclick="mutateLanguageContext('ta')" class="px-2.5 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono">
+                        தமிழ்
+                    </button>
                 </div>
             </div>
-        </header>
 
-        <!-- Dynamic Content Tabs Area -->
-        <div class="max-w-7xl w-full mx-auto px-6 sm:px-8 py-8 space-y-6 flex-1">
+        </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        <!-- Business Intelligence Analytics Row Widgets -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
+                <span id="lang-wdg-total-revenue" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-bold">Total Combined Revenue</span>
+                <p id="wdg-total-revenue" class="text-2xl font-black font-mono mt-1 text-white">₹ 0.00</p>
+                <span id="lang-wdg-total-revenue-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Aggregated sales across 13 niches</span>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
+                <span id="lang-wdg-total-expenses" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-bold">Total Operations Expenses</span>
+                <p id="wdg-total-expenses" class="text-2xl font-black font-mono mt-1 text-red-400">₹ 0.00</p>
+                <span id="lang-wdg-total-expenses-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Packaging & materials disbursements</span>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
+                <span id="lang-wdg-net-profit" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-bold">Net Profit Balance</span>
+                <p id="wdg-net-profit" class="text-2xl font-black font-mono mt-1 text-emeraldAccent">₹ 0.00</p>
+                <span id="lang-wdg-net-profit-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Calculated net yield margins</span>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
+                <span id="lang-wdg-low-stock" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-bold">Low Stock Alerts</span>
+                <p id="wdg-low-stock" class="text-2xl font-black font-mono mt-1 text-roseAccent">0</p>
+                <span id="lang-wdg-low-stock-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Breached reorder threshold limits</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- WORKSPACE TAB 1: OVERVIEW DASHBOARD -->
-            <div id="tab-view-dashboard" class="space-y-6">
-                <!-- SaaS Dynamic Control Metrics Widgets (Part 5 Subscription Matrix) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
-                        <span id="lang-wdg-revenue" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Today's Revenue Flow</span>
-                        <p class="text-2xl font-black font-mono mt-1 text-white">₹ 42,950.00</p>
-                        <span id="lang-wdg-revenue-sub" class="text-[9px] text-neutral-600 font-mono uppercase">IMPS / Cash direct settlement</span>
-                    </div>
-                    <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
-                        <span id="lang-wdg-limits" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold text-amberAccent">Remaining Invoices Limit</span>
-                        <p id="wdg-invoice-limits" class="text-2xl font-black font-mono mt-1 text-amberAccent">1000</p>
-                        <span id="lang-wdg-limits-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Slashed balance operational limits</span>
-                    </div>
-                    <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
-                        <span id="lang-wdg-validity" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Workspace Operational Days</span>
-                        <p id="wdg-license-validity" class="text-2xl font-black font-mono mt-1 text-emeraldAccent">365 Days</p>
-                        <span id="lang-wdg-validity-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Remaining validity countdown</span>
-                    </div>
-                    <div class="glass-panel p-5 rounded-2xl border-neutral-800/80 hover:border-amberAccent/30 transition-all group">
-                        <span id="lang-wdg-employees" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Operational Employees</span>
-                        <p id="wdg-employee-active-count" class="text-2xl font-black font-mono mt-1 text-white">4 Active</p>
-                        <span id="lang-wdg-employees-sub" class="text-[9px] text-neutral-600 font-mono uppercase">On-site attendance active</span>
-                    </div>
+            <!-- BI Bar Charts: Module Sales Performance representation -->
+            <div class="lg:col-span-8 glass-panel p-6 rounded-2xl flex flex-col justify-between min-h-[350px]">
+                <div class="flex items-center justify-between pb-3 border-b border-neutral-800/60 mb-4">
+                    <h3 id="lang-sec-performance-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Workspace Module Sales Performance</h3>
+                    <span class="text-[9px] text-neutral-500 font-mono uppercase font-bold">Today's Transactions trends</span>
                 </div>
-
-                <!-- BI Analytical Charts & Live Transactions -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-8 glass-panel p-6 rounded-2xl min-h-[300px] flex flex-col justify-between">
-                        <div class="flex items-center justify-between pb-3 border-b border-neutral-800/60 mb-4">
-                            <h3 id="lang-bi-chart-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Business Intelligence Platform Analytics</h3>
-                            <span class="text-[9px] text-neutral-500 font-mono uppercase font-bold">Today's Transactions trends</span>
-                        </div>
-                        <div class="flex-1 relative h-48 sm:h-56">
-                            <canvas id="dashboard-sales-chart" class="w-full h-full"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="lg:col-span-4 glass-panel p-6 rounded-2xl flex flex-col justify-between">
-                        <div class="pb-3 border-b border-neutral-800/60">
-                            <h3 id="lang-quick-billing-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Quick Billing Engine</h3>
-                            <p id="lang-quick-billing-desc" class="text-[10px] text-neutral-500 font-mono mt-0.5">Instantly compile transactions ledger models.</p>
-                        </div>
-                        <div class="py-8 text-center space-y-4">
-                            <div class="w-16 h-16 bg-amberAccent/5 border border-dashed border-amberAccent/30 rounded-2xl flex items-center justify-center mx-auto text-amberAccent">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-7 h-7 animate-bounce">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <p id="lang-billing-trigger-desc" class="text-xs text-neutral-400 max-w-xs mx-auto">Open the active transaction paywall template to log direct customer cash or UPI credits.</p>
-                        </div>
-                        <button onclick="toggleBillingInvoiceModal()" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold text-xs py-3.5 rounded-xl transition-all uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.12)]">
-                            Create New Bill
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Multi-Business Supported Dynamic Grid Integration (Part 2 Layout Matrix) -->
-                <div class="space-y-4 pt-4">
-                    <div>
-                        <h3 id="lang-grid-title" class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Multi-Business Core Matrix</h3>
-                        <p id="lang-grid-desc" class="text-xs text-neutral-500 font-mono mt-0.5">Select active operations workspace node to route transaction ledger. grayscaled options denote locked sub-POS licenses.</p>
-                    </div>
-
-                    <div id="business-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        <!-- Populated dynamically via Javascript based on selectShops array status (Active/Emerald vs Locked/Grayscale) -->
-                    </div>
+                <div class="flex-1 relative h-48 sm:h-56">
+                    <canvas id="performance-bar-chart" class="w-full h-full"></canvas>
                 </div>
             </div>
 
-            <!-- WORKSPACE TAB 2: BILLING ENGINE MODULE -->
-            <div id="tab-view-billing" class="space-y-6 hidden">
-                <div class="glass-panel p-6 rounded-2xl">
-                    <div class="pb-4 border-b border-neutral-800/80 mb-6 flex items-center justify-between">
-                        <div>
-                            <h3 id="lang-sec-billing-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Billing Engine Operations Terminal</h3>
-                            <p id="lang-sec-billing-desc" class="text-[11px] text-neutral-500 font-mono mt-0.5">Run sales transactions, generate tax split reports, and direct print thermal slips.</p>
-                        </div>
-                        <button onclick="toggleBillingInvoiceModal()" class="bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold text-xs py-2 px-4 rounded-lg uppercase tracking-wider transition-all">
-                            Create New Bill
-                        </button>
+            <!-- Inventory Low Stock Alerts Table Grid -->
+            <div class="lg:col-span-4 glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                <div>
+                    <div class="pb-3 border-b border-neutral-800/60 mb-4">
+                        <h3 id="lang-sec-stock-alerts-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Statutory Reorder Alerts</h3>
+                        <p id="lang-sec-stock-alerts-desc" class="text-[10px] text-neutral-500 font-mono mt-0.5">Critical inventory items requiring stock replenishment.</p>
                     </div>
                     
-                    <div class="text-center py-20">
-                        <div class="w-12 h-12 rounded-full border border-neutral-700 flex items-center justify-center text-neutral-600 mx-auto mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                            </svg>
-                        </div>
-                        <p id="lang-billing-empty-msg" class="text-xs text-neutral-500 max-w-xs mx-auto">Transactional history log is empty. Trigger a new invoice paywall above to seed records.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- WORKSPACE TAB 3: EMPLOYEE CONTROL GRID -->
-            <div id="tab-view-employees" class="space-y-6 hidden animate-fade-in">
-                <div class="pb-3 border-b border-neutral-900/60">
-                    <h3 id="lang-employee-ctrl-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Active Employee Control Matrix</h3>
-                    <p id="lang-employee-ctrl-desc" class="text-xs text-neutral-500 font-mono mt-0.5">Monitor current team status, logged operational active hours, and role assignments.</p>
-                </div>
-
-                <!-- Grid Matrix (Employee statuses representation card layout) -->
-                <div id="employee-control-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="glass-panel p-5 rounded-2xl border-neutral-800 flex flex-col justify-between h-44 relative overflow-hidden group">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-[9px] bg-emeraldAccent/10 text-emeraldAccent font-mono border border-emeraldAccent/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">ONLINE</span>
-                                <span class="text-[10px] text-neutral-500 font-mono">ID: EMP-001</span>
+                    <div class="overflow-y-auto max-h-[220px]">
+                        <table class="w-full text-[11px] font-mono leading-tight">
+                            <thead>
+                                <tr class="border-b border-neutral-800 text-[10px] font-mono text-neutral-500 text-left uppercase tracking-wider">
+                                    <th id="th-item" class="pb-2">Item Name</th>
+                                    <th id="th-module" class="pb-2">Module Source</th>
+                                    <th id="th-stock" class="pb-2 text-right">Stock Qty</th>
+                                    <th id="th-reorder" class="pb-2 text-right">Threshold</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stock-alerts-tbody" class="divide-y divide-neutral-800/30 text-neutral-300">
+                                <!-- Populated dynamically based on inventory key loop checks -->
+                            </tbody>
+                        </table>
+                        <!-- Table empty state fallback -->
+                        <div id="stock-alerts-empty" class="py-10 flex flex-col items-center justify-center text-center">
+                            <div class="w-9 h-9 rounded-full border border-dashed border-neutral-700 flex items-center justify-center text-neutral-600 mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                             </div>
-                            <h4 class="text-sm font-bold text-white tracking-wide">Karthik Raja</h4>
-                            <p class="text-[10px] text-neutral-400 font-mono mt-0.5">Role: Front Desk Cashier Counter</p>
-                        </div>
-                        <div class="border-t border-neutral-900 pt-2 flex justify-between items-center text-[10px] font-mono">
-                            <span class="text-neutral-500">Active Shift:</span>
-                            <span class="text-neutral-300 font-bold">07 Hrs 45 Mins</span>
-                        </div>
-                    </div>
-                    <div class="glass-panel p-5 rounded-2xl border-neutral-800 flex flex-col justify-between h-44 relative overflow-hidden group">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-[9px] bg-emeraldAccent/10 text-emeraldAccent font-mono border border-emeraldAccent/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">ONLINE</span>
-                                <span class="text-[10px] text-neutral-500 font-mono">ID: EMP-002</span>
-                            </div>
-                            <h4 class="text-sm font-bold text-white tracking-wide">Senthil Kumar</h4>
-                            <p class="text-[10px] text-neutral-400 font-mono mt-0.5">Role: Operations Floor Manager</p>
-                        </div>
-                        <div class="border-t border-neutral-900 pt-2 flex justify-between items-center text-[10px] font-mono">
-                            <span class="text-neutral-500">Active Shift:</span>
-                            <span class="text-neutral-300 font-bold">06 Hrs 12 Mins</span>
-                        </div>
-                    </div>
-                    <div class="glass-panel p-5 rounded-2xl border-neutral-800 flex flex-col justify-between h-44 relative overflow-hidden group">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-[9px] bg-emeraldAccent/10 text-emeraldAccent font-mono border border-emeraldAccent/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">ONLINE</span>
-                                <span class="text-[10px] text-neutral-500 font-mono">ID: EMP-003</span>
-                            </div>
-                            <h4 class="text-sm font-bold text-white tracking-wide">Selvi Raman</h4>
-                            <p class="text-[10px] text-neutral-400 font-mono mt-0.5">Role: e-Sevai Service Clerk</p>
-                        </div>
-                        <div class="border-t border-neutral-900 pt-2 flex justify-between items-center text-[10px] font-mono">
-                            <span class="text-neutral-500">Active Shift:</span>
-                            <span class="text-neutral-300 font-bold">04 Hrs 30 Mins</span>
-                        </div>
-                    </div>
-                    <div class="glass-panel p-5 rounded-2xl border-neutral-800 flex flex-col justify-between h-44 relative overflow-hidden group">
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-[9px] bg-red-500/10 text-red-400 font-mono border border-red-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">OFFLINE</span>
-                                <span class="text-[10px] text-neutral-500 font-mono">ID: EMP-004</span>
-                            </div>
-                            <h4 class="text-sm font-bold text-white tracking-wide">Ganesh Prasad</h4>
-                            <p class="text-[10px] text-neutral-400 font-mono mt-0.5">Role: Packaging Dispatch Executive</p>
-                        </div>
-                        <div class="border-t border-neutral-900 pt-2 flex justify-between items-center text-[10px] font-mono">
-                            <span class="text-neutral-500">Active Shift:</span>
-                            <span class="text-neutral-500">00 Hrs 00 Mins</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- WORKSPACE TAB 4: INVENTORY -->
-            <div id="tab-view-inventory" class="space-y-6 hidden">
-                <div class="glass-panel p-6 rounded-2xl">
-                    <div class="pb-3 border-b border-neutral-800/60 mb-6">
-                        <h3 id="lang-sec-inventory-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Inventory Management Database</h3>
-                        <p id="lang-sec-inventory-desc" class="text-[11px] text-neutral-500 font-mono mt-0.5">Real-time parameters monitoring catalog stock limits and replenishment alerts.</p>
-                    </div>
-                    <div class="text-center py-20">
-                        <div class="w-12 h-12 rounded-full border border-neutral-700 flex items-center justify-center text-neutral-600 mx-auto mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-                            </svg>
-                        </div>
-                        <p id="lang-inventory-empty-msg" class="text-xs text-neutral-500 max-w-xs mx-auto">No inventory items registered in current workspace active tenant category database.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- WORKSPACE TAB 5: ANALYTICS -->
-            <div id="tab-view-analytics" class="space-y-6 hidden">
-                <div class="glass-panel p-6 rounded-2xl">
-                    <div class="pb-3 border-b border-neutral-800/60 mb-6">
-                        <h3 id="lang-sec-analytics-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Business Intelligence Platform Analytics</h3>
-                        <p id="lang-sec-analytics-desc" class="text-[11px] text-neutral-500 font-mono mt-0.5">Real-time parameters monitoring transactions flows and regional telemetry.</p>
-                    </div>
-                    <div class="text-center py-20">
-                        <div class="w-12 h-12 rounded-full border border-neutral-700 flex items-center justify-center text-neutral-600 mx-auto mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v5.625c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 013 18.75v-5.625zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v10.125c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v14.625c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-                            </svg>
-                        </div>
-                        <p id="lang-analytics-empty-msg" class="text-xs text-neutral-500 max-w-xs mx-auto">No transaction data loaded. Trigger direct billing items above to compile chart records.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- WORKSPACE TAB 6: SETTINGS (Includes Theme Presets) -->
-            <div id="tab-view-settings" class="space-y-6 hidden">
-                <div class="glass-panel p-6 rounded-2xl">
-                    <div class="pb-4 border-b border-neutral-800/80 mb-6">
-                        <h3 id="lang-sec-settings-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Global Terminal Configurations</h3>
-                        <p id="lang-sec-settings-desc" class="text-[11px] text-neutral-500 font-mono mt-0.5">Directly configure portal parameters, localization profiles, and theme presets.</p>
-                    </div>
-
-                    <div class="space-y-6 text-xs font-mono">
-                        <!-- Theme Selector (Obsidian Dark, Deep Ocean Blue, Professional White) -->
-                        <div class="p-4 bg-neutral-900/60 rounded-xl border border-neutral-800">
-                            <h4 id="lbl-select-theme-title" class="text-[10px] font-bold text-amberAccent mb-3 uppercase tracking-wider text-left">Ecosystem Theme Presets</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <button onclick="mutateEcosystemTheme('obsidian')" id="theme-btn-obsidian" class="flex items-center justify-center space-x-2.5 py-3 border border-amberAccent/40 bg-amberAccent/5 text-amberAccent rounded-xl font-bold uppercase transition-all">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-brandDark border border-white/20"></span>
-                                    <span>Obsidian Dark</span>
-                                </button>
-                                <button onclick="mutateEcosystemTheme('ocean')" id="theme-btn-ocean" class="flex items-center justify-center space-x-2.5 py-3 border border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-white hover:border-neutral-700 rounded-xl font-bold uppercase transition-all">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#020d1a] border border-white/20"></span>
-                                    <span>Deep Ocean Blue</span>
-                                </button>
-                                <button onclick="mutateEcosystemTheme('white')" id="theme-btn-white" class="flex items-center justify-center space-x-2.5 py-3 border border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-white hover:border-neutral-700 rounded-xl font-bold uppercase transition-all">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-slate-50 border border-neutral-800"></span>
-                                    <span>Professional White</span>
-                                </button>
-                            </div>
+                            <p id="lang-stock-empty-msg" class="text-[10px] text-neutral-500 max-w-xs mx-auto">All stock counts normal. No reorder thresholds breached.</p>
                         </div>
                     </div>
                 </div>
@@ -442,531 +197,233 @@
 
     </main>
 
-    <!-- SLEEK BILLING ENGINE INVOICE CREATION MODAL POPUP -->
-    <div id="billing-invoice-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex-col items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 relative overflow-hidden animate-fade-in text-xs font-mono">
-            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amberAccent to-roseAccent"></div>
-            
-            <div class="flex items-center justify-between pb-3 border-b border-neutral-800/80 mb-4">
-                <h3 id="lang-modal-bill-title" class="text-xs font-bold text-neutral-300 uppercase tracking-widest">Create New Transaction Invoice</h3>
-                <button onclick="toggleBillingInvoiceModal()" class="text-neutral-500 hover:text-white transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Mock Billing Fields -->
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Customer Name</label>
-                        <input id="modal-cust-name" type="text" placeholder="e.g. Selvam Raman" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Mobile Contact</label>
-                        <input id="modal-cust-phone" type="text" placeholder="e.g. +91 94440 XXXXX" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Item Description</label>
-                        <input id="modal-item-desc" type="text" placeholder="e.g. Premium Matte Protection Case" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Total Amount Due (₹)</label>
-                        <input id="modal-item-price" type="number" step="0.5" placeholder="0.00" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[9px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Settlement Mode</label>
-                    <select id="modal-payment-mode" class="w-full bg-neutral-900 border border-neutral-800 text-white py-2 px-3 rounded-lg focus:border-amberAccent outline-none transition-all">
-                        <option value="Cash">Cash Settlement</option>
-                        <option value="UPI">UPI Digital Transfer</option>
-                    </select>
-                </div>
-            </div>
-
-            <button onclick="executeModalMockBillPrint()" class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-6">
-                Generate & Log Invoice
-            </button>
+    <!-- Statutory Platform Footer -->
+    <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4 shrink-0">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold">
+            <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
+            <span id="lang-footer-desc">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
         </div>
-    </div>
+    </footer>
+
+    <!-- Import connectivity hooks referencing the master_ledger.js engine -->
+    <script src="master_ledger.js"></script>
 
     <!-- Core Security & Onboarding Execution Scripts -->
     <script>
         // System state matrices
         let activeLanguageContext = "en";
-        let activeMerchantSession = null;
-        let registeredShopsArray = [];
-        let systemMaintenanceFlag = false;
-        let salesChartInstance = null;
+        let masterDatabase = { sales: [], inventory: {}, expenses: [], payroll: [], customer_crm: {} };
+        let performanceChartInstance = null;
 
-        // Structured English / Tamil Translation Dictionary Matrix (Safely isolates 0% Console Bugs)
+        // Structured English / Tamil Translation Dictionary Matrix
         const appTranslationMatrix = {
             en: {
-                appHeader: "ROAJI",
-                secLoginSubtitle: "ROAJI BILLING SOFTWARE",
-                secLoginSubtext: "Enter credentials to unlock context",
-                toastLogout: "Session invalidated successfully. Routing back to gateway...",
-                toastThemeSaved: "Ecosystem theme context mutated successfully.",
-                toastBillSuccess: "Transaction recorded in ledger database safely.",
-                toastEmptyFields: "Validation failed. Mandatory inputs must be filled.",
-                maintHeader: "GATEWAY LOCKED",
-                maintDesc: "System maintenance active. Access is temporarily restricted. Onboarding and validation pathways are locked.",
-                toastConfigSaved: "Maintenance settings updated.",
-                statusActiveFree: "Active_Lifetime_Free",
-                statusActiveTrial: "Active_Trial",
-                statusActivePro: "SaaS_Paid_Plan",
-                "stationery-title": "Xerox & Stationery Counter",
-                "stationery-desc": "Quick checkout ledger for copy pages, notebooks, and binders.",
-                "gifts-title": "Premium Gifts & Toys",
-                "gifts-desc": "Multi-channel packaging logistics tracker for retail and Meesho.",
-                "mobile-title": "Mobile Repair & Accessories",
-                "mobile-desc": "Slab-based hardware configuration diagnostics and accessories.",
-                "esevai-title": "e-Sevai CSC Portal",
-                "esevai-desc": "Digital CSC government applications database registry hub.",
-                "toys-title": "Toys Zone & Meesho Packing",
-                "toys-desc": "Supply chain shipping matrix with custom bubblewrap multipliers.",
-                "money_transfer-title": "DMT Money Transfer Desk",
-                "money_transfer-desc": "Dynamic financial slab commission routing and settlement ledger.",
-                "fabrication-title": "Welding & SS Fabrication",
-                "fabrication-desc": "SqFt dimension weight estimation multiplier calculator engine.",
-                "bakery-title": "Bakery Core Counter",
-                "bakery-desc": "Fresh cake piece weight dynamic metric POS counter interface.",
-                "teashop-title": "Tea Shop Quick POS",
-                "teashop-desc": "Ultra-rapid hot beverage button click quantity increments.",
-                "pharmacy-title": "Pharmacy Hub POS",
-                "pharmacy-desc": "Statutory pharmaceutical formulation batch matrix billing tracker.",
-                "supermarket-title": "Supermarket Billing",
-                "supermarket-desc": "Bulk barcode scan register with high-speed invoice draft queues.",
-                "boutique-title": "Boutique & Tailoring",
-                "boutique-desc": "Apparel measurement log sheet and pattern delivery tracker.",
-                "laundry-title": "Laundry & Dry Cleaning",
-                "laundry-desc": "Dynamic fabric tag tracker, processing stage log sheets, and dispatch."
+                appHeader: "ROAJI // MASTER LEDGER DASHBOARD",
+                btnRefresh: "Reload Ledger",
+                wdgTotalRevenue: "Total Combined Revenue",
+                wdgTotalRevenueSub: "Aggregated sales across 13 niches",
+                wdgTotalExpenses: "Total Operations Expenses",
+                wdgTotalExpensesSub: "Packaging & materials disbursements",
+                wdgNetProfit: "Net Profit Balance",
+                wdgNetProfitSub: "Calculated net yield margins",
+                wdgLowStock: "Low Stock Alerts",
+                wdgLowStockSub: "Breached reorder threshold limits",
+                secPerformanceTitle: "Workspace Module Sales Performance",
+                secStockAlertsTitle: "Statutory Reorder Alerts",
+                secStockAlertsDesc: "Critical inventory items requiring stock replenishment.",
+                thItem: "Item Name",
+                thModule: "Module Source",
+                thStock: "Stock Qty",
+                thReorder: "Threshold",
+                stockEmptyMsg: "All stock counts normal. No reorder thresholds breached.",
+                footerDesc: "STATUTORY AUTHORIZATION METRICS COMPLIANT UNDER ISO/IEC 27001 STANDARD.",
+                toastReload: "Master Global Ledger reloaded successfully."
             },
             ta: {
-                appHeader: "ரோஜி",
-                secLoginSubtitle: "ரோஜி பில்லிங் சாப்ட்வேர்",
-                secLoginSubtext: "அணுகலைத் திறக்க நற்சான்றிதழ்களை உள்ளிடவும்",
-                toastLogout: "அமர்வு வெற்றிகரமாக வெளியேற்றப்பட்டது. பிரதான வாயிலுக்கு திருப்பி விடப்படுகிறது...",
-                toastThemeSaved: "கணினி தீம் வெற்றிகரமாக மாற்றப்பட்டது.",
-                toastBillSuccess: "பரிவர்த்தனை கணக்கு பதிவேட்டில் வெற்றிகரமாக பதிவு செய்யப்பட்டது.",
-                toastEmptyFields: "பிழை! அனைத்து கட்டாய புலன்களையும் பூர்த்தி செய்யவும்.",
-                maintHeader: "நுழைவாயில் முடக்கப்பட்டுள்ளது",
-                maintDesc: "கணினி பராமரிப்பு வேலைகள் நடக்கின்றன. அனுமதி தற்காலிகமாக நிறுத்தப்பட்டுள்ளது.",
-                toastConfigSaved: "பராமரிப்பு அமைப்புகள் சேமிக்கப்பட்டன.",
-                statusActiveFree: "ஆயுட்கால இலவசம்",
-                statusActiveTrial: "சோதனைக் கணக்கு",
-                statusActivePro: "பிரீமியம் சந்தா",
-                "stationery-title": "ஜெராக்ஸ் & ஸ்டேஷனரி கவுண்டர்",
-                "stationery-desc": "நகல் தாள்கள், குறிப்பேடுகள் மற்றும் பைண்டர்களுக்கான விரைவான பில்லிங்.",
-                "gifts-title": "பிரீமியம் பரிசுகள் & பொம்மைகள்",
-                "gifts-desc": "சில்லறை மற்றும் மீஷோவுக்கான பேக்கேஜிங் லாஜிஸ்டிக்ஸ் டிராக்கர்.",
-                "mobile-title": "மொபைல் ரிப்பேர் & உபகரணங்கள்",
-                "mobile-desc": "வன்பொருள் கண்டறிதல் மற்றும் உபகரணங்கள் பில்லிங் மேலாண்மை.",
-                "esevai-title": "இ-சேவை சிஎஸ்சி போர்ட்டல்",
-                "esevai-desc": "அரசு டிஜிட்டல் விண்ணப்பங்களுக்கான கணக்கு பதிவு மேலாண்மை.",
-                "toys-title": "பொம்மைகள் & மீஷோ பேக்கிங்",
-                "toys-desc": "ஏர் பப்பில் ரேப் பெருக்கிகளுடன் விநியோகச் சங்கிலி கப்பல் தளம்.",
-                "money_transfer-title": "பண பரிமாற்ற பில்லிங்",
-                "money_transfer-desc": "சேவை கட்டணம் மற்றும் பட்டுவாடா முறை மேலாண்மை.",
-                "fabrication-title": "வெல்டிங் & எஸ்எஸ் ஃபேப்ரிகேஷன்",
-                "fabrication-desc": "அளவுகள் மற்றும் எடை அடிப்படையிலான மதிப்பீட்டு கால்குலேட்டர்.",
-                "bakery-title": "பேக்கரி கவுண்டர் பில்லிங்",
-                "bakery-desc": "கேக்குகள், பப்ஸ், இனிப்புகளுக்கான எடை அடிப்படையிலான பில்லிங்.",
-                "teashop-title": "டீ ஷாப் விரைவு பில்லிங்",
-                "teashop-desc": "பானங்கள் மற்றும் சிற்றுண்டிகளுக்கான விரைவான பில்லிங்.",
-                "pharmacy-title": "பார்மசி பில்லிங்",
-                "pharmacy-desc": "மருந்து தொகுப்பு மற்றும் பில்லிங் கண்காணிப்பு மேலாண்மை.",
-                "supermarket-title": "சூப்பர் மார்க்கெட் பில்லிங்",
-                "supermarket-desc": "பார்கோடு ஸ்கேன் மூலம் அதிவேக பில்லிங் மேலாண்மை.",
-                "boutique-title": "பொடிக்கு & தையல் கலை",
-                "boutique-desc": "அளவீடுகள் மற்றும் விநியோக கண்காணிப்பு மேலாண்மை.",
-                "laundry-title": "சலவை மற்றும் டிரை க்ளீனிங்",
-                "laundry-desc": "துணி டேக் டிராக்கர், செயலாக்க நிலைகள் மற்றும் அனுப்புதல்."
+                appHeader: "ரோஜி // தலைமை கணக்கு டாஷ்போர்டு",
+                btnRefresh: "மீட்டமைக்க",
+                wdgTotalRevenue: "மொத்த ஒருங்கிணைந்த வருவாய்",
+                wdgTotalRevenueSub: "13 பில்லிங் பிரிவுகளின் மொத்த விற்பனை",
+                wdgTotalExpenses: "மொத்த செயல்பாட்டு செலவுகள்",
+                wdgTotalExpensesSub: "பேக்கேஜிங் மற்றும் இயக்க செலவுகள்",
+                wdgNetProfit: "நிகர லாப இருப்பு",
+                wdgNetProfitSub: "கணக்கிடப்பட்ட நிகர லாப வரம்பு",
+                wdgLowStock: "குறைந்த இருப்பு எச்சரிக்கைகள்",
+                wdgLowStockSub: "மறுஆர்டர் வரம்பை எட்டிய பொருட்கள்",
+                secPerformanceTitle: "விற்பனை செயல்திறன் அடுக்ககம்",
+                secStockAlertsTitle: "மறுஆர்டர் இருப்பு எச்சரிக்கைகள்",
+                secStockAlertsDesc: "இருப்பு தீர்ந்து போகும் நிலையில் உள்ள முக்கியமான பொருட்கள்.",
+                thItem: "பொருள்",
+                thModule: "பிரிவு",
+                thStock: "இருப்பு",
+                thReorder: "வரம்பு",
+                stockEmptyMsg: "அனைத்து இருப்பு அளவுகளும் சீராக உள்ளன. எச்சரிக்கைகள் இல்லை.",
+                footerDesc: "ISO/IEC 27001 தரத்தின்படி பாதுகாக்கப்பட்டது.",
+                toastReload: "தலைமை கணக்கு பதிவேடு வெற்றிகரமாக புதுப்பிக்கப்பட்டது."
             }
         };
 
-        // All 13 core workspace channels catalog
-        const coreNicheShopsCatalog = [
-            { id: "stationery", path: "modules/stationery/billing.html", iconBg: "bg-blue-500/10 text-blue-400" },
-            { id: "gifts", path: "modules/gifts/billing.html", iconBg: "bg-purple-500/10 text-purple-400" },
-            { id: "mobile", path: "modules/mobile/billing.html", iconBg: "bg-teal-500/10 text-teal-400" },
-            { id: "esevai", path: "modules/esevai/billing.html", iconBg: "bg-cyan-500/10 text-cyan-400" },
-            { id: "toys", path: "modules/toys/billing.html", iconBg: "bg-pink-500/10 text-pink-400" },
-            { id: "money_transfer", path: "modules/money_transfer/billing.html", iconBg: "bg-emerald-500/10 text-emerald-400" },
-            { id: "fabrication", path: "modules/fabrication/billing.html", iconBg: "bg-orange-500/10 text-orange-400" },
-            { id: "bakery", path: "modules/bakery/billing.html", iconBg: "bg-yellow-500/10 text-yellow-400" },
-            { id: "teashop", path: "modules/teashop/billing.html", iconBg: "bg-rose-500/10 text-rose-400" },
-            { id: "pharmacy", path: "modules/pharmacy/billing.html", iconBg: "bg-indigo-500/10 text-indigo-400" },
-            { id: "supermarket", path: "modules/supermarket/billing.html", iconBg: "bg-sky-500/10 text-sky-400" },
-            { id: "boutique", path: "modules/boutique/billing.html", iconBg: "bg-fuchsia-500/10 text-fuchsia-400" },
-            { id: "laundry", path: "modules/laundry/billing.html", iconBg: "bg-lime-500/10 text-lime-400" }
-        ];
-
-        // Dynamic State Handshake on DOMContentLoaded (Part 2 & Part 5 Sync)
+        // DOM Content Loaded Handler
         window.addEventListener('DOMContentLoaded', () => {
-            try {
-                // 1. Immediately read 'roaji_active_shop_session' from localStorage
-                const rawSession = localStorage.getItem('roaji_active_shop_session');
-                
-                // If this key is null, force redirect to 'index.html'
-                if (!rawSession) {
-                    window.location.replace("index.html");
-                    return;
-                }
-
-                activeMerchantSession = JSON.parse(rawSession);
-
-                // Reveal Dashboard Workspace shell once validated successfully
-                const body = document.getElementById('dashboard-body');
-                if (body) {
-                    body.classList.remove('hidden');
-                }
-
-                // 2. Execute dynamic DOM Injection
-                refreshDashboardUI();
-                mutateLanguageContext('en');
-                pollMaintenanceInterceptorState();
-                initializeAnalyticsChartEngine();
-
-                setInterval(pollMaintenanceInterceptorState, 3000); // Continuous safety check loop
-            } catch (err) {
-                console.error("Critical session state startup error:", err);
-                window.location.replace("index.html");
-            }
+            initializeDiagnosticMockSeeds();
+            hotReloadLedgerData();
+            mutateLanguageContext('en');
         });
 
-        // Pull active list array from localStorage
-        function loadLocalStorageDatabases() {
-            try {
-                const rawShops = localStorage.getItem('roaji_shops');
-                registeredShopsArray = JSON.parse(rawShops) || [];
-            } catch(e) {
-                registeredShopsArray = [];
+        // Seed mock datastore if localStorage is empty to show beautiful analytics out-of-the-box
+        function initializeDiagnosticMockSeeds() {
+            const rawDB = localStorage.getItem('roaji_master_db');
+            if (!rawDB || rawDB === '{"sales":[],"inventory":{},"expenses":[],"payroll":[],"customer_crm":{}}') {
+                const seedDB = {
+                    sales: [
+                        { transactionId: "TXN-001", moduleSource: "bakery", totalAmount: 1250, timestamp: new Date().toISOString() },
+                        { transactionId: "TXN-002", moduleSource: "stationery", totalAmount: 450, timestamp: new Date().toISOString() },
+                        { transactionId: "TXN-003", moduleSource: "mobile", totalAmount: 1850, timestamp: new Date().toISOString() },
+                        { transactionId: "TXN-004", moduleSource: "esevai", totalAmount: 350, timestamp: new Date().toISOString() },
+                        { transactionId: "TXN-005", moduleSource: "teashop", totalAmount: 180, timestamp: new Date().toISOString() },
+                        { transactionId: "TXN-006", moduleSource: "gifts", totalAmount: 950, timestamp: new Date().toISOString() },
+                        { transactionId: "TXN-007", moduleSource: "fabrication", totalAmount: 14500, timestamp: new Date().toISOString() }
+                    ],
+                    expenses: [
+                        { expenseId: "EXP-001", moduleSource: "gifts", amount: 150 },
+                        { expenseId: "EXP-002", moduleSource: "toys", amount: 250 },
+                        { expenseId: "EXP-003", moduleSource: "expense", amount: 800 }
+                    ],
+                    inventory: {
+                        "ST-PAPER-A4": { name: "A4 Copy Paper Page", stockQty: 8, reorderPoint: 10, moduleSource: "stationery" },
+                        "BAK-PUFF": { name: "Baked Egg Puff", stockQty: 5, reorderPoint: 15, moduleSource: "bakery" },
+                        "ACC-TEMP": { name: "Tempered Glass Protector", stockQty: 25, reorderPoint: 5, moduleSource: "mobile" }
+                    },
+                    payroll: [],
+                    customer_crm: {}
+                };
+                localStorage.setItem('roaji_master_db', JSON.stringify(seedDB));
             }
         }
 
-        // Hot Reload Refresh Dashboard UI (Re-scans state and updates DOM instantly)
-        function refreshDashboardUI() {
+        // Pull active datastores and refresh BI charts dynamically
+        function hotReloadLedgerData() {
             try {
-                loadLocalStorageDatabases();
-
-                // Find active merchant updated record inside the raw roaji_shops datastore array
-                if (activeMerchantSession && activeMerchantSession.email) {
-                    const freshData = registeredShopsArray.find(user => user.email.toLowerCase() === activeMerchantSession.email.toLowerCase());
-                    if (freshData) {
-                        // Merge update state parameters
-                        activeMerchantSession = freshData;
-                        localStorage.setItem('roaji_active_shop_session', JSON.stringify(activeMerchantSession));
-                    }
-                }
-
-                // a) Update Shop Name (in profile chip and center header)
-                const headerBrandName = document.getElementById('app-billing-software-header');
-                if (headerBrandName && activeMerchantSession.name) {
-                    headerBrandName.textContent = activeMerchantSession.name + " BILLING MODULE";
-                }
-                const profileChipName = document.getElementById('active-shop-profile-name');
-                if (profileChipName && activeMerchantSession.name) {
-                    profileChipName.textContent = activeMerchantSession.name;
-                }
-
-                // b) Update Operational Tier
-                const profileChipPkg = document.getElementById('active-shop-profile-package');
-                if (profileChipPkg && activeMerchantSession.status) {
-                    profileChipPkg.textContent = activeMerchantSession.status;
-                }
-
-                // Stats widget
-                safeSetText('wdg-invoice-limits', activeMerchantSession.slashedInvoicesCount !== undefined ? activeMerchantSession.slashedInvoicesCount : 1000);
-                safeSetText('wdg-license-validity', `${activeMerchantSession.daysValidity !== undefined ? activeMerchantSession.daysValidity : 365} Days`);
-
-                // c) Re-draw dynamic N Niches Modules Grid based on 'selectedShops' array checklist (Active/Emerald vs Locked/Grayscale)
-                drawDynamicNichesGrid();
-                
-                triggerUINotification("Workspace databases state updated successfully.");
-            } catch (err) {
-                console.error("Dashboard Hot Reload UI refresh error:", err);
-            }
-        }
-
-        // Draw and synchronize dynamic niches grid layout
-        function drawDynamicNichesGrid() {
-            const container = document.getElementById('business-grid-container');
-            if (!container) return;
-
-            container.innerHTML = '';
-            const t = appTranslationMatrix[activeLanguageContext];
-
-            coreNicheShopsCatalog.forEach(shop => {
-                // Loop through 'selectedShops' array to evaluate active vs locked licenses
-                const isUnlocked = activeMerchantSession && activeMerchantSession.selectedShops && activeMerchantSession.selectedShops.includes(shop.id);
-
-                const card = document.createElement('div');
-                
-                // Focus highlight amber focus borders on active cards
-                const cardStyle = isUnlocked 
-                    ? "glass-panel border-neutral-800 hover:border-amberAccent/40 cursor-pointer hover:-translate-y-1" 
-                    : "opacity-40 border-neutral-900 bg-neutral-950/40 cursor-not-allowed filter grayscale";
-
-                if (isUnlocked) {
-                    card.onclick = () => handleActiveModuleRouting(shop.path);
+                // Safeguard lookup to the external master_ledger.js engine parameters
+                if (window.RoajiMasterLedger) {
+                    masterDatabase = window.RoajiMasterLedger.getMasterDatabase();
                 } else {
-                    card.onclick = () => triggerUINotification("Access denied. Channel locked inside your trial package.");
+                    const rawDB = localStorage.getItem('roaji_master_db');
+                    masterDatabase = JSON.parse(rawDB) || { sales: [], inventory: {}, expenses: [], payroll: [], customer_crm: {} };
                 }
 
-                const title = t[`${shop.id}-title`] || shop.id;
-                const desc = t[`${shop.id}-desc`] || "";
+                calculateFinancialLedgerSummaries();
+                rebuildStockAlertsTable();
+                updateBIChartsData();
 
-                card.className = `p-5 rounded-2xl border flex flex-col justify-between h-44 relative overflow-hidden group select-none transition-all duration-300 ${cardStyle}`;
-                card.innerHTML = `
-                    <div class="space-y-3.5 relative z-10">
-                        <div class="flex items-center justify-between">
-                            <!-- Icon Base -->
-                            <div class="w-9 h-9 ${shop.iconBg} rounded-xl flex items-center justify-center border border-white/5">
-                                <span class="font-bold text-[10px] font-mono uppercase">${shop.id.substring(0, 3)}</span>
-                            </div>
-                            
-                            <!-- License Node Status Badge -->
-                            <span class="text-[9px] font-mono tracking-wider font-bold ${isUnlocked ? 'text-emeraldAccent' : 'text-neutral-500'}">
-                                ${isUnlocked ? 'ACTIVE' : 'LOCKED'}
-                            </span>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-neutral-100 group-hover:text-amberAccent transition-colors font-mono tracking-wide uppercase">${title}</h4>
-                            <p class="text-[10px] text-neutral-500 mt-1 leading-normal leading-relaxed">${desc}</p>
-                        </div>
-                    </div>
-                    <!-- Hover ambient glow element -->
-                    <div class="absolute -bottom-10 -right-10 w-20 h-20 bg-amber-500/0 group-hover:bg-amber-500/5 rounded-full blur-xl transition-all duration-300"></div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Active Niche Module redirection
-        function handleActiveModuleRouting(path) {
-            triggerUINotification("Routing to selected micro-SaaS workspace...");
-            setTimeout(() => {
-                window.location.href = path;
-            }, 1200);
-        }
-
-        // Toggle Mobile Navigation Sidebar drawer
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById('sidebar-console');
-            const overlay = document.getElementById('sidebar-overlay');
-            if (sidebar && overlay) {
-                sidebar.classList.toggle('-translate-x-full');
-                overlay.classList.toggle('hidden');
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastReload);
+            } catch (err) {
+                console.error("Hot reload master database error:", err);
             }
         }
 
-        // Clean workspace modules tabs navigation switches (Soft Fade-ins & Space isolation)
-        function switchWorkspaceTab(tab) {
-            try {
-                // Hide all tab views
-                const views = ["dashboard", "billing", "employees", "inventory", "analytics", "settings"];
-                views.forEach(v => {
-                    const el = document.getElementById(`tab-view-${v}`);
-                    if (el) {
-                        el.classList.add('hidden');
-                    }
-                    // Reset nav buttons highlighting style
-                    const btn = document.getElementById(`nav-btn-${v}`);
-                    if (btn) {
-                        btn.className = "w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all text-left outline-none";
+        // Core dynamic accounting formulas
+        function calculateFinancialLedgerSummaries() {
+            let totalRevenue = 0;
+            let totalExpenses = 0;
+
+            // 1. Sum up sales revenues across all 13 niches
+            if (Array.isArray(masterDatabase.sales)) {
+                masterDatabase.sales.forEach(sale => {
+                    totalRevenue += parseFloat(sale.totalAmount) || 0;
+                });
+            }
+
+            // 2. Sum up operations expenses
+            if (Array.isArray(masterDatabase.expenses)) {
+                masterDatabase.expenses.forEach(exp => {
+                    totalExpenses += parseFloat(exp.amount) || 0;
+                });
+            }
+
+            const netProfit = totalRevenue - totalExpenses;
+
+            // 3. Count stock alerts breaching reorder threshold limits
+            let lowStockCount = 0;
+            if (masterDatabase.inventory && typeof masterDatabase.inventory === 'object') {
+                Object.keys(masterDatabase.inventory).forEach(key => {
+                    const node = masterDatabase.inventory[key];
+                    if (node && node.stockQty <= node.reorderPoint) {
+                        lowStockCount++;
                     }
                 });
+            }
 
-                // Display targeted tab view
-                const targetView = document.getElementById(`tab-view-${tab}`);
-                if (targetView) {
-                    targetView.classList.remove('hidden');
+            // Write variables to DOM
+            document.getElementById('wdg-total-revenue').textContent = `₹ ${totalRevenue.toFixed(2)}`;
+            document.getElementById('wdg-total-expenses').textContent = `₹ ${totalExpenses.toFixed(2)}`;
+            document.getElementById('wdg-net-profit').textContent = `₹ ${netProfit.toFixed(2)}`;
+            document.getElementById('wdg-low-stock').textContent = lowStockCount;
+
+            // Visual feedback adjustments
+            const netProfitWdg = document.getElementById('wdg-net-profit');
+            if (netProfitWdg) {
+                if (netProfit < 0) {
+                    netProfitWdg.className = "text-2xl font-black font-mono mt-1 text-red-400";
+                } else {
+                    netProfitWdg.className = "text-2xl font-black font-mono mt-1 text-emeraldAccent";
                 }
+            }
+        }
 
-                // Highlight active nav button
-                const targetBtn = document.getElementById(`nav-btn-${tab}`);
-                if (targetBtn) {
-                    targetBtn.className = "w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl bg-amberAccent/10 text-amberAccent transition-all text-left outline-none";
+        // Rebuild Stock Alert table rows
+        function rebuildStockAlertsTable() {
+            const tbody = document.getElementById('stock-alerts-tbody');
+            const placeholder = document.getElementById('stock-alerts-empty');
+
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let hasAlerts = false;
+
+            if (masterDatabase.inventory && typeof masterDatabase.inventory === 'object') {
+                Object.keys(masterDatabase.inventory).forEach(key => {
+                    const node = masterDatabase.inventory[key];
+                    if (node && node.stockQty <= node.reorderPoint) {
+                        hasAlerts = true;
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-b border-neutral-800/40 hover:bg-neutral-900/40 transition-colors text-neutral-300';
+                        tr.innerHTML = `
+                            <td class="py-2.5 pr-2 font-semibold text-white">${node.name}</td>
+                            <td class="py-2.5 pr-2 uppercase font-semibold text-amberAccent">${node.moduleSource}</td>
+                            <td class="py-2.5 pr-2 text-right font-mono text-roseAccent font-bold">${node.stockQty}</td>
+                            <td class="py-2.5 pr-2 text-right font-mono text-neutral-500">${node.reorderPoint}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                });
+            }
+
+            if (placeholder) {
+                if (hasAlerts) {
+                    placeholder.classList.add('hidden');
+                } else {
+                    placeholder.classList.remove('hidden');
                 }
-
-                // Close Mobile sidebar if open
-                const sidebar = document.getElementById('sidebar-console');
-                const overlay = document.getElementById('sidebar-overlay');
-                if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
-                }
-            } catch (err) {
-                console.error("Tab view swapping execution error:", err);
             }
         }
 
-        // SaaS Theme switching custom console logic (Obsidian Dark, Deep Ocean Blue, Professional White)
-        function mutateEcosystemTheme(theme) {
-            try {
-                const body = document.getElementById('dashboard-body');
-                const glow = document.getElementById('ambient-glow');
-                const btnObsidian = document.getElementById('theme-btn-obsidian');
-                const btnOcean = document.getElementById('theme-btn-ocean');
-                const btnWhite = document.getElementById('theme-btn-white');
-
-                // Reset buttons class lists
-                const btnNormalStyle = "flex items-center justify-center space-x-2.5 py-3 border border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:text-white hover:border-neutral-700 rounded-xl font-bold uppercase transition-all outline-none";
-                btnObsidian.className = btnNormalStyle;
-                btnOcean.className = btnNormalStyle;
-                btnWhite.className = btnNormalStyle;
-
-                if (theme === 'obsidian') {
-                    body.style.backgroundColor = "#050505";
-                    body.style.color = "#f5f5f5";
-                    if (glow) glow.style.display = "block";
-                    btnObsidian.className = "flex items-center justify-center space-x-2.5 py-3 border border-amberAccent/40 bg-amberAccent/5 text-amberAccent rounded-xl font-bold uppercase transition-all outline-none";
-                } else if (theme === 'ocean') {
-                    body.style.backgroundColor = "#020d1a";
-                    body.style.color = "#f1f5f9";
-                    if (glow) glow.style.display = "none";
-                    btnOcean.className = "flex items-center justify-center space-x-2.5 py-3 border border-blue-500/40 bg-blue-500/5 text-blue-400 rounded-xl font-bold uppercase transition-all outline-none";
-                } else if (theme === 'white') {
-                    body.style.backgroundColor = "#f8fafc";
-                    body.style.color = "#0f172a";
-                    if (glow) glow.style.display = "none";
-                    btnWhite.className = "flex items-center justify-center space-x-2.5 py-3 border border-slate-300 bg-slate-100 text-slate-800 rounded-xl font-bold uppercase transition-all outline-none";
-                }
-
-                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastThemeSaved);
-            } catch (err) {
-                console.error("Theme mutation execution error:", err);
-            }
-        }
-
-        // Toggle Sleek Billing modal
-        function toggleBillingInvoiceModal() {
-            const modal = document.getElementById('billing-invoice-modal');
-            if (modal) {
-                modal.classList.toggle('hidden');
-                modal.classList.toggle('flex');
-            }
-        }
-
-        // Log and print mock bill
-        function executeModalMockBillPrint() {
-            try {
-                const name = document.getElementById('modal-cust-name').value.trim();
-                const phone = document.getElementById('modal-cust-phone').value.trim();
-                const desc = document.getElementById('modal-item-desc').value.trim();
-                const price = parseFloat(document.getElementById('modal-item-price').value);
-
-                if (!name || !phone || !desc || isNaN(price) || price <= 0) {
-                    triggerUINotification(appTranslationMatrix[activeLanguageContext].toastEmptyFields);
-                    return;
-                }
-
-                toggleBillingInvoiceModal();
-                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastBillSuccess);
-
-                // Reset modal fields
-                document.getElementById('modal-cust-name').value = '';
-                document.getElementById('modal-cust-phone').value = '';
-                document.getElementById('modal-item-desc').value = '';
-                document.getElementById('modal-item-price').value = '';
-            } catch (err) {
-                console.error("Invoice paywall generation error:", err);
-            }
-        }
-
-        // Safe Element Text Updater
-        function safeSetText(id, text) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.textContent = text;
-            }
-        }
-
-        // Bilingual context translation logic
-        function mutateLanguageContext(lang) {
-            activeLanguageContext = lang;
-            const t = appTranslationMatrix[lang];
-
-            // Swapping DOM text content strings safely (0% console runtime bugs)
-            const activeBrandTitle = activeMerchantSession ? activeMerchantSession.name : "ROAJI";
-            safeSetText('app-billing-software-header', activeBrandTitle + " BILLING MODULE");
-            safeSetText('sec-dashboard-sub', t.secLoginSubtext || "Supply Chain Multi-tenant Enterprise Management Workspace");
-
-            // Sidebar translate
-            safeSetText('lang-footer-desc', t.footerDesc || "STATUTORY AUTHORIZATION METRICS COMPLIANT UNDER ISO/IEC 27001 STANDARD.");
-
-            // Maintenance Banner labels
-            safeSetText('lang-maint-header', t.maintHeader || "GATEWAY LOCKED");
-            safeSetText('lang-maint-desc', t.maintDesc || "System maintenance active.");
-
-            // Redraw active niches grid lists
-            drawDynamicNichesGrid();
-
-            // Active button indicators class lists
-            const btnEn = document.getElementById('lang-btn-en');
-            const btnTa = document.getElementById('lang-btn-ta');
-            if (lang === 'en') {
-                if (btnEn) btnEn.className = "px-2 py-1 text-[9px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono";
-                if (btnTa) btnTa.className = "px-2 py-1 text-[9px] font-bold rounded transition-all text-neutral-400 font-mono";
-            } else {
-                if (btnTa) btnTa.className = "px-2 py-1 text-[9px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono";
-                if (btnEn) btnEn.className = "px-2 py-1 text-[9px] font-bold rounded transition-all text-neutral-400 font-mono";
-            }
-        }
-
-        // Terminate user session and return back to index gateway login
-        function terminateUserSession() {
-            sessionStorage.removeItem('roaji_session_claims');
-            localStorage.removeItem('roaji_active_shop_session');
-            localStorage.removeItem('roaji_shops_active');
-            
-            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLogout);
-            setTimeout(() => {
-                window.location.replace("index.html");
-            }, 1200);
-        }
-
-        // Override Maintenance Status
-        function overrideMaintenance(state) {
-            localStorage.setItem('roaji_maintenance_mode', state);
-            pollMaintenanceInterceptorState();
-            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastConfigSaved);
-        }
-
-        // Pull active lockout state
-        function pollMaintenanceInterceptorState() {
-            const flag = localStorage.getItem('roaji_maintenance_mode');
-            const overlay = document.getElementById('maintenance-overlay');
-            if (flag === "ON") {
-                if (overlay) overlay.classList.remove('hidden');
-                if (overlay) overlay.classList.add('flex');
-            } else {
-                if (overlay) overlay.classList.add('hidden');
-                if (overlay) overlay.classList.remove('flex');
-            }
-        }
-
-        // Initialize high-fidelity Business Intelligence Sales trend chart
-        function initializeAnalyticsChartEngine() {
-            const ctx = document.getElementById('dashboard-sales-chart');
+        // Initialize high-fidelity ChartJS bar chart showing sales performance per business module
+        function initializeAnalyticsChartEngine(chartData) {
+            const ctx = document.getElementById('performance-bar-chart');
             if (!ctx) return;
 
-            salesChartInstance = new Chart(ctx, {
-                type: 'line',
+            performanceChartInstance = new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: ['09:00 AM', '11:00 AM', '01:00 PM', '03:00 PM', '05:00 PM', '07:00 PM'],
+                    labels: chartData.labels,
                     datasets: [{
-                        label: 'Revenues Flow (INR)',
-                        data: [12000, 18500, 24000, 19500, 31000, 42950],
+                        label: 'Revenue per Module (₹)',
+                        data: chartData.values,
+                        backgroundColor: 'rgba(245, 158, 11, 0.25)', // Amber
                         borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.05)',
-                        borderWidth: 2,
-                        tension: 0.35,
-                        fill: true
+                        borderWidth: 1.5,
+                        borderRadius: 8
                     }]
                 },
                 options: {
@@ -979,7 +436,7 @@
                                 color: 'rgba(255, 255, 255, 0.05)'
                             },
                             ticks: {
-                                color: '#737373',
+                                color: '#a3a3a3',
                                 font: {
                                     family: 'monospace',
                                     size: 9
@@ -991,7 +448,7 @@
                                 display: false
                             },
                             ticks: {
-                                color: '#737373',
+                                color: '#a3a3a3',
                                 font: {
                                     family: 'monospace',
                                     size: 9
@@ -1006,6 +463,135 @@
                     }
                 }
             });
+        }
+
+        // Dynamically compute and compile sales performance per business module
+        function updateBIChartsData() {
+            const moduleSalesMap = {};
+
+            // Initialize all niches to 0
+            const coreNiches = ["stationery", "gifts", "mobile", "esevai", "toys", "money_transfer", "fabrication", "bakery", "teashop", "pharmacy", "supermarket", "boutique", "laundry"];
+            coreNiches.forEach(niche => {
+                moduleSalesMap[niche] = 0;
+            });
+
+            // Map and sum up active sales
+            if (Array.isArray(masterDatabase.sales)) {
+                masterDatabase.sales.forEach(sale => {
+                    const source = sale.moduleSource ? sale.moduleSource.trim().toLowerCase() : "unknown";
+                    if (moduleSalesMap[source] !== undefined) {
+                        moduleSalesMap[source] += parseFloat(sale.totalAmount) || 0;
+                    } else {
+                        moduleSalesMap[source] = parseFloat(sale.totalAmount) || 0;
+                    }
+                });
+            }
+
+            const labels = [];
+            const values = [];
+
+            Object.keys(moduleSalesMap).forEach(key => {
+                labels.push(key.toUpperCase());
+                values.push(moduleSalesMap[key]);
+            });
+
+            const chartData = { labels: labels, values: values };
+
+            if (performanceChartInstance) {
+                performanceChartInstance.data.labels = chartData.labels;
+                performanceChartInstance.data.datasets[0].data = chartData.values;
+                performanceChartInstance.update();
+            } else {
+                initializeAnalyticsChartEngine(chartData);
+            }
+        }
+
+        // Safe Element Text Updater
+        function safeSetText(id, text) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = text;
+            }
+        }
+
+        // Error-free Bilingual translation context swapper safely isolating existing properties (Bypass Language Mutation Bug)
+        function mutateLanguageContext(lang) {
+            activeLanguageContext = lang;
+            const t = appTranslationMatrix[lang];
+
+            // 1. Strictly translate only DOM elements existing inside entryway to prevent null exceptions
+            safeSetText('app-title-header', t.appHeader);
+            safeSetText('lang-btn-refresh', t.btnRefresh);
+
+            // Widgets
+            safeSetText('lang-wdg-total-revenue', t.wdgTotalRevenue);
+            safeSetText('lang-wdg-total-revenue-sub', t.wdgTotalRevenueSub);
+            safeSetText('lang-wdg-total-expenses', t.wdgTotalExpenses);
+            safeSetText('lang-wdg-total-expenses-sub', t.wdgTotalExpensesSub);
+            safeSetText('lang-wdg-net-profit', t.wdgNetProfit);
+            safeSetText('lang-wdg-net-profit-sub', t.wdgNetProfitSub);
+            safeSetText('lang-wdg-low-stock', t.wdgLowStock);
+            safeSetText('lang-wdg-low-stock-sub', t.wdgLowStockSub);
+
+            // Headings
+            safeSetText('lang-sec-performance-title', t.secPerformanceTitle);
+            safeSetText('lang-sec-stock-alerts-title', t.secStockAlertsTitle);
+            safeSetText('lang-sec-stock-alerts-desc', t.secStockAlertsDesc);
+
+            // Table headers
+            safeSetText('th-item', t.thItem);
+            safeSetText('th-module', t.thModule);
+            safeSetText('th-stock', t.thStock);
+            safeSetText('th-reorder', t.thReorder);
+            safeSetText('lang-stock-empty-msg', t.stockEmptyMsg);
+
+            // Static Footer translations
+            safeSetText('lang-footer-desc', t.footerDesc);
+
+            // Setup buttons active classes UI language button indicators
+            if (lang === 'en') {
+                document.getElementById('lang-toggle-en').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                document.getElementById('lang-toggle-ta').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            } else {
+                document.getElementById('lang-toggle-ta').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                document.getElementById('lang-toggle-en').className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            }
+        }
+
+        // Toggle Diagnostic sandbox panel drawer
+        function toggleConfigLogPanel() {
+            const panel = document.getElementById('configs-drawer-panel');
+            if (panel) {
+                panel.classList.toggle('hidden');
+            }
+        }
+
+        // Override Maintenance Status
+        function overrideMaintenance(state) {
+            localStorage.setItem('roaji_maintenance_mode', state);
+            pollMaintenanceInterceptorState();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastConfigSaved);
+        }
+
+        // Flush and seed demo parameters to database
+        function forceCleanResetSeed() {
+            localStorage.removeItem('roaji_master_db');
+            initializeDiagnosticMockSeeds();
+            hotReloadLedgerData();
+            triggerUINotification("Master Global database has been refreshed cleanly.");
+        }
+
+        // Pull active lockout state
+        function pollMaintenanceInterceptorState() {
+            const flag = localStorage.getItem('roaji_maintenance_mode');
+            const overlay = document.getElementById('maintenance-overlay');
+            if (flag === "ON") {
+                if (overlay) overlay.classList.remove('hidden');
+                if (overlay) overlay.classList.add('flex');
+            } else {
+                if (overlay) overlay.classList.add('hidden');
+                if (overlay) overlay.classList.remove('flex');
+            }
         }
 
         // System Alert Toast notifications utility
