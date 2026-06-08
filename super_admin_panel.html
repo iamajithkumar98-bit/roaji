@@ -123,7 +123,7 @@
                 <div class="glass-panel p-5 rounded-2xl border-neutral-800/80">
                     <span id="lang-wdg-total-tenants" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Active Tenants Pool</span>
                     <p id="wdg-total-tenants" class="text-3xl font-black font-mono mt-1 text-white">0</p>
-                    <span id="lang-wdg-total-tenants-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Verified SaaS Operators</span>
+                    <span id="lang-wdg-total-tenants-sub" class="text-[9px] text-neutral-600 font-mono uppercase font-semibold">Verified SaaS Operators</span>
                 </div>
                 <div class="glass-panel p-5 rounded-2xl border-neutral-800/80">
                     <span id="lang-wdg-pending-queue" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold text-amberAccent">Pending Approval Queue</span>
@@ -184,7 +184,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="btn-save-profile" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold text-xs py-3.5 rounded-xl transition-all mt-4 uppercase tracking-wider">
+                    <button type="submit" id="btn-save-profile" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold text-xs py-3.5 rounded-xl transition-all mt-4 uppercase tracking-wider font-mono">
                         Update Admin Profile
                     </button>
                 </form>
@@ -213,7 +213,7 @@
                         </div>
                         <div>
                             <label id="lbl-prov-brand" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Shop Brand Name</label>
-                            <input id="inp-prov-brand" type="text" required placeholder="Sri Vari Stores" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus-border-amberAccent bg-neutral-900/60">
+                            <input id="inp-prov-brand" type="text" required placeholder="Sri Vari Stores" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-prov-mobile" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Mobile Contact</label>
@@ -221,7 +221,7 @@
                         </div>
                         <div>
                             <label id="lbl-prov-validity" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Allotment Expiration</label>
-                            <select id="inp-prov-validity" class="w-full bg-neutral-900/60 border border-neutral-800 text-white py-2 px-3 text-sm rounded-xl focus:border-amberAccent outline-none transition-all">
+                            <select id="inp-prov-validity" class="w-full bg-neutral-900/60 border border-neutral-800 text-white py-2 px-3 text-sm rounded-xl focus:border-amberAccent outline-none transition-all font-mono">
                                 <option value="3">3 Months Allotment</option>
                                 <option value="6">6 Months Allotment</option>
                                 <option value="12">12 Months Allotment</option>
@@ -438,7 +438,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="btn-save-payment" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold text-xs py-3 rounded-xl transition-all uppercase tracking-wider mt-4">
+                    <button type="submit" id="btn-save-payment" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold text-xs py-3 rounded-xl transition-all uppercase tracking-wider mt-4 font-mono">
                         Save Payment API Keys
                     </button>
                 </form>
@@ -511,7 +511,7 @@
 
     <!-- Statutory Platform Footer -->
     <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4 shrink-0">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold font-mono">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold">
             <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
             <!-- Clicking compliance text toggles the hidden sandboxed panel dynamically for debugging convenience -->
             <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors text-center" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
@@ -520,7 +520,7 @@
 
     <!-- Core Security Admin Operations Logic Engine -->
     <script>
-        // Core constant validation block checks
+        // Session Handshake: Use this robust, error-free parsing block at the start of your script (Strict Refactoring Directions)
         const rawClaims = sessionStorage.getItem('roaji_session_claims');
         let claims = { role: "GUEST" };
         try { if(rawClaims) claims = JSON.parse(rawClaims); } catch(e) { console.error("Parse Error"); }
@@ -721,7 +721,7 @@
 
         // DOM Content Loaded Handler (Authorization & Parsing Logic completely refactored to handle JSON claim string)
         window.addEventListener('DOMContentLoaded', () => {
-            // Unhide master body element frame once validated successfully
+            // If verified successfully, erase body hidden class lockdown traps
             const body = document.getElementById('admin-body');
             if (body) {
                 body.classList.remove('hidden');
