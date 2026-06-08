@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROAJI - Master Gateway</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0">
+    <title>ROAJI - Secure Portal Gateway</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -21,11 +21,11 @@
         }
     </script>
     <style>
-        /* Orange/Amber glowing tech typography text-shadow bloom effects matching Screen 499.png */
+        /* Orange/Amber glowing tech typography text-shadow bloom effects matching Screen 502.png */
         .bloom-text {
-            text-shadow: 0 0 10px rgba(245, 158, 11, 0.6), 0 0 20px rgba(245, 158, 11, 0.3);
+            text-shadow: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
         }
-        /* Centered Lock Capsule Glassmorphism Styling matching Screenshot 498.png */
+        /* Mobile-First optimized glassmorphic container displays */
         .glass-capsule {
             background: rgba(12, 12, 12, 0.85);
             backdrop-filter: blur(24px);
@@ -48,7 +48,7 @@
         }
     </style>
 </head>
-<body class="bg-brandDark text-neutral-100 min-h-full font-sans antialiased flex flex-col justify-between selection:bg-amber-500/20 selection:text-amber-300 relative overflow-hidden">
+<body class="min-h-screen bg-brandDark flex flex-col justify-between overflow-y-auto text-neutral-100 font-sans antialiased selection:bg-amber-500/20 selection:text-amber-300 relative">
 
     <!-- Ambient Subtle Amber Background Radial Glow -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
@@ -70,19 +70,38 @@
     </div>
 
     <!-- Top Header Navigation (Localization Trigger Only) -->
-    <header class="relative z-10 w-full max-w-7xl mx-auto px-6 py-5 flex justify-end">
-        <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex">
-            <button id="lang-toggle-en" onclick="mutateLanguageContext('en')" class="px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">
-                EN
-            </button>
-            <button id="lang-toggle-ta" onclick="mutateLanguageContext('ta')" class="px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono">
-                தமிழ்
-            </button>
+    <header class="relative z-10 w-full max-w-7xl mx-auto px-6 py-5 flex justify-between items-center shrink-0">
+        <!-- Master Branding Layout (Match Screenshot 491.png Apex) -->
+        <div class="flex items-center space-x-2 sm:space-x-3.5">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-amberAccent/10 border border-amberAccent/30 rounded-xl flex items-center justify-center">
+                <span class="text-amberAccent font-black text-lg sm:text-xl tracking-wider">R</span>
+            </div>
+            <h1 class="text-[10px] sm:text-xs font-extrabold text-neutral-100 tracking-wider uppercase font-sans">
+                ROAJI GATEWAY <span class="text-neutral-500 font-normal mx-1">//</span> <span class="text-neutral-400 font-semibold text-[9px] sm:text-[10px] tracking-widest">ONBOARDING PLATFORM</span>
+            </h1>
+        </div>
+
+        <div class="flex items-center space-x-3 sm:space-x-5">
+            <!-- Active Green Status Beacon -->
+            <div class="flex items-center space-x-2 bg-neutral-900/60 px-2.5 sm:px-3.5 py-1.5 rounded-full border border-neutral-800">
+                <span class="inline-block w-2 h-2 rounded-full bg-emeraldAccent animate-pulse"></span>
+                <span id="active-database-status" class="text-[8px] sm:text-[10px] text-neutral-400 font-mono uppercase tracking-wider font-semibold">Security Vault Armed</span>
+            </div>
+
+            <!-- Language selector row -->
+            <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex shrink-0">
+                <button id="lang-toggle-en" onclick="mutateLanguageContext('en')" class="px-2.5 py-1 text-[9px] sm:text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">
+                    EN
+                </button>
+                <button id="lang-toggle-ta" onclick="mutateLanguageContext('ta')" class="px-2.5 py-1 text-[9px] sm:text-[11px] font-bold rounded transition-all text-neutral-400 font-mono">
+                    தமிழ்
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Hidden Developer Sandbox Diagnostics (Accessible via Footer Compliancy Switch) -->
-    <div id="configs-drawer-panel" class="hidden border-b border-amber-500/20 bg-neutral-950 px-4 py-5 transition-all relative z-20">
+    <!-- Hidden Developer Sandbox Diagnostics Panel (Accessible via Footer Compliancy Switch) -->
+    <div id="configs-drawer-panel" class="hidden border-b border-amber-500/20 bg-neutral-950 px-4 py-5 transition-all relative z-20 shrink-0">
         <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
             
             <!-- Maintenance mode switch simulation -->
@@ -120,29 +139,34 @@
     </div>
 
     <!-- Main Centered Obsidian Lock-Capsule Onboarding & Security Module -->
-    <main class="relative z-10 flex-1 flex items-center justify-center px-4 py-8">
+    <main class="relative z-10 flex-1 flex items-center justify-center px-4 py-6 sm:py-10">
         
-        <div class="w-full max-w-lg">
+        <div class="w-full max-w-md mx-auto my-auto">
             
-            <!-- Centered Capsule Container (Screenshot 498.png Style) -->
-            <div class="glass-capsule rounded-3xl p-8 relative overflow-hidden shadow-2xl">
+            <!-- Centered Capsule Container (Screenshot 502.png Style Refactored for Mobile UI Resilience) -->
+            <div class="glass-capsule w-full rounded-2xl sm:rounded-3xl p-5 sm:p-8 relative overflow-hidden">
                 <!-- Top delicate ambient neon line -->
                 <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amberAccent to-transparent"></div>
 
-                <!-- Apex Security Lock Brand Emblem Header -->
-                <div class="flex flex-col items-center text-center mb-8">
-                    <!-- Amber Vector Lock Emblem with glow -->
-                    <div class="w-14 h-14 bg-amberAccent/5 border border-amberAccent/20 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(245,158,11,0.12)]">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-amberAccent filter drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">
-                            <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <h1 id="app-brand-title" class="text-3xl font-black text-white tracking-widest bloom-text transition-all duration-300">ROAJI</h1>
-                    <p id="sec-login-subtitle" class="text-[10px] text-amberAccent font-bold tracking-[0.2em] mt-2.5 uppercase">ROAJI BILLING SOFTWARE</p>
-                    <p id="sec-login-subtext" class="text-[11px] text-neutral-500 mt-1">Enter credentials to unlock context</p>
+                <!-- Apex Security Brand Emblem Header -->
+                <div class="flex flex-col items-center text-center mb-6">
+                    <!-- Amber glowing brand name header -->
+                    <h1 id="app-brand-title" class="text-3xl sm:text-4xl font-black text-white tracking-widest bloom-text transition-all duration-300">ROAJI</h1>
+                    <p id="sec-login-subtitle" class="text-[10px] sm:text-[11px] text-amberAccent font-bold tracking-[0.2em] mt-2.5 uppercase">ROAJI BILLING SOFTWARE</p>
+                    <p id="sec-login-subtext" class="text-[10px] sm:text-xs text-neutral-500 mt-1">Enter credentials to unlock context</p>
                 </div>
 
-                <!-- SIGN-IN CONTAINER MODULE (LOADS BY DEFAULT) -->
+                <!-- Tabbed Switching Controls with active amber accent underline states -->
+                <div class="flex border-b border-neutral-900 mb-6 text-center">
+                    <button id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-amberAccent text-white transition-all outline-none">
+                        SIGN IN
+                    </button>
+                    <button id="tab-btn-register" onclick="switchAuthTab('register')" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none">
+                        ONBOARD SHOP
+                    </button>
+                </div>
+
+                <!-- SIGN-IN TAB COMPONENT MATRIX (Screenshot 502.png style) -->
                 <div id="login-tab-view" class="space-y-4">
                     <form id="login-form-container" onsubmit="executeStandardLogin(event)" class="space-y-4">
                         <div>
@@ -183,10 +207,10 @@
                     </div>
                 </div>
 
-                <!-- ONBOARD SHOP COMPONENT REGISTER FORM (SMOOTH DYNAMIC EXPANSION) -->
+                <!-- ONBOARD SHOP TAB COMPONENT MATRIX WITH MOBILE OPTIMIZED niche grid list -->
                 <div id="register-tab-view" class="space-y-4 hidden">
                     <form id="register-form-container" onsubmit="executeMerchantOnboarding(event)" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                             <div>
                                 <label id="lbl-reg-merchant" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">MERCHANT OWNER NAME</label>
                                 <input id="reg-merchant-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none">
@@ -196,7 +220,7 @@
                                 <input id="reg-shop-name" type="text" required placeholder="e.g. Sri Vari Premium Plaza" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none">
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                             <div>
                                 <label id="lbl-reg-email" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
                                 <input id="reg-email" type="email" required placeholder="merchant@example.com" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
@@ -223,60 +247,60 @@
                             <textarea id="reg-address" required rows="2" placeholder="Enter physical store address details..." class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none resize-none"></textarea>
                         </div>
 
-                        <!-- 13 Niche Checkbox Selection Grid -->
+                        <!-- 13 Niche Checkbox Selection Grid (Mobile optimized layout prevents click jams) -->
                         <div class="bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
                             <h4 id="lbl-select-niches" class="text-[10px] font-bold text-amberAccent mb-3 uppercase tracking-wider text-left">SELECT WORKSPACE MODULE CHANNELS</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono select-none text-left">
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Xerox Matrix" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2.5 bg-black/50 border border-neutral-900 rounded-xl font-mono text-[11px] text-left select-none">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Xerox Matrix" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-xerox">Xerox Matrix</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Photo Studio" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Photo Studio" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-photo">Photo Studio Suite</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Custom Frames" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Custom Frames" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-frames">Custom Photo Frames</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Stationery Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Stationery Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-stationery">Stationery Zone POS</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Premium Gifts Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Premium Gifts Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-gifts">Premium Gifts Zone</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Mobile & Tech" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Mobile & Tech" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-mobile">Mobile Repair & Tech</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Printing & Tech Suite" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Printing & Tech Suite" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-printing">Printing Suite POS</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Internet Cafe & e-Sevai / CSC" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Internet Cafe & e-Sevai / CSC" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-esevai">e-Sevai & CSC Portal</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Toys Zone & Meesho Packing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Toys Zone & Meesho Packing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-toys">Toys Zone & Meesho Packing</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Money Transfer Ledger" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Money Transfer Ledger" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-money_transfer">Money Transfer Ledger</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Welding/Fabrication Works" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Welding/Fabrication Works" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-fabrication">Welding & SS Fabrication</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Bakery Core Counter" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Bakery Core Counter" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-bakery">Bakery Core Counter</span>
                                 </label>
-                                <label class="flex items-center space-x-2.5 cursor-pointer">
-                                    <input type="checkbox" value="Tea Shop Quick Billing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Tea Shop Quick Billing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
                                     <span id="niche-lbl-teashop">Tea Shop Quick POS</span>
                                 </label>
                             </div>
@@ -308,7 +332,7 @@
                             </div>
                         </div>
 
-                        <button id="btn-submit-reg" type="submit" disabled class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 disabled:opacity-40 disabled:cursor-not-allowed font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-6 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
+                        <button id="btn-submit-reg" type="submit" disabled class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 disabled:opacity-40 disabled:cursor-not-allowed font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-4 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
                             SUBMIT VERIFICATION ONBOARDING
                         </button>
                     </form>
@@ -334,11 +358,11 @@
     </div>
 
     <!-- Statutory Platform Footer -->
-    <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4">
+    <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4 shrink-0">
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold">
             <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
             <!-- Clicking compliance text toggles the hidden sandboxed panel dynamically for debugging convenience -->
-            <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
+            <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors text-center" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
         </div>
     </footer>
 
@@ -379,7 +403,7 @@
                 placeholderAddress: "Enter physical store address details...",
                 toastRegPending: "Onboarding request submitted! Pending Super Admin Approval.",
                 toastRegEmailDup: "Registration failed. Email is already allocated.",
-                toastAdminRedirect: "Super Admin detected. Redirecting to Super Admin Portal...",
+                toastAdminRedirect: "Master Admin credentials detected! Redirecting to Super Admin Portal...",
                 toastLoginSuccess: "Credentials authenticated successfully! Routing to shop resolver...",
                 toastLoginFailed: "Invalid email/password or pending admin approval.",
                 toastMaintActive: "SYSTEM LOCK ACTIVE. Gateway access is blocked.",
@@ -417,7 +441,7 @@
                 tabRegister: "கடை பதிவு",
                 lblEmail: "மின்னஞ்சல் முகவரி",
                 lblPassword: "பாதுகாப்பான கடவுச்சொல்",
-                btnSubmitLogin: "அங்கீகரிக்கவும்",
+                btnSubmitLogin: "உள்நுழைக",
                 lblRegMerchant: "வணிகர் உரிமையாளர் பெயர்",
                 lblRegShop: "கடை / உரிமையாளர் பெயர்",
                 lblRegEmail: "மின்னஞ்சல் முகவரி",
@@ -493,7 +517,7 @@
                     selectedShops: [
                         "Xerox Matrix", "Photo Studio", "Custom Frames", "Stationery Zone", "Premium Gifts Zone", 
                         "Mobile & Tech", "Printing & Tech Suite", "Internet Cafe & e-Sevai / CSC", "Toys Zone & Meesho Packing", "Money Transfer Ledger", "Welding/Fabrication Works", 
-                        "Bakery Core Counter", "Tea Shop Quick Billing"
+                        "Bakery Core Counter", "Tea Shop Quick POS"
                     ]
                 };
                 localStorage.setItem('roaji_shops', JSON.stringify([defaultVerifiedUser]));
