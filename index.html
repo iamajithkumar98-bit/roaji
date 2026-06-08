@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROAJI - Secure Portal Gateway</title>
+    <title>ROAJI - Master Entry Gateway</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -21,7 +21,7 @@
         }
     </script>
     <style>
-        /* Centered Lock Capsule Glassmorphism Styling matching Screenshot 456/496.png */
+        /* Centered Lock Capsule Glassmorphism Styling matching Screenshot 498.png */
         .glass-capsule {
             background: rgba(12, 12, 12, 0.85);
             backdrop-filter: blur(24px);
@@ -46,7 +46,7 @@
 </head>
 <body class="bg-brandDark text-neutral-100 min-h-full font-sans antialiased flex flex-col justify-between selection:bg-amber-500/20 selection:text-amber-300 relative overflow-hidden">
 
-    <!-- Subtle Amber Background Radial Glow -->
+    <!-- Ambient Amber Background Radial Glow -->
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
 
     <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
@@ -118,16 +118,16 @@
     <!-- Main Centered Obsidian Lock-Capsule Onboarding & Security Module -->
     <main class="relative z-10 flex-1 flex items-center justify-center px-4 py-8">
         
-        <div class="w-full max-w-md">
+        <div class="w-full max-w-lg">
             
-            <!-- Centered Capsule Container (Screenshot 456/496.png Style) -->
-            <div class="glass-capsule rounded-3xl p-8 relative overflow-hidden">
+            <!-- Centered Capsule Container (Screenshot 498.png Style) -->
+            <div class="glass-capsule rounded-3xl p-8 relative overflow-hidden shadow-2xl">
                 <!-- Top delicate ambient neon line -->
                 <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amberAccent to-transparent"></div>
 
                 <!-- Apex Security Lock Brand Emblem Header -->
                 <div class="flex flex-col items-center text-center mb-8">
-                    <!-- Amber Vector Lock Emblem with glow (100% Correct and Certified SVG coordinates) -->
+                    <!-- Amber Vector Lock Emblem with glow -->
                     <div class="w-14 h-14 bg-amberAccent/5 border border-amberAccent/20 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(245,158,11,0.12)]">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-amberAccent filter drop-shadow-[0_0_4px_rgba(245,158,11,0.5)]">
                             <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
@@ -184,39 +184,128 @@
                     </form>
                 </div>
 
-                <!-- ONBOARD SHOP TAB COMPONENT MATRIX -->
+                <!-- ONBOARD SHOP TAB COMPONENT MATRIX WITH LIVE ESTIMATION & CAPTCHA -->
                 <div id="register-tab-view" class="space-y-4 hidden">
-                    <form id="register-form-container" onsubmit="executeMerchantOnboarding(event)" class="space-y-3.5">
-                        <div>
-                            <label id="lbl-reg-merchant" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">MERCHANT OWNER NAME</label>
-                            <input id="reg-merchant-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none">
+                    <form id="register-form-container" onsubmit="executeMerchantOnboarding(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label id="lbl-reg-merchant" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">MERCHANT OWNER NAME</label>
+                                <input id="reg-merchant-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
+                            </div>
+                            <div>
+                                <label id="lbl-reg-shop" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SHOP / FRANCHISE NAME</label>
+                                <input id="reg-shop-name" type="text" required placeholder="e.g. Sri Vari Premium Plaza" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none">
+                            </div>
                         </div>
-                        <div>
-                            <label id="lbl-reg-shop" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SHOP / FRANCHISE NAME</label>
-                            <input id="reg-shop-name" type="text" required placeholder="e.g. Sri Vari Premium Plaza" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label id="lbl-reg-email" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
+                                <input id="reg-email" type="email" required placeholder="merchant@example.com" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono">
+                            </div>
+                            <div>
+                                <label id="lbl-reg-password" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
+                                <div class="relative">
+                                    <input id="reg-password" type="password" required placeholder="••••••••" class="w-full glass-input text-sm rounded-xl py-2 px-3 pr-10 text-white outline-none">
+                                    <button type="button" onclick="togglePasswordVisibility('reg-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors">
+                                        <svg id="eye-icon-reg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label id="lbl-reg-email" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
-                            <input id="reg-email" type="email" required placeholder="merchant@example.com" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
-                        </div>
-                        <div>
-                            <label id="lbl-reg-password" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
-                            <div class="relative">
-                                <input id="reg-password" type="password" required placeholder="••••••••" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 pr-10 text-white outline-none">
-                                <button type="button" onclick="togglePasswordVisibility('reg-password')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors">
-                                    <svg id="eye-icon-reg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                </button>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label id="lbl-reg-mobile" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CONTACT MOBILE NUMBER</label>
+                                <input id="reg-mobile" type="text" required placeholder="+91 94440 XXXXX" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono">
                             </div>
                         </div>
                         <div>
-                            <label id="lbl-reg-mobile" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CONTACT MOBILE NUMBER</label>
-                            <input id="reg-mobile" type="text" required placeholder="+91 94440 XXXXX" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
+                            <label id="lbl-reg-address" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CORPORATE SHOP ADDRESS</label>
+                            <textarea id="reg-address" required rows="2" placeholder="Enter physical store address details..." class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none resize-none"></textarea>
                         </div>
 
-                        <button id="btn-submit-reg" type="submit" class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-6 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
+                        <!-- 13 Niche Checkbox Selection Grid -->
+                        <div class="bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
+                            <h4 id="lbl-select-niches" class="text-[10px] font-bold text-amberAccent mb-3 uppercase tracking-wider">SELECT WORKSPACE MODULE CHANNELS</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono select-none">
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="xerox" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-xerox">Xerox Matrix</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="photo" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-photo">Photo Studio Suite</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="frames" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-frames">Custom Photo Frames</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="stationery" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-stationery">Stationery Zone POS</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="gifts" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-gifts">Premium Gifts Zone</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="mobile" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-mobile">Mobile Repair & Tech</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="printing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-printing">Printing Suite POS</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="esevai" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-esevai">e-Sevai & CSC Portal</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="toys" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-toys">Toys Zone & Meesho Packing</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="money_transfer" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-money_transfer">Money Transfer Ledger</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="fabrication" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-fabrication">Welding & SS Fabrication</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="bakery" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-bakery">Bakery Core Counter</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer">
+                                    <input type="checkbox" value="teashop" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950">
+                                    <span id="niche-lbl-teashop">Tea Shop Quick POS</span>
+                                </label>
+                            </div>
+
+                            <!-- Live Price Estimation Board -->
+                            <div class="border-t border-neutral-800/80 mt-4 pt-3 text-xs text-neutral-400 font-mono text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-1">
+                                <span id="lbl-estimated-amount">Estimated Total Package Plan Amount:</span>
+                                <span class="text-amberAccent font-bold">₹ <span id="onboarding-total-estimate">1950.00</span></span>
+                            </div>
+                        </div>
+
+                        <!-- Human Verification Block (CAPTCHA) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
+                            <div>
+                                <label id="lbl-captcha" class="block text-[10px] font-bold text-amberAccent mb-1.5 uppercase tracking-wider">HUMAN VERIFICATION</label>
+                                <div class="text-sm font-bold text-white font-mono bg-neutral-950/80 py-2.5 px-3 rounded-lg border border-neutral-800/60 text-center tracking-widest select-none">
+                                    <span id="captcha-var-a">5</span> + <span id="captcha-var-b">3</span> = ?
+                                </div>
+                            </div>
+                            <div>
+                                <label id="lbl-captcha-answer" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Enter Code</label>
+                                <input id="reg-captcha-input" type="text" oninput="verifyCaptchaValue()" required placeholder="Answer" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono text-center">
+                            </div>
+                        </div>
+
+                        <button id="btn-submit-reg" type="submit" disabled class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 disabled:opacity-40 disabled:cursor-not-allowed font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-4 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
                             SUBMIT VERIFICATION ONBOARDING
                         </button>
                     </form>
@@ -240,7 +329,7 @@
     <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4">
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider">
             <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
-            <!-- Clicking the ISO compliance text toggles the hidden sandboxed panel dynamically for debugging convenience -->
+            <!-- Clicking compliance text toggles the hidden diagnostic panel securely -->
             <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
         </div>
     </footer>
@@ -252,8 +341,9 @@
         let currentAuthTab = "login";
         let registeredShopsArray = [];
         let systemMaintenanceFlag = false;
+        let captchaResultSum = 8; // static fallback
 
-        // Structured English / Tamil Translation Dictionary Matrix (Safely isolates 0% Console Bugs)
+        // Structured English / Tamil Translation Dictionary Matrix
         const appTranslationMatrix = {
             en: {
                 appHeader: "ROAJI",
@@ -263,20 +353,25 @@
                 tabRegister: "ONBOARD SHOP",
                 lblEmail: "OFFICIAL EMAIL ADDRESS",
                 lblPassword: "SECURE ACCESS PASSWORD",
-                btnSubmitLogin: "SIGN IN",
+                btnSubmitLogin: "AUTHENTICATE SESSION",
                 lblRegMerchant: "MERCHANT OWNER NAME",
                 lblRegShop: "SHOP / FRANCHISE NAME",
                 lblRegEmail: "OFFICIAL EMAIL ADDRESS",
                 lblRegPassword: "SECURE ACCESS PASSWORD",
                 lblRegMobile: "CONTACT MOBILE NUMBER",
-                btnSubmitReg: "REGISTER SHOP & ACTIVATE",
+                lblRegAddress: "CORPORATE SHOP ADDRESS",
+                lblSelectNiches: "SELECT WORKSPACE MODULE CHANNELS",
+                lblCaptcha: "HUMAN VERIFICATION",
+                btnSubmitReg: "SUBMIT VERIFICATION ONBOARDING",
                 maintHeader: "GATEWAY LOCKED",
                 maintDesc: "System maintenance active. Access is temporarily restricted. Onboarding and validation pathways are locked.",
-                toastRegPending: "Onboarding success! Your account is active under status: Active_Lifetime_Free.",
+                lblEstimatedAmount: "Estimated Total Package Plan Amount:",
+                placeholderAddress: "Enter physical store address details...",
+                toastRegPending: "Onboarding request submitted! Pending Super Admin Approval.",
                 toastRegEmailDup: "Registration failed. Email is already allocated.",
-                toastAdminRedirect: "Master Admin credentials detected! Redirecting to Super Admin Portal...",
+                toastAdminRedirect: "Super Admin detected. Redirecting to Super Admin Portal...",
                 toastLoginSuccess: "Credentials authenticated successfully! Routing to shop resolver...",
-                toastLoginFailed: "Invalid email or secret password context. Try again.",
+                toastLoginFailed: "Invalid email/password or pending admin approval.",
                 toastMaintActive: "SYSTEM LOCK ACTIVE. Gateway access is blocked.",
                 toastConfigSaved: "Maintenance settings updated.",
                 footerDesc: "STATUTORY AUTHORIZATION METRICS COMPLIANT UNDER ISO/IEC 27001 STANDARD.",
@@ -287,7 +382,20 @@
                 placeholderMobile: "+91 94440 XXXXX",
                 lblRememberMe: "Remember Me",
                 linkForgot: "Forgot Password?",
-                toastForgotMsg: "Contact the enterprise system administrator to initiate password restoration."
+                toastForgotMsg: "Contact the enterprise system administrator to initiate password restoration.",
+                "niche-lbl-xerox": "Xerox Matrix",
+                "niche-lbl-photo": "Photo Studio Suite",
+                "niche-lbl-frames": "Custom Photo Frames",
+                "niche-lbl-stationery": "Stationery Zone POS",
+                "niche-lbl-gifts": "Premium Gifts Zone",
+                "niche-lbl-mobile": "Mobile Repair & Tech",
+                "niche-lbl-printing": "Printing Suite POS",
+                "niche-lbl-esevai": "e-Sevai & CSC Portal",
+                "niche-lbl-toys": "Toys Zone & Meesho Packing",
+                "niche-lbl-money_transfer": "Money Transfer Ledger",
+                "niche-lbl-fabrication": "Welding & SS Fabrication",
+                "niche-lbl-bakery": "Bakery Core Counter",
+                "niche-lbl-teashop": "Tea Shop Quick POS"
             },
             ta: {
                 appHeader: "ரோஜி",
@@ -297,20 +405,25 @@
                 tabRegister: "கடை பதிவு",
                 lblEmail: "மின்னஞ்சல் முகவரி",
                 lblPassword: "பாதுகாப்பான கடவுச்சொல்",
-                btnSubmitLogin: "உள்நுழைக",
+                btnSubmitLogin: "அங்கீகரிக்கவும்",
                 lblRegMerchant: "வணிகர் உரிமையாளர் பெயர்",
                 lblRegShop: "கடை / உரிமையாளர் பெயர்",
                 lblRegEmail: "மின்னஞ்சல் முகவரி",
                 lblRegPassword: "பாதுகாப்பான கடவுச்சொல்",
                 lblRegMobile: "தொடர்பு கைபேசி எண்",
-                btnSubmitReg: "பதிவு செய்து செயல்படுத்தவும்",
+                lblRegAddress: "அலுவலக கடை முகவரி",
+                lblSelectNiches: "பணி இட தொகுப்புத் துறைகளைத் தேர்ந்தெடுக்கவும்",
+                lblCaptcha: "மனித சரிபார்ப்பு",
+                btnSubmitReg: "பதிவு விண்ணப்பத்தைச் சமர்ப்பிக்கவும்",
                 maintHeader: "நுழைவாயில் முடக்கப்பட்டுள்ளது",
                 maintDesc: "கணினி பராமரிப்பு வேலைகள் நடக்கின்றன. அனுமதி தற்காலிகமாக நிறுத்தப்பட்டுள்ளது.",
-                toastRegPending: "பதிவு வெற்றிகரமாக முடிந்தது! கணக்கு உடனடியாக செயல்படுத்தப்பட்டது (Active_Lifetime_Free).",
+                lblEstimatedAmount: "மதிப்பிடப்பட்ட மொத்த தொகுப்புத் திட்டக் கட்டணம்:",
+                placeholderAddress: "கடையின் முகவரி விபரங்களை உள்ளிடவும்...",
+                toastRegPending: "பதிவு விண்ணப்பம் சமர்ப்பிக்கப்பட்டது! சூப்பர் அட்மின் ஒப்புதலுக்காக காத்திருக்கிறது.",
                 toastRegEmailDup: "பதிவு தோல்வியடைந்தது. இந்த மின்னஞ்சல் ஏற்கனவே பயன்படுத்தப்பட்டுள்ளது.",
                 toastAdminRedirect: "சூப்பர் அட்மின் கணக்கு கண்டறியப்பட்டது! அங்கீகாரப் பக்கத்திற்குத் திருப்பிவிடப்படுகிறது...",
                 toastLoginSuccess: "அங்கீகாரம் வெற்றிகரமாக முடிந்தது! சாதனத் தேர்வுக்குத் திருப்பிவிடப்படுகிறது...",
-                toastLoginFailed: "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல். மீண்டும் முயலவும்.",
+                toastLoginFailed: "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல் அல்லது ஒப்புதல் நிலுவையில் உள்ளது.",
                 toastMaintActive: "கணினி முடக்கம் செயலில் உள்ளது. போர்ட்டல் அணுகல் தடுக்கப்பட்டுள்ளது.",
                 toastConfigSaved: "பராமரிப்பு அமைப்புகள் சேமிக்கப்பட்டன.",
                 footerDesc: "ISO/IEC 27001 தரத்தின்படி பாதுகாக்கப்பட்டது.",
@@ -321,7 +434,20 @@
                 placeholderMobile: "+91 94440 XXXXX",
                 lblRememberMe: "நினைவில் வை",
                 linkForgot: "கடவுச்சொல் மறந்துவிட்டதா?",
-                toastForgotMsg: "கடவுச்சொல்லை மீட்டமைக்க கணினி நிர்வாகியைத் தொடர்பு கொள்ளவும்."
+                toastForgotMsg: "கடவுச்சொல்லை மீட்டமைக்க கணினி நிர்வாகியைத் தொடர்பு கொள்ளவும்.",
+                "niche-lbl-xerox": "ஜெராக்ஸ் மேட்ரிக்ஸ்",
+                "niche-lbl-photo": "புகைப்பட ஸ்டுடியோ",
+                "niche-lbl-frames": "விருப்ப புகைப்பட பிரேம்கள்",
+                "niche-lbl-stationery": "ஸ்டேஷனரி சோன் பில்லிங்",
+                "niche-lbl-gifts": "பிரீமியம் பரிசுகள் சோன்",
+                "niche-lbl-mobile": "மொபைல் பழுதுபார்ப்பு & டெக்",
+                "niche-lbl-printing": "பிரிண்டிங் சூட் பில்லிங்",
+                "niche-lbl-esevai": "இ-சேவை & சிஎஸ்சி போர்ட்டல்",
+                "niche-lbl-toys": "பொம்மைகள் & மீஷோ பேக்கிங்",
+                "niche-lbl-money_transfer": "பண பரிமாற்ற பில்லிங்",
+                "niche-lbl-fabrication": "வெல்டிங் & ஃபேப்ரிகேஷன்",
+                "niche-lbl-bakery": "பேக்கரி கவுண்டர் பில்லிங்",
+                "niche-lbl-teashop": "டீ ஷாப் விரைவு பில்லிங்"
             }
         };
 
@@ -329,6 +455,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             initializeDatabaseMockSeeds();
             synchronizeStateAndLogs();
+            generateCaptchaNumbers();
             mutateLanguageContext('en');
             pollMaintenanceInterceptorState();
             setInterval(pollMaintenanceInterceptorState, 2500); // Continuous safety check loop
@@ -343,9 +470,9 @@
                     email: "demo@roaji.com",
                     password: "password123",
                     phone: "+91 94440 98765",
-                    status: "Active_Lifetime_Free",
-                    package: "SaaS_Paid_Plan",
-                    // Dynamic selectedShops token array holding all 13 core channel IDs
+                    address: "12, Cathedral Road, Chennai",
+                    status: "Verified", // Active out-of-the-box
+                    package: "Active_Lifetime_Free",
                     selectedShops: [
                         "stationery", "gifts", "mobile", "esevai", "toys", 
                         "money_transfer", "fabrication", "bakery", "teashop", 
@@ -389,6 +516,19 @@
             }
         }
 
+        // Inline CAPTCHA generation utility
+        function generateCaptchaNumbers() {
+            const a = Math.floor(Math.random() * 9) + 1;
+            const b = Math.floor(Math.random() * 9) + 1;
+            
+            captchaResultSum = a + b;
+
+            document.getElementById('captcha-var-a').textContent = a;
+            document.getElementById('captcha-var-b').textContent = b;
+            document.getElementById('reg-captcha-input').value = '';
+            document.getElementById('btn-submit-reg').disabled = true;
+        }
+
         // Continuous flag check validator (Part 10 safety maintenance overlay feature)
         function pollMaintenanceInterceptorState() {
             const flag = localStorage.getItem('roaji_maintenance_mode');
@@ -427,6 +567,47 @@
                 btnLogin.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent text-neutral-500 hover:text-neutral-300 transition-all outline-none";
                 viewRegister.classList.remove('hidden');
                 viewLogin.classList.add('hidden');
+                generateCaptchaNumbers();
+                recalculateOnboardingPriceEstimation();
+            }
+        }
+
+        // Onboarding Checkbox slasher math calculation
+        function recalculateOnboardingPriceEstimation() {
+            const checkboxes = document.querySelectorAll('.niche-checkbox');
+            let selectedCount = 0;
+
+            checkboxes.forEach(box => {
+                if (box.checked) selectedCount++;
+            });
+
+            // Base pricing overrides lookup (₹150 standard fallback)
+            let baseRate = 150.00;
+            const ratesText = localStorage.getItem('roaji_global_pricing_rules');
+            if (ratesText) {
+                try {
+                    const rules = JSON.parse(ratesText);
+                    if (rules.niche_rate !== undefined) {
+                        baseRate = parseFloat(rules.niche_rate);
+                    }
+                } catch (e) {
+                    baseRate = 150.00;
+                }
+            }
+
+            const estimatedSum = selectedCount * baseRate;
+            document.getElementById('onboarding-total-estimate').textContent = estimatedSum.toFixed(2);
+        }
+
+        // Check if entered captcha equals sum values to unlock submission
+        function verifyCaptchaValue() {
+            const enteredVal = parseInt(document.getElementById('reg-captcha-input').value) || 0;
+            const btnSubmit = document.getElementById('btn-submit-reg');
+
+            if (enteredVal === captchaResultSum) {
+                btnSubmit.disabled = false;
+            } else {
+                btnSubmit.disabled = true;
             }
         }
 
@@ -493,7 +674,17 @@
             safeSetText('lbl-reg-email', t.lblRegEmail);
             safeSetText('lbl-reg-password', t.lblRegPassword);
             safeSetText('lbl-reg-mobile', t.lblRegMobile);
+            safeSetText('lbl-reg-address', t.lblRegAddress);
+            safeSetText('lbl-select-niches', t.lblSelectNiches);
+            safeSetText('lbl-captcha', t.lblCaptcha);
             safeSetText('btn-submit-reg', t.btnSubmitReg);
+            safeSetText('lbl-estimated-amount', t.lblEstimatedAmount);
+
+            // Maintain niches checklists translated names
+            const nichesList = ["xerox", "photo", "frames", "stationery", "gifts", "mobile", "printing", "esevai", "toys", "money_transfer", "fabrication", "bakery", "teashop"];
+            nichesList.forEach(niche => {
+                safeSetText(`niche-lbl-${niche}`, t[`niche-lbl-${niche}`]);
+            });
 
             // Maintenance Banner labels
             safeSetText('lang-maint-header', t.maintHeader);
@@ -507,6 +698,7 @@
             safeSetPlaceholder('reg-email', t.placeholderEmail);
             safeSetPlaceholder('reg-password', t.placeholderPassword);
             safeSetPlaceholder('reg-mobile', t.placeholderMobile);
+            safeSetPlaceholder('reg-address', t.placeholderAddress);
 
             // Static Footer translations
             safeSetText('lang-footer-desc', t.footerDesc);
@@ -534,6 +726,7 @@
             const email = document.getElementById('reg-email').value.trim();
             const password = document.getElementById('reg-password').value;
             const mobile = document.getElementById('reg-mobile').value.trim();
+            const address = document.getElementById('reg-address').value.trim();
 
             // Duplicate Email verification checker
             const emailExists = registeredShopsArray.some(user => user.email.toLowerCase() === email.toLowerCase());
@@ -542,21 +735,30 @@
                 return;
             }
 
-            // Create onboarding profile payload with status "Active_Lifetime_Free" and all 13 core channels
+            // Pack array list of selected store niche IDs
+            const selectedNiches = [];
+            document.querySelectorAll('.niche-checkbox').forEach(box => {
+                if (box.checked) {
+                    selectedNiches.push(box.value);
+                }
+            });
+
+            const estimateAmount = parseFloat(document.getElementById('onboarding-total-estimate').textContent) || 0;
+
+            // Create onboarding profile payload with status "PENDING_SUPER_ADMIN_APPROVAL"
             const newMerchant = {
                 merchantName: merchantName,
                 name: shopName,
                 email: email,
                 password: password,
                 phone: mobile,
-                status: "Active_Lifetime_Free", 
-                package: "SaaS_Paid_Plan",
-                // Access rights mapped dynamically across all 13 core workspace channels
-                selectedShops: [
-                    "stationery", "gifts", "mobile", "esevai", "toys", 
-                    "money_transfer", "fabrication", "bakery", "teashop", 
-                    "pharmacy", "supermarket", "boutique", "laundry"
-                ] 
+                address: address,
+                status: "PENDING_SUPER_ADMIN_APPROVAL", // Pending status on new registers
+                package: "Active_Lifetime_Free",
+                selectedShops: selectedNiches,
+                slashedInvoicesCount: 1000,
+                daysValidity: 365,
+                estimatedPlanAmount: estimateAmount
             };
 
             // Append payload to database variable array
@@ -569,6 +771,7 @@
             document.getElementById('reg-email').value = '';
             document.getElementById('reg-password').value = '';
             document.getElementById('reg-mobile').value = '';
+            document.getElementById('reg-address').value = '';
 
             synchronizeStateAndLogs();
             switchAuthTab('login');
@@ -588,6 +791,9 @@
 
             // Interceptor 1: Master Super Admin Bypass Gate check
             if (email.toLowerCase() === "iamajithkumar98@gmail.com") {
+                // Populate claims token inside sessionStorage
+                sessionStorage.setItem('roaji_session_claims', 'SUPER_ADMIN');
+                
                 triggerUINotification(appTranslationMatrix[activeLanguageContext].toastAdminRedirect);
                 setTimeout(() => {
                     window.location.href = "super_admin_panel.html";
@@ -601,7 +807,14 @@
             );
 
             if (matchUser) {
-                // Set active session state inside store database values
+                // Verify account is approved
+                if (matchUser.status === "PENDING_SUPER_ADMIN_APPROVAL") {
+                    triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginFailed);
+                    return;
+                }
+
+                // Write verified 'OWNER' claims payload matrix into sessionStorage
+                sessionStorage.setItem('roaji_session_claims', 'OWNER');
                 localStorage.setItem('roaji_active_shop_session', JSON.stringify(matchUser));
                 
                 // Backward compatible object seed mapping required by POS modules
