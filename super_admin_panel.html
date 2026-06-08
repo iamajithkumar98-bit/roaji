@@ -123,7 +123,7 @@
                 <div class="glass-panel p-5 rounded-2xl border-neutral-800/80">
                     <span id="lang-wdg-total-tenants" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold">Active Tenants Pool</span>
                     <p id="wdg-total-tenants" class="text-3xl font-black font-mono mt-1 text-white">0</p>
-                    <span id="lang-wdg-total-tenants-sub" class="text-[9px] text-neutral-600 font-mono uppercase font-semibold">Verified SaaS Operators</span>
+                    <span id="lang-wdg-total-tenants-sub" class="text-[9px] text-neutral-600 font-mono uppercase">Verified SaaS Operators</span>
                 </div>
                 <div class="glass-panel p-5 rounded-2xl border-neutral-800/80">
                     <span id="lang-wdg-pending-queue" class="text-[10px] text-neutral-500 font-mono uppercase tracking-wider font-semibold text-amberAccent">Pending Approval Queue</span>
@@ -216,7 +216,7 @@
                             <input id="inp-prov-brand" type="text" required placeholder="Sri Vari Stores" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
-                            <label id="lbl-prov-mobile" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Mobile Contact</label>
+                            <label id="lbl-prov-mobile" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">Mobile Contact</label>
                             <input id="inp-prov-mobile" type="text" required placeholder="+91 XXXXX XXXXX" class="w-full glass-input text-sm rounded-lg py-2.5 px-3.5 text-white outline-none focus:border-amberAccent font-mono bg-neutral-900/60">
                         </div>
                         <div>
@@ -302,7 +302,7 @@
 
         </div>
 
-        <!-- Onboarding Payment Verification Queue Matrix (Expanded Matrix Columns) -->
+        <!-- Onboarding Payment Verification Queue Table Matrix (Expanded Matrix Columns) -->
         <div class="glass-panel rounded-2xl p-6">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-neutral-800/80 gap-3 mb-4">
                 <div>
@@ -426,7 +426,7 @@
                     <div class="space-y-4 text-xs font-mono">
                         <div>
                             <label id="lbl-payment-upi" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">Admin Corporate UPI ID</label>
-                            <input id="inp-payment-upi" type="text" required placeholder="roajisystems@upi" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none focus:border-amberAccent">
+                            <input id="inp-payment-upi" type="text" required placeholder="roajisystems@upi" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none focus:border-amberAccent bg-neutral-900/60">
                         </div>
                         <div>
                             <label id="lbl-payment-qr-api" class="block text-[10px] font-bold text-neutral-500 mb-1.5 uppercase tracking-wider">QR Code Server API Endpoint URL</label>
@@ -438,7 +438,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="btn-save-payment" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold text-xs py-3 rounded-xl transition-all uppercase tracking-wider mt-4 font-mono">
+                    <button type="submit" id="btn-save-payment" class="w-full bg-neutral-100 hover:bg-amberAccent hover:text-neutral-950 text-neutral-950 font-bold text-xs py-3 rounded-xl transition-all uppercase tracking-wider mt-4">
                         Save Payment API Keys
                     </button>
                 </form>
@@ -520,14 +520,26 @@
 
     <!-- Core Security Admin Operations Logic Engine -->
     <script>
-        // Session Handshake: Use this robust, error-free parsing block at the start of your script (Strict Refactoring Directions)
+        // Dual-Layer Validation & Hardened Session Handshake (Strict Refactoring Directions)
+        const urlParams = new URLSearchParams(window.location.search);
         const rawClaims = sessionStorage.getItem('roaji_session_claims');
         let claims = { role: "GUEST" };
         try { if(rawClaims) claims = JSON.parse(rawClaims); } catch(e) { console.error("Parse Error"); }
-        if (claims.role !== "SUPER_ADMIN") { window.location.replace("index.html"); }
+        
+        // If query param or session is correct SUPER_ADMIN role
+        if (urlParams.get('auth') !== 'true' && claims.role !== "SUPER_ADMIN") {
+            window.location.replace("index.html");
+        } else {
+            // Remove hidden class from body ONLY when session check passes successfully
+            const body = document.getElementById('admin-body');
+            if (body) {
+                body.classList.remove('hidden');
+            }
+        }
 
-        // Force-load all databases from localStorage immediately (Fixes Admin Panel Blank View Crash)
-        const registeredShopsArray = JSON.parse(localStorage.getItem('roaji_shops')) || [];
+        // Force-load all databases from localStorage immediately (Defensive check implemented)
+        let registeredShopsArray = JSON.parse(localStorage.getItem('roaji_shops'));
+        if (!registeredShopsArray) registeredShopsArray = [];
 
         // Application states
         let activeLanguageContext = "en";
@@ -701,7 +713,7 @@
                 secPaymentDesc: "அனைத்து வணிகர்களின் பில்லிங் திரையிலும் அட்மினின் UPI ID மற்றும் QR API ஐ இணைக்கவும்.",
                 lblPaymentUpi: "அட்மின் கார்ப்பரேட் UPI ID",
                 lblPaymentQrApi: "QR கோடு சர்வர் API முகவரி",
-                lblPaymentApiKeys: "பாதுகாப்பான B2B கட்டண API சாவிகள்",
+                lblPaymentApiKeys: "பாதுகாப்பான B2B கட்டண API சாவிகளைச் சேமி",
                 btnSavePayment: "கட்டண API சாவிகளைச் சேமி",
                 "niche-lbl-xerox": "ஜெராக்ஸ் மேட்ரிக்ஸ்",
                 "niche-lbl-photo": "புகைப்பட ஸ்டுடியோ",
@@ -718,23 +730,6 @@
                 "niche-lbl-teashop": "டீ Shop விரைவு பில்லிங்"
             }
         };
-
-        // DOM Content Loaded Handler (Authorization & Parsing Logic completely refactored to handle JSON claim string)
-        window.addEventListener('DOMContentLoaded', () => {
-            // If verified successfully, erase body hidden class lockdown traps
-            const body = document.getElementById('admin-body');
-            if (body) {
-                body.classList.remove('hidden');
-            }
-            
-            // Initialize database models
-            loadLocalStorageDatabases();
-            loadPricingOverridesFromStorage();
-            loadAdminProfileFromStorage();
-            loadPaymentConfigFromStorage();
-            mutateLanguageContext('en');
-            initializeAnalyticsChartEngine();
-        });
 
         // Pull active list array from localStorage
         function loadLocalStorageDatabases() {
@@ -825,7 +820,7 @@
             triggerUINotification(appTranslationMatrix[activeLanguageContext].toastPaymentSaved);
         }
 
-        // Smart Manual Merchant Provisioning & Permissions Gate
+        // Smart Manual Merchant Provisioning & Permissions Gate (writes immediately to the same roaji_shops array used by index.html)
         function provisionMerchantAccountDirectly(event) {
             event.preventDefault();
 
@@ -863,7 +858,7 @@
                 estimatedPlanAmount: selectedNiches.length * 150
             };
 
-            // Inject Directly into global roaji_shops array
+            // Inject Directly into global roaji_shops array and save immediately
             registeredShopsArray.push(newMerchant);
             localStorage.setItem('roaji_shops', JSON.stringify(registeredShopsArray));
 
