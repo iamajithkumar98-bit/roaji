@@ -1,86 +1,1066 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Auth Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0">
+    <title>ROAJI - Secure Portal Gateway</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-
-    <!-- Login Card -->
-    <div id="auth-card" class="bg-white p-8 rounded-xl shadow-lg w-96">
-        <h2 class="text-2xl font-bold mb-6 text-center text-blue-600">Business Login</h2>
-        
-        <!-- Step 1: Identifier Input -->
-        <div id="step-1">
-            <label class="block text-sm font-medium text-gray-700">WhatsApp Number or Email</label>
-            <input type="text" id="identifier" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 9876543210">
-            <button onclick="sendOTP()" class="w-full mt-4 bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">Send OTP</button>
-        </div>
-
-        <!-- Step 2: OTP Input (Initially Hidden) -->
-        <div id="step-2" class="hidden">
-            <p class="text-sm text-gray-500 mb-4">எண்முறை (OTP) அனுப்பப்பட்டுள்ளது. அதை கீழே உள்ளிடவும்.</p>
-            <label class="block text-sm font-medium text-gray-700">Enter 6-digit OTP</label>
-            <input type="number" id="otp-input" class="mt-1 block w-full p-2 border border-gray-300 rounded-md tracking-widest text-center text-xl font-bold">
-            <button onclick="verifyOTP()" class="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition">Verify & Login</button>
-        </div>
-        
-        <p id="message" class="mt-4 text-center text-sm text-red-500"></p>
-    </div>
-
-    <!-- Dashboard (Initially Hidden) -->
-    <div id="dashboard" class="hidden bg-white p-10 rounded-xl shadow-2xl w-3/4">
-        <h1 class="text-3xl font-bold text-gray-800">Welcome to Business Dashboard! ✅</h1>
-        <p class="mt-4 text-gray-600">You have securely logged in using Passwordless Auth.</p>
-        <button onclick="location.reload()" class="mt-6 text-blue-600 underline">Logout</button>
-    </div>
-
     <script>
-        const API_URL = "http://localhost:3000/api";
-        let userIdentifier = "";
-
-        async function sendOTP() {
-            userIdentifier = document.getElementById('identifier').value;
-            if (!userIdentifier) return alert("Please enter phone/email");
-
-            const response = await fetch(`${API_URL}/send-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ identifier: userIdentifier })
-            });
-
-            const data = await response.json();
-            document.getElementById('message').innerText = data.message;
-            document.getElementById('message').classList.replace('text-red-500', 'text-green-500');
-            
-            // UI மாற்றங்கள்
-            document.getElementById('step-1').classList.add('hidden');
-            document.getElementById('step-2').classList.remove('hidden');
-        }
-
-        async function verifyOTP() {
-            const otp = document.getElementById('otp-input').value;
-            
-            const response = await fetch(`${API_URL}/verify-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ identifier: userIdentifier, otp: otp })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                // லாகின் வெற்றி - Dashboard காட்டு
-                document.getElementById('auth-card').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                // உண்மையில் இங்கே JWT-ஐ Cookie-யில் சேமிக்க வேண்டும்
-            } else {
-                document.getElementById('message').innerText = "Invalid OTP. Please try again.";
-                document.getElementById('message').classList.replace('text-green-500', 'text-red-500');
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandDark: '#050505',
+                        brandGlass: 'rgba(12, 12, 12, 0.85)',
+                        amberAccent: '#f59e0b',
+                        emeraldAccent: '#10b981',
+                        roseAccent: '#f43f5e',
+                    }
+                }
             }
         }
+    </script>
+    <style>
+        /* Orange/Amber glowing tech typography text-shadow bloom effects */
+        .bloom-text {
+            text-shadow: 0 0 12px rgba(244, 63, 94, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
+        }
+        /* Centered Glassmorphic Capsule with subtle white-border haze */
+        .glass-capsule {
+            background: rgba(15, 15, 15, 0.75);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95);
+        }
+        /* Custom luxury input fields border and focus interactions */
+        .glass-input {
+            background: rgba(8, 8, 8, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.3);
+            background: rgba(12, 12, 12, 0.95);
+        }
+        /* Rose neon-pink/amber glow drop-shadow styling */
+        .drop-shadow-glow {
+            filter: drop-shadow(0 0 10px rgba(244, 63, 94, 0.85));
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-brandDark flex flex-col justify-between overflow-y-auto text-neutral-100 font-sans antialiased selection:bg-amber-500/20 selection:text-amber-300 relative p-4">
+
+    <!-- Ambient Subtle Background Radial Glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0"></div>
+
+    <!-- Active System Lockout / Maintenance Mode Interceptor Modal -->
+    <div id="maintenance-overlay" class="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[9999] hidden flex-col items-center justify-center p-6 text-center">
+        <div class="glass-capsule p-8 rounded-3xl max-w-md w-full">
+            <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-5 animate-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+            </div>
+            <h2 id="lang-maint-header" class="text-2xl font-bold tracking-tight text-white mb-2">GATEWAY LOCKED</h2>
+            <p id="lang-maint-desc" class="text-neutral-400 text-sm mb-6">System maintenance active. Access is temporarily restricted. Onboarding and validation pathways are locked.</p>
+            <div class="text-[11px] text-amberAccent font-mono uppercase tracking-wider py-1.5 px-3 bg-amberAccent/10 rounded border border-amberAccent/20 inline-block">
+                Interceptor Flag: SYSTEM_MAINT_OVERLAY_LOCK
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Header Navigation (Localization Trigger Only) -->
+    <header class="relative z-10 w-full max-w-7xl mx-auto px-4 py-3 flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-amberAccent/10 border border-amberAccent/30 rounded-xl flex items-center justify-center">
+                <span class="text-amberAccent font-black text-lg tracking-wider">R</span>
+            </div>
+            <h1 class="text-[10px] sm:text-xs font-extrabold text-neutral-100 tracking-wider uppercase">
+                ROAJI GATEWAY <span class="text-neutral-500 font-normal mx-1">//</span> <span class="text-neutral-400 font-semibold text-[9px] sm:text-[10px] tracking-widest">ONBOARDING HUB</span>
+            </h1>
+        </div>
+
+        <!-- Language toggle switcher -->
+        <div class="bg-neutral-950 border border-neutral-900 p-0.5 rounded-lg flex shrink-0">
+            <button id="lang-toggle-en" onclick="mutateLanguageContext('en')" class="px-2.5 py-1 text-[10px] sm:text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono">
+                EN
+            </button>
+            <button id="lang-toggle-ta" onclick="mutateLanguageContext('ta')" class="px-2.5 py-1 text-[10px] sm:text-[11px] font-bold rounded transition-all text-neutral-400 font-mono">
+                தமிழ்
+            </button>
+        </div>
+    </header>
+
+    <!-- Hidden Developer Sandbox Diagnostics Panel (Accessible via Footer Compliancy Switch) -->
+    <div id="configs-drawer-panel" class="hidden border-b border-amber-500/20 bg-neutral-950 px-4 py-5 transition-all relative z-20 shrink-0">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- Maintenance mode switch simulation -->
+            <div class="glass-capsule p-3.5 rounded-2xl border-neutral-800 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-[10px] text-amberAccent font-mono uppercase mb-2">Simulate Maintenance Lockout</h3>
+                    <p class="text-neutral-500 text-[10px] leading-tight mb-3">Toggles `roaji_maintenance_mode` in localStorage. Lockout blocks all authentications instantly.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="overrideMaintenance('ON')" class="text-xs font-mono font-semibold py-1.5 bg-red-950/20 border border-red-800/40 text-red-400 hover:bg-red-900 hover:text-white rounded transition-all">ON (Lock)</button>
+                    <button onclick="overrideMaintenance('OFF')" class="text-xs font-mono font-semibold py-1.5 bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-emeraldAccent hover:text-emeraldAccent hover:border-transparent rounded transition-all">OFF (Active)</button>
+                </div>
+            </div>
+
+            <!-- Diagnostics DB state reader -->
+            <div class="glass-capsule p-3.5 rounded-2xl border-neutral-800">
+                <h3 class="text-[10px] text-amberAccent font-mono uppercase mb-2">Registered Accounts Diagnostic Ledger</h3>
+                <div id="sandbox-diag-accounts" class="text-[9px] font-mono text-neutral-400 bg-black/60 p-2.5 rounded border border-neutral-900 h-24 overflow-y-auto leading-relaxed">
+                    Loading diagnostic stack...
+                </div>
+            </div>
+
+            <!-- Dynamic setup database initial seeder helper -->
+            <div class="glass-capsule p-3.5 rounded-2xl border-neutral-800 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-[10px] text-amberAccent font-mono uppercase mb-2">Initialize / Reset Local Seed</h3>
+                    <p class="text-neutral-500 text-[10px] leading-tight">Clears all account data and registers the default demo verified merchant: `demo@roaji.com` / `password123`.</p>
+                </div>
+                <button onclick="forceCleanResetSeed()" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold text-xs py-2 rounded-lg transition-all mt-3 uppercase tracking-wider">
+                    Reset Local Registry
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Main Centered Obsidian Onboarding & Security Module -->
+    <main class="relative z-10 flex-1 flex items-center justify-center py-6 sm:py-10 animate-fade-in">
+        
+        <div class="w-full max-w-md mx-auto my-auto">
+            
+            <!-- Centered Capsule Container (Screenshot 524.png Style) -->
+            <div class="glass-capsule w-full rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+
+                <!-- Apex Rose Brand Emblem Header -->
+                <div class="flex flex-col items-center text-center mb-6">
+                    <!-- Centered elegant Vector Rose Flower SVG with neon pink/amber glow shadow -->
+                    <div class="w-16 h-16 flex items-center justify-center mb-2">
+                        <svg class="w-14 h-14 text-roseAccent drop-shadow-glow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10c0-4.418-3.582-8-8-8S4 7.582 4 12c0 6 8 10 8 10z" />
+                            <path d="M12 21a9.975 9.975 0 0 1-5-3M12 21a9.975 9.975 0 0 0 5-3" />
+                            <path d="M12 12c1.5-1.5 2-3 1-4s-3-.5-4 1 0 3.5 3 3z" />
+                            <path d="M12 12c-1.5-1.5-2-3-1-4s3-.5 4 1 0 3.5-3 3z" />
+                            <path d="M12 2a4.5 4.5 0 0 0-4.5 4.5c0 1.5 1 3.5 4.5 5.5 3.5-2 4.5-4 4.5-5.5A4.5 4.5 0 0 0 12 2z" />
+                        </svg>
+                    </div>
+                    <!-- Amber glowing brand name header -->
+                    <h1 id="app-brand-title" class="text-3xl sm:text-4xl font-black text-white tracking-widest bloom-text transition-all duration-300">ROAJI</h1>
+                    <p id="sec-login-subtitle" class="text-[10px] sm:text-[11px] text-amberAccent font-bold tracking-[0.2em] mt-2 uppercase">ROAJI BILLING SOFTWARE</p>
+                    <p id="sec-login-subtext" class="text-[10px] sm:text-xs text-neutral-500 mt-1">Enter credentials to unlock context</p>
+                </div>
+
+                <!-- PAGE 1: SIGN-IN VIEW -->
+                <div id="login-tab-view" class="space-y-4">
+                    <form id="login-form-container" class="space-y-4">
+                        <div>
+                            <label id="lbl-login-email" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
+                            <input id="login-email" type="email" required placeholder="Enter your official email address" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
+                        </div>
+                        <div>
+                            <label id="lbl-login-password" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
+                            <div class="relative">
+                                <input id="login-password" type="password" required placeholder="Enter secure password" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 pr-10 text-white outline-none">
+                                <!-- Eye Icon Visibility Toggle -->
+                                <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors">
+                                    <svg id="eye-icon-login" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox & Forgot Password row -->
+                        <div class="flex items-center justify-between text-[11px] text-neutral-400">
+                            <label class="flex items-center space-x-2 cursor-pointer select-none">
+                                <input type="checkbox" class="accent-amberAccent rounded border-neutral-800 bg-neutral-900 focus:ring-0 focus:ring-offset-0">
+                                <span id="lbl-remember-me">Remember Me</span>
+                            </label>
+                            <a href="#" onclick="triggerForgotPasswordToast()" id="link-forgot-password" class="text-amberAccent hover:underline">Forgot Password?</a>
+                        </div>
+
+                        <button id="btn-submit-login" type="submit" class="w-full bg-amberAccent hover:bg-amber-400 text-neutral-950 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-4 shadow-[0_0_20px_rgba(245,158,11,0.12)]">
+                            SIGN IN
+                        </button>
+                    </form>
+
+                    <!-- Clickable inline switch link for registration page navigation -->
+                    <div class="text-center pt-3 border-t border-neutral-900/60 mt-4">
+                        <a href="#" onclick="switchAuthMode('register')" id="link-switch-to-register" class="text-xs text-amberAccent hover:underline tracking-wide font-semibold uppercase">New Registration</a>
+                    </div>
+                </div>
+
+                <!-- PAGE 2: ONBOARD REGISTRATION MODULE (DYNAMIC PAGE STATE) -->
+                <div id="register-tab-view" class="space-y-4 hidden">
+                    <form id="register-form-container" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                            <div>
+                                <label id="lbl-reg-merchant" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">MERCHANT OWNER NAME</label>
+                                <input id="reg-merchant-name" type="text" required placeholder="e.g. Ajith Kumar" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none">
+                            </div>
+                            <div>
+                                <label id="lbl-reg-shop" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SHOP / FRANCHISE NAME</label>
+                                <input id="reg-shop-name" type="text" required placeholder="e.g. Sri Vari Premium Plaza" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                            <div>
+                                <label id="lbl-reg-email" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">OFFICIAL EMAIL ADDRESS</label>
+                                <input id="reg-email" type="email" required placeholder="merchant@example.com" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
+                            </div>
+                            <div>
+                                <label id="lbl-reg-password" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">SECURE ACCESS PASSWORD</label>
+                                <div class="relative">
+                                    <input id="reg-password" type="password" required placeholder="••••••••" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 pr-10 text-white outline-none">
+                                    <button type="button" onclick="togglePasswordVisibility('reg-password')" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors">
+                                        <svg id="eye-icon-reg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label id="lbl-reg-mobile" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CONTACT MOBILE NUMBER</label>
+                            <input id="reg-mobile" type="text" required placeholder="+91 94440 XXXXX" class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none font-mono">
+                        </div>
+                        <div>
+                            <label id="lbl-reg-address" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider">CORPORATE SHOP ADDRESS</label>
+                            <textarea id="reg-address" required rows="2" placeholder="Enter physical store address details..." class="w-full glass-input text-sm rounded-xl py-2.5 px-3.5 text-white outline-none resize-none"></textarea>
+                        </div>
+
+                        <!-- 13 Niche Checkbox Selection Grid (Mobile optimized layout, 1-col on mobile, 2-col on desktop) -->
+                        <div class="bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
+                            <h4 id="lbl-select-niches" class="text-[10px] font-bold text-amberAccent mb-3 uppercase tracking-wider text-left">SELECT WORKSPACE MODULE CHANNELS</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2.5 bg-black/50 border border-neutral-900 rounded-xl font-mono text-[11px] text-left select-none">
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Xerox Matrix" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-xerox">Xerox Matrix</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Photo Studio" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-photo">Photo Studio Suite</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Custom Frames" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-frames">Custom Photo Frames</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Stationery Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-stationery">Stationery Zone POS</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Premium Gifts Zone" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-gifts">Premium Gifts Zone</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Mobile & Tech" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-mobile">Mobile Repair & Tech</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Printing & Tech Suite" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-printing">Printing Suite POS</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Internet Cafe & e-Sevai / CSC" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-esevai">e-Sevai & CSC Portal</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Toys Zone & Meesho Packing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-toys">Toys Zone & Meesho Packing</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Money Transfer Ledger" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-money_transfer">Money Transfer Ledger</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Welding/Fabrication Works" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-fabrication">Welding & SS Fabrication</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Bakery Core Counter" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-bakery">Bakery Core Counter</span>
+                                </label>
+                                <label class="flex items-center space-x-2.5 cursor-pointer py-1">
+                                    <input type="checkbox" value="Tea Shop Quick Billing" checked onchange="recalculateOnboardingPriceEstimation()" class="niche-checkbox accent-amberAccent rounded border-neutral-800 bg-neutral-950 w-4 h-4 shrink-0">
+                                    <span id="niche-lbl-teashop">Tea Shop Quick POS</span>
+                                </label>
+                            </div>
+
+                            <!-- Live Price Estimation & Marketing Plan Badge row -->
+                            <div class="border-t border-neutral-800/80 mt-4 pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
+                                <div class="text-neutral-400 text-center sm:text-left">
+                                    <span id="lbl-estimated-amount">Estimated Total Package Plan Amount:</span>
+                                    <span class="text-amberAccent font-bold block sm:inline mt-0.5 sm:mt-0">₹ <span id="onboarding-total-estimate">1950.00</span></span>
+                                </div>
+                                <div class="text-center shrink-0">
+                                    <span id="lbl-saas-status" class="block text-[8px] text-neutral-500 uppercase tracking-widest font-semibold mb-1">SaaS License Status:</span>
+                                    <span id="lbl-trial-badge" class="bg-amberAccent/10 text-amberAccent text-[9px] font-bold px-2.5 py-1 rounded border border-amberAccent/20">Mapped under 30-Day Risk-Free Trial Package</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Human Verification Block (CAPTCHA) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center bg-neutral-900/60 p-4 rounded-xl border border-neutral-800">
+                            <div>
+                                <label id="lbl-captcha" class="block text-[10px] font-bold text-amberAccent mb-1.5 uppercase tracking-wider text-left">HUMAN VERIFICATION</label>
+                                <div class="text-sm font-bold text-white font-mono bg-neutral-950/80 py-2.5 px-3 rounded-lg border border-neutral-800/60 text-center tracking-widest select-none">
+                                    <span id="captcha-var-a">5</span> + <span id="captcha-var-b">3</span> = ?
+                                </div>
+                            </div>
+                            <div>
+                                <label id="lbl-captcha-answer" class="block text-[10px] font-bold text-neutral-400 mb-1.5 uppercase tracking-wider text-left">Enter Code</label>
+                                <input id="reg-captcha-input" type="text" oninput="verifyCaptchaValue()" required placeholder="Answer" class="w-full glass-input text-sm rounded-xl py-2 px-3 text-white outline-none font-mono text-center">
+                            </div>
+                        </div>
+
+                        <button id="btn-submit-reg" type="submit" disabled class="w-full bg-emeraldAccent hover:bg-emerald-500 text-neutral-950 disabled:opacity-40 disabled:cursor-not-allowed font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-all mt-4 shadow-[0_0_20px_rgba(16,185,129,0.12)]">
+                            SUBMIT ONBOARDING REGISTER
+                        </button>
+                    </form>
+
+                    <!-- Clickable inline switch link back to sign-in -->
+                    <div class="text-center pt-3 border-t border-neutral-900/60 mt-4">
+                        <a href="#" onclick="switchAuthMode('login')" id="link-switch-to-login" class="text-xs text-amberAccent hover:underline tracking-wide font-semibold uppercase">Already registered? Sign In</a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Operational System Toast Notifications Component -->
+    <div id="ui-toast" class="fixed bottom-6 right-6 glass-panel py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.8-8.793a.75.75 0 00-1.06-1.06L9 11.94 7.26 10.2a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.06 0l4.5-4.5z" clip-rule="evenodd" />
+        </svg>
+        <span id="toast-message-body">Operational execution success.</span>
+    </div>
+
+    <!-- Statutory Platform Footer -->
+    <footer class="relative z-10 border-t border-neutral-900 bg-neutral-950/40 py-4 shrink-0">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-neutral-500 font-mono gap-2 uppercase tracking-wider font-semibold">
+            <span>© 2026 ROAJI ECOSYSTEM. ALL CHANNELS ENCRYPTED.</span>
+            <!-- Clicking compliance text toggles the hidden sandboxed panel dynamically for debugging convenience -->
+            <span id="lang-footer-desc" class="cursor-pointer hover:text-amberAccent transition-colors text-center" onclick="toggleConfigLogPanel()">Statutory authorization metrics compliant under ISO/IEC 27001 standard.</span>
+        </div>
+    </footer>
+
+    <!-- Core Security & Onboarding Execution Scripts -->
+    <script>
+        // Global Admin Constant (Strict Refactoring Constants)
+        const SUPER_ADMIN_EMAIL = "iamajithkumar98@gmail.com";
+
+        // System state matrices
+        let activeLanguageContext = "en";
+        let currentAuthTab = "login"; // 'login' or 'register'
+        let registeredShopsArray = [];
+        let systemMaintenanceFlag = false;
+        let captchaResultSum = 8; // static fallback
+
+        // Structured English / Tamil Translation Dictionary Matrix (Safely isolates 0% Console Bugs)
+        const appTranslationMatrix = {
+            en: {
+                appHeader: "ROAJI",
+                secLoginSubtitle: "ROAJI BILLING SOFTWARE",
+                secLoginSubtext: "Enter credentials to unlock context",
+                tabLogin: "SIGN IN",
+                tabRegister: "ONBOARD SHOP",
+                lblEmail: "OFFICIAL EMAIL ADDRESS",
+                lblPassword: "SECURE ACCESS PASSWORD",
+                btnSubmitLogin: "SIGN IN",
+                lblRegMerchant: "MERCHANT OWNER NAME",
+                lblRegShop: "SHOP / FRANCHISE NAME",
+                lblRegEmail: "OFFICIAL EMAIL ADDRESS",
+                lblRegPassword: "SECURE ACCESS PASSWORD",
+                lblRegMobile: "CONTACT MOBILE NUMBER",
+                lblRegAddress: "CORPORATE SHOP ADDRESS",
+                lblSelectNiches: "SELECT WORKSPACE MODULE CHANNELS",
+                lblCaptcha: "HUMAN VERIFICATION",
+                btnSubmitReg: "SUBMIT ONBOARDING REGISTER",
+                maintHeader: "GATEWAY LOCKED",
+                maintDesc: "System maintenance active. Access is temporarily restricted. Onboarding and validation pathways are locked.",
+                lblEstimatedAmount: "Estimated Total Package Plan Amount:",
+                lblSaasStatus: "SaaS License Status:",
+                lblTrialBadge: "Mapped under 30-Day Risk-Free Trial Package",
+                placeholderAddress: "Enter physical store address details...",
+                toastRegPending: "Onboarding request submitted! Pending Super Admin Approval.",
+                toastRegEmailDup: "Registration failed. Email is already allocated.",
+                toastAdminRedirect: "Master Admin credentials detected! Redirecting to Super Admin Portal...",
+                toastLoginSuccess: "Credentials authenticated successfully! Routing to shop resolver...",
+                toastLoginFailed: "Invalid email/password or pending admin approval.",
+                toastMaintActive: "SYSTEM LOCK ACTIVE. Gateway access is blocked.",
+                toastConfigSaved: "Maintenance settings updated.",
+                footerDesc: "STATUTORY AUTHORIZATION METRICS COMPLIANT UNDER ISO/IEC 27001 STANDARD.",
+                placeholderEmail: "Enter your official email address",
+                placeholderPassword: "Enter secure password",
+                placeholderMerchant: "e.g. Ajith Kumar",
+                placeholderShop: "e.g. Sri Vari Premium Plaza",
+                placeholderMobile: "+91 94440 XXXXX",
+                lblRememberMe: "Remember Me",
+                linkForgot: "Forgot Password?",
+                toastForgotMsg: "Contact the enterprise system administrator to initiate password restoration.",
+                linkToRegister: "New Registration",
+                linkToLogin: "Already registered? Sign In",
+                "niche-lbl-xerox": "Xerox Matrix",
+                "niche-lbl-photo": "Photo Studio Suite",
+                "niche-lbl-frames": "Custom Photo Frames",
+                "niche-lbl-stationery": "Stationery Zone POS",
+                "niche-lbl-gifts": "Premium Gifts Zone",
+                "niche-lbl-mobile": "Mobile Repair & Tech",
+                "niche-lbl-printing": "Printing Suite POS",
+                "niche-lbl-esevai": "e-Sevai & CSC Portal",
+                "niche-lbl-toys": "Toys Zone & Meesho Packing",
+                "niche-lbl-money_transfer": "Money Transfer Ledger",
+                "niche-lbl-fabrication": "Welding & SS Fabrication",
+                "niche-lbl-bakery": "Bakery Core Counter",
+                "niche-lbl-teashop": "Tea Shop Quick POS"
+            },
+            ta: {
+                appHeader: "ரோஜி",
+                secLoginSubtitle: "ரோஜி பில்லிங் சாப்ட்வேர்",
+                secLoginSubtext: "அணுகலைத் திறக்க நற்சான்றிதழ்களை உள்ளிடவும்",
+                lblEmail: "மின்னஞ்சல் முகவரி",
+                lblPassword: "பாதுகாப்பான கடவுச்சொல்",
+                btnSubmitLogin: "உள்நுழைக",
+                lblRegMerchant: "வணிகர் உரிமையாளர் பெயர்",
+                lblRegShop: "கடை / உரிமையாளர் பெயர்",
+                lblRegEmail: "மின்னஞ்சல் முகவரி",
+                lblRegPassword: "பாதுகாப்பான கடவுச்சொல்",
+                lblRegMobile: "தொடர்பு கைபேசி எண்",
+                lblRegAddress: "அலுவலக கடை முகவரி",
+                lblSelectNiches: "பணி இட தொகுப்புத் துறைகளைத் தேர்ந்தெடுக்கவும்",
+                lblCaptcha: "மனித சரிபார்ப்பு",
+                btnSubmitReg: "பதிவு செய்து செயல்படுத்தவும்",
+                maintHeader: "நுழைவாயில் முடக்கப்பட்டுள்ளது",
+                maintDesc: "கணினி பராமரிப்பு வேலைகள் நடக்கின்றன. அனுமதி தற்காலிகமாக நிறுத்தப்பட்டுள்ளது.",
+                lblEstimatedAmount: "மதிப்பிடப்பட்ட மொத்த தொகுப்புத் திட்டக் கட்டணம்:",
+                lblSaasStatus: "SaaS உரிம நிலை:",
+                lblTrialBadge: "30 நாட்கள் ஆபத்தில்லாத சோதனை தொகுப்பு",
+                placeholderAddress: "கடையின் முகவரி விபரங்களை உள்ளிடவும்...",
+                toastRegPending: "பதிவு விண்ணப்பம் சமர்ப்பிக்கப்பட்டது! சூப்பர் அட்மின் ஒப்புதலுக்காக காத்திருக்கிறது.",
+                toastRegEmailDup: "பதிவு தோல்வியடைந்தது. இந்த மின்னஞ்சல் ஏற்கனவே பயன்படுத்தப்பட்டுள்ளது.",
+                toastAdminRedirect: "சூப்பர் அட்மின் கணக்கு கண்டறியப்பட்டது! அங்கீகாரப் பக்கத்திற்குத் திருப்பிவிடப்படுகிறது...",
+                toastLoginSuccess: "அங்கீகாரம் வெற்றிகரமாக முடிந்தது! சாதனத் தேர்வுக்குத் திருப்பிவிடப்படுகிறது...",
+                toastLoginFailed: "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல் அல்லது ஒப்புதல் நிலுவையில் உள்ளது.",
+                toastMaintActive: "கணினி முடக்கம் செயலில் உள்ளது. போர்ட்டல் அணுகல் தடுக்கப்பட்டுள்ளது.",
+                toastConfigSaved: "பராமரிப்பு அமைப்புகள் சேமிக்கப்பட்டன.",
+                footerDesc: "ISO/IEC 27001 தரத்தின்படி பாதுகாக்கப்பட்டது.",
+                placeholderEmail: "அதிகாரப்பூர்வ மின்னஞ்சல் முகவரியை உள்ளிடவும்",
+                placeholderPassword: "பாதுகாப்பான கடவுச்சொல்லை உள்ளிடவும்",
+                placeholderMerchant: "எ.கா. அஜித் குமார்",
+                placeholderShop: "எ.கா. ஸ்ரீ வாரி பிரீமியம் பிளாசா",
+                placeholderMobile: "+91 94440 XXXXX",
+                lblRememberMe: "நினைவில் வை",
+                linkForgot: "கடவுச்சொல் மறந்துவிட்டதா?",
+                toastForgotMsg: "கடவுச்சொல்லை மீட்டமைக்க கணினி நிர்வாகியைத் தொடர்பு கொள்ளவும்.",
+                linkToRegister: "புதிய பதிவு",
+                linkToLogin: "ஏற்கனவே கணக்கு உள்ளதா? உள்நுழைக",
+                "niche-lbl-xerox": "ஜெராக்ஸ் மேட்ரிக்ஸ்",
+                "niche-lbl-photo": "புகைப்பட ஸ்டுடியோ",
+                "niche-lbl-frames": "விருப்ப புகைப்பட பிரேம்கள்",
+                "niche-lbl-stationery": "ஸ்டேஷனரி சோன் பில்லிங்",
+                "niche-lbl-gifts": "பிரீமியம் பரிசுகள் சோன்",
+                "niche-lbl-mobile": "மொபைல் பழுதுபார்ப்பு & டெக்",
+                "niche-lbl-printing": "பிரிண்டிங் சூட் பில்லிங்",
+                "niche-lbl-esevai": "இ-சேவை & சிஎஸ்சி போர்ட்டல்",
+                "niche-lbl-toys": "பொம்மைகள் & மீஷோ பேக்கிங்",
+                "niche-lbl-money_transfer": "பண பரிமாற்ற பில்லிங்",
+                "niche-lbl-fabrication": "வெல்டிங் & ஃபேப்ரிகேஷன்",
+                "niche-lbl-bakery": "பேக்கரி கவுண்டர் பில்லிங்",
+                "niche-lbl-teashop": "டீ Shop விரைவு பில்லிங்"
+            }
+        };
+
+        // DOM Content Loaded Initializer Hook
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeDatabaseMockSeeds();
+            synchronizeStateAndLogs();
+            generateCaptchaNumbers();
+            mutateLanguageContext('en');
+            pollMaintenanceInterceptorState();
+            
+            // Attach form submission event listeners inside script block with complete error safety try-catch
+            try {
+                const loginForm = document.getElementById('login-form-container');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', window.executeStandardLogin);
+                }
+                const registerForm = document.getElementById('register-form-container');
+                if (registerForm) {
+                    registerForm.addEventListener('submit', window.executeMerchantOnboarding);
+                }
+            } catch (err) {
+                console.error("Forms submission setup error:", err);
+            }
+            
+            setInterval(pollMaintenanceInterceptorState, 2500); // Continuous safety check loop
+        });
+
+        // Seed default parameters to localStorage context if keys do not exist
+        function initializeDatabaseMockSeeds() {
+            try {
+                if (!localStorage.getItem('roaji_shops')) {
+                    const defaultVerifiedUser = {
+                        merchantName: "Ajith Kumar",
+                        name: "SRI VARI PREMIUM PLAZA",
+                        email: "demo@roaji.com",
+                        password: "password123",
+                        phone: "+91 94440 98765",
+                        address: "12, Cathedral Road, Chennai",
+                        status: "Verified", // Active out-of-the-box
+                        package: "Active_Lifetime_Free",
+                        // String mapping keys of the 13 niches to align with the core catalog structure
+                        selectedShops: [
+                            "Xerox Matrix", "Photo Studio", "Custom Frames", "Stationery Zone", "Premium Gifts Zone", 
+                            "Mobile & Tech", "Printing & Tech Suite", "Internet Cafe & e-Sevai / CSC", "Toys Zone & Meesho Packing", "Money Transfer Ledger", "Welding/Fabrication Works", 
+                            "Bakery Core Counter", "Tea Shop Quick POS"
+                        ]
+                    };
+                    localStorage.setItem('roaji_shops', JSON.stringify([defaultVerifiedUser]));
+                }
+
+                if (!localStorage.getItem('roaji_maintenance_mode')) {
+                    localStorage.setItem('roaji_maintenance_mode', "OFF");
+                }
+            } catch (err) {
+                console.error("Database seed execution error:", err);
+            }
+        }
+
+        // Pull array from localStorage
+        function synchronizeStateAndLogs() {
+            try {
+                const rawShops = localStorage.getItem('roaji_shops');
+                registeredShopsArray = JSON.parse(rawShops) || [];
+            } catch (e) {
+                registeredShopsArray = [];
+            }
+
+            // Sync diagnostics display in sandbox safely
+            try {
+                const diagContainer = document.getElementById('sandbox-diag-accounts');
+                if (diagContainer) {
+                    if (registeredShopsArray.length === 0) {
+                        diagContainer.textContent = "No accounts registered in `roaji_shops` database.";
+                    } else {
+                        diagContainer.innerHTML = '';
+                        registeredShopsArray.forEach((user, idx) => {
+                            if (user) {
+                                const div = document.createElement('div');
+                                div.className = "border-b border-neutral-900 pb-1 mb-1 last:border-0 text-left";
+                                div.innerHTML = `
+                                    <span class="text-amberAccent">[${idx+1}]</span> <strong>${user.name || 'Unnamed'}</strong> (${user.email || 'No email'})<br>
+                                    <span class="text-neutral-500">Status:</span> <span class="text-emeraldAccent font-semibold">${user.status || 'Active_Lifetime_Free'}</span> | <span class="text-neutral-500">Channels:</span> ${user.selectedShops ? user.selectedShops.length : 0}
+                                `;
+                                diagContainer.appendChild(div);
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error("Diagnostics dashboard rendering error:", err);
+            }
+        }
+
+        // Inline CAPTCHA generation utility
+        function generateCaptchaNumbers() {
+            const a = Math.floor(Math.random() * 9) + 1;
+            const b = Math.floor(Math.random() * 9) + 1;
+            
+            captchaResultSum = a + b;
+
+            const varA = document.getElementById('captcha-var-a');
+            const varB = document.getElementById('captcha-var-b');
+            const captchaInput = document.getElementById('reg-captcha-input');
+            const btnSubmit = document.getElementById('btn-submit-reg');
+
+            if (varA) varA.textContent = a;
+            if (varB) varB.textContent = b;
+            if (captchaInput) captchaInput.value = '';
+            if (btnSubmit) btnSubmit.disabled = true;
+        }
+
+        // Continuous flag check validator (Part 10 safety maintenance overlay feature)
+        function pollMaintenanceInterceptorState() {
+            try {
+                const flag = localStorage.getItem('roaji_maintenance_mode');
+                const overlay = document.getElementById('maintenance-overlay');
+                if (flag === "ON") {
+                    systemMaintenanceFlag = true;
+                    if (overlay) {
+                        overlay.classList.remove('hidden');
+                        overlay.classList.add('flex');
+                    }
+                } else {
+                    systemMaintenanceFlag = false;
+                    if (overlay) {
+                        overlay.classList.add('hidden');
+                        overlay.classList.remove('flex');
+                    }
+                }
+            } catch (err) {
+                console.error("Maintenance lock flag polling error:", err);
+            }
+        }
+
+        // Page navigation simulation switcher to cleanly toggle views (Eradicates duplicate display issues)
+        function switchAuthMode(mode) {
+            if (systemMaintenanceFlag) {
+                const t = appTranslationMatrix[activeLanguageContext];
+                triggerUINotification(t ? t.toastMaintActive : "SYSTEM LOCK ACTIVE. Gateway access is blocked.");
+                return;
+            }
+
+            currentAuthTab = mode;
+            const viewLogin = document.getElementById('login-tab-view');
+            const viewRegister = document.getElementById('register-tab-view');
+
+            if (mode === 'login') {
+                if (viewLogin) {
+                    viewLogin.classList.remove('hidden');
+                    viewLogin.style.display = 'block';
+                }
+                if (viewRegister) {
+                    viewRegister.classList.add('hidden');
+                    viewRegister.style.display = 'none';
+                }
+            } else {
+                if (viewRegister) {
+                    viewRegister.classList.remove('hidden');
+                    viewRegister.style.display = 'block';
+                }
+                if (viewLogin) {
+                    viewLogin.classList.add('hidden');
+                    viewLogin.style.display = 'none';
+                }
+                generateCaptchaNumbers();
+                recalculateOnboardingPriceEstimation();
+            }
+        }
+
+        // Fallback simulation support for classic horizontal tab row selector
+        function switchAuthTab(tab) {
+            switchAuthMode(tab);
+        }
+
+        // Onboarding Checkbox slasher math calculation (Only runs when register tab is visible to prevent console errors)
+        function recalculateOnboardingPriceEstimation() {
+            if (currentAuthTab !== 'register') return;
+
+            const checkboxes = document.querySelectorAll('.niche-checkbox');
+            let selectedCount = 0;
+
+            checkboxes.forEach(box => {
+                if (box && box.checked) selectedCount++;
+            });
+
+            // Base pricing overrides lookup (₹150 standard fallback)
+            let baseRate = 150.00;
+            try {
+                const ratesText = localStorage.getItem('roaji_global_pricing_rules');
+                if (ratesText) {
+                    const rules = JSON.parse(ratesText);
+                    if (rules && rules.niche_rate !== undefined) {
+                        baseRate = parseFloat(rules.niche_rate);
+                    }
+                }
+            } catch (e) {
+                baseRate = 150.00;
+            }
+
+            const estimatedSum = selectedCount * baseRate;
+            const estimateElement = document.getElementById('onboarding-total-estimate');
+            if (estimateElement) {
+                estimateElement.textContent = estimatedSum.toFixed(2);
+            }
+        }
+
+        // Check if entered captcha equals sum values to unlock submission
+        function verifyCaptchaValue() {
+            const captchaInput = document.getElementById('reg-captcha-input');
+            const enteredVal = captchaInput ? parseInt(captchaInput.value) || 0 : 0;
+            const btnSubmit = document.getElementById('btn-submit-reg');
+
+            if (btnSubmit) {
+                if (enteredVal === captchaResultSum) {
+                    btnSubmit.disabled = false;
+                } else {
+                    btnSubmit.disabled = true;
+                }
+            }
+        }
+
+        // Password input visibility eye-toggler utility
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            const iconLogin = document.getElementById('eye-icon-login');
+            const iconReg = document.getElementById('eye-icon-reg');
+            
+            const activeIcon = id === 'login-password' ? iconLogin : iconReg;
+
+            if (input && input.type === "password") {
+                input.type = "text";
+                if (activeIcon) {
+                    activeIcon.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.477 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    `;
+                }
+            } else if (input) {
+                input.type = "password";
+                if (activeIcon) {
+                    activeIcon.innerHTML = `
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    `;
+                }
+            }
+        }
+
+        // Safe Element Text Updater
+        function safeSetText(id, text) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = text;
+            }
+        }
+
+        // Safe Element Placeholder Updater
+        function safeSetPlaceholder(id, text) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.setAttribute('placeholder', text);
+            }
+        }
+
+        // Error-free Bilingual translation context swapper safely isolating existing properties (Bypass Language Mutation Bug)
+        function mutateLanguageContext(lang) {
+            activeLanguageContext = lang;
+            const t = appTranslationMatrix[lang];
+
+            // 1. Strictly translate only DOM elements existing inside index.html entryway to prevent null exceptions
+            safeSetText('app-brand-title', t.appHeader);
+            safeSetText('sec-login-subtitle', t.secLoginSubtitle);
+            safeSetText('sec-login-subtext', t.secLoginSubtext);
+
+            // Login Labels & subtext configs
+            safeSetText('lbl-login-email', t.lblEmail);
+            safeSetText('lbl-login-password', t.lblPassword);
+            safeSetText('lbl-remember-me', t.lblRememberMe);
+            safeSetText('link-forgot-password', t.linkForgot);
+            safeSetText('btn-submit-login', t.btnSubmitLogin);
+            safeSetText('link-switch-to-register', t.linkToRegister);
+            safeSetText('link-switch-to-login', t.linkToLogin);
+
+            // Register Labels
+            safeSetText('lbl-new-reg-section', t.lblNewRegSection);
+            safeSetText('desc-new-reg-section', t.descNewRegSection);
+            safeSetText('lbl-reg-merchant', t.lblRegMerchant);
+            safeSetText('lbl-reg-shop', t.lblRegShop);
+            safeSetText('lbl-reg-email', t.lblRegEmail);
+            safeSetText('lbl-reg-password', t.lblRegPassword);
+            safeSetText('lbl-reg-mobile', t.lblRegMobile);
+            safeSetText('lbl-reg-address', t.lblRegAddress);
+            safeSetText('lbl-select-niches', t.lblSelectNiches);
+            safeSetText('lbl-captcha', t.lblCaptcha);
+            safeSetText('btn-submit-reg', t.btnSubmitReg);
+            safeSetText('lbl-estimated-amount', t.lblEstimatedAmount);
+            safeSetText('lbl-saas-status', t.lblSaasStatus);
+            safeSetText('lbl-trial-badge', t.lblTrialBadge);
+
+            // Maintain niches checklists translated names
+            const nichesList = ["xerox", "photo", "frames", "stationery", "gifts", "mobile", "printing", "esevai", "toys", "money_transfer", "fabrication", "bakery", "teashop"];
+            nichesList.forEach(niche => {
+                safeSetText(`niche-lbl-${niche}`, t[`niche-lbl-${niche}`]);
+            });
+
+            // Maintenance Banner labels
+            safeSetText('lang-maint-header', t.maintHeader);
+            safeSetText('lang-maint-desc', t.maintDesc);
+
+            // Placeholders Sync
+            safeSetPlaceholder('login-email', t.placeholderEmail);
+            safeSetPlaceholder('login-password', t.placeholderPassword);
+            safeSetPlaceholder('reg-merchant-name', t.placeholderMerchant);
+            safeSetPlaceholder('reg-shop-name', t.placeholderShop);
+            safeSetPlaceholder('reg-email', t.placeholderEmail);
+            safeSetPlaceholder('reg-password', t.placeholderPassword);
+            safeSetPlaceholder('reg-mobile', t.placeholderMobile);
+            safeSetPlaceholder('reg-address', t.placeholderAddress);
+
+            // Static Footer translations
+            safeSetText('lang-footer-desc', t.footerDesc);
+
+            // Setup buttons active classes UI language button indicators
+            const toggleEnBtn = document.getElementById('lang-toggle-en');
+            const toggleTaBtn = document.getElementById('lang-toggle-ta');
+            if (lang === 'en') {
+                if (toggleEnBtn) toggleEnBtn.className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                if (toggleTaBtn) toggleTaBtn.className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            } else {
+                if (toggleTaBtn) toggleTaBtn.className = 'px-3 py-1 text-[11px] font-bold rounded transition-all bg-amberAccent text-neutral-950 font-mono';
+                if (toggleEnBtn) toggleEnBtn.className = 'px-3 py-1 text-[11px] font-bold rounded transition-all text-neutral-400 font-mono';
+            }
+        }
+
+        // Onboard Form Dynamic Registration Pipeline (Injects payload with pending approvals status)
+        window.executeMerchantOnboarding = function(event) {
+            if (event) {
+                event.preventDefault();
+            }
+
+            if (systemMaintenanceFlag) {
+                const t = appTranslationMatrix[activeLanguageContext];
+                triggerUINotification(t ? t.toastMaintActive : "SYSTEM LOCK ACTIVE. Gateway access is blocked.");
+                return;
+            }
+
+            try {
+                // 1. Defensive Programming: Verify all DOM elements exist before accessing properties (Prevent toLowerCase errors)
+                const merchantNameEl = document.getElementById('reg-merchant-name');
+                const shopNameEl = document.getElementById('reg-shop-name');
+                const emailEl = document.getElementById('reg-email');
+                const passwordEl = document.getElementById('reg-password');
+                const mobileEl = document.getElementById('reg-mobile');
+                const addressEl = document.getElementById('reg-address');
+
+                if (!merchantNameEl || !merchantNameEl.value.trim()) {
+                    triggerUINotification("Merchant Owner Name is required!");
+                    return;
+                }
+                if (!shopNameEl || !shopNameEl.value.trim()) {
+                    triggerUINotification("Shop / Franchise Name is required!");
+                    return;
+                }
+                if (!emailEl || !emailEl.value.trim()) {
+                    triggerUINotification("Official Email Address is required!");
+                    return;
+                }
+                if (!passwordEl || !passwordEl.value) {
+                    triggerUINotification("Secure Access Password is required!");
+                    return;
+                }
+                if (!mobileEl || !mobileEl.value.trim()) {
+                    triggerUINotification("Contact Mobile Number is required!");
+                    return;
+                }
+                if (!addressEl || !addressEl.value.trim()) {
+                    triggerUINotification("Corporate Shop Address is required!");
+                    return;
+                }
+
+                const merchantName = merchantNameEl.value.trim();
+                const shopName = shopNameEl.value.trim();
+                const email = emailEl.value.trim().toLowerCase();
+                const password = passwordEl.value;
+                const mobile = mobileEl.value.trim();
+                const address = addressEl.value.trim();
+
+                // 2. Array Safety: Ensure the datastore array is fully initialized as an array
+                if (!Array.isArray(registeredShopsArray)) {
+                    const rawShops = localStorage.getItem('roaji_shops');
+                    try {
+                        registeredShopsArray = JSON.parse(rawShops) || [];
+                    } catch (e) {
+                        registeredShopsArray = [];
+                    }
+                    if (!Array.isArray(registeredShopsArray)) {
+                        registeredShopsArray = [];
+                    }
+                }
+
+                // Safeguard duplicate verification check
+                const emailExists = registeredShopsArray.some(user => {
+                    return user && typeof user.email === 'string' && user.email.toLowerCase() === email;
+                });
+
+                if (emailExists) {
+                    const t = appTranslationMatrix[activeLanguageContext];
+                    triggerUINotification(t ? t.toastRegEmailDup : "Registration failed. Email is already allocated.");
+                    return;
+                }
+
+                // Pack array list of selected store niche module names
+                const selectedNiches = [];
+                document.querySelectorAll('.niche-checkbox').forEach(box => {
+                    if (box && box.checked) {
+                        selectedNiches.push(box.value);
+                    }
+                });
+
+                const estimateElement = document.getElementById('onboarding-total-estimate');
+                const estimateAmount = estimateElement ? parseFloat(estimateElement.textContent) || 0 : 0;
+
+                // Construct onboarding profile payload with status "PENDING_SUPER_ADMIN_APPROVAL"
+                const newMerchant = {
+                    merchantName: merchantName,
+                    name: shopName,
+                    email: email,
+                    password: password,
+                    phone: mobile,
+                    address: address,
+                    status: "PENDING_SUPER_ADMIN_APPROVAL",
+                    package: "Active_Lifetime_Free",
+                    selectedShops: selectedNiches,
+                    slashedInvoicesCount: 1000,
+                    daysValidity: 365,
+                    estimatedPlanAmount: estimateAmount
+                };
+
+                // Append payload to database variable array and write back to storage cleanly
+                registeredShopsArray.push(newMerchant);
+                localStorage.setItem('roaji_shops', JSON.stringify(registeredShopsArray));
+
+                // Reset registration fields safely
+                merchantNameEl.value = '';
+                shopNameEl.value = '';
+                emailEl.value = '';
+                passwordEl.value = '';
+                mobileEl.value = '';
+                addressEl.value = '';
+
+                const captchaInput = document.getElementById('reg-captcha-input');
+                if (captchaInput) {
+                    captchaInput.value = '';
+                }
+
+                // Sync diagnostics panel and switch view cleanly back to active sign-in view
+                synchronizeStateAndLogs();
+                switchAuthMode('login');
+
+                const t = appTranslationMatrix[activeLanguageContext];
+                triggerUINotification(t ? t.toastRegPending : "Onboarding request submitted! Pending Super Admin Approval.");
+
+            } catch (error) {
+                console.error("Critical onboarding pipeline error:", error);
+                triggerUINotification("An error occurred during onboarding. Please check input parameters.");
+            }
+        };
+
+        // Toggle Configurations Panel Drawer
+        function toggleConfigLogPanel() {
+            const panel = document.getElementById('configs-drawer-panel');
+            if (panel) {
+                panel.classList.toggle('hidden');
+            }
+        }
+
+        // Override Maintenance Status
+        function overrideMaintenance(state) {
+            localStorage.setItem('roaji_maintenance_mode', state);
+            pollMaintenanceInterceptorState();
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastConfigSaved);
+        }
+
+        // Flush and seed demo parameters to database
+        function forceCleanResetSeed() {
+            localStorage.removeItem('roaji_shops');
+            initializeDatabaseMockSeeds();
+            synchronizeStateAndLogs();
+            triggerUINotification("Databases cleared and seed values re-installed.");
+        }
+
+        // Trigger Forgot Password Notification safely
+        function triggerForgotPasswordToast() {
+            triggerUINotification(appTranslationMatrix[activeLanguageContext].toastForgotMsg);
+        }
+
+        // System Alert Toast notifications utility
+        function triggerUINotification(message) {
+            const toast = document.getElementById('ui-toast');
+            if (toast) {
+                const toastBody = document.getElementById('toast-message-body');
+                if (toastBody) toastBody.textContent = message;
+
+                toast.className = "fixed bottom-6 right-6 glass-capsule py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-0 opacity-100 transition-all duration-300 z-50 flex items-center gap-2";
+
+                setTimeout(() => {
+                    toast.className = "fixed bottom-6 right-6 glass-capsule py-3.5 px-6 rounded-xl border-emeraldAccent/30 text-emeraldAccent text-xs font-mono shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2";
+                }, 3000);
+            }
+        }
+
+        // Window-level global script execution mapping scope hook trigger (Fixes Unresponsive Login Button Freeze)
+        window.executeStandardLogin = function(event) {
+            event.preventDefault();
+            if (systemMaintenanceFlag) {
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastMaintActive);
+                return;
+            }
+
+            // Get email/password values directly from elements safely
+            const emailEl = document.getElementById('login-email');
+            const passwordEl = document.getElementById('login-password');
+            if (!emailEl || !passwordEl) return;
+
+            const email = emailEl.value.trim();
+            const password = passwordEl.value;
+
+            // Interceptor 1: Master Super Admin Bypass Gate check (Fixes downstream panel crash with secure parameter token)
+            if (email.toLowerCase() === SUPER_ADMIN_EMAIL) {
+                // Clear any legacy session states and write valid stringified JSON claims token to sessionStorage
+                sessionStorage.removeItem('roaji_session_claims');
+                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: email, role: "SUPER_ADMIN", status: "active" }));
+                
+                // Write standard administrative values in roaji_shops_active for backwards compatibility
+                localStorage.setItem('roaji_shops_active', JSON.stringify({ name: "Ajith Kumar", phone: "94440 XXXXX", address: "Root Hub, Chennai" }));
+
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastAdminRedirect);
+                setTimeout(() => {
+                    // Unconditional immediate routing hook
+                    window.location.replace("super_admin_panel.html?auth=true");
+                }, 1500);
+                return;
+            }
+
+            // Interceptor 2: Standard Tenant Merchant validation search
+            const matchUser = registeredShopsArray.find(user => 
+                user && user.email && user.email.toLowerCase() === email.toLowerCase() && user.password === password
+            );
+
+            if (matchUser) {
+                // Verify account is approved
+                if (matchUser.status === "PENDING_SUPER_ADMIN_APPROVAL") {
+                    triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginFailed);
+                    return;
+                }
+
+                // Stringify proper JSON object payload to sessionStorage key "roaji_session_claims"
+                sessionStorage.setItem('roaji_session_claims', JSON.stringify({ email: matchUser.email, role: "OWNER", status: "active" }));
+                localStorage.setItem('roaji_active_shop_session', JSON.stringify(matchUser));
+                
+                // Backward compatible object seed mapping required by POS modules
+                const compatibilityMeta = {
+                    name: matchUser.name,
+                    phone: matchUser.phone,
+                    address: matchUser.address || "Main Plaza Outlet, Chennai",
+                    gstin: matchUser.gstin || "33AACCS1032F1ZA"
+                };
+                localStorage.setItem('roaji_shops_active', JSON.stringify(compatibilityMeta));
+
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginSuccess);
+                setTimeout(() => {
+                    window.location.href = "shop_resolver.html";
+                }, 1500);
+            } else {
+                // Authentication variables mismatch block
+                triggerUINotification(appTranslationMatrix[activeLanguageContext].toastLoginFailed);
+            }
+        };
     </script>
 </body>
 </html>
