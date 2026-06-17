@@ -1,52 +1,45 @@
 /**
- * Roaji Billing Pro - Business Logic Layer
- * Handles core financial calculations and tax applications.
+ * Roaji Billing Pro - Business Logic Engine
+ * Core calculation functions for processing invoice data.
  */
 
 /**
- * Calculates the subtotal from an array of products.
- * @param {Array} items - Array of objects containing price and quantity.
- * @returns {number} The sum of all item totals.
+ * Calculates the subtotal from an array of items.
+ * @param {Array} items - Array of objects { price: number, quantity: number }
+ * @returns {number} The calculated subtotal.
  */
 export const calculateTotal = (items) => {
-    try {
-        if (!Array.isArray(items)) {
-            throw new Error("Calculation failed: Items must be provided as an array.");
-        }
-
-        return items.reduce((acc, item) => {
-            const price = parseFloat(item.price);
-            const quantity = parseFloat(item.quantity);
-
-            // Validation: Ensure values are numbers and non-negative
-            if (isNaN(price) || isNaN(quantity) || price < 0 || quantity < 0) {
-                console.error("Data Integrity Error: Invalid price or quantity found in item list.", item);
-                return acc;
-            }
-
-            return acc + (price * quantity);
-        }, 0);
-    } catch (error) {
-        console.error("Billing Engine Error:", error.message);
+    if (!Array.isArray(items)) {
+        console.error("Invalid items array provided to calculateTotal.");
         return 0;
     }
+
+    return items.reduce((acc, item) => {
+        const price = parseFloat(item.price) || 0;
+        const quantity = parseFloat(item.quantity) || 0;
+
+        if (price < 0 || quantity < 0) {
+            console.error("Negative values detected during calculation.");
+        }
+
+        return acc + (price * quantity);
+    }, 0);
 };
 
 /**
- * Applies a standard 18% GST to the given subtotal.
+ * Applies 18% GST to the provided subtotal.
  * @param {number} subtotal - The base amount before tax.
- * @returns {number} The total amount including GST, rounded to 2 decimal places.
+ * @returns {number} The final amount including GST, rounded to 2 decimal places.
  */
 export const applyGST = (subtotal) => {
-    const GST_RATE = 0.18; // 18% GST
-
-    if (typeof subtotal !== 'number' || isNaN(subtotal) || subtotal < 0) {
-        console.error("Tax Calculation Error: Invalid subtotal provided.");
+    if (typeof subtotal !== 'number' || isNaN(subtotal)) {
+        console.error("Invalid subtotal provided to applyGST.");
         return 0;
     }
 
-    const totalWithTax = subtotal + (subtotal * GST_RATE);
+    const GST_RATE = 0.18; // Standard 18% GST
+    const finalTotal = subtotal + (subtotal * GST_RATE);
 
-    // Return rounded to 2 decimal places for financial accuracy
-    return Math.round(totalWithTax * 100) / 100;
+    // Return final value rounded to two decimal places
+    return Math.round(finalTotal * 100) / 100;
 };
