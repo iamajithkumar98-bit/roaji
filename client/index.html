@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROAJI - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <div class="flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="bg-slate-900 shadow-xl h-screen z-10 w-full md:w-64">
+            <div class="p-6">
+                <a href="#" class="text-white text-3xl font-bold uppercase hover:text-gray-300">ROAJI</a>
+            </div>
+            <nav class="text-white text-base font-semibold pt-3">
+                <a href="#" class="flex items-center active-nav-link text-white py-4 pl-6 nav-item bg-slate-800 border-l-4 border-blue-500">
+                    <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+                </a>
+                <a href="#" class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item">
+                    <i class="fas fa-file-invoice mr-3"></i> Billing
+                </a>
+                <a href="#" class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item">
+                    <i class="fas fa-boxes mr-3"></i> Inventory
+                </a>
+                <a href="#" class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item">
+                    <i class="fas fa-users mr-3"></i> CRM
+                </a>
+                <a href="#" class="flex items-center text-white opacity-75 hover:opacity-100 py-4 pl-6 nav-item">
+                    <i class="fas fa-chart-line mr-3"></i> Analytics
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="w-full flex-grow p-6">
+            <header class="w-full items-center bg-white py-2 px-6 hidden sm:flex justify-between rounded-lg shadow-md mb-6">
+                <div class="text-xl font-semibold text-gray-700">Business Overview</div>
+                <div class="relative flex items-center">
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        <i class="fas fa-plus mr-2"></i> New Sale
+                    </button>
+                    <div class="ml-4 w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                        <i class="fas fa-user text-gray-600"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Cards Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-md border-b-4 border-green-500">
+                    <p class="text-gray-500 text-sm uppercase">Total Sales</p>
+                    <p class="text-2xl font-bold text-gray-800">₹ 45,200</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border-b-4 border-blue-500">
+                    <p class="text-gray-500 text-sm uppercase">Active Orders</p>
+                    <p class="text-2xl font-bold text-gray-800">12</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border-b-4 border-yellow-500">
+                    <p class="text-gray-500 text-sm uppercase">Stock Alerts</p>
+                    <p class="text-2xl font-bold text-gray-800">03</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border-b-4 border-purple-500">
+                    <p class="text-gray-500 text-sm uppercase">Customers</p>
+                    <p class="text-2xl font-bold text-gray-800">1,240</p>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="bg-white p-6 rounded-lg shadow-md h-64 flex items-center justify-center border-dashed border-2 border-gray-200">
+                <p class="text-gray-400">Main Analytics Chart / Table placeholder</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
